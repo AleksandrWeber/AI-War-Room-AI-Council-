@@ -59,14 +59,27 @@ Default local ports are:
 
 ## Docker Deployment
 
-Build and start the production API container with PostgreSQL and Redis:
+Build the production API and web images:
 
 ```bash
 npm run docker:build
+```
+
+Start the API with PostgreSQL and Redis:
+
+```bash
 npm run docker:up:stack
 ```
 
 The API container runs database migrations on startup, then serves on port `3000`.
+
+Start the full production stack including the nginx web container:
+
+```bash
+npm run docker:up:full
+```
+
+The web container serves the Vite build on port `8080` and proxies `/api` to the API service, so the browser uses same-origin requests without extra CORS configuration.
 
 Readiness checks:
 
@@ -78,6 +91,8 @@ To include the Temporal worker profile (requires a Temporal server reachable at 
 ```bash
 npm run docker:up:temporal
 ```
+
+This starts postgres, redis, api, web, and the temporal worker.
 
 Required production environment variables for the API container:
 
@@ -153,6 +168,13 @@ Run mutation endpoints verify that the request workspace matches the header work
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v5.1` behavior:
+
+- Production web image serves the Vite build through nginx on port `8080`.
+- nginx proxies `/api` to the API container with SSE-friendly settings (`proxy_buffering off`).
+- Docker builds the web app with `VITE_API_URL=/api` for same-origin API calls behind nginx.
+- `npm run docker:up:full` starts postgres, redis, api, and web together.
 
 Current `v5.0` behavior:
 
