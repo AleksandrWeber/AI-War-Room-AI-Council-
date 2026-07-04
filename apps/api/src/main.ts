@@ -21,6 +21,7 @@ export async function bootstrap() {
   app.enableCors({
     origin: webOrigin,
     allowedHeaders: [
+      'Authorization',
       'Content-Type',
       'Last-Event-ID',
       'x-user-id',

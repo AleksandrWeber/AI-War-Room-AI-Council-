@@ -102,6 +102,19 @@ describe('API skeleton', () => {
     })
   })
 
+  it('returns auth capabilities from shared schemas', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/auth/capabilities')
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      provider: 'headers',
+      requiresBearerToken: false,
+      workspaceHeadersRequired: true,
+      guidance: expect.stringContaining('x-user-id'),
+    })
+  })
+
   it('returns run capabilities from shared schemas', async () => {
     const response = await request(app!.getHttpServer())
       .get('/api/runs/capabilities')

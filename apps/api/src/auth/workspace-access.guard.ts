@@ -6,6 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common'
 import type { AuthContext } from '@ai-war-room/schemas'
+import { AuthService } from './auth.service.js'
 import { WorkspaceService } from '../workspaces/workspace.service.js'
 
 type WorkspaceRequestBody = {
@@ -24,10 +25,14 @@ export type AuthenticatedRequest = {
 
 @Injectable()
 export class WorkspaceAccessGuard implements CanActivate {
-  constructor(private readonly workspaceService: WorkspaceService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly workspaceService: WorkspaceService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>()
+    this.authService.assertApiAccess(request)
     const userId = this.getSingleHeader(request.headers['x-user-id'])
     const headerWorkspaceId = this.getSingleHeader(
       request.headers['x-workspace-id'],

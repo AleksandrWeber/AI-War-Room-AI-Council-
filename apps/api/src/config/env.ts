@@ -53,10 +53,18 @@ export const envSchema = z.object({
     .int()
     .positive()
     .default(300_000),
+  AUTH_PROVIDER: z.enum(['headers', 'bearer']).default('headers'),
+  AUTH_BEARER_TOKEN: optionalEnvStringSchema,
 })
 
 export type ApiEnv = z.infer<typeof envSchema>
 
 export function validateEnv(config: Record<string, unknown>): ApiEnv {
-  return envSchema.parse(config)
+  const env = envSchema.parse(config)
+
+  if (env.AUTH_PROVIDER === 'bearer' && !env.AUTH_BEARER_TOKEN) {
+    throw new Error('AUTH_BEARER_TOKEN is required when AUTH_PROVIDER=bearer.')
+  }
+
+  return env
 }

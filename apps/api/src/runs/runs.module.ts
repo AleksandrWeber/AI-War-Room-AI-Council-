@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common'
 import { AgentService } from '../agents/agent.service.js'
 import { ArtifactService } from '../artifacts/artifact.service.js'
-import { WorkspaceAccessGuard } from '../auth/workspace-access.guard.js'
+import { AuthModule } from '../auth/auth.module.js'
 import { LlmModule } from '../llm/llm.module.js'
 import { ModeratorService } from '../moderator/moderator.service.js'
 import { ObservabilityModule } from '../observability/observability.module.js'
@@ -24,6 +24,7 @@ import { RunsService } from './runs.service.js'
   imports: [
     PersistenceModule,
     LlmModule,
+    AuthModule,
     WorkspacesModule,
     UsageModule,
     ObservabilityModule,
@@ -43,7 +44,6 @@ import { RunsService } from './runs.service.js'
       provide: TEMPORAL_RUN_CLIENT,
       useClass: TemporalSdkRunClient,
     },
-    WorkspaceAccessGuard,
   ],
 })
 export class RunsModule {}

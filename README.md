@@ -158,16 +158,36 @@ Tests use an in-memory repository so they do not require Docker.
 
 ## Auth And Workspaces
 
-Current local auth is header-based until a real auth provider is selected:
+Auth provider modes are configured on the API:
+
+- `AUTH_PROVIDER=headers` (default) — local development uses workspace headers only.
+- `AUTH_PROVIDER=bearer` — protected routes also require `Authorization: Bearer <AUTH_BEARER_TOKEN>`.
+
+Discover the active mode from `GET /api/auth/capabilities`.
+
+Local development headers:
 
 - `x-user-id: user_local`
 - `x-workspace-id: local_workspace`
+
+For bearer rollout, set matching tokens on the API and web build:
+
+```bash
+AUTH_PROVIDER=bearer AUTH_BEARER_TOKEN=change-me npm run dev:api
+VITE_AUTH_BEARER_TOKEN=change-me npm run dev:web
+```
 
 Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
 
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v5.2` behavior:
+
+- `GET /api/auth/capabilities` reports whether the API expects header-only or bearer auth.
+- `AUTH_PROVIDER=bearer` gates protected routes with a shared bearer token before workspace checks run.
+- The frontend loads auth capabilities on startup and sends `Authorization` when `VITE_AUTH_BEARER_TOKEN` is configured.
 
 Current `v5.1` behavior:
 

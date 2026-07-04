@@ -1,9 +1,11 @@
 import { Fragment, useEffect, useRef, useState, type FormEvent } from 'react'
 import type {
+  AuthCapabilitiesResponse,
   RunCapabilitiesResponse,
   TemporalRuntimeHealthResponse,
 } from '@ai-war-room/schemas'
 import './App.css'
+import { buildWorkspaceAuthHeaders } from './auth-headers'
 import {
   type TemporalRunStartResponse,
   type TemporalWorkflowRecoveryResponse,
@@ -235,10 +237,6 @@ type TemporalRunStatusResponse = {
 }
 
 const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:3000/api'
-const localAuthHeaders = {
-  'x-user-id': 'user_local',
-  'x-workspace-id': 'local_workspace',
-}
 const reviewStorageKey = 'ai-war-room.review-draft'
 const ideaStorageKey = 'ai-war-room.idea-draft'
 const pipelineResultStorageKey = 'ai-war-room.pipeline-result'
@@ -491,6 +489,9 @@ function App() {
   const [lastStreamRunId, setLastStreamRunId] = useState<string | null>(null)
   const [runCapabilities, setRunCapabilities] =
     useState<RunCapabilitiesResponse | null>(null)
+  const [authCapabilities, setAuthCapabilities] =
+    useState<AuthCapabilitiesResponse | null>(null)
+  const workspaceAuthHeaders = buildWorkspaceAuthHeaders(authCapabilities)
   const [temporalRuntimeHealth, setTemporalRuntimeHealth] =
     useState<TemporalRuntimeHealthResponse | null>(null)
   const useTemporalWorkflowRuntime = shouldUseTemporalRuntime(
@@ -572,6 +573,21 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setApiHealth('offline')
+        }
+      })
+
+    fetch(`${apiBaseUrl}/auth/capabilities`, {
+      signal: controller.signal,
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((capabilities) => {
+        if (capabilities && !controller.signal.aborted) {
+          setAuthCapabilities(capabilities as AuthCapabilitiesResponse)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAuthCapabilities(null)
         }
       })
 
@@ -666,7 +682,7 @@ function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...localAuthHeaders,
+          ...workspaceAuthHeaders,
         },
         body: JSON.stringify({
           workspaceId: 'local_workspace',
@@ -797,7 +813,7 @@ function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...localAuthHeaders,
+          ...workspaceAuthHeaders,
           ...(canReplayStream ? { 'Last-Event-ID': lastStreamEventId } : {}),
         },
         body: JSON.stringify(payload),
@@ -867,7 +883,7 @@ function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          ...localAuthHeaders,
+          ...workspaceAuthHeaders,
         },
         body: JSON.stringify(payload),
       })
@@ -905,7 +921,7 @@ function App() {
         `${apiBaseUrl}/runs/workflows/${workflow.workflowId}/recover`,
         {
           method: 'POST',
-          headers: localAuthHeaders,
+          headers: workspaceAuthHeaders,
         },
       )
 
@@ -947,7 +963,7 @@ function App() {
     options?: { afterEventId?: string | null },
   ) {
     const headers: Record<string, string> = {
-      ...localAuthHeaders,
+      ...workspaceAuthHeaders,
     }
     const afterEventId = options?.afterEventId ?? lastStreamEventIdRef.current
 
@@ -978,7 +994,7 @@ function App() {
       const statusResponse = await fetch(
         `${apiBaseUrl}/runs/workflows/${workflow.workflowId}/status`,
         {
-          headers: localAuthHeaders,
+          headers: workspaceAuthHeaders,
         },
       )
 
@@ -1030,7 +1046,7 @@ function App() {
 
     try {
       const response = await fetch(`${apiBaseUrl}/runs/artifacts/history`, {
-        headers: localAuthHeaders,
+        headers: workspaceAuthHeaders,
       })
 
       if (!response.ok) {
@@ -1057,7 +1073,7 @@ function App() {
       const response = await fetch(
         `${apiBaseUrl}/runs/artifacts/${artifactId}/export/markdown`,
         {
-          headers: localAuthHeaders,
+          headers: workspaceAuthHeaders,
         },
       )
 
@@ -1088,7 +1104,7 @@ function App() {
 
     try {
       const response = await fetch(`${apiBaseUrl}/provider-credentials`, {
-        headers: localAuthHeaders,
+        headers: workspaceAuthHeaders,
       })
 
       if (!response.ok) {
@@ -1125,7 +1141,7 @@ function App() {
           method: providerCredentialForm.credentialId ? 'PUT' : 'POST',
           headers: {
             'Content-Type': 'application/json',
-            ...localAuthHeaders,
+            ...workspaceAuthHeaders,
           },
           body: JSON.stringify({
             providerId: providerCredentialForm.providerId,
@@ -1170,7 +1186,7 @@ function App() {
         `${apiBaseUrl}/provider-credentials/${credentialId}`,
         {
           method: 'DELETE',
-          headers: localAuthHeaders,
+          headers: workspaceAuthHeaders,
         },
       )
 
@@ -1199,7 +1215,7 @@ function App() {
         `${apiBaseUrl}/provider-credentials/${credentialId}/test`,
         {
           method: 'POST',
-          headers: localAuthHeaders,
+          headers: workspaceAuthHeaders,
         },
       )
 

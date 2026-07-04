@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import type { ApiEnv } from '../config/env.js'
+import { AuthModule } from '../auth/auth.module.js'
 import { PersistenceModule } from '../persistence/persistence.module.js'
 import { WorkspacesModule } from '../workspaces/workspaces.module.js'
 import { InMemoryProviderCredentialRepository } from './in-memory-provider-credential.repository.js'
@@ -12,7 +13,7 @@ import { ProviderCredentialsController } from './provider-credentials.controller
 import { ProviderCredentialsService } from './provider-credentials.service.js'
 
 @Module({
-  imports: [PersistenceModule, WorkspacesModule],
+  imports: [PersistenceModule, AuthModule, WorkspacesModule],
   controllers: [ProviderCredentialsController],
   providers: [
     PostgresProviderCredentialRepository,
