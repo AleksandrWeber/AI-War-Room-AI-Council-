@@ -6,12 +6,14 @@ import { InMemoryRunRepository } from './in-memory-run.repository.js'
 import { PostgresRunRepository } from './postgres-run.repository.js'
 import { PostgresService } from './postgres.service.js'
 import { RUN_REPOSITORY } from './run.repository.js'
+import { StreamEventBufferService } from './stream-event-buffer.service.js'
 
 @Module({
   providers: [
     PostgresService,
     PostgresRunRepository,
     IdempotencyService,
+    StreamEventBufferService,
     {
       provide: RUN_REPOSITORY,
       inject: [ConfigService, PostgresRunRepository],
@@ -25,6 +27,11 @@ import { RUN_REPOSITORY } from './run.repository.js'
       },
     },
   ],
-  exports: [RUN_REPOSITORY, IdempotencyService, PostgresService],
+  exports: [
+    RUN_REPOSITORY,
+    IdempotencyService,
+    PostgresService,
+    StreamEventBufferService,
+  ],
 })
 export class PersistenceModule {}

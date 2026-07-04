@@ -355,6 +355,8 @@ function App() {
   )
   const [streamEvents, setStreamEvents] = useState<PipelineStreamEvent[]>([])
   const [streamedArtifacts, setStreamedArtifacts] = useState<ArtifactResult[]>([])
+  const [lastStreamEventId, setLastStreamEventId] = useState<string | null>(null)
+  const [lastStreamRunId, setLastStreamRunId] = useState<string | null>(null)
   const [artifactHistory, setArtifactHistory] = useState<ArtifactHistoryItem[]>([])
   const [historyError, setHistoryError] = useState<string | null>(null)
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
@@ -501,11 +503,21 @@ function App() {
       return
     }
 
+    const canReplayStream =
+      pipelineState === 'error' &&
+      lastStreamRunId === draftRun.runId &&
+      lastStreamEventId
+
     setPipelineState('running')
     setPipelineError(null)
     setPipelineResult(null)
-    setStreamEvents([])
-    setStreamedArtifacts([])
+    setLastStreamRunId(draftRun.runId)
+
+    if (!canReplayStream) {
+      setStreamEvents([])
+      setStreamedArtifacts([])
+      setLastStreamEventId(null)
+    }
 
     try {
       const response = await fetch(`${apiBaseUrl}/runs/mock-pipeline/stream`, {
@@ -513,6 +525,7 @@ function App() {
         headers: {
           'Content-Type': 'application/json',
           ...localAuthHeaders,
+          ...(canReplayStream ? { 'Last-Event-ID': lastStreamEventId } : {}),
         },
         body: JSON.stringify({
           draftRun,
@@ -616,6 +629,7 @@ function App() {
 
   function handlePipelineStreamEvent(event: PipelineStreamEvent) {
     setStreamEvents((current) => [...current, event])
+    setLastStreamEventId(event.eventId)
 
     if (event.type === 'artifact') {
       setStreamedArtifacts((current) => {

@@ -34,39 +34,11 @@ import {
 } from '../persistence/run.repository.js'
 import { TriageService } from '../triage/triage.service.js'
 import { UsageService } from '../usage/usage.service.js'
+import type { PipelineStreamEvent } from './pipeline-stream-event.js'
 
 function createId(prefix: string) {
   return `${prefix}_${randomUUID()}`
 }
-
-export type PipelineStreamEvent =
-  | {
-      eventId: string
-      type: 'status'
-      stepId: string
-      label: string
-      status: 'running' | 'completed'
-      timestamp: string
-    }
-  | {
-      eventId: string
-      type: 'artifact'
-      artifactType: MockPipelineResult['artifacts'][number]['metadata']['artifactType']
-      artifact: MockPipelineResult['artifacts'][number]
-      timestamp: string
-    }
-  | {
-      eventId: string
-      type: 'completed'
-      result: MockPipelineResult
-      timestamp: string
-    }
-  | {
-      eventId: string
-      type: 'error'
-      message: string
-      timestamp: string
-    }
 
 type PipelineStreamEmitter = (event: PipelineStreamEvent) => void | Promise<void>
 

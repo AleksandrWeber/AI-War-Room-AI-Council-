@@ -125,7 +125,7 @@ Run mutation endpoints verify that the request workspace matches the header work
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
-Current `v2.2` behavior:
+Current `v2.3` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
 - All JSON responses are parsed and validated with Zod schemas.
@@ -150,6 +150,9 @@ Current `v2.2` behavior:
 - `GET /api/runs/artifacts/history` returns workspace-scoped persisted artifacts from previous runs.
 - `GET /api/runs/artifacts/:artifactId/export/markdown` exports the immutable persisted artifact content as Markdown.
 - The frontend includes an Artifact History panel with Markdown export controls.
+- Streamed run events are buffered in Redis Streams with an in-memory test fallback.
+- `Last-Event-ID` replay returns missed stream events without rerunning a completed pipeline.
+- The frontend preserves the last stream event ID after a stream error and retries the same run with `Last-Event-ID`.
 
 Real Anthropic/OpenAI provider adapters are still intentionally left for a later milestone.
 

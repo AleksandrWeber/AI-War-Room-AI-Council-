@@ -14,11 +14,16 @@ import {
   WorkspaceAccessGuard,
   type AuthenticatedRequest,
 } from '../auth/workspace-access.guard.js'
-import { RunsService, type PipelineStreamEvent } from './runs.service.js'
+import { StreamEventBufferService } from '../persistence/stream-event-buffer.service.js'
+import type { PipelineStreamEvent } from './pipeline-stream-event.js'
+import { RunsService } from './runs.service.js'
 
 @Controller('runs')
 export class RunsController {
-  constructor(private readonly runsService: RunsService) {}
+  constructor(
+    private readonly runsService: RunsService,
+    private readonly streamEventBufferService: StreamEventBufferService,
+  ) {}
 
   @Get('capabilities')
   getCapabilities() {
@@ -69,19 +74,45 @@ export class RunsController {
     @Req() request: AuthenticatedRequest,
     @Res() reply: FastifyReply,
   ) {
+    const workspaceId = request.authContext!.workspaceId
+    const runId = this.resolveStreamRunId(body)
+    const lastEventId = this.getSingleHeader(request.headers['last-event-id'])
+
     reply.raw.writeHead(200, {
       'Content-Type': 'text/event-stream; charset=utf-8',
       'Cache-Control': 'no-cache, no-transform',
       Connection: 'keep-alive',
     })
 
-    const send = (event: PipelineStreamEvent) => {
-      reply.raw.write(`event: ${event.type}\n`)
-      reply.raw.write(`id: ${event.eventId}\n`)
-      reply.raw.write(`data: ${JSON.stringify(event)}\n\n`)
+    const send = async (event: PipelineStreamEvent) => {
+      const bufferedEvent = runId
+        ? await this.streamEventBufferService.append({
+            workspaceId,
+            runId,
+            event,
+          })
+        : event
+
+      this.writeStreamEvent(reply, bufferedEvent)
     }
 
     try {
+      if (runId && lastEventId) {
+        const replayedEvents = await this.streamEventBufferService.replayAfter({
+          workspaceId,
+          runId,
+          afterEventId: lastEventId,
+        })
+
+        for (const event of replayedEvents) {
+          this.writeStreamEvent(reply, event)
+        }
+
+        if (replayedEvents.some((event) => this.isTerminalEvent(event))) {
+          return
+        }
+      }
+
       await this.runsService.executeMockPipelineStream(
         body,
         send,
@@ -98,5 +129,35 @@ export class RunsController {
     } finally {
       reply.raw.end()
     }
+  }
+
+  private writeStreamEvent(reply: FastifyReply, event: PipelineStreamEvent) {
+    reply.raw.write(`event: ${event.type}\n`)
+    reply.raw.write(`id: ${event.eventId}\n`)
+    reply.raw.write(`data: ${JSON.stringify(event)}\n\n`)
+  }
+
+  private isTerminalEvent(event: PipelineStreamEvent) {
+    return event.type === 'completed' || event.type === 'error'
+  }
+
+  private resolveStreamRunId(body: unknown) {
+    if (
+      typeof body === 'object' &&
+      body !== null &&
+      'draftRun' in body &&
+      typeof body.draftRun === 'object' &&
+      body.draftRun !== null &&
+      'runId' in body.draftRun &&
+      typeof body.draftRun.runId === 'string'
+    ) {
+      return body.draftRun.runId
+    }
+
+    return null
+  }
+
+  private getSingleHeader(value: string | string[] | undefined) {
+    return Array.isArray(value) ? value[0] : value
   }
 }

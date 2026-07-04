@@ -17,6 +17,23 @@ const authHeaders = {
   'x-workspace-id': 'workspace_1',
 }
 
+function parseSseBlocks(text: string) {
+  return text
+    .split('\n\n')
+    .filter(Boolean)
+    .map((block) => {
+      const lines = block.split('\n')
+
+      return {
+        event: lines
+          .find((line) => line.startsWith('event: '))
+          ?.replace('event: ', ''),
+        id: lines.find((line) => line.startsWith('id: '))?.replace('id: ', ''),
+        data: lines.find((line) => line.startsWith('data: '))?.replace('data: ', ''),
+      }
+    })
+}
+
 describe('API skeleton', () => {
   let app: NestFastifyApplication | undefined
   let moduleRef: TestingModule | undefined
@@ -280,6 +297,29 @@ describe('API skeleton', () => {
     expect(streamResponse.text).toContain('event: artifact')
     expect(streamResponse.text).toContain('event: completed')
     expect(streamResponse.text).toContain('artifacts/development_prompt/v1')
+
+    const streamedEvents = parseSseBlocks(streamResponse.text)
+    const firstEventId = streamedEvents[0].id
+
+    expect(firstEventId).toBeTruthy()
+
+    const replayResponse = await request(app!.getHttpServer())
+      .post('/api/runs/mock-pipeline/stream')
+      .set({
+        ...authHeaders,
+        'Last-Event-ID': firstEventId!,
+      })
+      .send({
+        draftRun: draftResponse.body,
+        approvedTriage: draftResponse.body.triage,
+        selectedAgents: draftResponse.body.selectedAgents,
+      })
+      .expect(200)
+
+    const replayedEvents = parseSseBlocks(replayResponse.text)
+
+    expect(replayedEvents.map((event) => event.id)).not.toContain(firstEventId)
+    expect(replayedEvents.some((event) => event.event === 'completed')).toBe(true)
   })
 
   it('requires workspace auth headers for run mutations', async () => {

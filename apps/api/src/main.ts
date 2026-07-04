@@ -20,6 +20,12 @@ export async function bootstrap() {
   app.setGlobalPrefix('api')
   app.enableCors({
     origin: webOrigin,
+    allowedHeaders: [
+      'Content-Type',
+      'Last-Event-ID',
+      'x-user-id',
+      'x-workspace-id',
+    ],
   })
 
   await app.listen(port)
