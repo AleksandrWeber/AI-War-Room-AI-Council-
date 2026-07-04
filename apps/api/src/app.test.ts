@@ -60,7 +60,7 @@ describe('API skeleton', () => {
     expect(response.body.flow).toContain('human_review')
   })
 
-  it('creates a draft run with deterministic triage', async () => {
+  it('creates a draft run with prompt-driven triage', async () => {
     const response = await request(app!.getHttpServer())
       .post('/api/runs/draft')
       .send({
@@ -143,7 +143,7 @@ describe('API skeleton', () => {
     expect(response.body.message).toBe('Invalid create run request.')
   })
 
-  it('executes the deterministic mock pipeline', async () => {
+  it('executes the prompt-driven planning pipeline', async () => {
     const draftResponse = await request(app!.getHttpServer())
       .post('/api/runs/draft')
       .send({
@@ -173,12 +173,22 @@ describe('API skeleton', () => {
     )
     expect(pipelineResponse.body.agentOutputs[0].modelProvider).toBe('mock')
     expect(pipelineResponse.body.agentOutputs[0].inputTokens).toBeGreaterThan(0)
+    expect(
+      pipelineResponse.body.moderatorSynthesis.artifactGenerationBrief
+        .promptVersion,
+    ).toBe('moderator/v1')
     expect(pipelineResponse.body.moderatorSynthesis.mvpScope).toContain(
-      'Mock isolated agent analysis',
+      'Prompt-driven isolated agent analysis',
     )
     expect(pipelineResponse.body.artifacts).toHaveLength(3)
     expect(pipelineResponse.body.artifacts[0].artifact.artifactType).toBe(
       'executive_summary',
     )
+    expect(pipelineResponse.body.artifacts[0].metadata.promptVersion).toBe(
+      'artifacts/executive_summary/v1',
+    )
+    expect(
+      pipelineResponse.body.artifacts[2].metadata.tokenUsage.inputTokens,
+    ).toBeGreaterThan(0)
   })
 })

@@ -10,8 +10,8 @@ Idea submission
 -> Prompt-driven triage through LLM Gateway
 -> Human Review Screen
 -> Prompt-driven isolated agents through LLM Gateway
--> Mock Moderator synthesis
--> Executive Summary, PRD, Development Prompt
+-> Prompt-driven Moderator synthesis through LLM Gateway
+-> Prompt-driven Executive Summary, PRD, Development Prompt
 ```
 
 ## Workspace Layout
@@ -114,7 +114,7 @@ Tests use an in-memory repository so they do not require Docker.
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
-Current `v1.1` behavior:
+Current `v1.2` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
 - All JSON responses are parsed and validated with Zod schemas.
@@ -123,6 +123,10 @@ Current `v1.1` behavior:
 - Token usage is estimated and returned with gateway results.
 - Triage and base agent outputs are produced through versioned prompts.
 - Agent outputs store prompt version, provider, model, validation status, and token metadata.
+- Moderator synthesis is produced through a versioned prompt.
+- Executive Summary, PRD, and Development Prompt are generated sequentially through versioned prompts.
+- The Development Prompt receives the completed PRD as direct input.
+- Generated artifact metadata stores prompt version, provider, model, validation status, token usage, cost, and Shield status.
 
 Real Anthropic/OpenAI provider adapters are still intentionally left for a later milestone.
 

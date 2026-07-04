@@ -52,6 +52,22 @@ export class MockLlmProvider implements LlmProvider {
       return JSON.stringify(this.createAgentResponse(request))
     }
 
+    if (request.taskName === 'moderator/v1') {
+      return JSON.stringify(this.createModeratorResponse(request))
+    }
+
+    if (request.taskName === 'artifacts/executive_summary/v1') {
+      return JSON.stringify(this.createExecutiveSummaryResponse(request))
+    }
+
+    if (request.taskName === 'artifacts/prd/v1') {
+      return JSON.stringify(this.createPrdResponse(request))
+    }
+
+    if (request.taskName === 'artifacts/development_prompt/v1') {
+      return JSON.stringify(this.createDevelopmentPromptResponse(request))
+    }
+
     return JSON.stringify({
       summary: `Mock response for ${request.taskName}`,
     })
@@ -139,6 +155,179 @@ export class MockLlmProvider implements LlmProvider {
     }
   }
 
+  private createModeratorResponse(request: LlmProviderRequest) {
+    const payload = this.extractPayload(request)
+    const draftRun = payload.draftRun ?? {}
+    const approvedTriage = payload.approvedTriage ?? {}
+    const agentOutputs = Array.isArray(payload.agentOutputs)
+      ? payload.agentOutputs
+      : []
+
+    return {
+      executivePositioning:
+        'AI War Room turns raw product ideas into reviewed, build-ready artifacts through a structured council workflow.',
+      targetUsers: [
+        draftRun.idea?.targetAudience ?? 'Founders',
+        'Technical product builders',
+      ],
+      coreProblem:
+        'Builders need a repeatable path from rough idea to coherent PRD and implementation prompt.',
+      proposedSolution:
+        'Use Shield, approved triage, isolated specialists, and Moderator synthesis before generating final artifacts.',
+      mvpScope: [
+        'Idea submission',
+        'Shield input scan',
+        'Human Review Screen',
+        'Prompt-driven isolated agent analysis',
+        'Moderator synthesis',
+        'Executive Summary, PRD, and Development Prompt',
+      ],
+      nonGoals: [
+        'Custom user-defined agents',
+        'Agent marketplace',
+        'Open-ended multi-agent chat',
+      ],
+      keyDecisions: [
+        `Use ${approvedTriage.recommendedRunMode ?? 'standard'} run mode for this draft.`,
+        `Execute ${agentOutputs.length} non-moderator agents in isolation.`,
+        'Keep Shield as a background security layer.',
+      ],
+      risks: agentOutputs
+        .flatMap((agentOutput) => agentOutput.output?.risks ?? [])
+        .slice(0, 10),
+      openQuestions: [
+        'Which artifact format should users export first?',
+        'What quality signal proves that a generated development prompt is build-ready?',
+      ],
+      artifactGenerationBrief: {
+        source: 'mock_prompt_driven_moderator',
+        agentCount: agentOutputs.length,
+        shieldStatus: draftRun.shieldScan?.status ?? 'clear',
+      },
+    }
+  }
+
+  private createExecutiveSummaryResponse(request: LlmProviderRequest) {
+    const payload = this.extractPayload(request)
+    const draftRun = payload.draftRun ?? {}
+    const moderatorSynthesis = payload.moderatorSynthesis ?? {}
+
+    return {
+      productIdea: draftRun.idea?.rawIdea ?? 'The submitted product idea',
+      targetUsers: moderatorSynthesis.targetUsers ?? ['Founders'],
+      coreValueProposition:
+        moderatorSynthesis.proposedSolution ??
+        'Generate validated product planning artifacts from a raw idea in minutes.',
+      mainDifferentiator:
+        'A structured non-chat pipeline with isolated agents and human approval.',
+      mvpRecommendation:
+        'Continue with the prompt-driven local flow and validate artifact usefulness.',
+      topRisks: (moderatorSynthesis.risks ?? []).slice(0, 5),
+      recommendation: 'go',
+    }
+  }
+
+  private createPrdResponse(request: LlmProviderRequest) {
+    const payload = this.extractPayload(request)
+    const moderatorSynthesis = payload.moderatorSynthesis ?? {}
+
+    return {
+      overview:
+        moderatorSynthesis.proposedSolution ??
+        'Create a structured planning workflow that turns ideas into artifacts.',
+      goals: [
+        'Create a repeatable idea-to-artifacts workflow.',
+        'Keep execution structured and schema-validated.',
+        'Protect the pipeline with Shield checks.',
+      ],
+      nonGoals: moderatorSynthesis.nonGoals ?? [],
+      userPersonas: moderatorSynthesis.targetUsers ?? ['Founders'],
+      userJourneys: [
+        'User submits a raw idea and target audience.',
+        'System scans input and triages the draft.',
+        'User reviews metadata and selected agents.',
+        'System executes prompt-driven agents and produces artifacts.',
+      ],
+      functionalRequirements: [
+        'Submit idea draft.',
+        'Display Shield findings with highlighted spans.',
+        'Allow triage metadata edits.',
+        'Allow selected agent edits.',
+        'Generate Executive Summary, PRD, and Development Prompt.',
+      ],
+      nonFunctionalRequirements: [
+        'Validate all generated objects with shared schemas.',
+        'Record prompt version and model metadata for generated outputs.',
+      ],
+      mvpScope: moderatorSynthesis.mvpScope ?? ['Prompt-driven planning flow'],
+      futureScope: [
+        'Temporal orchestration',
+        'Real provider adapters',
+        'SSE artifact streaming',
+      ],
+      securityConsiderations: [
+        'Treat user input as untrusted.',
+        'Keep Shield findings separate from general product reasoning.',
+      ],
+      successMetrics: [
+        'Draft run completion rate.',
+        'Artifact copy/export rate.',
+        'User approval rate after Human Review.',
+      ],
+      openQuestions: moderatorSynthesis.openQuestions ?? [],
+    }
+  }
+
+  private createDevelopmentPromptResponse(request: LlmProviderRequest) {
+    const payload = this.extractPayload(request)
+    const completedPrd = payload.completedPrd ?? {}
+
+    return {
+      productSummary:
+        completedPrd.overview ??
+        'Build the approved AI War Room product described by the PRD.',
+      technicalStack: ['Vite', 'React', 'TypeScript', 'NestJS', 'Fastify', 'Zod'],
+      architectureOverview:
+        'Use a monorepo with web, api, and shared schema packages. Route all model calls through the LLM gateway.',
+      requiredModules: [
+        'Idea submission UI',
+        'Human Review Screen',
+        'Runs API',
+        'Prompt-driven agent pipeline',
+        'Artifact viewer',
+      ],
+      dataModel: [
+        'DraftRun',
+        'AgentExecutionResult',
+        'ModeratorSynthesis',
+        'Artifact',
+      ],
+      apiRequirements: [
+        'POST /api/runs/draft',
+        'POST /api/runs/mock-pipeline',
+        'GET /api/runs/capabilities',
+      ],
+      uiRequirements: [
+        'Show agent step statuses.',
+        'Render generated artifacts after execution.',
+        'Keep Shield warnings compact and contextual.',
+      ],
+      securityConstraints: completedPrd.securityConsiderations ?? [
+        'Treat user input as untrusted.',
+      ],
+      testingRequirements: [
+        'Validate prompt-driven pipeline response schema.',
+        'Test Shield detection and agent routing.',
+        'Run build, lint, typecheck, and tests before committing.',
+      ],
+      implementationOrder: [
+        ...(completedPrd.functionalRequirements ?? []).slice(0, 5),
+        'Verify generated artifacts with schema tests and runtime checks.',
+      ],
+      outOfScope: completedPrd.nonGoals ?? [],
+    }
+  }
+
   private extractPayload(request: LlmProviderRequest) {
     const content = [...request.messages]
       .reverse()
@@ -163,8 +352,12 @@ export class MockLlmProvider implements LlmProvider {
             rawIdea?: string
             targetAudience?: string
           }
+          shieldScan?: {
+            status?: string
+          }
         }
         shieldMaxSeverity?: string
+        [key: string]: any
       }
     } catch {
       return {}
