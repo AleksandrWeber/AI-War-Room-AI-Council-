@@ -4,6 +4,7 @@ import { validateEnv } from './config/env.js'
 import { HealthModule } from './health/health.module.js'
 import { LlmModule } from './llm/llm.module.js'
 import { RunsModule } from './runs/runs.module.js'
+import { ShieldModule } from './shield/shield.module.js'
 import { VersionModule } from './version/version.module.js'
 
 @Module({
@@ -15,6 +16,7 @@ import { VersionModule } from './version/version.module.js'
     HealthModule,
     VersionModule,
     LlmModule,
+    ShieldModule,
     RunsModule,
   ],
 })

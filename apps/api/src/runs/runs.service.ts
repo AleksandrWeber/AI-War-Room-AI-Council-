@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   NotFoundException,
   Inject,
   Injectable,
@@ -148,13 +149,24 @@ export class RunsService {
       })
     }
 
-    const shieldScan = this.triageService.scanInput(request.idea.rawIdea)
+    const shieldScan = await this.triageService.scanInput({
+      workspaceId: request.workspaceId,
+      rawIdea: request.idea.rawIdea,
+    })
     this.observabilityService.record('shield_scan_completed', {
       workspaceId: request.workspaceId,
       status: shieldScan.status,
       maxSeverity: shieldScan.maxSeverity,
       findingCount: shieldScan.findings.length,
     })
+
+    if (shieldScan.status === 'blocked') {
+      throw new ForbiddenException({
+        message: 'Shield blocked critical input before execution.',
+        shieldScan,
+      })
+    }
+
     const triage = await this.triageService.triageIdea(request, shieldScan)
     const now = new Date().toISOString()
 

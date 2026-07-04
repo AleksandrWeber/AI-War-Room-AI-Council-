@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { randomUUID } from 'node:crypto'
 import type { DraftRun } from '@ai-war-room/schemas'
 import { ObservabilityService } from '../observability/observability.service.js'
+import { AdvancedShieldService } from '../shield/advanced-shield.service.js'
 import { UsageService } from '../usage/usage.service.js'
 import { MockResearchProvider } from './mock-research.provider.js'
 import type {
@@ -10,11 +11,6 @@ import type {
 } from './research.types.js'
 
 type ResearchShieldScan = NonNullable<DraftRun['shieldScan']>
-
-const promptInjectionPattern =
-  /ignore (all )?(previous|prior) instructions|system prompt|developer message/i
-
-const secretPattern = /(sk-[a-z0-9_-]{12,}|api[_-]?key|secret|password|token)/i
 
 function createId(prefix: string) {
   return `${prefix}_${randomUUID()}`
@@ -26,6 +22,7 @@ export class ResearchService {
     private readonly usageService: UsageService,
     private readonly mockResearchProvider: MockResearchProvider,
     private readonly observabilityService: ObservabilityService,
+    private readonly advancedShieldService: AdvancedShieldService,
   ) {}
 
   async createResearchContext(input: { workspaceId: string; draftRun: DraftRun }) {
@@ -34,18 +31,25 @@ export class ResearchService {
     const documents = await this.provider.search({
       draftRun: input.draftRun,
     })
-    const scannedDocuments = documents.map((document) => {
-      const shieldScan = this.scanRetrievedContent(document.content)
+    const scannedDocuments = await Promise.all(
+      documents.map(async (document) => {
+        const shieldScan = await this.advancedShieldService.scanText({
+          workspaceId: input.workspaceId,
+          runId: input.draftRun.runId,
+          text: document.content,
+          source: 'external_research',
+        })
 
-      return {
-        ...document,
-        shieldScan,
-        sanitizedContent:
-          shieldScan.findings.length > 0
-            ? '[Sanitized research content withheld due to Shield findings.]'
-            : document.content,
-      }
-    })
+        return {
+          ...document,
+          shieldScan,
+          sanitizedContent:
+            shieldScan.findings.length > 0
+              ? '[Sanitized research content withheld due to Shield findings.]'
+              : document.content,
+        }
+      }),
+    )
     const combinedShieldScan = this.combineShieldScans(
       scannedDocuments.map((document) => document.shieldScan),
     )
@@ -79,57 +83,6 @@ export class ResearchService {
 
   private get provider(): ResearchProvider {
     return this.mockResearchProvider
-  }
-
-  private scanRetrievedContent(content: string): ResearchShieldScan {
-    const findings: ResearchShieldScan['findings'] = []
-    const injectionMatch = promptInjectionPattern.exec(content)
-    const secretMatch = secretPattern.exec(content)
-
-    if (injectionMatch) {
-      findings.push({
-        findingId: createId('finding'),
-        severity: 'high',
-        category: 'prompt_injection',
-        source: 'external_research',
-        span: {
-          start: injectionMatch.index,
-          end: injectionMatch.index + injectionMatch[0].length,
-          quote: injectionMatch[0],
-        },
-        explanation:
-          'Retrieved research content contains instructions that could override downstream prompts.',
-        recommendedAction: 'redact',
-      })
-    }
-
-    if (secretMatch) {
-      findings.push({
-        findingId: createId('finding'),
-        severity: 'medium',
-        category: 'secrets',
-        source: 'external_research',
-        span: {
-          start: secretMatch.index,
-          end: secretMatch.index + secretMatch[0].length,
-          quote: secretMatch[0],
-        },
-        explanation:
-          'Retrieved research content appears to contain credential-like material.',
-        recommendedAction: 'redact',
-      })
-    }
-
-    return {
-      scanId: createId('scan'),
-      status: findings.length > 0 ? 'warning' : 'clear',
-      maxSeverity: findings.some((finding) => finding.severity === 'high')
-        ? 'high'
-        : findings.length > 0
-          ? 'medium'
-          : 'none',
-      findings,
-    }
   }
 
   private combineShieldScans(scans: ResearchShieldScan[]): ResearchShieldScan {

@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common'
-import { randomUUID } from 'node:crypto'
 import {
   type CreateRunRequest,
   type DraftRun,
@@ -7,72 +6,24 @@ import {
 } from '@ai-war-room/schemas'
 import { LlmGatewayService } from '../llm/llm-gateway.service.js'
 import { triagePromptV1 } from '../prompts/triage.prompts.js'
-
-const promptInjectionPattern =
-  /ignore (all )?(previous|prior) instructions|system prompt|developer message/i
-
-const secretPattern =
-  /(sk-[a-z0-9_-]{12,}|api[_-]?key|secret|password|token)/i
-
-function createId(prefix: string) {
-  return `${prefix}_${randomUUID()}`
-}
+import { AdvancedShieldService } from '../shield/advanced-shield.service.js'
 
 @Injectable()
 export class TriageService {
-  constructor(private readonly llmGatewayService: LlmGatewayService) {}
+  constructor(
+    private readonly llmGatewayService: LlmGatewayService,
+    private readonly advancedShieldService: AdvancedShieldService,
+  ) {}
 
-  scanInput(rawIdea: string): DraftRun['shieldScan'] {
-    const findings: DraftRun['shieldScan']['findings'] = []
-    const injectionMatch = promptInjectionPattern.exec(rawIdea)
-    const secretMatch = secretPattern.exec(rawIdea)
-
-    if (injectionMatch) {
-      findings.push({
-        findingId: createId('finding'),
-        severity: 'high',
-        category: 'prompt_injection',
-        source: 'user_input',
-        span: {
-          start: injectionMatch.index,
-          end: injectionMatch.index + injectionMatch[0].length,
-          quote: injectionMatch[0],
-        },
-        explanation:
-          'The input appears to contain instructions that could override the planning pipeline.',
-        recommendedAction: 'require_confirmation',
-      })
-    }
-
-    if (secretMatch) {
-      findings.push({
-        findingId: createId('finding'),
-        severity: 'medium',
-        category: 'secrets',
-        source: 'user_input',
-        span: {
-          start: secretMatch.index,
-          end: secretMatch.index + secretMatch[0].length,
-          quote: secretMatch[0],
-        },
-        explanation:
-          'The input may contain a secret or credential-like value and should be reviewed.',
-        recommendedAction: 'warn',
-      })
-    }
-
-    const maxSeverity = findings.some((finding) => finding.severity === 'high')
-      ? 'high'
-      : findings.length > 0
-        ? 'medium'
-        : 'none'
-
-    return {
-      scanId: createId('scan'),
-      status: findings.length > 0 ? 'warning' : 'clear',
-      maxSeverity,
-      findings,
-    }
+  scanInput(input: {
+    workspaceId: string
+    rawIdea: string
+  }): Promise<DraftRun['shieldScan']> {
+    return this.advancedShieldService.scanText({
+      workspaceId: input.workspaceId,
+      text: input.rawIdea,
+      source: 'user_input',
+    })
   }
 
   async triageIdea(
