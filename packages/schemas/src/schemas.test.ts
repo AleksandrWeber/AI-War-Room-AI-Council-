@@ -5,6 +5,8 @@ import {
   draftRunSchema,
   authContextSchema,
   shieldScanResultSchema,
+  usageEventSchema,
+  workspaceUsageLimitSchema,
   workspaceMembershipSchema,
 } from './index.js'
 
@@ -158,6 +160,36 @@ describe('pipeline schemas', () => {
         workspaceId: 'workspace_1',
         userId: 'user_1',
         role: 'member',
+      }).success,
+    ).toBe(true)
+  })
+
+  it('validates usage events and workspace usage limits', () => {
+    expect(
+      usageEventSchema.safeParse({
+        usageEventId: 'usage_1',
+        workspaceId: 'workspace_1',
+        userId: 'user_1',
+        runId: 'run_1',
+        phase: 'agent',
+        sourceId: 'product_manager',
+        modelProvider: 'mock',
+        modelName: 'mock-json-v1',
+        promptVersion: 'agents/product_manager/v1',
+        inputTokens: 100,
+        outputTokens: 200,
+        estimatedCostUsd: 0.01,
+        createdAt: now,
+      }).success,
+    ).toBe(true)
+    expect(
+      workspaceUsageLimitSchema.safeParse({
+        workspaceId: 'workspace_1',
+        paidTier: 'free',
+        dailyTokenLimit: 250000,
+        dailyCostLimitUsd: 25,
+        createdAt: now,
+        updatedAt: now,
       }).success,
     ).toBe(true)
   })

@@ -8,6 +8,7 @@ import { ConfigService } from '@nestjs/config'
 import { randomUUID } from 'node:crypto'
 import {
   type AgentRole,
+  type AuthContext,
   type DraftRun,
   type MockPipelineRequest,
   type MockPipelineResult,
@@ -28,6 +29,7 @@ import {
   type RunRepository,
 } from '../persistence/run.repository.js'
 import { TriageService } from '../triage/triage.service.js'
+import { UsageService } from '../usage/usage.service.js'
 
 function createId(prefix: string) {
   return `${prefix}_${randomUUID()}`
@@ -75,6 +77,7 @@ export class RunsService {
     private readonly agentService: AgentService,
     private readonly moderatorService: ModeratorService,
     private readonly artifactService: ArtifactService,
+    private readonly usageService: UsageService,
   ) {}
 
   getCapabilities() {
@@ -167,19 +170,23 @@ export class RunsService {
     return draftRun
   }
 
-  async executeMockPipeline(input: unknown): Promise<MockPipelineResult> {
+  async executeMockPipeline(
+    input: unknown,
+    authContext?: AuthContext,
+  ): Promise<MockPipelineResult> {
     const request = this.parseMockPipelineRequest(input)
 
-    return this.executeParsedPipeline(request)
+    return this.executeParsedPipeline(request, undefined, authContext)
   }
 
   async executeMockPipelineStream(
     input: unknown,
     emit: PipelineStreamEmitter,
+    authContext?: AuthContext,
   ): Promise<MockPipelineResult> {
     const request = this.parseMockPipelineRequest(input)
 
-    return this.executeParsedPipeline(request, emit)
+    return this.executeParsedPipeline(request, emit, authContext)
   }
 
   private parseMockPipelineRequest(input: unknown): MockPipelineRequest {
@@ -198,6 +205,7 @@ export class RunsService {
   private async executeParsedPipeline(
     request: MockPipelineRequest,
     emit?: PipelineStreamEmitter,
+    authContext?: AuthContext,
   ): Promise<MockPipelineResult> {
     const now = new Date().toISOString()
     const executableAgents = request.selectedAgents.filter(
@@ -210,6 +218,11 @@ export class RunsService {
         message: 'At least one non-moderator agent is required.',
       })
     }
+
+    await this.usageService.assertWorkspaceCanExecute({
+      workspaceId: request.draftRun.workspaceId,
+      estimatedMaxCostUsd: request.approvedTriage.estimatedMaxCostUsd,
+    })
 
     await this.emitStatus(emit, 'agent_pool', 'Prompt-driven agent pool', 'running')
     const agentOutputs = await Promise.all(
@@ -287,6 +300,10 @@ export class RunsService {
     })
 
     await this.runRepository.saveMockPipelineResult(pipelineResult)
+    await this.usageService.recordPipelineUsage({
+      authContext,
+      result: pipelineResult,
+    })
     await emit?.({
       eventId: createId('event'),
       type: 'completed',

@@ -1,4 +1,5 @@
 import { Test } from '@nestjs/testing'
+import type { TestingModule } from '@nestjs/testing'
 import {
   FastifyAdapter,
   type NestFastifyApplication,
@@ -6,6 +7,10 @@ import {
 import request from 'supertest'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { AppModule } from './app.module.js'
+import {
+  USAGE_REPOSITORY,
+  type UsageRepository,
+} from './usage/usage.repository.js'
 
 const authHeaders = {
   'x-user-id': 'user_test',
@@ -14,9 +19,10 @@ const authHeaders = {
 
 describe('API skeleton', () => {
   let app: NestFastifyApplication | undefined
+  let moduleRef: TestingModule | undefined
 
   beforeAll(async () => {
-    const moduleRef = await Test.createTestingModule({
+    moduleRef = await Test.createTestingModule({
       imports: [AppModule],
     }).compile()
 
@@ -202,6 +208,12 @@ describe('API skeleton', () => {
     expect(
       pipelineResponse.body.artifacts[2].metadata.tokenUsage.inputTokens,
     ).toBeGreaterThan(0)
+
+    const usageRepository =
+      moduleRef!.get<UsageRepository>(USAGE_REPOSITORY)
+    const usageTotal = await usageRepository.getDailyUsageTotal('workspace_1')
+
+    expect(usageTotal.inputTokens + usageTotal.outputTokens).toBeGreaterThan(0)
   })
 
   it('streams pipeline status and final artifacts', async () => {
@@ -289,5 +301,37 @@ describe('API skeleton', () => {
       .expect(403)
 
     expect(response.body.message).toBe('User is not a member of this workspace.')
+  })
+
+  it('blocks execution when workspace quota would be exceeded', async () => {
+    const tinyQuotaHeaders = {
+      'x-user-id': 'user_test',
+      'x-workspace-id': 'workspace_tiny_quota',
+    }
+    const draftResponse = await request(app!.getHttpServer())
+      .post('/api/runs/draft')
+      .set(tinyQuotaHeaders)
+      .send({
+        workspaceId: 'workspace_tiny_quota',
+        idempotencyKey: 'idem_quota_1',
+        idea: {
+          rawIdea:
+            'Build a high-value AI War Room flow that should be blocked by quota.',
+          targetAudience: 'Technical founders',
+        },
+      })
+      .expect(201)
+
+    const response = await request(app!.getHttpServer())
+      .post('/api/runs/mock-pipeline')
+      .set(tinyQuotaHeaders)
+      .send({
+        draftRun: draftResponse.body,
+        approvedTriage: draftResponse.body.triage,
+        selectedAgents: draftResponse.body.selectedAgents,
+      })
+      .expect(403)
+
+    expect(response.body.message).toBe('Workspace daily cost quota exceeded.')
   })
 })

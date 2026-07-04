@@ -107,6 +107,7 @@ Local persistence uses:
 
 - PostgreSQL for runs, Shield scans, idempotency records, agent outputs, moderator synthesis, and artifacts.
 - PostgreSQL for local users, workspaces, and workspace memberships.
+- PostgreSQL for usage events, workspace usage limits, and Stripe-ready billing records.
 - Redis for fast idempotency reservation.
 
 Tests use an in-memory repository so they do not require Docker.
@@ -124,7 +125,7 @@ Run mutation endpoints verify that the request workspace matches the header work
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
-Current `v2.0` behavior:
+Current `v2.1` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
 - All JSON responses are parsed and validated with Zod schemas.
@@ -143,6 +144,9 @@ Current `v2.0` behavior:
 - The frontend consumes the stream through `fetch`, shows live status updates, and stores the latest completed result locally for refresh recovery.
 - Run creation and execution routes are protected by workspace membership checks.
 - Local development uses seeded `user_local` and `local_workspace` records.
+- Completed pipeline runs write auditable usage events for agent, Moderator, and artifact LLM phases.
+- Workspace daily cost limits are checked before expensive execution starts.
+- Billing records exist as Stripe-ready local records, but Stripe integration is intentionally deferred.
 
 Real Anthropic/OpenAI provider adapters are still intentionally left for a later milestone.
 

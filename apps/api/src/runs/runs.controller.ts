@@ -1,7 +1,10 @@
-import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common'
+import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common'
 import type { FastifyReply } from 'fastify'
 import { randomUUID } from 'node:crypto'
-import { WorkspaceAccessGuard } from '../auth/workspace-access.guard.js'
+import {
+  WorkspaceAccessGuard,
+  type AuthenticatedRequest,
+} from '../auth/workspace-access.guard.js'
 import { RunsService, type PipelineStreamEvent } from './runs.service.js'
 
 @Controller('runs')
@@ -21,14 +24,18 @@ export class RunsController {
 
   @Post('mock-pipeline')
   @UseGuards(WorkspaceAccessGuard)
-  executeMockPipeline(@Body() body: unknown) {
-    return this.runsService.executeMockPipeline(body)
+  executeMockPipeline(
+    @Body() body: unknown,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.runsService.executeMockPipeline(body, request.authContext)
   }
 
   @Post('mock-pipeline/stream')
   @UseGuards(WorkspaceAccessGuard)
   async executeMockPipelineStream(
     @Body() body: unknown,
+    @Req() request: AuthenticatedRequest,
     @Res() reply: FastifyReply,
   ) {
     reply.raw.writeHead(200, {
@@ -44,7 +51,11 @@ export class RunsController {
     }
 
     try {
-      await this.runsService.executeMockPipelineStream(body, send)
+      await this.runsService.executeMockPipelineStream(
+        body,
+        send,
+        request.authContext,
+      )
     } catch (error) {
       send({
         eventId: `event_${randomUUID()}`,
