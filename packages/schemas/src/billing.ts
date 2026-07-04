@@ -34,6 +34,7 @@ export const billingCapabilitiesResponseSchema = z.object({
   supportsCheckout: z.boolean(),
   supportsCustomerPortal: z.boolean(),
   supportsWebhookAudit: z.boolean(),
+  supportsInvoiceHistory: z.boolean(),
   checkoutTiers: z.array(checkoutPaidTierSchema),
   guidance: z.string(),
 })
@@ -141,6 +142,43 @@ export type BillingWebhookEventsResponse = z.infer<
   typeof billingWebhookEventsResponseSchema
 >
 
+export const billingInvoiceStatusSchema = z.enum([
+  'draft',
+  'open',
+  'paid',
+  'void',
+  'uncollectible',
+  'failed',
+])
+export type BillingInvoiceStatus = z.infer<typeof billingInvoiceStatusSchema>
+
+export const billingInvoiceRecordSchema = z.object({
+  billingInvoiceId: nonEmptyStringSchema,
+  workspaceId: nonEmptyStringSchema,
+  provider: billingAdapterSchema,
+  externalInvoiceId: nonEmptyStringSchema,
+  externalCustomerId: z.string().nullable(),
+  paidTier: paidTierSchema.nullable(),
+  amountTotalUsd: z.number().nonnegative(),
+  currency: z.string().trim().min(1),
+  status: billingInvoiceStatusSchema,
+  hostedInvoiceUrl: z.string().nullable(),
+  invoicePdfUrl: z.string().nullable(),
+  periodStart: utcDateStringSchema.nullable(),
+  periodEnd: utcDateStringSchema.nullable(),
+  createdAt: utcDateStringSchema,
+  updatedAt: utcDateStringSchema,
+})
+export type BillingInvoiceRecord = z.infer<typeof billingInvoiceRecordSchema>
+
+export const billingInvoicesResponseSchema = z.object({
+  workspaceId: nonEmptyStringSchema,
+  invoices: z.array(billingInvoiceRecordSchema),
+})
+export type BillingInvoicesResponse = z.infer<
+  typeof billingInvoicesResponseSchema
+>
+
 export function getBillingGuidance(input: {
   enabled: boolean
   adapter: BillingAdapter
@@ -150,8 +188,8 @@ export function getBillingGuidance(input: {
   }
 
   if (input.adapter === 'mock') {
-    return 'Mock billing is active. Checkout and customer portal flows run locally for development and tests.'
+    return 'Mock billing is active. Checkout, customer portal, and invoice history run locally for development and tests.'
   }
 
-  return 'Stripe billing is active. Use checkout for upgrades, the customer portal for subscription management, and configure webhooks to POST /api/billing/webhook with idempotent event processing.'
+  return 'Stripe billing is active. Use checkout for upgrades, the customer portal for subscription management, and configure webhooks for idempotent billing and invoice history updates.'
 }

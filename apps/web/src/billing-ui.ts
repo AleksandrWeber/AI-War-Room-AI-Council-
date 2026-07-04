@@ -1,5 +1,6 @@
 import type {
   BillingCapabilitiesResponse,
+  BillingInvoiceStatus,
   BillingStatus,
   CheckoutPaidTier,
   MockCustomerPortalResponse,
@@ -8,6 +9,7 @@ import type {
 import {
   PAID_TIER_LIMITS,
   billingCapabilitiesResponseSchema,
+  billingInvoicesResponseSchema,
   billingWebhookEventsResponseSchema,
   billingWorkspaceStatusResponseSchema,
   checkoutSessionResponseSchema,
@@ -118,6 +120,49 @@ export async function fetchBillingWorkspaceStatus(
   }
 
   return billingWorkspaceStatusResponseSchema.parse(await response.json())
+}
+
+export async function fetchBillingInvoices(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/billing/workspace/${encodeURIComponent(workspaceId)}/invoices`,
+    {
+      headers,
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return billingInvoicesResponseSchema.parse(await response.json())
+}
+
+export function formatInvoiceStatus(status: BillingInvoiceStatus) {
+  switch (status) {
+    case 'draft':
+      return 'Draft'
+    case 'open':
+      return 'Open'
+    case 'paid':
+      return 'Paid'
+    case 'void':
+      return 'Void'
+    case 'uncollectible':
+      return 'Uncollectible'
+    case 'failed':
+      return 'Failed'
+  }
+}
+
+export function formatInvoiceAmount(amountTotalUsd: number, currency: string) {
+  return new Intl.NumberFormat(undefined, {
+    style: 'currency',
+    currency: currency.toUpperCase(),
+  }).format(amountTotalUsd)
 }
 
 export async function fetchBillingWebhookEvents(

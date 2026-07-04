@@ -1,8 +1,10 @@
 import type {
+  BillingInvoiceStatus,
   BillingStatus,
   CheckoutPaidTier,
   CheckoutSessionResponse,
   CustomerPortalSessionResponse,
+  PaidTier,
 } from '@ai-war-room/schemas'
 
 export const BILLING_ADAPTER = Symbol('BILLING_ADAPTER')
@@ -27,6 +29,24 @@ export type BillingWebhookEvent =
   | {
       type: 'payment.failed'
       externalCustomerId: string
+      externalInvoiceId?: string
+      amountTotalUsd?: number
+      currency?: string
+      paidTier?: PaidTier | null
+    }
+  | {
+      type: 'invoice.recorded'
+      workspaceId?: string
+      externalCustomerId?: string
+      externalInvoiceId: string
+      paidTier?: PaidTier | null
+      amountTotalUsd: number
+      currency: string
+      status: BillingInvoiceStatus
+      hostedInvoiceUrl?: string
+      invoicePdfUrl?: string
+      periodStart?: string
+      periodEnd?: string
     }
 
 export type ParsedBillingWebhookResult = {

@@ -371,6 +371,47 @@
   margin: 0;
 }
 
+.billing-invoice-history {
+  display: grid;
+  gap: 12px;
+}
+
+.billing-invoice-history > span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.billing-invoice-card {
+  align-items: start;
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  display: grid;
+  gap: 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 16px;
+}
+
+.billing-invoice-card p,
+.billing-invoice-card small {
+  color: var(--muted);
+  margin: 4px 0 0;
+}
+
+.billing-invoice-meta {
+  display: grid;
+  gap: 8px;
+  justify-items: end;
+  text-align: right;
+}
+
+.billing-invoice-meta a {
+  color: #bae6fd;
+}
+
 .billing-alert {
   border-radius: 18px;
   padding: 16px;
@@ -1005,6 +1046,7 @@
   .provider-grid,
   .billing-summary,
   .billing-grid,
+  .billing-invoice-card,
   .provider-instructions,
   .agent-result-grid,
   .artifact-grid {

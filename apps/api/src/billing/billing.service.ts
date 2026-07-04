@@ -9,6 +9,7 @@ import {
 import { ConfigService } from '@nestjs/config'
 import {
   billingCapabilitiesResponseSchema,
+  billingInvoicesResponseSchema,
   billingWebhookEventsResponseSchema,
   billingWebhookHandleResponseSchema,
   billingWorkspaceStatusResponseSchema,
@@ -25,6 +26,11 @@ import {
   type BillingCheckoutAdapter,
   type BillingWebhookEvent,
 } from './billing.adapter.js'
+import { buildPaidTierInvoiceInput } from './billing-invoice.helpers.js'
+import {
+  BILLING_INVOICE_REPOSITORY,
+  type BillingInvoiceRepository,
+} from './billing-invoice.repository.js'
 import {
   BILLING_WEBHOOK_REPOSITORY,
   type BillingWebhookRepository,
@@ -42,6 +48,8 @@ export class BillingService {
     private readonly billingRepository: BillingRepository,
     @Inject(BILLING_WEBHOOK_REPOSITORY)
     private readonly billingWebhookRepository: BillingWebhookRepository,
+    @Inject(BILLING_INVOICE_REPOSITORY)
+    private readonly billingInvoiceRepository: BillingInvoiceRepository,
     @Inject(BILLING_ADAPTER)
     private readonly billingAdapter: BillingCheckoutAdapter,
   ) {}
@@ -58,6 +66,7 @@ export class BillingService {
       supportsCheckout: enabled,
       supportsCustomerPortal: enabled,
       supportsWebhookAudit: enabled,
+      supportsInvoiceHistory: enabled,
       checkoutTiers: ['pro', 'business'],
       guidance: getBillingGuidance({ enabled, adapter }),
     })
@@ -82,6 +91,16 @@ export class BillingService {
     return billingWebhookEventsResponseSchema.parse({
       workspaceId,
       events,
+    })
+  }
+
+  async listWorkspaceInvoices(workspaceId: string) {
+    const invoices =
+      await this.billingInvoiceRepository.listWorkspaceInvoices(workspaceId)
+
+    return billingInvoicesResponseSchema.parse({
+      workspaceId,
+      invoices,
     })
   }
 
@@ -241,6 +260,17 @@ export class BillingService {
       externalCustomerId: `mock_customer_${pending.workspaceId}`,
     })
 
+    await this.billingInvoiceRepository.upsertInvoice(
+      buildPaidTierInvoiceInput({
+        workspaceId: pending.workspaceId,
+        provider: 'mock',
+        paidTier: pending.paidTier,
+        externalInvoiceId: `mock_inv_${sessionId}`,
+        externalCustomerId: billingRecord.externalCustomerId,
+        status: 'paid',
+      }),
+    )
+
     return billingWorkspaceStatusResponseSchema.parse({
       workspaceId: pending.workspaceId,
       billingRecord,
@@ -291,7 +321,10 @@ export class BillingService {
     }
 
     try {
-      const workspaceId = await this.applyWebhookEvent(parsed.providerEvent)
+      const workspaceId = await this.applyWebhookEvent(parsed.providerEvent, {
+        adapter,
+        externalEventId: parsed.externalEventId,
+      })
 
       await this.billingWebhookRepository.finalizeWebhookEvent({
         billingWebhookEventId: reservation.record.billingWebhookEventId,
@@ -328,12 +361,20 @@ export class BillingService {
       case 'subscription.updated':
       case 'subscription.canceled':
         return event.workspaceId
+      case 'invoice.recorded':
+        return event.workspaceId ?? null
       case 'payment.failed':
         return null
     }
   }
 
-  private async applyWebhookEvent(event: BillingWebhookEvent) {
+  private async applyWebhookEvent(
+    event: BillingWebhookEvent,
+    context: {
+      adapter: ApiEnv['STRIPE_BILLING_ADAPTER']
+      externalEventId: string
+    },
+  ) {
     switch (event.type) {
       case 'checkout.completed':
         await this.billingRepository.activateSubscription({
@@ -341,6 +382,16 @@ export class BillingService {
           paidTier: event.paidTier,
           externalCustomerId: event.externalCustomerId,
         })
+        await this.billingInvoiceRepository.upsertInvoice(
+          buildPaidTierInvoiceInput({
+            workspaceId: event.workspaceId,
+            provider: context.adapter,
+            paidTier: event.paidTier,
+            externalInvoiceId: `inv_${context.externalEventId}`,
+            externalCustomerId: event.externalCustomerId ?? null,
+            status: 'paid',
+          }),
+        )
         return event.workspaceId
       case 'subscription.updated':
         await this.billingRepository.updateBillingStatus({
@@ -373,9 +424,71 @@ export class BillingService {
           status: 'past_due',
         })
 
+        if (event.externalInvoiceId && event.amountTotalUsd !== undefined) {
+          await this.billingInvoiceRepository.upsertInvoice({
+            workspaceId: billingRecord.workspaceId,
+            provider: context.adapter,
+            externalInvoiceId: event.externalInvoiceId,
+            externalCustomerId: event.externalCustomerId,
+            paidTier: event.paidTier ?? billingRecord.paidTier,
+            amountTotalUsd: event.amountTotalUsd,
+            currency: event.currency ?? 'usd',
+            status: 'failed',
+            hostedInvoiceUrl: null,
+            invoicePdfUrl: null,
+            periodStart: null,
+            periodEnd: null,
+          })
+        }
+
         return billingRecord.workspaceId
       }
+      case 'invoice.recorded': {
+        const workspaceId = await this.resolveInvoiceWorkspaceId(event)
+
+        if (!workspaceId) {
+          throw new NotFoundException({
+            message: `Workspace could not be resolved for invoice ${event.externalInvoiceId}.`,
+          })
+        }
+
+        await this.billingInvoiceRepository.upsertInvoice({
+          workspaceId,
+          provider: context.adapter,
+          externalInvoiceId: event.externalInvoiceId,
+          externalCustomerId: event.externalCustomerId ?? null,
+          paidTier: event.paidTier ?? null,
+          amountTotalUsd: event.amountTotalUsd,
+          currency: event.currency,
+          status: event.status,
+          hostedInvoiceUrl: event.hostedInvoiceUrl ?? null,
+          invoicePdfUrl: event.invoicePdfUrl ?? null,
+          periodStart: event.periodStart ?? null,
+          periodEnd: event.periodEnd ?? null,
+        })
+
+        return workspaceId
+      }
     }
+  }
+
+  private async resolveInvoiceWorkspaceId(
+    event: Extract<BillingWebhookEvent, { type: 'invoice.recorded' }>,
+  ) {
+    if (event.workspaceId) {
+      return event.workspaceId
+    }
+
+    if (!event.externalCustomerId) {
+      return null
+    }
+
+    const billingRecord =
+      await this.billingRepository.getBillingRecordByExternalCustomerId(
+        event.externalCustomerId,
+      )
+
+    return billingRecord?.workspaceId ?? null
   }
 
   private assertBillingEnabled() {

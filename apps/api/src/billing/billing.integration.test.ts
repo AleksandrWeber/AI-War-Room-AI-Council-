@@ -53,6 +53,7 @@ describe('billing integration', () => {
       supportsCheckout: true,
       supportsCustomerPortal: true,
       supportsWebhookAudit: true,
+      supportsInvoiceHistory: true,
       checkoutTiers: ['pro', 'business'],
     })
   })
@@ -189,5 +190,35 @@ describe('billing integration', () => {
       status: 'processed',
       workspaceId: 'workspace_1',
     })
+  })
+
+  it('records invoice history for checkout and lists workspace invoices', async () => {
+    await request(app!.getHttpServer())
+      .post('/api/billing/webhook')
+      .send({
+        eventId: 'mock_evt_invoice_checkout',
+        event: 'checkout.completed',
+        workspaceId: 'workspace_1',
+        paidTier: 'pro',
+        externalCustomerId: 'cus_invoice',
+      })
+      .expect(201)
+
+    const invoicesResponse = await request(app!.getHttpServer())
+      .get('/api/billing/workspace/workspace_1/invoices')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(invoicesResponse.body.invoices).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          workspaceId: 'workspace_1',
+          paidTier: 'pro',
+          status: 'paid',
+          amountTotalUsd: 29,
+          externalInvoiceId: 'inv_mock_evt_invoice_checkout',
+        }),
+      ]),
+    )
   })
 })

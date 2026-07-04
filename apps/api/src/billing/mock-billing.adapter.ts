@@ -156,6 +156,79 @@ export class MockBillingAdapter implements BillingCheckoutAdapter {
       }
     }
 
+    if (body.event === 'invoice.paid' || body.event === 'invoice.payment_failed') {
+      const workspaceId = body.workspaceId
+      const externalInvoiceId = body.externalInvoiceId
+      const amountTotalUsd = body.amountTotalUsd
+
+      if (
+        typeof workspaceId !== 'string' ||
+        typeof externalInvoiceId !== 'string' ||
+        typeof amountTotalUsd !== 'number'
+      ) {
+        return {
+          externalEventId,
+          eventType,
+          providerEvent: null,
+        }
+      }
+
+      if (body.event === 'invoice.payment_failed') {
+        return {
+          externalEventId,
+          eventType,
+          providerEvent: {
+            type: 'payment.failed',
+            externalCustomerId:
+              typeof body.externalCustomerId === 'string'
+                ? body.externalCustomerId
+                : `mock_customer_${workspaceId}`,
+            externalInvoiceId,
+            amountTotalUsd,
+            currency:
+              typeof body.currency === 'string' ? body.currency : 'usd',
+            paidTier:
+              body.paidTier === 'pro' ||
+              body.paidTier === 'business' ||
+              body.paidTier === 'free'
+                ? body.paidTier
+                : null,
+          },
+        }
+      }
+
+      return {
+        externalEventId,
+        eventType,
+        providerEvent: {
+          type: 'invoice.recorded',
+          workspaceId,
+          externalCustomerId:
+            typeof body.externalCustomerId === 'string'
+              ? body.externalCustomerId
+              : undefined,
+          externalInvoiceId,
+          paidTier:
+            body.paidTier === 'pro' ||
+            body.paidTier === 'business' ||
+            body.paidTier === 'free'
+              ? body.paidTier
+              : null,
+          amountTotalUsd,
+          currency: typeof body.currency === 'string' ? body.currency : 'usd',
+          status: 'paid',
+          hostedInvoiceUrl:
+            typeof body.hostedInvoiceUrl === 'string'
+              ? body.hostedInvoiceUrl
+              : undefined,
+          invoicePdfUrl:
+            typeof body.invoicePdfUrl === 'string'
+              ? body.invoicePdfUrl
+              : undefined,
+        },
+      }
+    }
+
     return {
       externalEventId,
       eventType,

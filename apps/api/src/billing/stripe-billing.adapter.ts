@@ -181,7 +181,7 @@ export class StripeBillingAdapter implements BillingCheckoutAdapter {
             ? invoice.customer
             : invoice.customer?.id
 
-        if (!customerId) {
+        if (!customerId || !invoice.id) {
           return {
             externalEventId: event.id,
             eventType: event.type,
@@ -195,6 +195,55 @@ export class StripeBillingAdapter implements BillingCheckoutAdapter {
           providerEvent: {
             type: 'payment.failed',
             externalCustomerId: customerId,
+            externalInvoiceId: invoice.id,
+            amountTotalUsd: Number(invoice.total ?? 0) / 100,
+            currency: invoice.currency ?? 'usd',
+          },
+        }
+      }
+      case 'invoice.paid': {
+        const invoice = event.data.object as Stripe.Invoice
+        const customerId =
+          typeof invoice.customer === 'string'
+            ? invoice.customer
+            : invoice.customer?.id
+
+        if (!customerId || !invoice.id) {
+          return {
+            externalEventId: event.id,
+            eventType: event.type,
+            providerEvent: null,
+          }
+        }
+
+        const paidTier = invoice.metadata?.paidTier
+
+        return {
+          externalEventId: event.id,
+          eventType: event.type,
+          providerEvent: {
+            type: 'invoice.recorded',
+            workspaceId:
+              typeof invoice.metadata?.workspaceId === 'string'
+                ? invoice.metadata.workspaceId
+                : undefined,
+            externalCustomerId: customerId,
+            externalInvoiceId: invoice.id,
+            paidTier:
+              paidTier === 'pro' || paidTier === 'business' || paidTier === 'free'
+                ? paidTier
+                : null,
+            amountTotalUsd: Number(invoice.amount_paid ?? invoice.total ?? 0) / 100,
+            currency: invoice.currency ?? 'usd',
+            status: 'paid',
+            hostedInvoiceUrl: invoice.hosted_invoice_url ?? undefined,
+            invoicePdfUrl: invoice.invoice_pdf ?? undefined,
+            periodStart: invoice.period_start
+              ? new Date(invoice.period_start * 1000).toISOString()
+              : undefined,
+            periodEnd: invoice.period_end
+              ? new Date(invoice.period_end * 1000).toISOString()
+              : undefined,
           },
         }
       }

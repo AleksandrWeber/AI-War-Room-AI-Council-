@@ -285,11 +285,23 @@ Webhook hardening:
 - `GET /api/billing/workspace/:workspaceId/webhook-events` returns recent audit events for the workspace.
 - The API enables raw request bodies for Stripe signature verification.
 
+Invoice history:
+
+- `GET /api/billing/workspace/:workspaceId/invoices` returns workspace invoice records.
+- Checkout and webhook flows upsert invoices with amount, status, tier, and hosted invoice URLs.
+- Mock tier amounts: Pro `$29`, Business `$99`.
+
 Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
 
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v5.10` behavior:
+
+- Billing invoices are persisted in `billing_invoices` and exposed through workspace invoice history endpoints.
+- Checkout and webhook flows upsert paid or failed invoice records for mock and Stripe billing.
+- The web billing panel shows recent invoice history with amount, status, and hosted invoice links when available.
 
 Current `v5.9` behavior:
 

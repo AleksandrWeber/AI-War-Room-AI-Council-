@@ -17,3 +17,8 @@ export const PAID_TIER_LIMITS: Record<
     dailyCostLimitUsd: 500,
   },
 }
+
+export const PAID_TIER_INVOICE_AMOUNTS_USD = {
+  pro: 29,
+  business: 99,
+} as const

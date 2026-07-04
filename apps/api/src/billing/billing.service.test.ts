@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { ApiEnv } from '../config/env.js'
 import { MockBillingAdapter } from './mock-billing.adapter.js'
 import { InMemoryBillingRepository } from './in-memory-billing.repository.js'
+import { InMemoryBillingInvoiceRepository } from './in-memory-billing-invoice.repository.js'
 import { InMemoryBillingWebhookRepository } from './in-memory-billing-webhook.repository.js'
 import { BillingService } from './billing.service.js'
 
@@ -23,6 +24,7 @@ function createBillingService(env: Partial<ApiEnv>) {
 
   const repository = new InMemoryBillingRepository()
   const webhookRepository = new InMemoryBillingWebhookRepository()
+  const invoiceRepository = new InMemoryBillingInvoiceRepository()
   const adapter = new MockBillingAdapter('http://127.0.0.1:3000')
 
   return {
@@ -30,10 +32,12 @@ function createBillingService(env: Partial<ApiEnv>) {
       configService,
       repository,
       webhookRepository,
+      invoiceRepository,
       adapter,
     ),
     repository,
     webhookRepository,
+    invoiceRepository,
     adapter,
   }
 }
@@ -50,6 +54,7 @@ describe('BillingService', () => {
       supportsCheckout: false,
       supportsCustomerPortal: false,
       supportsWebhookAudit: false,
+      supportsInvoiceHistory: false,
     })
   })
 
@@ -152,6 +157,59 @@ describe('BillingService', () => {
       externalEventId: 'mock_evt_checkout_1',
       status: 'processed',
     })
+
+    const invoices = await service.listWorkspaceInvoices('workspace_1')
+
+    expect(invoices.invoices).toHaveLength(1)
+    expect(invoices.invoices[0]).toMatchObject({
+      workspaceId: 'workspace_1',
+      paidTier: 'business',
+      status: 'paid',
+      amountTotalUsd: 99,
+    })
+  })
+
+  it('records failed invoice history from payment.failed webhooks', async () => {
+    const { service } = createBillingService({})
+
+    await service.handleWebhook(
+      JSON.stringify({
+        eventId: 'mock_evt_checkout_seed',
+        event: 'checkout.completed',
+        workspaceId: 'workspace_1',
+        paidTier: 'pro',
+        externalCustomerId: 'cus_failed',
+      }),
+      undefined,
+    )
+
+    await service.handleWebhook(
+      JSON.stringify({
+        eventId: 'mock_evt_invoice_failed',
+        event: 'invoice.payment_failed',
+        workspaceId: 'workspace_1',
+        externalInvoiceId: 'mock_inv_failed',
+        externalCustomerId: 'cus_failed',
+        amountTotalUsd: 29,
+        paidTier: 'pro',
+      }),
+      undefined,
+    )
+
+    const invoices = await service.listWorkspaceInvoices('workspace_1')
+
+    expect(invoices.invoices).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          externalInvoiceId: 'mock_inv_failed',
+          status: 'failed',
+          amountTotalUsd: 29,
+        }),
+        expect.objectContaining({
+          status: 'paid',
+        }),
+      ]),
+    )
   })
 
   it('marks unsupported mock webhook events as ignored', async () => {

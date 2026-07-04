@@ -3,6 +3,7 @@ import type {
   AuthCapabilitiesResponse,
   AuthSessionResponse,
   BillingCapabilitiesResponse,
+  BillingInvoiceRecord,
   BillingWebhookEventRecord,
   BillingWorkspaceStatusResponse,
   CheckoutPaidTier,
@@ -26,8 +27,11 @@ import {
   defaultWorkspaceId,
   describeBillingCapabilities,
   fetchBillingCapabilities,
+  fetchBillingInvoices,
   fetchBillingWebhookEvents,
   fetchBillingWorkspaceStatus,
+  formatInvoiceAmount,
+  formatInvoiceStatus,
   fetchMockCustomerPortal,
   formatBillingStatus,
   formatPaidTier,
@@ -566,6 +570,9 @@ function App() {
   const [billingWebhookEvents, setBillingWebhookEvents] = useState<
     BillingWebhookEventRecord[]
   >([])
+  const [billingInvoices, setBillingInvoices] = useState<BillingInvoiceRecord[]>(
+    [],
+  )
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
     useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
@@ -1245,6 +1252,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setBillingWebhookEvents(events.events)
+
+      const invoices = await fetchBillingInvoices(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBillingInvoices(invoices.invoices)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -1985,6 +1999,40 @@ function App() {
               ))
             ) : (
               <p className="clear-copy">No webhook events recorded for this workspace yet.</p>
+            )}
+          </div>
+        ) : null}
+
+        {billingCapabilities?.supportsInvoiceHistory ? (
+          <div className="billing-invoice-history">
+            <span>Invoice history</span>
+            {billingInvoices.length ? (
+              billingInvoices.map((invoice) => (
+                <article className="billing-invoice-card" key={invoice.billingInvoiceId}>
+                  <div>
+                    <strong>
+                      {formatInvoiceAmount(invoice.amountTotalUsd, invoice.currency)}
+                    </strong>
+                    <p>
+                      {formatInvoiceStatus(invoice.status)}
+                      {invoice.paidTier
+                        ? ` · ${formatPaidTier(invoice.paidTier)}`
+                        : ''}
+                    </p>
+                    <small>{invoice.externalInvoiceId}</small>
+                  </div>
+                  <div className="billing-invoice-meta">
+                    <small>{new Date(invoice.createdAt).toLocaleString()}</small>
+                    {invoice.hostedInvoiceUrl ? (
+                      <a href={invoice.hostedInvoiceUrl} target="_blank" rel="noreferrer">
+                        View invoice
+                      </a>
+                    ) : null}
+                  </div>
+                </article>
+              ))
+            ) : (
+              <p className="clear-copy">No invoices recorded for this workspace yet.</p>
             )}
           </div>
         ) : null}
