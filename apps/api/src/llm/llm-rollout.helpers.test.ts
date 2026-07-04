@@ -11,8 +11,6 @@ function createInput(overrides: Partial<LlmRolloutInput>): LlmRolloutInput {
     llmFallbackModel: 'gpt-4o-mini',
     anthropicApiKey: 'sk-ant-test',
     openaiApiKey: 'sk-openai-test',
-    researchProvider: 'tavily',
-    tavilyApiKey: 'tvly-test',
     ...overrides,
   }
 }
@@ -31,7 +29,6 @@ describe('evaluateLlmRollout', () => {
         llmFallbackProvider: 'mock',
         llmPrimaryModel: 'mock-json-v1',
         llmFallbackModel: 'mock-json-v1',
-        researchProvider: 'mock',
       }),
     )
 

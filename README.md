@@ -356,8 +356,22 @@ Workspace member admin tools:
 - `POST /api/workspaces/:workspaceId/admin/members/actions` runs member admin actions such as role updates, removals, and local test member adds.
 - Only workspace owners and admins can access workspace member admin endpoints.
 - The web billing panel shows member roster and role management actions for authorized roles.
+- `GET /api/workspaces/:workspaceId/admin/audit/export?format=csv|json` downloads workspace audit records for owners and admins.
+- Audit export includes usage events, billing webhook events, billing notifications, and meter usage reports.
+- The web billing panel exposes **Export audit CSV** and **Export audit JSON** actions for authorized roles.
 
 Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
+
+## Research Provider
+
+Market Research Agent uses an external research provider abstraction.
+
+Research rollout readiness:
+
+- `GET /api/research/readiness` returns operator-facing production research checklist results (`ready` or `not_ready`).
+- Checks cover research provider selection, Tavily API key, and Tavily max results.
+- Production startup rejects `RESEARCH_PROVIDER=mock`.
+- The web billing panel shows research rollout status and per-check guidance.
 
 ## LLM Gateway
 
@@ -366,9 +380,16 @@ The API contains an internal LLM gateway abstraction for structured JSON calls.
 LLM rollout readiness:
 
 - `GET /api/llm/readiness` returns operator-facing production LLM checklist results (`ready` or `not_ready`).
-- Checks cover primary/fallback providers, model names, provider API keys, and research provider config.
+- Checks cover primary/fallback providers, model names, and provider API keys.
 - Production startup rejects `LLM_PRIMARY_PROVIDER=mock`.
 - The web billing panel shows LLM rollout status and per-check guidance.
+
+Current `v5.20` behavior:
+
+- Research rollout readiness validates production research configuration through `GET /api/research/readiness`.
+- Production rejects mock research providers at startup.
+- Workspace owners and admins can export audit records from `GET /api/workspaces/:workspaceId/admin/audit/export`.
+- The web billing panel shows research rollout checks and workspace audit export actions.
 
 Current `v5.19` behavior:
 

@@ -91,4 +91,14 @@ export class InMemoryUsageRepository implements UsageRepository {
   async recordUsageEvents(events: UsageEvent[]): Promise<void> {
     this.events.push(...events)
   }
+
+  async listWorkspaceUsageEvents(
+    workspaceId: string,
+    limit = 500,
+  ): Promise<UsageEvent[]> {
+    return this.events
+      .filter((event) => event.workspaceId === workspaceId)
+      .sort((left, right) => right.createdAt.localeCompare(left.createdAt))
+      .slice(0, limit)
+  }
 }

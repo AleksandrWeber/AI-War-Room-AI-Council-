@@ -24,8 +24,6 @@ export type LlmRolloutInput = {
   llmFallbackModel: string
   anthropicApiKey?: string
   openaiApiKey?: string
-  researchProvider: ApiEnv['RESEARCH_PROVIDER']
-  tavilyApiKey?: string
 }
 
 function hasProviderCredential(
@@ -110,30 +108,6 @@ export function evaluateLlmRollout(input: LlmRolloutInput): LlmRolloutEvaluation
           ? 'OpenAI API key is configured.'
           : 'OPENAI_API_KEY is required when OpenAI is active, unless workspace BYOK credentials are provisioned separately.',
     },
-    {
-      name: 'research_provider',
-      label: 'Research provider',
-      status:
-        !isProduction || input.researchProvider !== 'mock' ? 'pass' : 'fail',
-      detail:
-        !isProduction || input.researchProvider !== 'mock'
-          ? `Research provider is ${input.researchProvider}.`
-          : 'RESEARCH_PROVIDER=mock cannot be used in production when paid research is enabled.',
-    },
-    {
-      name: 'tavily_api_key',
-      label: 'Tavily API key',
-      status:
-        input.researchProvider !== 'tavily' || Boolean(input.tavilyApiKey)
-          ? 'pass'
-          : 'fail',
-      detail:
-        input.researchProvider !== 'tavily'
-          ? 'Tavily is not configured as the research provider.'
-          : input.tavilyApiKey
-            ? 'Tavily API key is configured.'
-            : 'TAVILY_API_KEY is required when RESEARCH_PROVIDER=tavily.',
-    },
   ]
 
   const status = checks.every((check) => check.status === 'pass')
@@ -147,7 +121,7 @@ export function evaluateLlmRollout(input: LlmRolloutInput): LlmRolloutEvaluation
     checks,
     guidance:
       status === 'ready'
-        ? 'LLM rollout checks passed. Primary/fallback providers and research config are ready for production.'
+        ? 'LLM rollout checks passed. Primary/fallback providers are ready for production.'
         : 'LLM rollout is not ready. Resolve failed checks before enabling real AI execution in production.',
   }
 }

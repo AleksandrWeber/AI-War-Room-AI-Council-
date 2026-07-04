@@ -36,8 +36,9 @@ export class WorkspaceAdminService {
   getCapabilities() {
     return workspaceAdminCapabilitiesResponseSchema.parse({
       supportsWorkspaceMemberAdminTools: true,
+      supportsWorkspaceAuditExport: true,
       guidance:
-        'Workspace member admin tools are available to owners and admins.',
+        'Workspace member admin tools and audit export are available to owners and admins.',
     })
   }
 

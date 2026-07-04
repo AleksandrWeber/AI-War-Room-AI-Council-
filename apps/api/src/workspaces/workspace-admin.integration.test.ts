@@ -52,6 +52,46 @@ describe('llm integration', () => {
   })
 })
 
+describe('research integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports research capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/research/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsResearchRollout: true,
+      researchProvider: 'mock',
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/research/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+})
+
 describe('workspace admin integration', () => {
   let app: NestFastifyApplication | undefined
 
@@ -92,6 +132,31 @@ describe('workspace admin integration', () => {
   it('rejects workspace member admin tools for members', async () => {
     await request(app!.getHttpServer())
       .get('/api/workspaces/workspace_1/admin/members')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+
+  it('exports workspace audit data for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/workspaces/workspace_1/admin/audit/export?format=json')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.headers['content-type']).toContain('application/json')
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      stats: {
+        usageEventCount: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects workspace audit export for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/workspaces/workspace_1/admin/audit/export?format=csv')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',

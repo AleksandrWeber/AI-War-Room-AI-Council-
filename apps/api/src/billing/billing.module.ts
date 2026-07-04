@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { Module, forwardRef } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import type { ApiEnv } from '../config/env.js'
 import { AuthModule } from '../auth/auth.module.js'
@@ -34,7 +34,12 @@ import {
 } from './billing-notification.adapter.js'
 
 @Module({
-  imports: [PersistenceModule, AuthModule, WorkspacesModule, UsageModule],
+  imports: [
+    PersistenceModule,
+    forwardRef(() => AuthModule),
+    forwardRef(() => WorkspacesModule),
+    forwardRef(() => UsageModule),
+  ],
   controllers: [BillingController],
   providers: [
     PostgresBillingRepository,

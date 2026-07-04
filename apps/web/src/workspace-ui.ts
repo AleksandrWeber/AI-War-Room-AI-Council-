@@ -63,3 +63,46 @@ export async function executeWorkspaceMemberAdminAction(
 export function formatWorkspaceRole(role: string) {
   return role.charAt(0).toUpperCase() + role.slice(1)
 }
+
+function readContentDispositionFilename(contentDisposition: string | null) {
+  if (!contentDisposition) {
+    return null
+  }
+
+  const match = contentDisposition.match(/filename="([^"]+)"/)
+
+  return match?.[1] ?? null
+}
+
+export async function downloadWorkspaceAuditExport(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+  format: 'csv' | 'json',
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/workspaces/${encodeURIComponent(workspaceId)}/admin/audit/export?format=${format}`,
+    {
+      headers,
+    },
+  )
+
+  if (response.status === 403) {
+    throw new Error('Only workspace owners and admins can export audit data.')
+  }
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  const blob = await response.blob()
+  const filename =
+    readContentDispositionFilename(response.headers.get('content-disposition')) ??
+    `${workspaceId}-audit.${format}`
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.click()
+  URL.revokeObjectURL(url)
+}

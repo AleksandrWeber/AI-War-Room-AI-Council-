@@ -30,6 +30,22 @@ type DailyUsageMetricsRow = {
   distinct_run_count: string
 }
 
+type UsageEventRow = {
+  usage_event_id: string
+  workspace_id: string
+  user_id: string
+  run_id: string
+  phase: UsageEvent['phase']
+  source_id: string
+  model_provider: string
+  model_name: string
+  prompt_version: string
+  input_tokens: number
+  output_tokens: number
+  estimated_cost_usd: string
+  created_at: Date
+}
+
 @Injectable()
 export class PostgresUsageRepository implements UsageRepository {
   constructor(private readonly postgresService: PostgresService) {}
@@ -164,5 +180,50 @@ export class PostgresUsageRepository implements UsageRepository {
         )
       }
     })
+  }
+
+  async listWorkspaceUsageEvents(
+    workspaceId: string,
+    limit = 500,
+  ): Promise<UsageEvent[]> {
+    const result = await this.postgresService.query<UsageEventRow>(
+      `
+        SELECT
+          usage_event_id,
+          workspace_id,
+          user_id,
+          run_id,
+          phase,
+          source_id,
+          model_provider,
+          model_name,
+          prompt_version,
+          input_tokens,
+          output_tokens,
+          estimated_cost_usd,
+          created_at
+        FROM usage_events
+        WHERE workspace_id = $1
+        ORDER BY created_at DESC
+        LIMIT $2
+      `,
+      [workspaceId, limit],
+    )
+
+    return result.rows.map((row) => ({
+      usageEventId: row.usage_event_id,
+      workspaceId: row.workspace_id,
+      userId: row.user_id,
+      runId: row.run_id,
+      phase: row.phase,
+      sourceId: row.source_id,
+      modelProvider: row.model_provider,
+      modelName: row.model_name,
+      promptVersion: row.prompt_version,
+      inputTokens: row.input_tokens,
+      outputTokens: row.output_tokens,
+      estimatedCostUsd: Number(row.estimated_cost_usd),
+      createdAt: row.created_at.toISOString(),
+    }))
   }
 }

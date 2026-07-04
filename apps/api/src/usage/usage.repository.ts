@@ -21,5 +21,9 @@ export interface UsageRepository {
   getDailyUsageTotal(workspaceId: string): Promise<DailyUsageTotal>
   getDailyUsageMetrics(workspaceId: string): Promise<DailyUsageMetrics>
   resetDailyUsage(workspaceId: string): Promise<void>
+  listWorkspaceUsageEvents(
+    workspaceId: string,
+    limit?: number,
+  ): Promise<UsageEvent[]>
   recordUsageEvents(events: UsageEvent[]): Promise<void>
 }

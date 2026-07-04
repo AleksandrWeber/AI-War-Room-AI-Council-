@@ -15,6 +15,7 @@ import type {
   BillingWorkspaceUsageResponse,
   CheckoutPaidTier,
   LlmRolloutResponse,
+  ResearchRolloutResponse,
   RunCapabilitiesResponse,
   TemporalRuntimeHealthResponse,
   UsageAdminSummaryResponse,
@@ -31,6 +32,11 @@ import {
   formatLlmRolloutCheckStatus,
   formatLlmRolloutStatus,
 } from './llm-ui'
+import {
+  fetchResearchRollout,
+  formatResearchRolloutCheckStatus,
+  formatResearchRolloutStatus,
+} from './research-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -84,6 +90,7 @@ import {
 } from './usage-ui'
 import {
   executeWorkspaceMemberAdminAction,
+  downloadWorkspaceAuditExport,
   fetchWorkspaceMemberAdminSummary,
   formatWorkspaceRole,
 } from './workspace-ui'
@@ -575,6 +582,8 @@ function App() {
   const [authRollout, setAuthRollout] =
     useState<AuthRolloutResponse | null>(null)
   const [llmRollout, setLlmRollout] = useState<LlmRolloutResponse | null>(null)
+  const [researchRollout, setResearchRollout] =
+    useState<ResearchRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -755,6 +764,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setLlmRollout(null)
+        }
+      })
+
+    fetchResearchRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setResearchRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setResearchRollout(null)
         }
       })
 
@@ -1562,6 +1583,25 @@ function App() {
     }
   }
 
+  async function handleExportWorkspaceAudit(format: 'csv' | 'json') {
+    setBillingError(null)
+
+    try {
+      await downloadWorkspaceAuditExport(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        format,
+      )
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to export workspace audit data.',
+      )
+    }
+  }
+
   async function handleUpgradeBillingTier(paidTier: CheckoutPaidTier) {
     setBillingAction('upgrading')
     setBillingError(null)
@@ -2165,6 +2205,33 @@ function App() {
           </div>
         ) : null}
 
+        {researchRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Research rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${researchRollout.status}`}
+              >
+                {formatResearchRolloutStatus(researchRollout.status)}
+              </strong>
+            </div>
+            <p>{researchRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {researchRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>{formatResearchRolloutCheckStatus(check.status)}</span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {researchRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
         {billingCapabilities?.supportsBillingRollout && billingRollout ? (
           <div className="billing-rollout">
             <div className="billing-rollout__header">
@@ -2630,6 +2697,27 @@ function App() {
                 </button>
               </form>
             ) : null}
+            <div className="workspace-audit-export">
+              <span>Workspace audit export</span>
+              <div className="billing-export-actions">
+                <button
+                  className="secondary-button"
+                  type="button"
+                  disabled={billingAction !== 'idle' || memberAdminAction !== 'idle'}
+                  onClick={() => void handleExportWorkspaceAudit('csv')}
+                >
+                  Export audit CSV
+                </button>
+                <button
+                  className="secondary-button"
+                  type="button"
+                  disabled={billingAction !== 'idle' || memberAdminAction !== 'idle'}
+                  onClick={() => void handleExportWorkspaceAudit('json')}
+                >
+                  Export audit JSON
+                </button>
+              </div>
+            </div>
           </div>
         ) : null}
 

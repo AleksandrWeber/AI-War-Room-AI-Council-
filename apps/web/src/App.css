@@ -764,6 +764,14 @@
   gap: 0.35rem;
 }
 
+.workspace-audit-export {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
 .billing-alerts {
   display: grid;
   gap: 12px;

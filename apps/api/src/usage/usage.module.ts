@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { Module, forwardRef } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import type { ApiEnv } from '../config/env.js'
 import { AuthModule } from '../auth/auth.module.js'
@@ -11,7 +11,11 @@ import { UsageService } from './usage.service.js'
 import { USAGE_REPOSITORY } from './usage.repository.js'
 
 @Module({
-  imports: [PersistenceModule, AuthModule, WorkspacesModule],
+  imports: [
+    PersistenceModule,
+    forwardRef(() => AuthModule),
+    forwardRef(() => WorkspacesModule),
+  ],
   controllers: [UsageController],
   providers: [
     PostgresUsageRepository,
@@ -29,6 +33,6 @@ import { USAGE_REPOSITORY } from './usage.repository.js'
       },
     },
   ],
-  exports: [UsageService],
+  exports: [UsageService, USAGE_REPOSITORY],
 })
 export class UsageModule {}

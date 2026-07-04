@@ -6,14 +6,18 @@ import {
   Get,
   Param,
   Post,
+  Query,
   Req,
+  Res,
   UseGuards,
 } from '@nestjs/common'
+import type { FastifyReply } from 'fastify'
 import {
   type AuthenticatedRequest,
   WorkspaceAccessGuard,
 } from '../auth/workspace-access.guard.js'
 import { WorkspaceAdminService } from './workspace-admin.service.js'
+import { WorkspaceAuditService } from './workspace-audit.service.js'
 
 type WorkspaceMemberAdminBody = {
   workspaceId?: unknown
@@ -26,7 +30,10 @@ type WorkspaceMemberAdminBody = {
 
 @Controller('workspaces')
 export class WorkspacesController {
-  constructor(private readonly workspaceAdminService: WorkspaceAdminService) {}
+  constructor(
+    private readonly workspaceAdminService: WorkspaceAdminService,
+    private readonly workspaceAuditService: WorkspaceAuditService,
+  ) {}
 
   @Get('capabilities')
   getCapabilities() {
@@ -45,6 +52,31 @@ export class WorkspacesController {
       request.authContext!,
       workspaceId,
     )
+  }
+
+  @Get(':workspaceId/admin/audit/export')
+  @UseGuards(WorkspaceAccessGuard)
+  async exportWorkspaceAudit(
+    @Param('workspaceId') workspaceId: string,
+    @Query('format') format: string | undefined,
+    @Req() request: AuthenticatedRequest,
+    @Res() reply: FastifyReply,
+  ) {
+    this.assertWorkspaceParam(request, workspaceId)
+
+    const exported = await this.workspaceAuditService.exportWorkspaceAudit(
+      request.authContext!,
+      workspaceId,
+      format,
+    )
+
+    reply
+      .header('Content-Type', exported.contentType)
+      .header(
+        'Content-Disposition',
+        `attachment; filename="${exported.filename}"`,
+      )
+    reply.send(exported.body)
   }
 
   @Post(':workspaceId/admin/members/actions')

@@ -57,10 +57,6 @@ export class LlmService {
         infer: true,
       }),
       openaiApiKey: this.configService.get('OPENAI_API_KEY', { infer: true }),
-      researchProvider: this.configService.get('RESEARCH_PROVIDER', {
-        infer: true,
-      }),
-      tavilyApiKey: this.configService.get('TAVILY_API_KEY', { infer: true }),
     })
 
     return llmRolloutResponseSchema.parse({
