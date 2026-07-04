@@ -27,6 +27,7 @@ import { AgentService } from '../agents/agent.service.js'
 import { ArtifactService } from '../artifacts/artifact.service.js'
 import type { ApiEnv } from '../config/env.js'
 import { ModeratorService } from '../moderator/moderator.service.js'
+import { ObservabilityService } from '../observability/observability.service.js'
 import { IdempotencyService } from '../persistence/idempotency.service.js'
 import {
   RUN_REPOSITORY,
@@ -54,6 +55,7 @@ export class RunsService {
     private readonly moderatorService: ModeratorService,
     private readonly artifactService: ArtifactService,
     private readonly usageService: UsageService,
+    private readonly observabilityService: ObservabilityService,
   ) {}
 
   getCapabilities() {
@@ -147,6 +149,12 @@ export class RunsService {
     }
 
     const shieldScan = this.triageService.scanInput(request.idea.rawIdea)
+    this.observabilityService.record('shield_scan_completed', {
+      workspaceId: request.workspaceId,
+      status: shieldScan.status,
+      maxSeverity: shieldScan.maxSeverity,
+      findingCount: shieldScan.findings.length,
+    })
     const triage = await this.triageService.triageIdea(request, shieldScan)
     const now = new Date().toISOString()
 
@@ -222,21 +230,38 @@ export class RunsService {
       })
     }
 
-    await this.usageService.assertWorkspaceCanExecute({
-      workspaceId: request.draftRun.workspaceId,
-      estimatedMaxCostUsd: request.approvedTriage.estimatedMaxCostUsd,
-    })
+    await this.observabilityService.measure(
+      'pipeline_quota_check_completed',
+      {
+        workspaceId: request.draftRun.workspaceId,
+        runId: request.draftRun.runId,
+        estimatedMaxCostUsd: request.approvedTriage.estimatedMaxCostUsd,
+      },
+      () =>
+        this.usageService.assertWorkspaceCanExecute({
+          workspaceId: request.draftRun.workspaceId,
+          estimatedMaxCostUsd: request.approvedTriage.estimatedMaxCostUsd,
+        }),
+    )
 
     await this.emitStatus(emit, 'agent_pool', 'Prompt-driven agent pool', 'running')
-    const agentOutputs = await Promise.all(
-      executableAgents.map((agentRole) =>
-        this.agentService.executeAgent({
-          runId: request.draftRun.runId,
-          agentRole,
-          draftRun: request.draftRun,
-          completedAt: now,
-        }),
-      ),
+    const agentOutputs = await this.measurePipelinePhase(
+      request,
+      'agent_pool',
+      () =>
+        Promise.all(
+          executableAgents.map((agentRole) =>
+            this.agentService.executeAgent({
+              runId: request.draftRun.runId,
+              agentRole,
+              draftRun: request.draftRun,
+              completedAt: now,
+            }),
+          ),
+        ),
+      {
+        agentCount: executableAgents.length,
+      },
     )
     await this.emitStatus(emit, 'agent_pool', 'Prompt-driven agent pool', 'completed')
 
@@ -246,11 +271,16 @@ export class RunsService {
       'Prompt-driven Moderator synthesis',
       'running',
     )
-    const moderatorSynthesis = await this.moderatorService.synthesize({
-      draftRun: request.draftRun,
-      approvedTriage: request.approvedTriage,
-      agentOutputs,
-    })
+    const moderatorSynthesis = await this.measurePipelinePhase(
+      request,
+      'moderator',
+      () =>
+        this.moderatorService.synthesize({
+          draftRun: request.draftRun,
+          approvedTriage: request.approvedTriage,
+          agentOutputs,
+        }),
+    )
     await this.emitStatus(
       emit,
       'moderator',
@@ -264,11 +294,13 @@ export class RunsService {
       'Prompt-driven artifact generation',
       'running',
     )
-    const artifacts = await this.artifactService.generateArtifacts({
-      draftRun: request.draftRun,
-      moderatorSynthesis,
-      completedAt: now,
-    })
+    const artifacts = await this.measurePipelinePhase(request, 'artifacts', () =>
+      this.artifactService.generateArtifacts({
+        draftRun: request.draftRun,
+        moderatorSynthesis,
+        completedAt: now,
+      }),
+    )
     for (const artifact of artifacts) {
       await emit?.({
         eventId: createId('event'),
@@ -302,11 +334,16 @@ export class RunsService {
       completedAt: now,
     })
 
-    await this.runRepository.saveMockPipelineResult(pipelineResult)
-    await this.usageService.recordPipelineUsage({
-      authContext,
-      result: pipelineResult,
-    })
+    await this.measurePipelinePhase(request, 'persistence', () =>
+      this.runRepository.saveMockPipelineResult(pipelineResult),
+    )
+    const usageEvents = await this.measurePipelinePhase(request, 'usage_recording', () =>
+      this.usageService.recordPipelineUsage({
+        authContext,
+        result: pipelineResult,
+      }),
+    )
+    this.recordPipelineCostSignal(request, usageEvents)
     await emit?.({
       eventId: createId('event'),
       type: 'completed',
@@ -331,6 +368,60 @@ export class RunsService {
       status,
       timestamp: new Date().toISOString(),
     })
+  }
+
+  private async measurePipelinePhase<T>(
+    request: MockPipelineRequest,
+    phase: string,
+    operation: () => Promise<T>,
+    attributes: Record<string, string | number | boolean | null> = {},
+  ) {
+    return this.observabilityService.measure(
+      'pipeline_phase_completed',
+      {
+        workspaceId: request.draftRun.workspaceId,
+        runId: request.draftRun.runId,
+        phase,
+        ...attributes,
+      },
+      operation,
+    )
+  }
+
+  private recordPipelineCostSignal(
+    request: MockPipelineRequest,
+    usageEvents: Awaited<ReturnType<UsageService['recordPipelineUsage']>>,
+  ) {
+    const estimatedCostUsd = usageEvents.reduce(
+      (total, event) => total + event.estimatedCostUsd,
+      0,
+    )
+    const inputTokens = usageEvents.reduce(
+      (total, event) => total + event.inputTokens,
+      0,
+    )
+    const outputTokens = usageEvents.reduce(
+      (total, event) => total + event.outputTokens,
+      0,
+    )
+    const isCostAnomaly =
+      estimatedCostUsd > request.approvedTriage.estimatedMaxCostUsd ||
+      estimatedCostUsd >= 1
+
+    this.observabilityService.record(
+      'pipeline_cost_signal',
+      {
+        workspaceId: request.draftRun.workspaceId,
+        runId: request.draftRun.runId,
+        inputTokens,
+        outputTokens,
+        estimatedCostUsd,
+        estimatedMaxCostUsd: request.approvedTriage.estimatedMaxCostUsd,
+        usageEventCount: usageEvents.length,
+        isCostAnomaly,
+      },
+      isCostAnomaly ? 'warn' : 'info',
+    )
   }
 
   private createCompletedStep(stepId: string, label: string, timestamp: string) {

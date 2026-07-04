@@ -125,7 +125,7 @@ Run mutation endpoints verify that the request workspace matches the header work
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
-Current `v2.3` behavior:
+Current `v3.0` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
 - All JSON responses are parsed and validated with Zod schemas.
@@ -153,6 +153,9 @@ Current `v2.3` behavior:
 - Streamed run events are buffered in Redis Streams with an in-memory test fallback.
 - `Last-Event-ID` replay returns missed stream events without rerunning a completed pipeline.
 - The frontend preserves the last stream event ID after a stream error and retries the same run with `Last-Event-ID`.
+- Pipeline phases, quota checks, Shield scans, LLM validation failures, provider failures, token usage, and cost signals emit structured JSON logs.
+- Pipeline phase measurements also create OpenTelemetry API spans, ready for a future SDK/exporter configuration.
+- Cost anomaly signals are emitted when completed usage exceeds the approved estimate or crosses the local warning threshold.
 
 Real Anthropic/OpenAI provider adapters are still intentionally left for a later milestone.
 

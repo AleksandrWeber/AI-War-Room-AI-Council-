@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import type { z } from 'zod'
 import type { ApiEnv } from '../config/env.js'
+import { ObservabilityService } from '../observability/observability.service.js'
 import { LlmProviderRegistry } from './llm-provider.registry.js'
 import type {
   LlmMessage,
@@ -20,6 +21,7 @@ export class LlmGatewayService {
   constructor(
     private readonly configService: ConfigService<ApiEnv, true>,
     private readonly providerRegistry: LlmProviderRegistry,
+    private readonly observabilityService: ObservabilityService,
   ) {}
 
   async generateStructuredJson<TSchema extends z.ZodType>(
@@ -37,12 +39,32 @@ export class LlmGatewayService {
       const providerId = this.resolveProviderId(attempt)
       const model = this.resolveModel(attempt)
       const provider = this.providerRegistry.getProvider(providerId)
-      const providerResponse = await provider.completeJson({
-        taskName: request.taskName,
-        model,
-        messages: this.createAttemptMessages(request.messages, errors),
-        responseFormat: 'json_object',
-      })
+      const attemptStartedAt = Date.now()
+      let providerResponse
+
+      try {
+        providerResponse = await provider.completeJson({
+          taskName: request.taskName,
+          model,
+          messages: this.createAttemptMessages(request.messages, errors),
+          responseFormat: 'json_object',
+        })
+      } catch (error) {
+        this.observabilityService.record(
+          'llm_provider_failure',
+          {
+            taskName: request.taskName,
+            providerId,
+            model,
+            attempt,
+            durationMs: Date.now() - attemptStartedAt,
+            errorMessage:
+              error instanceof Error ? error.message : 'Unknown provider failure.',
+          },
+          'error',
+        )
+        throw error
+      }
 
       usage = addUsage(usage, providerResponse.usage)
       lastRawText = providerResponse.rawText
@@ -53,10 +75,24 @@ export class LlmGatewayService {
       )
 
       if (parsed.success) {
+        const validationStatus = attempt === 1 ? 'valid' : 'repaired'
+
+        this.observabilityService.record('llm_call_completed', {
+          taskName: request.taskName,
+          providerId,
+          model,
+          attempts: attempt,
+          validationStatus,
+          inputTokens: usage.inputTokens,
+          outputTokens: usage.outputTokens,
+          estimatedCostUsd: usage.estimatedCostUsd,
+          durationMs: Date.now() - attemptStartedAt,
+        })
+
         return {
           value: parsed.value,
           rawText: providerResponse.rawText,
-          validationStatus: attempt === 1 ? 'valid' : 'repaired',
+          validationStatus,
           providerId,
           model,
           attempts: attempt,
@@ -66,10 +102,36 @@ export class LlmGatewayService {
       }
 
       errors.push(parsed.error)
+      this.observabilityService.record(
+        'llm_validation_failure',
+        {
+          taskName: request.taskName,
+          providerId,
+          model,
+          attempt,
+          errorMessage: parsed.error,
+        },
+        'warn',
+      )
     }
 
     const providerId = this.resolveProviderId(maxAttempts)
     const model = this.resolveModel(maxAttempts)
+
+    this.observabilityService.record(
+      'llm_fallback_used',
+      {
+        taskName: request.taskName,
+        providerId,
+        model,
+        attempts: maxAttempts,
+        validationErrorCount: errors.length,
+        inputTokens: usage.inputTokens,
+        outputTokens: usage.outputTokens,
+        estimatedCostUsd: usage.estimatedCostUsd,
+      },
+      'error',
+    )
 
     return {
       value: request.fallback,

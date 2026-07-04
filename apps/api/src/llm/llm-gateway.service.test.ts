@@ -2,6 +2,7 @@ import { ConfigService } from '@nestjs/config'
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 import type { ApiEnv } from '../config/env.js'
+import type { ObservabilityEvent } from '../observability/observability.service.js'
 import { LlmGatewayService } from './llm-gateway.service.js'
 import type {
   LlmProvider,
@@ -58,6 +59,26 @@ class TestRegistry {
   }
 }
 
+class TestObservability {
+  readonly events: ObservabilityEvent[] = []
+
+  record(
+    eventName: string,
+    attributes: ObservabilityEvent['attributes'],
+    level: ObservabilityEvent['level'] = 'info',
+  ) {
+    const event = {
+      eventName,
+      level,
+      timestamp: new Date().toISOString(),
+      attributes,
+    }
+    this.events.push(event)
+
+    return event
+  }
+}
+
 function createGateway(providers: LlmProvider[]) {
   const config = new ConfigService<ApiEnv>({
     LLM_PRIMARY_PROVIDER: 'mock',
@@ -67,17 +88,21 @@ function createGateway(providers: LlmProvider[]) {
     LLM_MAX_ATTEMPTS: 3,
   })
 
-  return new LlmGatewayService(
+  const observability = new TestObservability()
+  const gateway = new LlmGatewayService(
     config,
     new TestRegistry(
       new Map(providers.map((provider) => [provider.providerId, provider])),
     ) as never,
+    observability as never,
   )
+
+  return { gateway, observability }
 }
 
 describe('LlmGatewayService', () => {
   it('returns valid structured JSON on the first attempt', async () => {
-    const gateway = createGateway([
+    const { gateway, observability } = createGateway([
       new ScriptedProvider('mock', [
         JSON.stringify({
           summary: 'Valid response',
@@ -97,10 +122,11 @@ describe('LlmGatewayService', () => {
     expect(result.attempts).toBe(1)
     expect(result.value.summary).toBe('Valid response')
     expect(result.usage.totalTokens).toBeGreaterThan(0)
+    expect(observability.events[0].eventName).toBe('llm_call_completed')
   })
 
   it('repairs after invalid JSON by retrying through the gateway', async () => {
-    const gateway = createGateway([
+    const { gateway, observability } = createGateway([
       new ScriptedProvider('mock', [
         'not json',
         JSON.stringify({
@@ -121,10 +147,14 @@ describe('LlmGatewayService', () => {
     expect(result.attempts).toBe(2)
     expect(result.errors[0]).toContain('JSON object')
     expect(result.value.summary).toBe('Repaired response')
+    expect(observability.events.map((event) => event.eventName)).toEqual([
+      'llm_validation_failure',
+      'llm_call_completed',
+    ])
   })
 
   it('returns a safe fallback after repeated schema validation failures', async () => {
-    const gateway = createGateway([
+    const { gateway, observability } = createGateway([
       new ScriptedProvider('mock', [
         JSON.stringify({ summary: 123 }),
         JSON.stringify({ nope: true }),
@@ -143,5 +173,10 @@ describe('LlmGatewayService', () => {
     expect(result.attempts).toBe(2)
     expect(result.value.summary).toBe('fallback')
     expect(result.errors.length).toBe(2)
+    expect(observability.events.map((event) => event.eventName)).toEqual([
+      'llm_validation_failure',
+      'llm_validation_failure',
+      'llm_fallback_used',
+    ])
   })
 })

@@ -7,6 +7,7 @@ import {
 import request from 'supertest'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { AppModule } from './app.module.js'
+import { ObservabilityService } from './observability/observability.service.js'
 import {
   USAGE_REPOSITORY,
   type UsageRepository,
@@ -177,6 +178,9 @@ describe('API skeleton', () => {
   })
 
   it('executes the prompt-driven planning pipeline', async () => {
+    const observabilityService = moduleRef!.get(ObservabilityService)
+    observabilityService.clearRecentEvents()
+
     const draftResponse = await request(app!.getHttpServer())
       .post('/api/runs/draft')
       .set(authHeaders)
@@ -265,6 +269,32 @@ describe('API skeleton', () => {
     expect(exportResponse.headers['content-type']).toContain('text/markdown')
     expect(exportResponse.text).toContain(`# ${expectedTitle}`)
     expect(exportResponse.text).toContain(`Artifact ID: ${exportedArtifact.artifactId}`)
+
+    const observabilityEvents = observabilityService.getRecentEvents()
+    const eventNames = observabilityEvents.map((event) => event.eventName)
+    const phaseEvents = observabilityEvents.filter(
+      (event) => event.eventName === 'pipeline_phase_completed',
+    )
+
+    expect(eventNames).toContain('shield_scan_completed')
+    expect(eventNames).toContain('llm_call_completed')
+    expect(eventNames).toContain('pipeline_cost_signal')
+    expect(phaseEvents.map((event) => event.attributes.phase)).toEqual(
+      expect.arrayContaining([
+        'agent_pool',
+        'moderator',
+        'artifacts',
+        'persistence',
+        'usage_recording',
+      ]),
+    )
+    expect(
+      phaseEvents.every(
+        (event) =>
+          typeof event.attributes.durationMs === 'number' &&
+          typeof event.attributes.success === 'boolean',
+      ),
+    ).toBe(true)
   })
 
   it('streams pipeline status and final artifacts', async () => {
