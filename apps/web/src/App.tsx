@@ -19,14 +19,19 @@ import {
   clearBillingReturnHint,
   completeMockBillingCheckout,
   createBillingCheckoutSession,
+  createCustomerPortalSession,
+  cancelMockCustomerPortalSubscription,
+  canOpenCustomerPortal,
   defaultWorkspaceId,
   describeBillingCapabilities,
   fetchBillingCapabilities,
   fetchBillingWorkspaceStatus,
+  fetchMockCustomerPortal,
   formatBillingStatus,
   formatPaidTier,
   formatTierLimits,
   readBillingReturnHint,
+  type MockCustomerPortalResponse,
 } from './billing-ui'
 import {
   type TemporalRunStartResponse,
@@ -552,8 +557,10 @@ function App() {
   const [billingError, setBillingError] = useState<string | null>(null)
   const [billingMessage, setBillingMessage] = useState<string | null>(null)
   const [billingAction, setBillingAction] = useState<
-    'idle' | 'loading' | 'upgrading'
+    'idle' | 'loading' | 'upgrading' | 'portal' | 'canceling'
   >('idle')
+  const [mockCustomerPortal, setMockCustomerPortal] =
+    useState<MockCustomerPortalResponse | null>(null)
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
     useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
@@ -772,11 +779,14 @@ function App() {
 
     if (returnHint === 'success') {
       setBillingMessage('Checkout completed. Workspace billing status refreshed.')
+    } else if (returnHint === 'portal') {
+      setBillingMessage('Returned from customer portal. Billing status refreshed.')
     } else {
       setBillingMessage('Checkout canceled. No billing changes were applied.')
     }
 
     clearBillingReturnHint()
+    setMockCustomerPortal(null)
     void handleLoadBillingStatus()
   }, [])
 
@@ -1238,6 +1248,7 @@ function App() {
     setBillingAction('upgrading')
     setBillingError(null)
     setBillingMessage(null)
+    setMockCustomerPortal(null)
 
     try {
       const session = await createBillingCheckoutSession(
@@ -1262,6 +1273,61 @@ function App() {
         error instanceof Error
           ? error.message
           : 'Failed to start billing checkout.',
+      )
+    } finally {
+      setBillingAction('idle')
+    }
+  }
+
+  async function handleOpenCustomerPortal() {
+    setBillingAction('portal')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const session = await createCustomerPortalSession(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+
+      if (billingCapabilities?.adapter === 'mock') {
+        const portal = await fetchMockCustomerPortal(session.portalUrl)
+        setMockCustomerPortal(portal)
+        return
+      }
+
+      window.location.assign(session.portalUrl)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to open customer portal.',
+      )
+    } finally {
+      setBillingAction('idle')
+    }
+  }
+
+  async function handleCancelMockSubscription() {
+    setBillingAction('canceling')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const status = await cancelMockCustomerPortalSubscription(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBillingStatus(status)
+      setMockCustomerPortal(null)
+      setBillingMessage('Subscription canceled. Workspace returned to the Free tier.')
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to cancel subscription.',
       )
     } finally {
       setBillingAction('idle')
@@ -1762,16 +1828,76 @@ function App() {
                 : 'Disabled'}
             </strong>
             <p>{describeBillingCapabilities(billingCapabilities)}</p>
+            <div className="billing-actions">
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={billingAction !== 'idle'}
+                onClick={() => void handleLoadBillingStatus()}
+              >
+                Refresh billing status
+              </button>
+              {canOpenCustomerPortal(
+                billingCapabilities,
+                billingStatus?.billingRecord?.externalCustomerId,
+              ) ? (
+                <button
+                  type="button"
+                  disabled={billingAction !== 'idle'}
+                  onClick={() => void handleOpenCustomerPortal()}
+                >
+                  {billingAction === 'portal'
+                    ? 'Opening portal...'
+                    : 'Manage subscription'}
+                </button>
+              ) : null}
+            </div>
+          </article>
+        </div>
+
+        {mockCustomerPortal ? (
+          <div className="billing-portal-card">
+            <span>Mock customer portal</span>
+            <strong>
+              {formatPaidTier(mockCustomerPortal.paidTier)} ·{' '}
+              {formatBillingStatus(mockCustomerPortal.status)}
+            </strong>
+            <p>
+              Customer {mockCustomerPortal.externalCustomerId} can manage the
+              workspace subscription here during local development.
+            </p>
+            <ul className="billing-portal-actions">
+              {mockCustomerPortal.availableActions.includes(
+                'update_payment_method',
+              ) ? (
+                <li>Update payment method (Stripe only in production)</li>
+              ) : null}
+              {mockCustomerPortal.availableActions.includes(
+                'cancel_subscription',
+              ) ? (
+                <li>
+                  <button
+                    className="danger-button"
+                    type="button"
+                    disabled={billingAction !== 'idle'}
+                    onClick={() => void handleCancelMockSubscription()}
+                  >
+                    {billingAction === 'canceling'
+                      ? 'Canceling...'
+                      : 'Cancel subscription'}
+                  </button>
+                </li>
+              ) : null}
+            </ul>
             <button
               className="secondary-button"
               type="button"
-              disabled={billingAction !== 'idle'}
-              onClick={() => void handleLoadBillingStatus()}
+              onClick={() => setMockCustomerPortal(null)}
             >
-              Refresh billing status
+              Close portal
             </button>
-          </article>
-        </div>
+          </div>
+        ) : null}
 
         {billingMessage ? (
           <div className="billing-alert billing-alert--success">

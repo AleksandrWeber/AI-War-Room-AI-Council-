@@ -2,6 +2,7 @@ import type {
   BillingStatus,
   CheckoutPaidTier,
   CheckoutSessionResponse,
+  CustomerPortalSessionResponse,
 } from '@ai-war-room/schemas'
 
 export const BILLING_ADAPTER = Symbol('BILLING_ADAPTER')
@@ -39,4 +40,9 @@ export interface BillingCheckoutAdapter {
     payload: Buffer | string,
     signature: string | undefined,
   ): Promise<BillingWebhookEvent | null>
+  createCustomerPortalSession(input: {
+    workspaceId: string
+    externalCustomerId: string
+    returnUrl: string
+  }): Promise<CustomerPortalSessionResponse>
 }

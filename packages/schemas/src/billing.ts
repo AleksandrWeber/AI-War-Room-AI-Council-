@@ -32,11 +32,43 @@ export const billingCapabilitiesResponseSchema = z.object({
   enabled: z.boolean(),
   adapter: billingAdapterSchema,
   supportsCheckout: z.boolean(),
+  supportsCustomerPortal: z.boolean(),
   checkoutTiers: z.array(checkoutPaidTierSchema),
   guidance: z.string(),
 })
 export type BillingCapabilitiesResponse = z.infer<
   typeof billingCapabilitiesResponseSchema
+>
+
+export const createCustomerPortalSessionRequestSchema = z.object({
+  workspaceId: nonEmptyStringSchema,
+})
+export type CreateCustomerPortalSessionRequest = z.infer<
+  typeof createCustomerPortalSessionRequestSchema
+>
+
+export const customerPortalSessionResponseSchema = z.object({
+  portalUrl: z.url(),
+})
+export type CustomerPortalSessionResponse = z.infer<
+  typeof customerPortalSessionResponseSchema
+>
+
+export const customerPortalActionSchema = z.enum([
+  'cancel_subscription',
+  'update_payment_method',
+])
+export type CustomerPortalAction = z.infer<typeof customerPortalActionSchema>
+
+export const mockCustomerPortalResponseSchema = z.object({
+  workspaceId: nonEmptyStringSchema,
+  externalCustomerId: nonEmptyStringSchema,
+  paidTier: paidTierSchema,
+  status: billingStatusSchema,
+  availableActions: z.array(customerPortalActionSchema),
+})
+export type MockCustomerPortalResponse = z.infer<
+  typeof mockCustomerPortalResponseSchema
 >
 
 export const createCheckoutSessionRequestSchema = z.object({
@@ -72,8 +104,8 @@ export function getBillingGuidance(input: {
   }
 
   if (input.adapter === 'mock') {
-    return 'Mock billing is active. Checkout returns a local completion URL for development and tests.'
+    return 'Mock billing is active. Checkout and customer portal flows run locally for development and tests.'
   }
 
-  return 'Stripe billing is active. Use POST /api/billing/checkout-session to start checkout and configure Stripe webhooks to POST /api/billing/webhook.'
+  return 'Stripe billing is active. Use checkout for upgrades and the customer portal to manage subscriptions, payment methods, and cancellation.'
 }

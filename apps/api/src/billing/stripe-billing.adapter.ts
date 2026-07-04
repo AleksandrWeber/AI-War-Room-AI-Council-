@@ -2,6 +2,7 @@ import Stripe from 'stripe'
 import type {
   CheckoutPaidTier,
   CheckoutSessionResponse,
+  CustomerPortalSessionResponse,
 } from '@ai-war-room/schemas'
 import type {
   BillingCheckoutAdapter,
@@ -54,6 +55,23 @@ export class StripeBillingAdapter implements BillingCheckoutAdapter {
     return {
       sessionId: session.id,
       checkoutUrl: session.url,
+    }
+  }
+
+  async createCustomerPortalSession(input: {
+    workspaceId: string
+    externalCustomerId: string
+    returnUrl: string
+  }): Promise<CustomerPortalSessionResponse> {
+    void input.workspaceId
+
+    const session = await this.stripe.billingPortal.sessions.create({
+      customer: input.externalCustomerId,
+      return_url: input.returnUrl,
+    })
+
+    return {
+      portalUrl: session.url,
     }
   }
 

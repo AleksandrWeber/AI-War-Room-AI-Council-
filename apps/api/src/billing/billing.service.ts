@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Inject,
   Injectable,
@@ -11,6 +12,10 @@ import {
   billingWorkspaceStatusResponseSchema,
   checkoutSessionResponseSchema,
   createCheckoutSessionRequestSchema,
+  createCustomerPortalSessionRequestSchema,
+  customerPortalSessionResponseSchema,
+  getBillingGuidance,
+  mockCustomerPortalResponseSchema,
 } from '@ai-war-room/schemas'
 import type { ApiEnv } from '../config/env.js'
 import {
@@ -43,12 +48,9 @@ export class BillingService {
       enabled,
       adapter,
       supportsCheckout: enabled,
+      supportsCustomerPortal: enabled,
       checkoutTiers: ['pro', 'business'],
-      guidance: enabled
-        ? adapter === 'mock'
-          ? 'Mock billing is active. Checkout returns a local completion URL for development and tests.'
-          : 'Stripe billing is active. Use POST /api/billing/checkout-session to start checkout and configure Stripe webhooks to POST /api/billing/webhook.'
-        : 'Billing checkout is disabled. Set STRIPE_ENABLED=true to activate billing flows.',
+      guidance: getBillingGuidance({ enabled, adapter }),
     })
   }
 
@@ -95,6 +97,104 @@ export class BillingService {
     })
 
     return checkoutSessionResponseSchema.parse(session)
+  }
+
+  async createCustomerPortalSession(input: {
+    workspaceId: string
+    requestWorkspaceId: string
+  }) {
+    this.assertBillingEnabled()
+
+    const payload = createCustomerPortalSessionRequestSchema.parse({
+      workspaceId: input.workspaceId,
+    })
+
+    if (payload.workspaceId !== input.requestWorkspaceId) {
+      throw new ForbiddenException({
+        message: 'Workspace header does not match request workspace.',
+      })
+    }
+
+    const billingRecord = await this.billingRepository.getBillingRecord(
+      payload.workspaceId,
+    )
+
+    if (!billingRecord?.externalCustomerId) {
+      throw new BadRequestException({
+        message:
+          'Customer portal requires an active billing customer. Complete checkout first.',
+      })
+    }
+
+    const returnUrl = this.configService.get('STRIPE_PORTAL_RETURN_URL', {
+      infer: true,
+    })
+
+    const session = await this.billingAdapter.createCustomerPortalSession({
+      workspaceId: payload.workspaceId,
+      externalCustomerId: billingRecord.externalCustomerId,
+      returnUrl,
+    })
+
+    return customerPortalSessionResponseSchema.parse(session)
+  }
+
+  async getMockCustomerPortal(workspaceId: string) {
+    this.assertBillingEnabled()
+
+    if (this.configService.get('STRIPE_BILLING_ADAPTER', { infer: true }) !== 'mock') {
+      throw new NotFoundException({
+        message: 'Mock customer portal is only available in mock adapter mode.',
+      })
+    }
+
+    const billingRecord = await this.billingRepository.getBillingRecord(workspaceId)
+
+    if (!billingRecord?.externalCustomerId) {
+      throw new NotFoundException({
+        message: 'Billing customer was not found for this workspace.',
+      })
+    }
+
+    const availableActions =
+      billingRecord.paidTier === 'free'
+        ? (['update_payment_method'] as const)
+        : (['cancel_subscription', 'update_payment_method'] as const)
+
+    return mockCustomerPortalResponseSchema.parse({
+      workspaceId,
+      externalCustomerId: billingRecord.externalCustomerId,
+      paidTier: billingRecord.paidTier,
+      status: billingRecord.status,
+      availableActions: [...availableActions],
+    })
+  }
+
+  async cancelMockCustomerPortalSubscription(workspaceId: string) {
+    this.assertBillingEnabled()
+
+    if (this.configService.get('STRIPE_BILLING_ADAPTER', { infer: true }) !== 'mock') {
+      throw new NotFoundException({
+        message: 'Mock customer portal cancellation is only available in mock adapter mode.',
+      })
+    }
+
+    const billingRecord = await this.billingRepository.updateBillingStatus({
+      workspaceId,
+      status: 'canceled',
+      paidTier: 'free',
+    })
+
+    if (!billingRecord) {
+      throw new NotFoundException({
+        message: 'Billing record was not found for this workspace.',
+      })
+    }
+
+    return billingWorkspaceStatusResponseSchema.parse({
+      workspaceId,
+      billingRecord,
+    })
   }
 
   async completeMockCheckout(sessionId: string) {

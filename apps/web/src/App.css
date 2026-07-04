@@ -277,6 +277,72 @@
   justify-self: start;
 }
 
+.billing-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.billing-actions button {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  border: 0;
+  border-radius: 999px;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  padding: 10px 14px;
+}
+
+.billing-actions button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.billing-portal-card {
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid rgba(56, 189, 248, 0.32);
+  border-radius: 22px;
+  display: grid;
+  gap: 12px;
+  padding: 20px;
+}
+
+.billing-portal-card > span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.billing-portal-card p {
+  color: var(--muted);
+  margin: 0;
+}
+
+.billing-portal-actions {
+  color: var(--muted);
+  margin: 0;
+  padding-left: 18px;
+}
+
+.billing-portal-actions .danger-button {
+  background: rgba(239, 68, 68, 0.14);
+  border: 1px solid rgba(239, 68, 68, 0.34);
+  border-radius: 999px;
+  color: #fecaca;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  padding: 10px 14px;
+}
+
+.billing-portal-actions .danger-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .billing-alert {
   border-radius: 18px;
   padding: 16px;

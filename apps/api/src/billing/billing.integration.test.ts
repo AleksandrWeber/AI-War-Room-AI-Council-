@@ -51,6 +51,7 @@ describe('billing integration', () => {
       enabled: true,
       adapter: 'mock',
       supportsCheckout: true,
+      supportsCustomerPortal: true,
       checkoutTiers: ['pro', 'business'],
     })
   })
@@ -92,6 +93,55 @@ describe('billing integration', () => {
       billingRecord: {
         paidTier: 'pro',
         status: 'active',
+      },
+    })
+  })
+
+  it('opens mock customer portal sessions and cancels subscriptions', async () => {
+    const checkoutResponse = await request(app!.getHttpServer())
+      .post('/api/billing/checkout-session')
+      .set(authHeaders)
+      .send({
+        workspaceId: 'workspace_1',
+        paidTier: 'business',
+      })
+      .expect(201)
+
+    await request(app!.getHttpServer())
+      .get(checkoutResponse.body.checkoutUrl.replace(/^https?:\/\/[^/]+/, ''))
+      .expect(200)
+
+    const portalResponse = await request(app!.getHttpServer())
+      .post('/api/billing/customer-portal-session')
+      .set(authHeaders)
+      .send({
+        workspaceId: 'workspace_1',
+      })
+      .expect(201)
+
+    expect(portalResponse.body.portalUrl).toContain('/api/billing/mock/portal')
+
+    const mockPortalResponse = await request(app!.getHttpServer())
+      .get(portalResponse.body.portalUrl.replace(/^https?:\/\/[^/]+/, ''))
+      .expect(200)
+
+    expect(mockPortalResponse.body.availableActions).toContain(
+      'cancel_subscription',
+    )
+
+    const cancelResponse = await request(app!.getHttpServer())
+      .post('/api/billing/mock/portal/cancel')
+      .set(authHeaders)
+      .send({
+        workspaceId: 'workspace_1',
+      })
+      .expect(201)
+
+    expect(cancelResponse.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      billingRecord: {
+        paidTier: 'free',
+        status: 'canceled',
       },
     })
   })

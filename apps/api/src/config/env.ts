@@ -79,6 +79,9 @@ export const envSchema = z.object({
   STRIPE_PRICE_ID_BUSINESS: optionalEnvStringSchema,
   STRIPE_SUCCESS_URL: z.url().default('http://127.0.0.1:5173/billing/success'),
   STRIPE_CANCEL_URL: z.url().default('http://127.0.0.1:5173/billing/cancel'),
+  STRIPE_PORTAL_RETURN_URL: z
+    .url()
+    .default('http://127.0.0.1:5173/billing/portal'),
 })
 
 export type ApiEnv = z.infer<typeof envSchema>

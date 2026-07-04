@@ -2,6 +2,7 @@ import { randomUUID } from 'node:crypto'
 import type {
   CheckoutPaidTier,
   CheckoutSessionResponse,
+  CustomerPortalSessionResponse,
 } from '@ai-war-room/schemas'
 import type {
   BillingCheckoutAdapter,
@@ -40,6 +41,19 @@ export class MockBillingAdapter implements BillingCheckoutAdapter {
 
   async completeMockCheckout(sessionId: string) {
     return this.pendingCheckouts.get(sessionId) ?? null
+  }
+
+  async createCustomerPortalSession(input: {
+    workspaceId: string
+    externalCustomerId: string
+    returnUrl: string
+  }): Promise<CustomerPortalSessionResponse> {
+    void input.externalCustomerId
+    void input.returnUrl
+
+    return {
+      portalUrl: `${this.apiBaseUrl}/api/billing/mock/portal?workspaceId=${encodeURIComponent(input.workspaceId)}`,
+    }
   }
 
   async parseWebhookEvent(

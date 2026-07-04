@@ -2,6 +2,7 @@ import type {
   BillingCapabilitiesResponse,
   BillingStatus,
   CheckoutPaidTier,
+  MockCustomerPortalResponse,
   PaidTier,
 } from '@ai-war-room/schemas'
 import {
@@ -9,11 +10,13 @@ import {
   billingCapabilitiesResponseSchema,
   billingWorkspaceStatusResponseSchema,
   checkoutSessionResponseSchema,
+  customerPortalSessionResponseSchema,
+  mockCustomerPortalResponseSchema,
 } from '@ai-war-room/schemas'
 
 export const defaultWorkspaceId = 'local_workspace'
 
-export type BillingReturnHint = 'success' | 'cancel'
+export type BillingReturnHint = 'success' | 'cancel' | 'portal'
 
 export function formatPaidTier(tier: PaidTier) {
   switch (tier) {
@@ -62,6 +65,13 @@ export function readBillingReturnHint(): BillingReturnHint | null {
     return 'cancel'
   }
 
+  if (
+    url.searchParams.get('billing') === 'portal' ||
+    url.pathname.endsWith('/billing/portal')
+  ) {
+    return 'portal'
+  }
+
   return null
 }
 
@@ -71,7 +81,8 @@ export function clearBillingReturnHint() {
 
   if (
     url.pathname.endsWith('/billing/success') ||
-    url.pathname.endsWith('/billing/cancel')
+    url.pathname.endsWith('/billing/cancel') ||
+    url.pathname.endsWith('/billing/portal')
   ) {
     url.pathname = '/'
   }
@@ -133,6 +144,62 @@ export async function createBillingCheckoutSession(
   return checkoutSessionResponseSchema.parse(await response.json())
 }
 
+export async function createCustomerPortalSession(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+) {
+  const response = await fetch(`${apiBaseUrl}/billing/customer-portal-session`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers,
+    },
+    body: JSON.stringify({
+      workspaceId,
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return customerPortalSessionResponseSchema.parse(await response.json())
+}
+
+export async function fetchMockCustomerPortal(portalUrl: string) {
+  const response = await fetch(portalUrl)
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return mockCustomerPortalResponseSchema.parse(await response.json())
+}
+
+export async function cancelMockCustomerPortalSubscription(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+) {
+  const response = await fetch(`${apiBaseUrl}/billing/mock/portal/cancel`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      ...headers,
+    },
+    body: JSON.stringify({
+      workspaceId,
+    }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return billingWorkspaceStatusResponseSchema.parse(await response.json())
+}
+
 export async function completeMockBillingCheckout(checkoutUrl: string) {
   const response = await fetch(checkoutUrl)
 
@@ -152,3 +219,14 @@ export function describeBillingCapabilities(
 
   return capabilities.guidance
 }
+
+export function canOpenCustomerPortal(
+  capabilities: BillingCapabilitiesResponse | null,
+  externalCustomerId: string | null | undefined,
+) {
+  return Boolean(
+    capabilities?.supportsCustomerPortal && externalCustomerId,
+  )
+}
+
+export type { MockCustomerPortalResponse }

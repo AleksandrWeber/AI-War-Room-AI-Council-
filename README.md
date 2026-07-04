@@ -264,11 +264,32 @@ npm run dev:web
 
 Open the web app, scroll to **Workspace Billing**, and click **Upgrade to Pro**.
 
+Customer portal:
+
+```bash
+curl -X POST http://127.0.0.1:3000/api/billing/customer-portal-session \
+  -H 'content-type: application/json' \
+  -H 'x-user-id: user_local' \
+  -H 'x-workspace-id: local_workspace' \
+  -d '{"workspaceId":"local_workspace"}'
+```
+
+In the web app, use **Manage subscription** after checkout. Mock mode opens an inline portal with cancel support; Stripe mode redirects to the hosted Billing Portal and returns via `/billing/portal`.
+
+Configure `STRIPE_PORTAL_RETURN_URL` for production return navigation.
+
 Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
 
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v5.8` behavior:
+
+- `POST /api/billing/customer-portal-session` opens Stripe Billing Portal or a mock portal for local development.
+- Mock portal supports subscription cancellation through `POST /api/billing/mock/portal/cancel`.
+- The web billing panel exposes **Manage subscription** after checkout creates a billing customer.
+- Stripe portal returns to `STRIPE_PORTAL_RETURN_URL` (default `/billing/portal`).
 
 Current `v5.7` behavior:
 

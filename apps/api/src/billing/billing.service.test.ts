@@ -11,6 +11,7 @@ function createBillingService(env: Partial<ApiEnv>) {
     STRIPE_BILLING_ADAPTER: 'mock',
     STRIPE_SUCCESS_URL: 'http://127.0.0.1:5173/billing/success',
     STRIPE_CANCEL_URL: 'http://127.0.0.1:5173/billing/cancel',
+    STRIPE_PORTAL_RETURN_URL: 'http://127.0.0.1:5173/billing/portal',
     API_PORT: 3000,
     ...env,
   } as ApiEnv
@@ -39,6 +40,38 @@ describe('BillingService', () => {
       enabled: false,
       adapter: 'mock',
       supportsCheckout: false,
+      supportsCustomerPortal: false,
+    })
+  })
+
+  it('creates mock customer portal sessions after checkout', async () => {
+    const { service } = createBillingService({})
+
+    const checkout = await service.createCheckoutSession({
+      workspaceId: 'workspace_1',
+      paidTier: 'pro',
+      requestWorkspaceId: 'workspace_1',
+    })
+    await service.completeMockCheckout(checkout.sessionId)
+
+    const portal = await service.createCustomerPortalSession({
+      workspaceId: 'workspace_1',
+      requestWorkspaceId: 'workspace_1',
+    })
+
+    expect(portal.portalUrl).toContain('/api/billing/mock/portal')
+
+    const mockPortal = await service.getMockCustomerPortal('workspace_1')
+
+    expect(mockPortal.availableActions).toContain('cancel_subscription')
+
+    const canceled = await service.cancelMockCustomerPortalSubscription(
+      'workspace_1',
+    )
+
+    expect(canceled.billingRecord).toMatchObject({
+      paidTier: 'free',
+      status: 'canceled',
     })
   })
 

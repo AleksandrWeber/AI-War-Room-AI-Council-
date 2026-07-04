@@ -16,7 +16,7 @@ import {
 } from '../auth/workspace-access.guard.js'
 import { BillingService } from './billing.service.js'
 
-type CheckoutSessionBody = {
+type BillingWorkspaceBody = {
   workspaceId?: unknown
   paidTier?: unknown
 }
@@ -45,13 +45,27 @@ export class BillingController {
   @UseGuards(WorkspaceAccessGuard)
   createCheckoutSession(
     @Req() request: AuthenticatedRequest,
-    @Body() body: CheckoutSessionBody,
+    @Body() body: BillingWorkspaceBody,
   ) {
     const workspaceId = this.getRequestWorkspaceId(request, body)
 
     return this.billingService.createCheckoutSession({
       workspaceId,
       paidTier: body.paidTier as 'pro' | 'business',
+      requestWorkspaceId: workspaceId,
+    })
+  }
+
+  @Post('customer-portal-session')
+  @UseGuards(WorkspaceAccessGuard)
+  createCustomerPortalSession(
+    @Req() request: AuthenticatedRequest,
+    @Body() body: BillingWorkspaceBody,
+  ) {
+    const workspaceId = this.getRequestWorkspaceId(request, body)
+
+    return this.billingService.createCustomerPortalSession({
+      workspaceId,
       requestWorkspaceId: workspaceId,
     })
   }
@@ -92,6 +106,28 @@ export class BillingController {
     return this.billingService.completeMockCheckout(sessionId)
   }
 
+  @Get('mock/portal')
+  getMockCustomerPortal(@Query('workspaceId') workspaceId: string | undefined) {
+    if (!workspaceId) {
+      return {
+        message: 'Missing workspaceId query parameter.',
+      }
+    }
+
+    return this.billingService.getMockCustomerPortal(workspaceId)
+  }
+
+  @Post('mock/portal/cancel')
+  @UseGuards(WorkspaceAccessGuard)
+  cancelMockCustomerPortalSubscription(
+    @Req() request: AuthenticatedRequest,
+    @Body() body: BillingWorkspaceBody,
+  ) {
+    const workspaceId = this.getRequestWorkspaceId(request, body)
+
+    return this.billingService.cancelMockCustomerPortalSubscription(workspaceId)
+  }
+
   private assertWorkspaceParam(
     request: AuthenticatedRequest,
     workspaceId: string,
@@ -107,7 +143,7 @@ export class BillingController {
 
   private getRequestWorkspaceId(
     request: AuthenticatedRequest,
-    body: CheckoutSessionBody,
+    body: BillingWorkspaceBody,
   ) {
     const bodyWorkspaceId =
       typeof body.workspaceId === 'string' && body.workspaceId.trim().length > 0
