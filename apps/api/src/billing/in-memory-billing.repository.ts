@@ -95,4 +95,28 @@ export class InMemoryBillingRepository implements BillingRepository {
 
     return record
   }
+
+  async resetMockWorkspaceBilling(
+    workspaceId: string,
+  ): Promise<BillingRecord | null> {
+    const existing = this.records.get(workspaceId)
+
+    if (!existing) {
+      return null
+    }
+
+    const updatedAt = new Date().toISOString()
+    const record: BillingRecord = {
+      ...existing,
+      paidTier: 'free',
+      status: 'draft',
+      externalCustomerId: null,
+      externalSubscriptionItemId: null,
+      updatedAt,
+    }
+
+    this.records.set(workspaceId, record)
+
+    return record
+  }
 }

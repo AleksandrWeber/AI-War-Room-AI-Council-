@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   ForbiddenException,
+  BadRequestException,
   Get,
   Param,
   Post,
@@ -22,6 +23,7 @@ import { BillingService } from './billing.service.js'
 type BillingWorkspaceBody = {
   workspaceId?: unknown
   paidTier?: unknown
+  action?: unknown
 }
 
 @Controller('billing')
@@ -75,6 +77,43 @@ export class BillingController {
     return this.billingService.createCustomerPortalSession({
       workspaceId,
       requestWorkspaceId: workspaceId,
+    })
+  }
+
+  @Get('workspace/:workspaceId/admin')
+  @UseGuards(WorkspaceAccessGuard)
+  getWorkspaceBillingAdminSummary(
+    @Param('workspaceId') workspaceId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    this.assertWorkspaceParam(request, workspaceId)
+
+    return this.billingService.getWorkspaceBillingAdminSummary(
+      request.authContext!,
+      workspaceId,
+    )
+  }
+
+  @Post('workspace/:workspaceId/admin/actions')
+  @UseGuards(WorkspaceAccessGuard)
+  executeBillingAdminAction(
+    @Param('workspaceId') workspaceId: string,
+    @Req() request: AuthenticatedRequest,
+    @Body() body: BillingWorkspaceBody,
+  ) {
+    this.assertWorkspaceParam(request, workspaceId)
+
+    const action = body.action
+
+    if (action !== 'sync_notifications' && action !== 'reset_mock_billing') {
+      throw new BadRequestException({
+        message: 'Unsupported billing admin action.',
+      })
+    }
+
+    return this.billingService.executeBillingAdminAction(request.authContext!, {
+      workspaceId,
+      action,
     })
   }
 

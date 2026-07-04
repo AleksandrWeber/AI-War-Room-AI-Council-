@@ -329,11 +329,24 @@ Billing rollout readiness:
 - Copy `.env.production.billing.example` for Docker Compose production billing env wiring.
 - The web billing panel shows rollout status and per-check guidance.
 
+Billing admin tools:
+
+- `GET /api/billing/workspace/:workspaceId/admin` returns owner/admin billing health metrics and available actions.
+- `POST /api/billing/workspace/:workspaceId/admin/actions` runs workspace billing admin actions such as notification sync and mock billing reset.
+- Only workspace owners and admins can access billing admin endpoints.
+- The web billing panel shows billing admin stats and action buttons for authorized roles.
+
 Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
 
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v5.17` behavior:
+
+- Workspace owners and admins can inspect billing health metrics from `GET /api/billing/workspace/:workspaceId/admin`.
+- Billing admin actions sync notifications and reset mock billing state for local testing.
+- The web billing panel shows billing admin stats and role-gated action buttons.
 
 Current `v5.16` behavior:
 

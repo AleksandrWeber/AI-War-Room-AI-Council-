@@ -60,6 +60,7 @@ describe('billing integration', () => {
       supportsMeteredUsage: true,
       supportsBillingNotifications: true,
       supportsBillingRollout: true,
+      supportsBillingAdminTools: true,
       checkoutTiers: ['pro', 'business'],
     })
   })
@@ -424,5 +425,65 @@ describe('billing integration', () => {
         }),
       ]),
     )
+  })
+
+  it('returns billing admin summary for workspace owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/billing/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      availableActions: expect.arrayContaining(['sync_notifications']),
+    })
+    expect(response.body.stats).toMatchObject({
+      alertCount: expect.any(Number),
+      invoiceCount: expect.any(Number),
+    })
+  })
+
+  it('rejects billing admin tools for workspace members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/billing/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+
+  it('resets mock billing through admin action', async () => {
+    const checkoutResponse = await request(app!.getHttpServer())
+      .post('/api/billing/checkout-session')
+      .set(authHeaders)
+      .send({
+        workspaceId: 'workspace_1',
+        paidTier: 'pro',
+      })
+      .expect(201)
+
+    await request(app!.getHttpServer())
+      .get(checkoutResponse.body.checkoutUrl.replace(/^https?:\/\/[^/]+/, ''))
+      .expect(200)
+
+    const resetResponse = await request(app!.getHttpServer())
+      .post('/api/billing/workspace/workspace_1/admin/actions')
+      .set(authHeaders)
+      .send({
+        workspaceId: 'workspace_1',
+        action: 'reset_mock_billing',
+      })
+      .expect(201)
+
+    expect(resetResponse.body).toMatchObject({
+      action: 'reset_mock_billing',
+      billingRecord: {
+        workspaceId: 'workspace_1',
+        paidTier: 'free',
+        status: 'draft',
+      },
+    })
   })
 })

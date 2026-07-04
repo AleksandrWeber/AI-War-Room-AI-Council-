@@ -88,6 +88,7 @@ describe('BillingService', () => {
       supportsMeteredUsage: false,
       supportsBillingNotifications: false,
       supportsBillingRollout: true,
+      supportsBillingAdminTools: false,
     })
   })
 
@@ -445,5 +446,76 @@ describe('BillingService', () => {
     const events = await service.listWorkspaceWebhookEvents('workspace_1')
 
     expect(events.events).toHaveLength(0)
+  })
+
+  it('returns billing admin summary for workspace owners', async () => {
+    const { service } = createBillingService({})
+
+    const summary = await service.getWorkspaceBillingAdminSummary(
+      {
+        userId: 'user_test',
+        workspaceId: 'workspace_1',
+        role: 'owner',
+      },
+      'workspace_1',
+    )
+
+    expect(summary).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      availableActions: expect.arrayContaining(['sync_notifications']),
+    })
+    expect(summary.stats.invoiceCount).toBeGreaterThanOrEqual(0)
+  })
+
+  it('rejects billing admin tools for workspace members', async () => {
+    const { service } = createBillingService({})
+
+    await expect(
+      service.getWorkspaceBillingAdminSummary(
+        {
+          userId: 'user_member',
+          workspaceId: 'workspace_1',
+          role: 'member',
+        },
+        'workspace_1',
+      ),
+    ).rejects.toMatchObject({
+      response: {
+        message: 'Only workspace owners and admins can manage billing settings.',
+      },
+    })
+  })
+
+  it('resets mock billing through admin action', async () => {
+    const { service, repository } = createBillingService({})
+
+    await repository.activateSubscription({
+      workspaceId: 'workspace_1',
+      paidTier: 'pro',
+      externalCustomerId: 'cus_admin_reset',
+    })
+
+    const result = await service.executeBillingAdminAction(
+      {
+        userId: 'user_test',
+        workspaceId: 'workspace_1',
+        role: 'owner',
+      },
+      {
+        workspaceId: 'workspace_1',
+        action: 'reset_mock_billing',
+      },
+    )
+
+    expect(result).toMatchObject({
+      action: 'reset_mock_billing',
+      billingRecord: {
+        workspaceId: 'workspace_1',
+        paidTier: 'free',
+        status: 'draft',
+        externalCustomerId: null,
+      },
+    })
   })
 })

@@ -287,6 +287,90 @@ export class PostgresBillingRepository implements BillingRepository {
     })
   }
 
+  async resetMockWorkspaceBilling(
+    workspaceId: string,
+  ): Promise<BillingRecord | null> {
+    const limits = PAID_TIER_LIMITS.free
+
+    return this.postgresService.transaction(async (client) => {
+      const existing = await client.query<BillingRecordRow>(
+        `
+          SELECT
+            billing_record_id,
+            workspace_id,
+            provider,
+            external_customer_id,
+            external_subscription_item_id,
+            paid_tier,
+            status,
+            created_at,
+            updated_at
+          FROM billing_records
+          WHERE workspace_id = $1
+          ORDER BY updated_at DESC
+          LIMIT 1
+        `,
+        [workspaceId],
+      )
+      const row = existing.rows[0]
+
+      if (!row) {
+        return null
+      }
+
+      await client.query(
+        `
+          UPDATE billing_records
+          SET status = 'draft',
+              paid_tier = 'free',
+              external_customer_id = NULL,
+              external_subscription_item_id = NULL,
+              updated_at = NOW()
+          WHERE billing_record_id = $1
+        `,
+        [row.billing_record_id],
+      )
+
+      await client.query(
+        `
+          UPDATE workspace_usage_limits
+          SET paid_tier = 'free',
+              daily_token_limit = $2,
+              daily_cost_limit_usd = $3,
+              updated_at = NOW()
+          WHERE workspace_id = $1
+        `,
+        [
+          workspaceId,
+          limits.dailyTokenLimit,
+          limits.dailyCostLimitUsd,
+        ],
+      )
+
+      const result = await client.query<BillingRecordRow>(
+        `
+          SELECT
+            billing_record_id,
+            workspace_id,
+            provider,
+            external_customer_id,
+            external_subscription_item_id,
+            paid_tier,
+            status,
+            created_at,
+            updated_at
+          FROM billing_records
+          WHERE billing_record_id = $1
+          LIMIT 1
+        `,
+        [row.billing_record_id],
+      )
+      const updated = result.rows[0]
+
+      return updated ? this.mapRow(updated) : null
+    })
+  }
+
   private mapRow(row: BillingRecordRow): BillingRecord {
     return {
       billingRecordId: row.billing_record_id,

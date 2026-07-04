@@ -9,6 +9,9 @@ import {
 import { ConfigService } from '@nestjs/config'
 import {
   billingCapabilitiesResponseSchema,
+  billingAdminActionRequestSchema,
+  billingAdminActionResponseSchema,
+  billingAdminSummaryResponseSchema,
   billingExportFormatSchema,
   billingInvoicesResponseSchema,
   billingRolloutResponseSchema,
@@ -24,6 +27,7 @@ import {
   getBillingGuidance,
   mockCustomerPortalResponseSchema,
 } from '@ai-war-room/schemas'
+import type { AuthContext } from '@ai-war-room/schemas'
 import type { ApiEnv } from '../config/env.js'
 import {
   BILLING_ADAPTER,
@@ -36,6 +40,11 @@ import {
   serializeBillingInvoicesCsv,
 } from './billing-export.helpers.js'
 import { buildWorkspaceBillingAlerts } from './billing-alerts.helpers.js'
+import {
+  buildBillingAdminStats,
+  getBillingAdminGuidance,
+  resolveBillingAdminActions,
+} from './billing-admin.helpers.js'
 import { evaluateBillingRollout } from './billing-rollout.helpers.js'
 import {
   BILLING_INVOICE_REPOSITORY,
@@ -90,6 +99,7 @@ export class BillingService {
       supportsBillingNotifications:
         this.billingNotificationService.supportsBillingNotifications(),
       supportsBillingRollout: true,
+      supportsBillingAdminTools: enabled,
       checkoutTiers: ['pro', 'business'],
       guidance: getBillingGuidance({ enabled, adapter }),
     })
@@ -210,6 +220,163 @@ export class BillingService {
     return this.billingNotificationService.listWorkspaceNotifications(
       workspaceId,
     )
+  }
+
+  async getWorkspaceBillingAdminSummary(
+    authContext: AuthContext,
+    workspaceId: string,
+  ) {
+    this.assertBillingEnabled()
+    this.assertCanManageBillingAdmin(authContext)
+
+    if (authContext.workspaceId !== workspaceId) {
+      throw new ForbiddenException({
+        message: 'Workspace header does not match request workspace.',
+      })
+    }
+
+    const adapter = this.configService.get('STRIPE_BILLING_ADAPTER', {
+      infer: true,
+    })
+    const billingEnabled = this.configService.get('STRIPE_ENABLED', {
+      infer: true,
+    })
+
+    const [
+      billingRecord,
+      usage,
+      invoices,
+      webhookEvents,
+      meterUsageReports,
+      notifications,
+    ] = await Promise.all([
+      this.billingRepository.getBillingRecord(workspaceId),
+      this.getWorkspaceUsageSummary(workspaceId).catch(() => null),
+      this.billingInvoiceRepository.listWorkspaceInvoices(workspaceId),
+      this.billingWebhookRepository.listWorkspaceWebhookEvents(workspaceId),
+      this.billingMeterUsageService
+        .listWorkspaceMeterUsageReports(workspaceId)
+        .then((response) => response.reports),
+      this.billingNotificationService
+        .getWorkspaceNotificationsSnapshot(workspaceId)
+        .then((response) => response.notifications),
+    ])
+
+    const alerts = buildWorkspaceBillingAlerts({
+      workspaceId,
+      usage: usage ?? {
+        workspaceId,
+        paidTier: billingRecord?.paidTier ?? 'free',
+        dailyTokenLimit: 0,
+        dailyCostLimitUsd: 0,
+        dailyUsage: {
+          inputTokens: 0,
+          outputTokens: 0,
+          totalTokens: 0,
+          estimatedCostUsd: 0,
+        },
+        usagePeriodStart: new Date().toISOString(),
+        usagePeriodEnd: new Date().toISOString(),
+      },
+      billingRecord,
+    })
+
+    const availableActions = resolveBillingAdminActions({
+      adapter,
+      billingEnabled,
+      billingRecord,
+    })
+
+    return billingAdminSummaryResponseSchema.parse({
+      workspaceId,
+      role: authContext.role,
+      billingRecord,
+      usage,
+      stats: buildBillingAdminStats({
+        alerts,
+        invoices,
+        webhookEvents,
+        meterUsageReports,
+        notifications,
+      }),
+      availableActions,
+      guidance: getBillingAdminGuidance({
+        role: authContext.role,
+        billingEnabled,
+        availableActions,
+      }),
+    })
+  }
+
+  async executeBillingAdminAction(
+    authContext: AuthContext,
+    input: {
+      workspaceId: string
+      action: 'sync_notifications' | 'reset_mock_billing'
+    },
+  ) {
+    this.assertBillingEnabled()
+    this.assertCanManageBillingAdmin(authContext)
+
+    const payload = billingAdminActionRequestSchema.parse({
+      workspaceId: input.workspaceId,
+      action: input.action,
+    })
+
+    if (payload.workspaceId !== authContext.workspaceId) {
+      throw new ForbiddenException({
+        message: 'Workspace header does not match request workspace.',
+      })
+    }
+
+    switch (payload.action) {
+      case 'sync_notifications': {
+        await this.billingNotificationService.syncWorkspaceNotifications(
+          payload.workspaceId,
+        )
+        const notifications =
+          await this.billingNotificationService.getWorkspaceNotificationsSnapshot(
+            payload.workspaceId,
+          )
+
+        return billingAdminActionResponseSchema.parse({
+          workspaceId: payload.workspaceId,
+          action: payload.action,
+          message: 'Billing notifications synced from active workspace alerts.',
+          notificationCount: notifications.notifications.length,
+        })
+      }
+      case 'reset_mock_billing': {
+        if (
+          this.configService.get('STRIPE_BILLING_ADAPTER', { infer: true }) !==
+          'mock'
+        ) {
+          throw new BadRequestException({
+            message:
+              'Reset mock billing is only available when STRIPE_BILLING_ADAPTER=mock.',
+          })
+        }
+
+        const billingRecord =
+          await this.billingRepository.resetMockWorkspaceBilling(
+            payload.workspaceId,
+          )
+
+        if (!billingRecord) {
+          throw new NotFoundException({
+            message: 'Billing record was not found for this workspace.',
+          })
+        }
+
+        return billingAdminActionResponseSchema.parse({
+          workspaceId: payload.workspaceId,
+          action: payload.action,
+          message:
+            'Mock billing state reset to free draft tier for local testing.',
+          billingRecord,
+        })
+      }
+    }
   }
 
   async exportWorkspaceInvoices(
@@ -656,5 +823,15 @@ export class BillingService {
         message: 'Billing is disabled. Set STRIPE_ENABLED=true to activate checkout.',
       })
     }
+  }
+
+  private assertCanManageBillingAdmin(authContext: AuthContext) {
+    if (authContext.role === 'owner' || authContext.role === 'admin') {
+      return
+    }
+
+    throw new ForbiddenException({
+      message: 'Only workspace owners and admins can manage billing settings.',
+    })
   }
 }

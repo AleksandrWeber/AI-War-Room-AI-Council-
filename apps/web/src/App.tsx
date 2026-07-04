@@ -2,6 +2,7 @@ import { Fragment, useEffect, useRef, useState, type FormEvent } from 'react'
 import type {
   AuthCapabilitiesResponse,
   AuthSessionResponse,
+  BillingAdminSummaryResponse,
   BillingCapabilitiesResponse,
   BillingInvoiceRecord,
   BillingMeterUsageReport,
@@ -31,6 +32,8 @@ import {
   canOpenCustomerPortal,
   defaultWorkspaceId,
   describeBillingCapabilities,
+  executeBillingAdminAction,
+  fetchBillingAdminSummary,
   fetchBillingCapabilities,
   fetchBillingRollout,
   fetchBillingAlerts,
@@ -49,6 +52,7 @@ import {
   fetchMockCustomerPortal,
   formatBillingStatus,
   formatBillingAlertSeverity,
+  formatBillingAdminAction,
   formatBillingNotificationStatus,
   formatBillingRolloutCheckStatus,
   formatBillingRolloutStatus,
@@ -605,6 +609,11 @@ function App() {
   const [billingNotifications, setBillingNotifications] = useState<
     BillingNotificationRecord[]
   >([])
+  const [billingAdminSummary, setBillingAdminSummary] =
+    useState<BillingAdminSummaryResponse | null>(null)
+  const [billingAdminAction, setBillingAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
     useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
@@ -1331,6 +1340,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setBillingNotifications(notifications.notifications)
+
+      const adminSummary = await fetchBillingAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBillingAdminSummary(adminSummary)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -1339,6 +1355,33 @@ function App() {
       )
     } finally {
       setBillingAction('idle')
+    }
+  }
+
+  async function handleBillingAdminAction(
+    action: 'sync_notifications' | 'reset_mock_billing',
+  ) {
+    setBillingAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeBillingAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        action,
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run billing admin action.',
+      )
+    } finally {
+      setBillingAdminAction('idle')
     }
   }
 
@@ -2243,6 +2286,68 @@ function App() {
                 No billing notifications have been delivered for this workspace yet.
               </p>
             )}
+          </div>
+        ) : null}
+
+        {billingCapabilities?.supportsBillingAdminTools &&
+        billingAdminSummary ? (
+          <div className="billing-admin">
+            <div className="billing-admin__header">
+              <span>Billing admin tools</span>
+              <strong>{billingAdminSummary.role}</strong>
+            </div>
+            <p>{billingAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Alerts</span>
+                <strong>{billingAdminSummary.stats.alertCount}</strong>
+                <small>
+                  {billingAdminSummary.stats.criticalAlertCount} critical
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Invoices</span>
+                <strong>{billingAdminSummary.stats.invoiceCount}</strong>
+                <small>
+                  ${billingAdminSummary.stats.paidInvoiceTotalUsd.toFixed(2)} paid
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Webhooks</span>
+                <strong>{billingAdminSummary.stats.webhookEventCount}</strong>
+                <small>
+                  {billingAdminSummary.stats.failedWebhookEventCount} failed
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Notifications</span>
+                <strong>{billingAdminSummary.stats.notificationCount}</strong>
+                <small>
+                  {billingAdminSummary.stats.failedNotificationCount} failed
+                </small>
+              </article>
+            </div>
+            {billingAdminSummary.availableActions.length ? (
+              <div className="billing-admin__actions">
+                {billingAdminSummary.availableActions.map((action) => (
+                  <button
+                    key={action}
+                    className={
+                      action === 'reset_mock_billing'
+                        ? 'danger-button'
+                        : 'secondary-button'
+                    }
+                    type="button"
+                    disabled={
+                      billingAction !== 'idle' || billingAdminAction !== 'idle'
+                    }
+                    onClick={() => void handleBillingAdminAction(action)}
+                  >
+                    {formatBillingAdminAction(action)}
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
         ) : null}
 

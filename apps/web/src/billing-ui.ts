@@ -8,6 +8,8 @@ import type {
 } from '@ai-war-room/schemas'
 import {
   PAID_TIER_LIMITS,
+  billingAdminActionResponseSchema,
+  billingAdminSummaryResponseSchema,
   billingCapabilitiesResponseSchema,
   billingInvoicesResponseSchema,
   billingMeterUsageReportsResponseSchema,
@@ -141,6 +143,68 @@ export function formatBillingRolloutCheckStatus(
       return 'Fail'
     case 'skip':
       return 'Skip'
+  }
+}
+
+export async function fetchBillingAdminSummary(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/billing/workspace/${encodeURIComponent(workspaceId)}/admin`,
+    {
+      headers,
+    },
+  )
+
+  if (response.status === 403) {
+    return null
+  }
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return billingAdminSummaryResponseSchema.parse(await response.json())
+}
+
+export async function executeBillingAdminAction(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+  action: 'sync_notifications' | 'reset_mock_billing',
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/billing/workspace/${encodeURIComponent(workspaceId)}/admin/actions`,
+    {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        workspaceId,
+        action,
+      }),
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return billingAdminActionResponseSchema.parse(await response.json())
+}
+
+export function formatBillingAdminAction(
+  action: 'sync_notifications' | 'reset_mock_billing',
+) {
+  switch (action) {
+    case 'sync_notifications':
+      return 'Sync notifications'
+    case 'reset_mock_billing':
+      return 'Reset mock billing'
   }
 }
 

@@ -22,4 +22,5 @@ export interface BillingRepository {
     status: BillingStatus
     paidTier?: CheckoutPaidTier | 'free'
   }): Promise<BillingRecord | null>
+  resetMockWorkspaceBilling(workspaceId: string): Promise<BillingRecord | null>
 }

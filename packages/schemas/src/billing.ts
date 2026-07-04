@@ -1,6 +1,7 @@
 import { z } from 'zod'
 import { nonEmptyStringSchema, utcDateStringSchema } from './common.js'
 import { paidTierSchema } from './usage.js'
+import { workspaceRoleSchema } from './workspace.js'
 
 export const billingStatusSchema = z.enum([
   'draft',
@@ -42,6 +43,7 @@ export const billingCapabilitiesResponseSchema = z.object({
   supportsMeteredUsage: z.boolean(),
   supportsBillingNotifications: z.boolean(),
   supportsBillingRollout: z.boolean(),
+  supportsBillingAdminTools: z.boolean(),
   checkoutTiers: z.array(checkoutPaidTierSchema),
   guidance: z.string(),
 })
@@ -343,6 +345,58 @@ export const billingRolloutResponseSchema = z.object({
 })
 export type BillingRolloutResponse = z.infer<typeof billingRolloutResponseSchema>
 
+export const billingAdminActionSchema = z.enum([
+  'sync_notifications',
+  'reset_mock_billing',
+])
+export type BillingAdminAction = z.infer<typeof billingAdminActionSchema>
+
+export const billingAdminStatsSchema = z.object({
+  alertCount: z.number().int().nonnegative(),
+  criticalAlertCount: z.number().int().nonnegative(),
+  invoiceCount: z.number().int().nonnegative(),
+  paidInvoiceTotalUsd: z.number().nonnegative(),
+  webhookEventCount: z.number().int().nonnegative(),
+  failedWebhookEventCount: z.number().int().nonnegative(),
+  meterUsageReportCount: z.number().int().nonnegative(),
+  failedMeterUsageReportCount: z.number().int().nonnegative(),
+  notificationCount: z.number().int().nonnegative(),
+  failedNotificationCount: z.number().int().nonnegative(),
+})
+export type BillingAdminStats = z.infer<typeof billingAdminStatsSchema>
+
+export const billingAdminSummaryResponseSchema = z.object({
+  workspaceId: nonEmptyStringSchema,
+  role: workspaceRoleSchema,
+  billingRecord: billingRecordSchema.nullable(),
+  usage: billingWorkspaceUsageResponseSchema.nullable(),
+  stats: billingAdminStatsSchema,
+  availableActions: z.array(billingAdminActionSchema),
+  guidance: nonEmptyStringSchema,
+})
+export type BillingAdminSummaryResponse = z.infer<
+  typeof billingAdminSummaryResponseSchema
+>
+
+export const billingAdminActionRequestSchema = z.object({
+  workspaceId: nonEmptyStringSchema,
+  action: billingAdminActionSchema,
+})
+export type BillingAdminActionRequest = z.infer<
+  typeof billingAdminActionRequestSchema
+>
+
+export const billingAdminActionResponseSchema = z.object({
+  workspaceId: nonEmptyStringSchema,
+  action: billingAdminActionSchema,
+  message: nonEmptyStringSchema,
+  billingRecord: billingRecordSchema.nullable().optional(),
+  notificationCount: z.number().int().nonnegative().optional(),
+})
+export type BillingAdminActionResponse = z.infer<
+  typeof billingAdminActionResponseSchema
+>
+
 export function getBillingGuidance(input: {
   enabled: boolean
   adapter: BillingAdapter
@@ -352,8 +406,8 @@ export function getBillingGuidance(input: {
   }
 
   if (input.adapter === 'mock') {
-    return 'Mock billing is active. Checkout, customer portal, invoice history, usage summary, billing export, billing alerts, metered usage reporting, and billing notification delivery run locally for development and tests.'
+    return 'Mock billing is active. Checkout, customer portal, invoice history, usage summary, billing export, billing alerts, metered usage reporting, billing notification delivery, and workspace billing admin tools run locally for development and tests.'
   }
 
-  return 'Stripe billing is active. Use checkout for upgrades, the customer portal for subscription management, and configure webhooks for idempotent billing, invoice history, usage summary, export, alerts, metered usage reporting, and notification delivery.'
+  return 'Stripe billing is active. Use checkout for upgrades, the customer portal for subscription management, workspace billing admin tools for owners and admins, and configure webhooks for idempotent billing, invoice history, usage summary, export, alerts, metered usage reporting, and notification delivery.'
 }

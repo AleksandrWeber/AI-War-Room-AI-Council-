@@ -65,6 +65,10 @@ export class BillingNotificationService {
   async listWorkspaceNotifications(workspaceId: string) {
     await this.syncWorkspaceNotifications(workspaceId)
 
+    return this.getWorkspaceNotificationsSnapshot(workspaceId)
+  }
+
+  async getWorkspaceNotificationsSnapshot(workspaceId: string) {
     const notifications =
       await this.billingNotificationRepository.listWorkspaceNotifications(
         workspaceId,
