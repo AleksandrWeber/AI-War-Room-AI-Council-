@@ -562,6 +562,12 @@
   opacity: 0.6;
 }
 
+.runtime-note {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0;
+}
+
 .results-panel {
   display: grid;
   gap: 22px;

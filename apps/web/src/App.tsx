@@ -4,6 +4,16 @@ import './App.css'
 type ApiHealthState = 'checking' | 'online' | 'offline'
 type SubmitState = 'idle' | 'submitting' | 'success' | 'error'
 type PipelineState = 'idle' | 'running' | 'completed' | 'error'
+type TemporalWorkflowStatus =
+  | 'disabled'
+  | 'running'
+  | 'completed'
+  | 'failed'
+  | 'canceled'
+  | 'terminated'
+  | 'timed_out'
+  | 'continued_as_new'
+  | 'unknown'
 
 type ShieldFinding = {
   findingId: string
@@ -88,6 +98,16 @@ type PipelineStreamEvent =
       eventId: string
       type: 'error'
       message: string
+      timestamp: string
+    }
+  | {
+      eventId: string
+      type: 'workflow_status'
+      runId: string
+      workflowId: string
+      temporalRunId?: string
+      taskQueue: string
+      status: TemporalWorkflowStatus
       timestamp: string
     }
 
@@ -191,7 +211,31 @@ type MockPipelineResult = {
   artifacts: ArtifactResult[]
 }
 
+type TemporalRunStartResponse = {
+  runId: string
+  workspaceId: string
+  workflowId: string
+  temporalRunId?: string
+  taskQueue: string
+  status: TemporalWorkflowStatus
+  temporalEnabled: true
+  startedAt: string
+}
+
+type TemporalRunStatusResponse = {
+  runId: string
+  workspaceId: string
+  workflowId: string
+  temporalRunId?: string
+  taskQueue: string
+  status: TemporalWorkflowStatus
+  temporalEnabled: true
+  checkedAt: string
+}
+
 const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:3000/api'
+const useTemporalWorkflowRuntime =
+  import.meta.env.VITE_USE_TEMPORAL_WORKFLOWS === 'true'
 const localAuthHeaders = {
   'x-user-id': 'user_local',
   'x-workspace-id': 'local_workspace',
@@ -369,6 +413,56 @@ function parseSseEvents(chunk: string): PipelineStreamEvent[] {
     .filter((event): event is PipelineStreamEvent => Boolean(event))
 }
 
+function isTemporalTerminalStatus(status: TemporalWorkflowStatus) {
+  return !['running', 'unknown', 'disabled'].includes(status)
+}
+
+function mapTemporalStatusToStepStatus(
+  status: TemporalWorkflowStatus,
+): PipelineStep['status'] {
+  if (status === 'completed') {
+    return 'completed'
+  }
+
+  if (status === 'running' || status === 'unknown') {
+    return 'running'
+  }
+
+  return 'failed'
+}
+
+async function readSseStream(
+  response: Response,
+  onEvent: (event: PipelineStreamEvent) => void,
+) {
+  if (!response.body) {
+    throw new Error('Streaming response body is not available.')
+  }
+
+  const reader = response.body.getReader()
+  const decoder = new TextDecoder()
+  let buffer = ''
+
+  while (true) {
+    const { done, value } = await reader.read()
+    buffer += decoder.decode(value, { stream: !done })
+    const chunks = buffer.split('\n\n')
+    buffer = chunks.pop() ?? ''
+
+    for (const event of parseSseEvents(chunks.join('\n\n'))) {
+      onEvent(event)
+    }
+
+    if (done) {
+      break
+    }
+  }
+
+  for (const event of parseSseEvents(buffer)) {
+    onEvent(event)
+  }
+}
+
 function App() {
   const [apiHealth, setApiHealth] = useState<ApiHealthState>('checking')
   const [rawIdea, setRawIdea] = useState(() => {
@@ -399,6 +493,8 @@ function App() {
   const [streamedArtifacts, setStreamedArtifacts] = useState<ArtifactResult[]>([])
   const [lastStreamEventId, setLastStreamEventId] = useState<string | null>(null)
   const [lastStreamRunId, setLastStreamRunId] = useState<string | null>(null)
+  const [activeTemporalWorkflow, setActiveTemporalWorkflow] =
+    useState<TemporalRunStartResponse | null>(null)
   const [artifactHistory, setArtifactHistory] = useState<ArtifactHistoryItem[]>([])
   const [historyError, setHistoryError] = useState<string | null>(null)
   const [providerCredentials, setProviderCredentials] =
@@ -554,7 +650,28 @@ function App() {
     })
   }
 
-  async function handleExecuteMockPipeline() {
+  function createApprovedRunPayload() {
+    if (!draftRun || !reviewDraft) {
+      return null
+    }
+
+    return {
+      draftRun,
+      approvedTriage: reviewDraft.triage,
+      selectedAgents: reviewDraft.selectedAgents,
+    }
+  }
+
+  async function handleExecuteApprovedRun() {
+    if (useTemporalWorkflowRuntime) {
+      await handleExecuteTemporalWorkflow()
+      return
+    }
+
+    await handleExecuteStreamedPipeline()
+  }
+
+  async function handleExecuteStreamedPipeline() {
     if (!draftRun || !reviewDraft) {
       return
     }
@@ -573,9 +690,16 @@ function App() {
       setStreamEvents([])
       setStreamedArtifacts([])
       setLastStreamEventId(null)
+      setActiveTemporalWorkflow(null)
     }
 
     try {
+      const payload = createApprovedRunPayload()
+
+      if (!payload) {
+        return
+      }
+
       const response = await fetch(`${apiBaseUrl}/runs/mock-pipeline/stream`, {
         method: 'POST',
         headers: {
@@ -583,43 +707,14 @@ function App() {
           ...localAuthHeaders,
           ...(canReplayStream ? { 'Last-Event-ID': lastStreamEventId } : {}),
         },
-        body: JSON.stringify({
-          draftRun,
-          approvedTriage: reviewDraft.triage,
-          selectedAgents: reviewDraft.selectedAgents,
-        }),
+        body: JSON.stringify(payload),
       })
 
       if (!response.ok) {
         throw new Error(`API returned ${response.status}`)
       }
 
-      if (!response.body) {
-        throw new Error('Streaming response body is not available.')
-      }
-
-      const reader = response.body.getReader()
-      const decoder = new TextDecoder()
-      let buffer = ''
-
-      while (true) {
-        const { done, value } = await reader.read()
-        buffer += decoder.decode(value, { stream: !done })
-        const chunks = buffer.split('\n\n')
-        buffer = chunks.pop() ?? ''
-
-        for (const event of parseSseEvents(chunks.join('\n\n'))) {
-          handlePipelineStreamEvent(event)
-        }
-
-        if (done) {
-          break
-        }
-      }
-
-      for (const event of parseSseEvents(buffer)) {
-        handlePipelineStreamEvent(event)
-      }
+      await readSseStream(response, handlePipelineStreamEvent)
     } catch (error) {
       setPipelineState('error')
       setPipelineError(
@@ -627,6 +722,120 @@ function App() {
           ? error.message
           : 'Failed to execute prompt-driven pipeline.',
       )
+    }
+  }
+
+  async function handleExecuteTemporalWorkflow() {
+    if (!draftRun) {
+      return
+    }
+
+    setPipelineState('running')
+    setPipelineError(null)
+    setPipelineResult(null)
+    setActiveTemporalWorkflow(null)
+    setLastStreamRunId(draftRun.runId)
+    setStreamEvents([])
+    setStreamedArtifacts([])
+    setLastStreamEventId(null)
+
+    try {
+      const payload = createApprovedRunPayload()
+
+      if (!payload) {
+        return
+      }
+
+      const startResponse = await fetch(`${apiBaseUrl}/runs/workflows`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...localAuthHeaders,
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (!startResponse.ok) {
+        throw new Error(`API returned ${startResponse.status}`)
+      }
+
+      const workflow = (await startResponse.json()) as TemporalRunStartResponse
+      setActiveTemporalWorkflow(workflow)
+
+      await observeTemporalWorkflow(workflow.workflowId)
+      await pollTemporalWorkflowStatus(workflow)
+    } catch (error) {
+      setPipelineState('error')
+      setPipelineError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to start Temporal workflow.',
+      )
+    }
+  }
+
+  async function observeTemporalWorkflow(workflowId: string) {
+    const response = await fetch(`${apiBaseUrl}/runs/workflows/${workflowId}/stream`, {
+      headers: localAuthHeaders,
+    })
+
+    if (!response.ok) {
+      throw new Error(`API returned ${response.status}`)
+    }
+
+    await readSseStream(response, handlePipelineStreamEvent)
+  }
+
+  async function pollTemporalWorkflowStatus(workflow: TemporalRunStartResponse) {
+    let latestStatus: TemporalWorkflowStatus = workflow.status
+
+    for (let attempt = 0; attempt < 20 && !isTemporalTerminalStatus(latestStatus); attempt += 1) {
+      await new Promise((resolve) => setTimeout(resolve, attempt === 0 ? 500 : 1_500))
+
+      const statusResponse = await fetch(
+        `${apiBaseUrl}/runs/workflows/${workflow.workflowId}/status`,
+        {
+          headers: localAuthHeaders,
+        },
+      )
+
+      if (!statusResponse.ok) {
+        throw new Error(`API returned ${statusResponse.status}`)
+      }
+
+      const status = (await statusResponse.json()) as TemporalRunStatusResponse
+      latestStatus = status.status
+      setActiveTemporalWorkflow((current) =>
+        current
+          ? {
+              ...current,
+              temporalRunId: status.temporalRunId ?? current.temporalRunId,
+              status: status.status,
+            }
+          : current,
+      )
+      await observeTemporalWorkflow(workflow.workflowId)
+    }
+
+    if (latestStatus === 'completed') {
+      const history = await handleLoadArtifactHistory()
+      const runArtifacts = history
+        .filter((artifact) => artifact.runId === workflow.runId)
+        .map((artifact) => ({
+          metadata: artifact.metadata,
+          artifact: artifact.artifact,
+        }))
+
+      setStreamedArtifacts(runArtifacts)
+      if (runArtifacts[0]) {
+        setActiveArtifactType(runArtifacts[0].metadata.artifactType)
+      }
+      setPipelineState('completed')
+      return
+    }
+
+    if (isTemporalTerminalStatus(latestStatus)) {
+      throw new Error(`Temporal workflow ended with status: ${latestStatus}`)
     }
   }
 
@@ -644,10 +853,14 @@ function App() {
 
       const history = (await response.json()) as ArtifactHistoryResponse
       setArtifactHistory(history.artifacts)
+
+      return history.artifacts
     } catch (error) {
       setHistoryError(
         error instanceof Error ? error.message : 'Failed to load artifact history.',
       )
+
+      return []
     }
   }
 
@@ -839,6 +1052,27 @@ function App() {
       setPipelineState('completed')
     }
 
+    if (event.type === 'workflow_status') {
+      setActiveTemporalWorkflow((current) =>
+        current
+          ? {
+              ...current,
+              temporalRunId: event.temporalRunId ?? current.temporalRunId,
+              status: event.status,
+            }
+          : current,
+      )
+
+      if (event.status === 'completed') {
+        setPipelineState('completed')
+      }
+
+      if (isTemporalTerminalStatus(event.status) && event.status !== 'completed') {
+        setPipelineState('error')
+        setPipelineError(`Temporal workflow ended with status: ${event.status}`)
+      }
+    }
+
     if (event.type === 'error') {
       setPipelineState('error')
       setPipelineError(event.message)
@@ -855,6 +1089,18 @@ function App() {
     ) ?? (pipelineResult?.artifacts ?? streamedArtifacts)[0]
   const visibleArtifacts = pipelineResult?.artifacts ?? streamedArtifacts
   const statusEvents = streamEvents.filter((event) => event.type === 'status')
+  const workflowStatusEvents = streamEvents.filter(
+    (event) => event.type === 'workflow_status',
+  )
+  const displayedSteps: PipelineStep[] =
+    pipelineResult?.steps ??
+    (workflowStatusEvents.length > 0
+      ? workflowStatusEvents.map((event) => ({
+          stepId: event.workflowId,
+          label: `Temporal workflow (${event.taskQueue})`,
+          status: mapTemporalStatusToStepStatus(event.status),
+        }))
+      : statusEvents)
   const selectedAgentCount = reviewDraft?.selectedAgents.length ?? 0
   const selectedSpecialistCount =
     reviewDraft?.selectedAgents.filter((agent) => agent !== 'moderator').length ?? 0
@@ -1281,12 +1527,22 @@ function App() {
               disabled={
                 pipelineState === 'running' || reviewDraft.selectedAgents.length < 3
               }
-              onClick={handleExecuteMockPipeline}
+              onClick={handleExecuteApprovedRun}
             >
               {pipelineState === 'running'
-                ? 'Executing prompt-driven pipeline...'
-                : 'Execute prompt-driven pipeline'}
+                ? useTemporalWorkflowRuntime
+                  ? 'Starting Temporal workflow...'
+                  : 'Executing prompt-driven pipeline...'
+                : useTemporalWorkflowRuntime
+                  ? 'Execute with Temporal workflow'
+                  : 'Execute prompt-driven pipeline'}
             </button>
+            {useTemporalWorkflowRuntime ? (
+              <p className="runtime-note">
+                Temporal runtime path enabled. Make sure `TEMPORAL_ENABLED=true`
+                and the worker are running.
+              </p>
+            ) : null}
             {pipelineError ? <p className="form-error">{pipelineError}</p> : null}
           </div>
         </section>
@@ -1298,13 +1554,21 @@ function App() {
             <p className="eyebrow">Pipeline Result</p>
             <h2>
               {pipelineState === 'running'
-                ? 'Streaming run status...'
+                ? useTemporalWorkflowRuntime
+                  ? 'Observing Temporal workflow...'
+                  : 'Streaming run status...'
                 : 'Artifacts generated from isolated prompt-driven agents.'}
             </h2>
+            {activeTemporalWorkflow ? (
+              <p>
+                Workflow {activeTemporalWorkflow.workflowId} is{' '}
+                {activeTemporalWorkflow.status}.
+              </p>
+            ) : null}
           </div>
 
           <div className="step-list">
-            {(pipelineResult?.steps ?? statusEvents).map((step) => (
+            {displayedSteps.map((step) => (
               <div className="step-item" key={`${step.stepId}-${step.status}`}>
                 <span>{step.label}</span>
                 <strong>{step.status}</strong>

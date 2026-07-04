@@ -125,7 +125,7 @@ Run mutation endpoints verify that the request workspace matches the header work
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
-Current `v4.2` behavior:
+Current `v4.3` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
 - All JSON responses are parsed and validated with Zod schemas.
@@ -195,6 +195,9 @@ Current `v4.2` behavior:
 - Status checks update persisted workflow metadata and publish `workflow_status` events into the existing run stream buffer.
 - `GET /api/runs/workflows/:workflowId/observation` returns the persisted workflow metadata for the current workspace.
 - `GET /api/runs/workflows/:workflowId/stream` streams/replays workflow status events with `Last-Event-ID` support.
+- The frontend keeps the existing direct REST/SSE pipeline as the default runtime path.
+- `VITE_USE_TEMPORAL_WORKFLOWS=true` switches the Execute button to the Temporal workflow start/status/stream path.
+- In Temporal runtime mode, the frontend observes workflow status and loads generated artifacts from persisted artifact history after completion.
 
 To enable real providers locally, copy `.env.example` to `.env`, add provider keys, and explicitly select the provider/model:
 
@@ -213,10 +216,11 @@ RESEARCH_PROVIDER=tavily
 TAVILY_API_KEY=...
 ```
 
-To run the Temporal worker skeleton against a local Temporal server, set `TEMPORAL_ENABLED=true`, run the API, and start the worker in a separate terminal:
+To run the Temporal runtime path against a local Temporal server, set both backend and frontend flags, run the API, and start the worker in a separate terminal:
 
 ```bash
 TEMPORAL_ENABLED=true npm run dev:api
+VITE_USE_TEMPORAL_WORKFLOWS=true npm run dev:web
 npm run worker:temporal:dev
 ```
 
