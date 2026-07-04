@@ -229,6 +229,112 @@
   margin-bottom: 24px;
 }
 
+.billing-panel {
+  display: grid;
+  gap: 20px;
+  margin-bottom: 24px;
+}
+
+.billing-summary {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.billing-status-card,
+.billing-guidance-card,
+.billing-tier-card {
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  display: grid;
+  gap: 10px;
+  padding: 20px;
+}
+
+.billing-status-card > span,
+.billing-guidance-card > span,
+.billing-tier-card > span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.billing-status-card p,
+.billing-guidance-card p,
+.billing-tier-card p {
+  color: var(--muted);
+  margin: 0;
+}
+
+.billing-status-card small {
+  color: var(--muted);
+}
+
+.billing-guidance-card button {
+  justify-self: start;
+}
+
+.billing-alert {
+  border-radius: 18px;
+  padding: 16px;
+}
+
+.billing-alert--success {
+  background: rgba(34, 197, 94, 0.12);
+  border: 1px solid rgba(34, 197, 94, 0.32);
+  color: #dcfce7;
+}
+
+.billing-grid {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.billing-tier-card--current {
+  border-color: rgba(56, 189, 248, 0.45);
+  box-shadow: inset 0 0 0 1px rgba(56, 189, 248, 0.18);
+}
+
+.billing-tier-badge {
+  color: #bae6fd;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.billing-tier-card button {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  border: 0;
+  border-radius: 999px;
+  color: #ffffff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  justify-self: start;
+  padding: 10px 14px;
+}
+
+.billing-tier-card button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.billing-guidance-card .secondary-button {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  font-weight: 800;
+  padding: 10px 14px;
+}
+
 .provider-alert {
   background: rgba(251, 191, 36, 0.12);
   border: 1px solid rgba(251, 191, 36, 0.32);
@@ -803,6 +909,8 @@
   .grid-section,
   .review-grid,
   .provider-grid,
+  .billing-summary,
+  .billing-grid,
   .provider-instructions,
   .agent-result-grid,
   .artifact-grid {

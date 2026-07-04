@@ -2,6 +2,9 @@ import { Fragment, useEffect, useRef, useState, type FormEvent } from 'react'
 import type {
   AuthCapabilitiesResponse,
   AuthSessionResponse,
+  BillingCapabilitiesResponse,
+  BillingWorkspaceStatusResponse,
+  CheckoutPaidTier,
   RunCapabilitiesResponse,
   TemporalRuntimeHealthResponse,
 } from '@ai-war-room/schemas'
@@ -12,6 +15,19 @@ import {
   loadStoredAuthSession,
   saveStoredAuthSession,
 } from './auth-headers'
+import {
+  clearBillingReturnHint,
+  completeMockBillingCheckout,
+  createBillingCheckoutSession,
+  defaultWorkspaceId,
+  describeBillingCapabilities,
+  fetchBillingCapabilities,
+  fetchBillingWorkspaceStatus,
+  formatBillingStatus,
+  formatPaidTier,
+  formatTierLimits,
+  readBillingReturnHint,
+} from './billing-ui'
 import {
   type TemporalRunStartResponse,
   type TemporalWorkflowRecoveryResponse,
@@ -529,6 +545,15 @@ function App() {
   const [providerCredentialStatus, setProviderCredentialStatus] = useState<
     'idle' | 'loading' | 'saving' | 'testing'
   >('idle')
+  const [billingCapabilities, setBillingCapabilities] =
+    useState<BillingCapabilitiesResponse | null>(null)
+  const [billingStatus, setBillingStatus] =
+    useState<BillingWorkspaceStatusResponse | null>(null)
+  const [billingError, setBillingError] = useState<string | null>(null)
+  const [billingMessage, setBillingMessage] = useState<string | null>(null)
+  const [billingAction, setBillingAction] = useState<
+    'idle' | 'loading' | 'upgrading'
+  >('idle')
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
     useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
@@ -615,6 +640,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setRunCapabilities(null)
+        }
+      })
+
+    fetchBillingCapabilities(apiBaseUrl)
+      .then((capabilities) => {
+        if (!controller.signal.aborted) {
+          setBillingCapabilities(capabilities)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setBillingCapabilities(null)
         }
       })
 
@@ -720,6 +757,27 @@ function App() {
 
   useEffect(() => {
     void handleLoadProviderCredentials()
+  }, [])
+
+  useEffect(() => {
+    void handleLoadBillingStatus()
+  }, [authCapabilities, authSession])
+
+  useEffect(() => {
+    const returnHint = readBillingReturnHint()
+
+    if (!returnHint) {
+      return
+    }
+
+    if (returnHint === 'success') {
+      setBillingMessage('Checkout completed. Workspace billing status refreshed.')
+    } else {
+      setBillingMessage('Checkout canceled. No billing changes were applied.')
+    }
+
+    clearBillingReturnHint()
+    void handleLoadBillingStatus()
   }, [])
 
   useEffect(() => {
@@ -1151,6 +1209,62 @@ function App() {
       setHistoryError(
         error instanceof Error ? error.message : 'Failed to export Markdown.',
       )
+    }
+  }
+
+  async function handleLoadBillingStatus() {
+    setBillingAction('loading')
+    setBillingError(null)
+
+    try {
+      const status = await fetchBillingWorkspaceStatus(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBillingStatus(status)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to load workspace billing status.',
+      )
+    } finally {
+      setBillingAction('idle')
+    }
+  }
+
+  async function handleUpgradeBillingTier(paidTier: CheckoutPaidTier) {
+    setBillingAction('upgrading')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const session = await createBillingCheckoutSession(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        paidTier,
+        workspaceAuthHeaders,
+      )
+
+      if (billingCapabilities?.adapter === 'mock') {
+        const completed = await completeMockBillingCheckout(session.checkoutUrl)
+        setBillingStatus(completed)
+        setBillingMessage(
+          `Mock checkout completed. Workspace upgraded to ${formatPaidTier(paidTier)}.`,
+        )
+        return
+      }
+
+      window.location.assign(session.checkoutUrl)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to start billing checkout.',
+      )
+    } finally {
+      setBillingAction('idle')
     }
   }
 
@@ -1600,6 +1714,123 @@ function App() {
             )}
           </div>
         ) : null}
+      </section>
+
+      <section className="panel billing-panel" id="billing">
+        <div className="section-heading">
+          <p className="eyebrow">Workspace Billing</p>
+          <h2>Upgrade tiers and unlock paid features.</h2>
+          <p>
+            Market Research and higher daily usage limits require a paid
+            workspace tier. Checkout uses mock billing locally or Stripe in
+            production.
+          </p>
+        </div>
+
+        <div className="billing-summary">
+          <article className="billing-status-card">
+            <span>Current workspace</span>
+            <strong>{defaultWorkspaceId}</strong>
+            <p>
+              Tier:{' '}
+              {billingStatus?.billingRecord
+                ? formatPaidTier(billingStatus.billingRecord.paidTier)
+                : 'Unknown'}
+            </p>
+            <p>
+              Status:{' '}
+              {billingStatus?.billingRecord
+                ? formatBillingStatus(billingStatus.billingRecord.status)
+                : billingAction === 'loading'
+                  ? 'Loading...'
+                  : 'Unavailable'}
+            </p>
+            {billingStatus?.billingRecord?.externalCustomerId ? (
+              <small>
+                Customer: {billingStatus.billingRecord.externalCustomerId}
+              </small>
+            ) : null}
+          </article>
+
+          <article className="billing-guidance-card">
+            <span>Billing mode</span>
+            <strong>
+              {billingCapabilities?.enabled
+                ? billingCapabilities.adapter === 'mock'
+                  ? 'Mock checkout'
+                  : 'Stripe checkout'
+                : 'Disabled'}
+            </strong>
+            <p>{describeBillingCapabilities(billingCapabilities)}</p>
+            <button
+              className="secondary-button"
+              type="button"
+              disabled={billingAction !== 'idle'}
+              onClick={() => void handleLoadBillingStatus()}
+            >
+              Refresh billing status
+            </button>
+          </article>
+        </div>
+
+        {billingMessage ? (
+          <div className="billing-alert billing-alert--success">
+            <strong>{billingMessage}</strong>
+          </div>
+        ) : null}
+
+        {billingError ? (
+          <p className="form-error">{billingError}</p>
+        ) : null}
+
+        <div className="billing-grid">
+          {(['free', 'pro', 'business'] as const).map((tier) => {
+            const currentTier = billingStatus?.billingRecord?.paidTier ?? 'free'
+            const isCurrent = currentTier === tier
+            const isUpgradeTarget =
+              billingCapabilities?.checkoutTiers.includes(
+                tier as CheckoutPaidTier,
+              ) ?? false
+
+            return (
+              <article
+                className={`billing-tier-card${isCurrent ? ' billing-tier-card--current' : ''}`}
+                key={tier}
+              >
+                <span>{formatPaidTier(tier)}</span>
+                <strong>{formatTierLimits(tier)}</strong>
+                <p>
+                  {tier === 'free'
+                    ? 'Default local tier with core planning flow.'
+                    : tier === 'pro'
+                      ? 'Unlocks Market Research and higher daily limits.'
+                      : 'Highest limits for teams running frequent deep runs.'}
+                </p>
+                {isCurrent ? (
+                  <p className="billing-tier-badge">Current tier</p>
+                ) : tier !== 'free' &&
+                  isUpgradeTarget &&
+                  billingCapabilities?.supportsCheckout ? (
+                  <button
+                    type="button"
+                    disabled={billingAction === 'upgrading'}
+                    onClick={() => void handleUpgradeBillingTier(tier)}
+                  >
+                    {billingAction === 'upgrading'
+                      ? 'Starting checkout...'
+                      : `Upgrade to ${formatPaidTier(tier)}`}
+                  </button>
+                ) : (
+                  <p className="clear-copy">
+                    {billingCapabilities?.enabled
+                      ? 'Checkout unavailable for this tier.'
+                      : 'Enable STRIPE_ENABLED=true on the API to start checkout.'}
+                  </p>
+                )}
+              </article>
+            )
+          })}
+        </div>
       </section>
 
       {draftRun && reviewDraft ? (

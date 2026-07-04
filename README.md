@@ -245,11 +245,36 @@ npm run dev:api
 
 Configure Stripe webhooks to `POST /api/billing/webhook`. Checkout metadata includes `workspaceId` and `paidTier` so subscription events upgrade workspace limits automatically.
 
+### Billing UI
+
+The web app includes a **Workspace Billing** panel (`#billing`) that:
+
+- loads billing capabilities and workspace billing status from the API
+- shows Free / Pro / Business tier cards with daily limits
+- starts checkout for Pro or Business when `STRIPE_ENABLED=true`
+- completes mock checkout inline in the browser
+- refreshes status after Stripe returns to `/billing/success` or `/billing/cancel`
+
+Local mock billing UI test:
+
+```bash
+STRIPE_ENABLED=true STRIPE_BILLING_ADAPTER=mock npm run dev:api
+npm run dev:web
+```
+
+Open the web app, scroll to **Workspace Billing**, and click **Upgrade to Pro**.
+
 Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
 
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v5.7` behavior:
+
+- The web app shows a Workspace Billing panel with current tier, status, and upgrade actions.
+- Mock checkout completes inline without leaving the app; Stripe checkout redirects to hosted checkout and returns via `/billing/success`.
+- Billing status refresh runs automatically after checkout return hints.
 
 Current `v5.6` behavior:
 
