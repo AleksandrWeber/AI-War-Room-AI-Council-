@@ -1,4 +1,10 @@
-import { BadRequestException, Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  ConflictException,
+  Inject,
+  Injectable,
+} from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { randomUUID } from 'node:crypto'
 import {
   type AgentExecutionResult,
@@ -19,6 +25,12 @@ import {
   moderatorSynthesisSchema,
   runStatusSchema,
 } from '@ai-war-room/schemas'
+import type { ApiEnv } from '../config/env.js'
+import { IdempotencyService } from '../persistence/idempotency.service.js'
+import {
+  RUN_REPOSITORY,
+  type RunRepository,
+} from '../persistence/run.repository.js'
 
 const promptInjectionPattern =
   /ignore (all )?(previous|prior) instructions|system prompt|developer message/i
@@ -32,6 +44,13 @@ function createId(prefix: string) {
 
 @Injectable()
 export class RunsService {
+  constructor(
+    @Inject(RUN_REPOSITORY)
+    private readonly runRepository: RunRepository,
+    private readonly idempotencyService: IdempotencyService,
+    private readonly configService: ConfigService<ApiEnv, true>,
+  ) {}
+
   getCapabilities() {
     return {
       statuses: runStatusSchema.options,
@@ -48,7 +67,7 @@ export class RunsService {
     }
   }
 
-  createDraftRun(input: unknown): DraftRun {
+  async createDraftRun(input: unknown): Promise<DraftRun> {
     const parsedRequest = createRunRequestSchema.safeParse(input)
 
     if (!parsedRequest.success) {
@@ -59,11 +78,47 @@ export class RunsService {
     }
 
     const request = parsedRequest.data
+    const existingRun =
+      await this.runRepository.findDraftRunByIdempotencyKey(
+        request.workspaceId,
+        request.idempotencyKey,
+      )
+
+    if (existingRun) {
+      return existingRun
+    }
+
+    const idempotencyTtlSeconds = this.configService.get(
+      'IDEMPOTENCY_TTL_SECONDS',
+      { infer: true },
+    )
+    const reserved = await this.idempotencyService.reserve({
+      workspaceId: request.workspaceId,
+      idempotencyKey: request.idempotencyKey,
+      ttlSeconds: idempotencyTtlSeconds,
+    })
+
+    if (!reserved) {
+      const maybeExisting =
+        await this.runRepository.findDraftRunByIdempotencyKey(
+          request.workspaceId,
+          request.idempotencyKey,
+        )
+
+      if (maybeExisting) {
+        return maybeExisting
+      }
+
+      throw new ConflictException({
+        message: 'Duplicate run request is already being processed.',
+      })
+    }
+
     const shieldScan = this.scanInput(request.idea.rawIdea)
     const triage = this.triageIdea(request, shieldScan.maxSeverity)
     const now = new Date().toISOString()
 
-    return draftRunSchema.parse({
+    const draftRun = draftRunSchema.parse({
       runId: createId('run'),
       workspaceId: request.workspaceId,
       status: 'draft',
@@ -76,9 +131,17 @@ export class RunsService {
       createdAt: now,
       updatedAt: now,
     })
+
+    await this.runRepository.saveDraftRun({
+      draftRun,
+      idempotencyKey: request.idempotencyKey,
+      idempotencyTtlSeconds,
+    })
+
+    return draftRun
   }
 
-  executeMockPipeline(input: unknown): MockPipelineResult {
+  async executeMockPipeline(input: unknown): Promise<MockPipelineResult> {
     const parsedRequest = mockPipelineRequestSchema.safeParse(input)
 
     if (!parsedRequest.success) {
@@ -119,7 +182,7 @@ export class RunsService {
       completedAt: now,
     })
 
-    return mockPipelineResultSchema.parse({
+    const pipelineResult = mockPipelineResultSchema.parse({
       runId: request.draftRun.runId,
       workspaceId: request.draftRun.workspaceId,
       status: 'completed',
@@ -135,6 +198,10 @@ export class RunsService {
       artifacts,
       completedAt: now,
     })
+
+    await this.runRepository.saveMockPipelineResult(pipelineResult)
+
+    return pipelineResult
   }
 
   private scanInput(rawIdea: string): DraftRun['shieldScan'] {

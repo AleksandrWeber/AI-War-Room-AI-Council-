@@ -9,9 +9,12 @@
   ],
   "scripts": {
     "build": "npm run build --workspaces --if-present",
+    "db:migrate": "npm run db:migrate --workspace @ai-war-room/api",
     "dev": "npm run dev --workspace apps/web",
     "dev:web": "npm run dev --workspace apps/web",
     "dev:api": "npm run dev --workspace apps/api",
+    "infra:up": "docker compose up -d --wait",
+    "infra:down": "docker compose down",
     "lint": "npm run lint --workspaces --if-present",
     "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present"

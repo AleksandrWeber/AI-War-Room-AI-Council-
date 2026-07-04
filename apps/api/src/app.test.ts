@@ -8,7 +8,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { AppModule } from './app.module.js'
 
 describe('API skeleton', () => {
-  let app: NestFastifyApplication
+  let app: NestFastifyApplication | undefined
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -24,11 +24,11 @@ describe('API skeleton', () => {
   })
 
   afterAll(async () => {
-    await app.close()
+    await app?.close()
   })
 
   it('returns health status', async () => {
-    const response = await request(app.getHttpServer())
+    const response = await request(app!.getHttpServer())
       .get('/api/health')
       .expect(200)
 
@@ -40,7 +40,7 @@ describe('API skeleton', () => {
   })
 
   it('returns version metadata', async () => {
-    const response = await request(app.getHttpServer())
+    const response = await request(app!.getHttpServer())
       .get('/api/version')
       .expect(200)
 
@@ -51,7 +51,7 @@ describe('API skeleton', () => {
   })
 
   it('returns run capabilities from shared schemas', async () => {
-    const response = await request(app.getHttpServer())
+    const response = await request(app!.getHttpServer())
       .get('/api/runs/capabilities')
       .expect(200)
 
@@ -61,7 +61,7 @@ describe('API skeleton', () => {
   })
 
   it('creates a draft run with deterministic triage', async () => {
-    const response = await request(app.getHttpServer())
+    const response = await request(app!.getHttpServer())
       .post('/api/runs/draft')
       .send({
         workspaceId: 'workspace_1',
@@ -84,8 +84,28 @@ describe('API skeleton', () => {
     expect(response.body.selectedAgents).toContain('moderator')
   })
 
+  it('returns the existing draft run for duplicate idempotency keys', async () => {
+    const payload = {
+      workspaceId: 'workspace_1',
+      idempotencyKey: 'idem_duplicate',
+      idea: {
+        rawIdea: 'Build a repeatable AI planning workflow.',
+      },
+    }
+    const firstResponse = await request(app!.getHttpServer())
+      .post('/api/runs/draft')
+      .send(payload)
+      .expect(201)
+    const secondResponse = await request(app!.getHttpServer())
+      .post('/api/runs/draft')
+      .send(payload)
+      .expect(201)
+
+    expect(secondResponse.body.runId).toBe(firstResponse.body.runId)
+  })
+
   it('surfaces Shield findings for risky input spans', async () => {
-    const response = await request(app.getHttpServer())
+    const response = await request(app!.getHttpServer())
       .post('/api/runs/draft')
       .send({
         workspaceId: 'workspace_1',
@@ -108,7 +128,7 @@ describe('API skeleton', () => {
   })
 
   it('rejects invalid draft run requests', async () => {
-    const response = await request(app.getHttpServer())
+    const response = await request(app!.getHttpServer())
       .post('/api/runs/draft')
       .send({
         workspaceId: 'workspace_1',
@@ -123,7 +143,7 @@ describe('API skeleton', () => {
   })
 
   it('executes the deterministic mock pipeline', async () => {
-    const draftResponse = await request(app.getHttpServer())
+    const draftResponse = await request(app!.getHttpServer())
       .post('/api/runs/draft')
       .send({
         workspaceId: 'workspace_1',
@@ -136,7 +156,7 @@ describe('API skeleton', () => {
       })
       .expect(201)
 
-    const pipelineResponse = await request(app.getHttpServer())
+    const pipelineResponse = await request(app!.getHttpServer())
       .post('/api/runs/mock-pipeline')
       .send({
         draftRun: draftResponse.body,

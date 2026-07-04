@@ -4,6 +4,11 @@ export const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   API_PORT: z.coerce.number().int().positive().default(3000),
   WEB_ORIGIN: z.url().default('http://127.0.0.1:5173'),
+  DATABASE_URL: z
+    .url()
+    .default('postgres://ai_war_room:ai_war_room@127.0.0.1:5432/ai_war_room'),
+  REDIS_URL: z.url().default('redis://127.0.0.1:6379'),
+  IDEMPOTENCY_TTL_SECONDS: z.coerce.number().int().positive().default(86_400),
 })
 
 export type ApiEnv = z.infer<typeof envSchema>

@@ -1,0 +1,259 @@
+import type { DraftRun, MockPipelineResult } from '@ai-war-room/schemas'
+import { draftRunSchema } from '@ai-war-room/schemas'
+import { Injectable } from '@nestjs/common'
+import type {
+  RunRepository,
+  SaveDraftRunInput,
+} from './run.repository.js'
+import { PostgresService } from './postgres.service.js'
+
+type DraftRunRow = {
+  run_id: string
+  workspace_id: string
+  status: 'draft'
+  idea: unknown
+  triage: unknown
+  selected_agents: unknown
+  estimated_duration_seconds: number
+  estimated_max_cost_usd: string
+  created_at: Date
+  updated_at: Date
+  shield_scan: {
+    scan_id: string
+    status: string
+    max_severity: string
+    findings: unknown
+  }
+}
+
+@Injectable()
+export class PostgresRunRepository implements RunRepository {
+  constructor(private readonly postgresService: PostgresService) {}
+
+  async findDraftRunByIdempotencyKey(
+    workspaceId: string,
+    idempotencyKey: string,
+  ): Promise<DraftRun | null> {
+    const result = await this.postgresService.query<DraftRunRow>(
+      `
+        SELECT
+          r.run_id,
+          r.workspace_id,
+          r.status,
+          r.idea,
+          r.triage,
+          r.selected_agents,
+          r.estimated_duration_seconds,
+          r.estimated_max_cost_usd,
+          r.created_at,
+          r.updated_at,
+          json_build_object(
+            'scanId', s.scan_id,
+            'status', s.status,
+            'maxSeverity', s.max_severity,
+            'findings', s.findings
+          ) AS shield_scan
+        FROM idempotency_keys i
+        JOIN runs r ON r.run_id = i.run_id
+        JOIN shield_scans s ON s.run_id = r.run_id
+        WHERE i.workspace_id = $1
+          AND i.idempotency_key = $2
+          AND i.expires_at > NOW()
+        LIMIT 1
+      `,
+      [workspaceId, idempotencyKey],
+    )
+
+    const row = result.rows[0]
+
+    if (!row) {
+      return null
+    }
+
+    return draftRunSchema.parse({
+      runId: row.run_id,
+      workspaceId: row.workspace_id,
+      status: row.status,
+      idea: row.idea,
+      shieldScan: row.shield_scan,
+      triage: row.triage,
+      selectedAgents: row.selected_agents,
+      estimatedDurationSeconds: row.estimated_duration_seconds,
+      estimatedMaxCostUsd: Number(row.estimated_max_cost_usd),
+      createdAt: row.created_at.toISOString(),
+      updatedAt: row.updated_at.toISOString(),
+    })
+  }
+
+  async saveDraftRun(input: SaveDraftRunInput): Promise<void> {
+    await this.postgresService.transaction(async (client) => {
+      await client.query(
+        `
+          INSERT INTO runs (
+            run_id,
+            workspace_id,
+            status,
+            idea,
+            triage,
+            selected_agents,
+            estimated_duration_seconds,
+            estimated_max_cost_usd,
+            created_at,
+            updated_at
+          )
+          VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+          ON CONFLICT (run_id) DO NOTHING
+        `,
+        [
+          input.draftRun.runId,
+          input.draftRun.workspaceId,
+          input.draftRun.status,
+          JSON.stringify(input.draftRun.idea),
+          JSON.stringify(input.draftRun.triage),
+          JSON.stringify(input.draftRun.selectedAgents),
+          input.draftRun.estimatedDurationSeconds,
+          input.draftRun.estimatedMaxCostUsd,
+          input.draftRun.createdAt,
+          input.draftRun.updatedAt,
+        ],
+      )
+
+      await client.query(
+        `
+          INSERT INTO shield_scans (
+            scan_id,
+            run_id,
+            source,
+            status,
+            max_severity,
+            findings,
+            created_at
+          )
+          VALUES ($1, $2, $3, $4, $5, $6, $7)
+          ON CONFLICT (scan_id) DO NOTHING
+        `,
+        [
+          input.draftRun.shieldScan.scanId,
+          input.draftRun.runId,
+          'user_input',
+          input.draftRun.shieldScan.status,
+          input.draftRun.shieldScan.maxSeverity,
+          JSON.stringify(input.draftRun.shieldScan.findings),
+          input.draftRun.createdAt,
+        ],
+      )
+
+      await client.query(
+        `
+          INSERT INTO idempotency_keys (
+            workspace_id,
+            idempotency_key,
+            run_id,
+            expires_at
+          )
+          VALUES ($1, $2, $3, NOW() + ($4::TEXT || ' seconds')::INTERVAL)
+          ON CONFLICT (workspace_id, idempotency_key) DO NOTHING
+        `,
+        [
+          input.draftRun.workspaceId,
+          input.idempotencyKey,
+          input.draftRun.runId,
+          input.idempotencyTtlSeconds,
+        ],
+      )
+    })
+  }
+
+  async saveMockPipelineResult(result: MockPipelineResult): Promise<void> {
+    await this.postgresService.transaction(async (client) => {
+      await client.query(
+        `
+          UPDATE runs
+          SET status = $2,
+              completed_at = $3,
+              updated_at = $3
+          WHERE run_id = $1
+        `,
+        [result.runId, result.status, result.completedAt],
+      )
+
+      for (const agentOutput of result.agentOutputs) {
+        await client.query(
+          `
+            INSERT INTO agent_outputs (
+              run_id,
+              agent_role,
+              output,
+              validation_status,
+              prompt_version,
+              model_provider,
+              model_name,
+              input_tokens,
+              output_tokens,
+              estimated_cost_usd,
+              shield_scan,
+              completed_at
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+          `,
+          [
+            agentOutput.runId,
+            agentOutput.agentRole,
+            JSON.stringify(agentOutput.output),
+            agentOutput.validationStatus,
+            agentOutput.promptVersion,
+            agentOutput.modelProvider,
+            agentOutput.modelName,
+            agentOutput.inputTokens,
+            agentOutput.outputTokens,
+            agentOutput.estimatedCostUsd,
+            JSON.stringify(agentOutput.shieldScan ?? null),
+            agentOutput.completedAt,
+          ],
+        )
+      }
+
+      await client.query(
+        `
+          INSERT INTO moderator_syntheses (run_id, synthesis, created_at)
+          VALUES ($1, $2, $3)
+          ON CONFLICT (run_id)
+          DO UPDATE SET synthesis = EXCLUDED.synthesis,
+                        created_at = EXCLUDED.created_at
+        `,
+        [
+          result.runId,
+          JSON.stringify(result.moderatorSynthesis),
+          result.completedAt,
+        ],
+      )
+
+      for (const artifact of result.artifacts) {
+        await client.query(
+          `
+            INSERT INTO artifacts (
+              artifact_id,
+              run_id,
+              workspace_id,
+              artifact_type,
+              metadata,
+              content,
+              created_at
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
+            ON CONFLICT (artifact_id) DO NOTHING
+          `,
+          [
+            artifact.metadata.artifactId,
+            artifact.metadata.runId,
+            artifact.metadata.workspaceId,
+            artifact.metadata.artifactType,
+            JSON.stringify(artifact.metadata),
+            JSON.stringify(artifact.artifact.content),
+            artifact.metadata.createdAt,
+          ],
+        )
+      }
+    })
+  }
+}
