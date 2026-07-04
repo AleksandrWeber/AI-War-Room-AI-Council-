@@ -1,4 +1,4 @@
-import { useEffect, useState, type FormEvent } from 'react'
+import { Fragment, useEffect, useState, type FormEvent } from 'react'
 import './App.css'
 
 type ApiHealthState = 'checking' | 'online' | 'offline'
@@ -64,6 +64,12 @@ type PipelineStep = {
 
 type AgentExecution = {
   agentRole: string
+  promptVersion: string
+  modelProvider: string
+  modelName: string
+  validationStatus: 'valid' | 'repaired' | 'fallback'
+  inputTokens: number
+  outputTokens: number
   output: {
     summary: string
     strengths: string[]
@@ -76,6 +82,15 @@ type AgentExecution = {
 type ArtifactResult = {
   metadata: {
     artifactType: 'executive_summary' | 'prd' | 'development_prompt'
+    promptVersion: string
+    modelProvider: string
+    modelName: string
+    validationStatus: 'valid' | 'repaired' | 'fallback'
+    shieldStatus: 'clear' | 'warning' | 'blocked'
+    tokenUsage: {
+      inputTokens: number
+      outputTokens: number
+    }
   }
   artifact: {
     artifactType: 'executive_summary' | 'prd' | 'development_prompt'
@@ -130,6 +145,37 @@ const agentOptions = [
   'mobile_ux_expert',
 ]
 
+const agentCatalog: Record<string, { label: string; rationale: string }> = {
+  product_manager: {
+    label: 'Product Manager',
+    rationale: 'Selected to frame users, value proposition, MVP scope, and product tradeoffs.',
+  },
+  critic: {
+    label: 'Critic',
+    rationale: 'Selected to challenge assumptions, weak points, and hidden execution risks.',
+  },
+  moderator: {
+    label: 'Moderator',
+    rationale: 'Required to synthesize isolated specialist output into one artifact brief.',
+  },
+  security_expert: {
+    label: 'Security Expert',
+    rationale: 'Selected when Shield or triage detects security-sensitive context.',
+  },
+  software_architect: {
+    label: 'Software Architect',
+    rationale: 'Selected for high-complexity ideas that need architecture and sequencing guidance.',
+  },
+  market_researcher: {
+    label: 'Market Researcher',
+    rationale: 'Selected when positioning, competition, pricing, or market validation is important.',
+  },
+  mobile_ux_expert: {
+    label: 'Mobile UX Expert',
+    rationale: 'Selected when the idea mentions mobile, iOS, Android, or compact review UX.',
+  },
+}
+
 const domainOptions = [
   'software',
   'mobile',
@@ -143,22 +189,55 @@ const domainOptions = [
 ]
 
 function formatAgent(agent: string) {
-  return agent
+  return (agentCatalog[agent]?.label ?? agent)
     .split('_')
     .map((word) => word[0].toUpperCase() + word.slice(1))
     .join(' ')
 }
 
-function getHighlightedIdea(rawIdea: string, finding?: ShieldFinding) {
-  if (!finding?.span) {
+function formatArtifactTitle(artifactType: ArtifactResult['metadata']['artifactType']) {
+  if (artifactType === 'prd') {
+    return 'PRD'
+  }
+
+  return formatAgent(artifactType)
+}
+
+function getSeverityLabel(severity: string) {
+  return severity === 'none' ? 'No risk' : severity
+}
+
+function getHighlightedIdea(rawIdea: string, findings: ShieldFinding[]) {
+  const spans = findings
+    .filter((finding) => finding.span)
+    .map((finding) => ({
+      findingId: finding.findingId,
+      start: finding.span!.start,
+      end: finding.span!.end,
+    }))
+    .sort((left, right) => left.start - right.start)
+
+  if (spans.length === 0) {
     return rawIdea
   }
 
+  let cursor = 0
+
   return (
     <>
-      {rawIdea.slice(0, finding.span.start)}
-      <mark>{rawIdea.slice(finding.span.start, finding.span.end)}</mark>
-      {rawIdea.slice(finding.span.end)}
+      {spans.map((span) => {
+        const before = rawIdea.slice(cursor, span.start)
+        const highlighted = rawIdea.slice(span.start, span.end)
+        cursor = span.end
+
+        return (
+          <Fragment key={span.findingId}>
+            {before}
+            <mark>{highlighted}</mark>
+          </Fragment>
+        )
+      })}
+      {rawIdea.slice(cursor)}
     </>
   )
 }
@@ -198,6 +277,9 @@ function App() {
   const [pipelineError, setPipelineError] = useState<string | null>(null)
   const [pipelineResult, setPipelineResult] =
     useState<MockPipelineResult | null>(null)
+  const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
+  const [activeArtifactType, setActiveArtifactType] =
+    useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
 
   useEffect(() => {
     const controller = new AbortController()
@@ -228,6 +310,16 @@ function App() {
       localStorage.setItem(reviewStorageKey, JSON.stringify(reviewDraft))
     }
   }, [reviewDraft])
+
+  useEffect(() => {
+    setActiveFindingId(draftRun?.shieldScan.findings[0]?.findingId ?? null)
+  }, [draftRun])
+
+  useEffect(() => {
+    if (pipelineResult?.artifacts[0]) {
+      setActiveArtifactType(pipelineResult.artifacts[0].metadata.artifactType)
+    }
+  }, [pipelineResult])
 
   async function handleCreateDraftRun(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
@@ -346,7 +438,17 @@ function App() {
     }
   }
 
-  const firstFinding = draftRun?.shieldScan.findings[0]
+  const activeFinding =
+    draftRun?.shieldScan.findings.find(
+      (finding) => finding.findingId === activeFindingId,
+    ) ?? draftRun?.shieldScan.findings[0]
+  const selectedArtifact =
+    pipelineResult?.artifacts.find(
+      (artifact) => artifact.metadata.artifactType === activeArtifactType,
+    ) ?? pipelineResult?.artifacts[0]
+  const selectedAgentCount = reviewDraft?.selectedAgents.length ?? 0
+  const selectedSpecialistCount =
+    reviewDraft?.selectedAgents.filter((agent) => agent !== 'moderator').length ?? 0
 
   return (
     <main className="app-shell">
@@ -412,22 +514,58 @@ function App() {
             <p className="eyebrow">Human Review</p>
             <h2>Approve the plan before execution.</h2>
             <p>
-              Draft state is autosaved locally. This MVP step does not execute
-              agents yet.
+              Draft state is autosaved locally. Review Shield context, triage,
+              selected agents, and estimated run cost before execution.
             </p>
           </div>
 
           <div className="review-grid">
             <div className="review-card">
               <span>Input with Shield context</span>
+              <div
+                className={`shield-warning-card shield-warning-card--${draftRun.shieldScan.status}`}
+              >
+                <strong>
+                  Shield {draftRun.shieldScan.status}:{' '}
+                  {getSeverityLabel(draftRun.shieldScan.maxSeverity)}
+                </strong>
+                <p>
+                  {draftRun.shieldScan.findings.length > 0
+                    ? `${draftRun.shieldScan.findings.length} finding(s) require review before execution.`
+                    : 'No meaningful findings. Shield stays quiet and the run can proceed.'}
+                </p>
+              </div>
               <p className="review-idea">
-                {getHighlightedIdea(draftRun.idea.rawIdea, firstFinding)}
+                {getHighlightedIdea(draftRun.idea.rawIdea, draftRun.shieldScan.findings)}
               </p>
-              {firstFinding ? (
-                <div className="finding-detail">
-                  <strong>{firstFinding.category}</strong>
-                  <p>{firstFinding.explanation}</p>
-                </div>
+              {draftRun.shieldScan.findings.length > 0 ? (
+                <>
+                  <div className="finding-tabs" aria-label="Shield findings">
+                    {draftRun.shieldScan.findings.map((finding) => (
+                      <button
+                        className={
+                          finding.findingId === activeFinding?.findingId
+                            ? 'finding-tab finding-tab--active'
+                            : 'finding-tab'
+                        }
+                        key={finding.findingId}
+                        type="button"
+                        onClick={() => setActiveFindingId(finding.findingId)}
+                      >
+                        {finding.category}
+                      </button>
+                    ))}
+                  </div>
+                  {activeFinding ? (
+                    <div className="finding-detail">
+                      <strong>
+                        {activeFinding.category} · {activeFinding.severity}
+                      </strong>
+                      <p>{activeFinding.explanation}</p>
+                      <small>Recommended action: {activeFinding.recommendedAction}</small>
+                    </div>
+                  ) : null}
+                </>
               ) : (
                 <p className="clear-copy">No meaningful Shield findings.</p>
               )}
@@ -502,14 +640,30 @@ function App() {
                   </select>
                 </label>
               </div>
+              <div className="triage-rationale">
+                <strong>Why this routing?</strong>
+                <p>{reviewDraft.triage.reasoningSummary}</p>
+              </div>
             </div>
           </div>
 
           <div className="review-card">
             <span>Selected agents</span>
+            <div className="agent-selection-summary">
+              <strong>{selectedAgentCount} selected</strong>
+              <span>{selectedSpecialistCount} specialists + Moderator</span>
+              <span>{reviewDraft.triage.recommendedRunMode} run mode</span>
+            </div>
             <div className="agent-toggle-list">
               {agentOptions.map((agent) => (
-                <label key={agent} className="agent-toggle">
+                <label
+                  key={agent}
+                  className={
+                    reviewDraft.selectedAgents.includes(agent)
+                      ? 'agent-toggle agent-toggle--selected'
+                      : 'agent-toggle'
+                  }
+                >
                   <input
                     type="checkbox"
                     checked={reviewDraft.selectedAgents.includes(agent)}
@@ -519,10 +673,24 @@ function App() {
                 </label>
               ))}
             </div>
+            <div className="agent-rationale-grid">
+              {reviewDraft.selectedAgents.map((agent) => (
+                <article className="agent-rationale-card" key={agent}>
+                  <strong>{formatAgent(agent)}</strong>
+                  <p>{agentCatalog[agent]?.rationale ?? 'Selected for this run.'}</p>
+                  {reviewDraft.triage.recommendedAgents.includes(agent) ? (
+                    <small>Recommended by triage</small>
+                  ) : (
+                    <small>Added during human review</small>
+                  )}
+                </article>
+              ))}
+            </div>
             <div className="estimate-row">
-              <span>{reviewDraft.triage.recommendedRunMode} run</span>
               <span>{reviewDraft.triage.estimatedDurationSeconds}s estimate</span>
-              <span>${reviewDraft.triage.estimatedMaxCostUsd.toFixed(2)} max</span>
+              <span>${reviewDraft.triage.estimatedMaxCostUsd.toFixed(2)} max cost</span>
+              <span>{reviewDraft.triage.complexity} complexity</span>
+              <span>{reviewDraft.triage.securitySensitivity} security</span>
             </div>
             <button
               className="execute-button"
@@ -533,8 +701,8 @@ function App() {
               onClick={handleExecuteMockPipeline}
             >
               {pipelineState === 'running'
-                ? 'Executing mock pipeline...'
-                : 'Execute mock pipeline'}
+                ? 'Executing prompt-driven pipeline...'
+                : 'Execute prompt-driven pipeline'}
             </button>
             {pipelineError ? <p className="form-error">{pipelineError}</p> : null}
           </div>
@@ -544,8 +712,8 @@ function App() {
       {pipelineResult ? (
         <section className="panel results-panel">
           <div className="section-heading">
-            <p className="eyebrow">Mock Pipeline Result</p>
-            <h2>Artifacts generated from isolated mock agents.</h2>
+            <p className="eyebrow">Pipeline Result</p>
+            <h2>Artifacts generated from isolated prompt-driven agents.</h2>
           </div>
 
           <div className="step-list">
@@ -562,25 +730,59 @@ function App() {
               <article className="agent-card" key={agentOutput.agentRole}>
                 <h3>{formatAgent(agentOutput.agentRole)}</h3>
                 <p>{agentOutput.output.summary}</p>
+                <div className="metadata-row">
+                  <span>{agentOutput.validationStatus}</span>
+                  <span>{agentOutput.modelProvider}</span>
+                  <span>{agentOutput.inputTokens + agentOutput.outputTokens} tokens</span>
+                </div>
               </article>
             ))}
           </div>
 
-          <div className="artifact-grid">
-            {pipelineResult.artifacts.map((artifact) => (
-              <article
-                className="artifact-card"
-                key={artifact.metadata.artifactType}
-              >
-                <span>{formatAgent(artifact.metadata.artifactType)}</span>
-                {Object.entries(artifact.artifact.content).map(([key, value]) => (
+          <div className="artifact-viewer">
+            <div className="artifact-tabs" aria-label="Generated artifacts">
+              {pipelineResult.artifacts.map((artifact) => (
+                <button
+                  className={
+                    artifact.metadata.artifactType === activeArtifactType
+                      ? 'artifact-tab artifact-tab--active'
+                      : 'artifact-tab'
+                  }
+                  key={artifact.metadata.artifactType}
+                  type="button"
+                  onClick={() => setActiveArtifactType(artifact.metadata.artifactType)}
+                >
+                  {formatArtifactTitle(artifact.metadata.artifactType)}
+                </button>
+              ))}
+            </div>
+
+            {selectedArtifact ? (
+              <article className="artifact-card">
+                <div className="artifact-card-header">
+                  <span>{formatArtifactTitle(selectedArtifact.metadata.artifactType)}</span>
+                  <div className="metadata-row">
+                    <span>{selectedArtifact.metadata.validationStatus}</span>
+                    <span>{selectedArtifact.metadata.modelProvider}</span>
+                    <span>{selectedArtifact.metadata.shieldStatus} shield</span>
+                    <span>
+                      {selectedArtifact.metadata.tokenUsage.inputTokens +
+                        selectedArtifact.metadata.tokenUsage.outputTokens}{' '}
+                      tokens
+                    </span>
+                  </div>
+                </div>
+                <p className="prompt-version">
+                  Prompt version: {selectedArtifact.metadata.promptVersion}
+                </p>
+                {Object.entries(selectedArtifact.artifact.content).map(([key, value]) => (
                   <div className="artifact-section" key={key}>
                     <strong>{formatAgent(key)}</strong>
                     {renderArtifactValue(value)}
                   </div>
                 ))}
               </article>
-            ))}
+            ) : null}
           </div>
         </section>
       ) : null}
