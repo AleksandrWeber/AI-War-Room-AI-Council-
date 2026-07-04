@@ -15,6 +15,7 @@ import {
   type AuthenticatedRequest,
 } from '../auth/workspace-access.guard.js'
 import { StreamEventBufferService } from '../persistence/stream-event-buffer.service.js'
+import { TemporalRunService } from '../temporal/temporal-run.service.js'
 import type { PipelineStreamEvent } from './pipeline-stream-event.js'
 import { RunsService } from './runs.service.js'
 
@@ -23,6 +24,7 @@ export class RunsController {
   constructor(
     private readonly runsService: RunsService,
     private readonly streamEventBufferService: StreamEventBufferService,
+    private readonly temporalRunService: TemporalRunService,
   ) {}
 
   @Get('capabilities')
@@ -65,6 +67,27 @@ export class RunsController {
     @Req() request: AuthenticatedRequest,
   ) {
     return this.runsService.executeMockPipeline(body, request.authContext)
+  }
+
+  @Post('workflows')
+  @UseGuards(WorkspaceAccessGuard)
+  startWorkflow(
+    @Body() body: unknown,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.temporalRunService.startApprovedRun(body, request.authContext!)
+  }
+
+  @Get('workflows/:workflowId/status')
+  @UseGuards(WorkspaceAccessGuard)
+  getWorkflowStatus(
+    @Param('workflowId') workflowId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.temporalRunService.getWorkflowStatus({
+      workflowId,
+      authContext: request.authContext!,
+    })
   }
 
   @Post('mock-pipeline/stream')

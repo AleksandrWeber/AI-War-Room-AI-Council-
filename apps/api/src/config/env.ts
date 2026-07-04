@@ -5,6 +5,14 @@ const optionalEnvStringSchema = z.preprocess(
   z.string().trim().min(1).optional(),
 )
 
+const booleanEnvSchema = z.preprocess((value) => {
+  if (typeof value !== 'string') {
+    return value
+  }
+
+  return ['1', 'true', 'yes', 'on'].includes(value.trim().toLowerCase())
+}, z.boolean())
+
 export const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   API_PORT: z.coerce.number().int().positive().default(3000),
@@ -35,6 +43,7 @@ export const envSchema = z.object({
   TAVILY_API_KEY: optionalEnvStringSchema,
   TAVILY_API_URL: z.url().default('https://api.tavily.com/search'),
   TAVILY_MAX_RESULTS: z.coerce.number().int().positive().max(10).default(5),
+  TEMPORAL_ENABLED: booleanEnvSchema.default(false),
   TEMPORAL_ADDRESS: z.string().trim().min(1).default('127.0.0.1:7233'),
   TEMPORAL_NAMESPACE: z.string().trim().min(1).default('default'),
   TEMPORAL_TASK_QUEUE: z.string().trim().min(1).default('ai-war-room-runs'),

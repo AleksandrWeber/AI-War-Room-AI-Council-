@@ -4,6 +4,7 @@ import type { ApiEnv } from '../config/env.js'
 import { getTemporalWorkerConfig } from './temporal-worker.config.js'
 
 function createConfigService(values: {
+  TEMPORAL_ENABLED: boolean
   TEMPORAL_ADDRESS: string
   TEMPORAL_NAMESPACE: string
   TEMPORAL_TASK_QUEUE: string
@@ -19,6 +20,7 @@ describe('temporal worker config', () => {
   it('maps env-backed config into worker options', () => {
     const config = getTemporalWorkerConfig(
       createConfigService({
+        TEMPORAL_ENABLED: true,
         TEMPORAL_ADDRESS: '127.0.0.1:7233',
         TEMPORAL_NAMESPACE: 'default',
         TEMPORAL_TASK_QUEUE: 'ai-war-room-runs',
@@ -26,6 +28,7 @@ describe('temporal worker config', () => {
     )
 
     expect(config).toMatchObject({
+      enabled: true,
       address: '127.0.0.1:7233',
       namespace: 'default',
       taskQueue: 'ai-war-room-runs',

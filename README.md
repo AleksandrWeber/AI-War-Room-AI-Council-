@@ -125,7 +125,7 @@ Run mutation endpoints verify that the request workspace matches the header work
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
-Current `v4.0` behavior:
+Current `v4.1` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
 - All JSON responses are parsed and validated with Zod schemas.
@@ -187,7 +187,10 @@ Current `v4.0` behavior:
 - Temporal SDK packages are installed as API dev dependencies for the first durable workflow skeleton.
 - `durableRunWorkflow` validates approved run input, then executes the existing pipeline through Temporal activities.
 - The Temporal worker is a separate process and does not change current REST/SSE execution behavior yet.
-- Temporal worker config is controlled through `TEMPORAL_ADDRESS`, `TEMPORAL_NAMESPACE`, and `TEMPORAL_TASK_QUEUE`.
+- Temporal worker config is controlled through `TEMPORAL_ENABLED`, `TEMPORAL_ADDRESS`, `TEMPORAL_NAMESPACE`, and `TEMPORAL_TASK_QUEUE`.
+- `POST /api/runs/workflows` starts an approved run as a Temporal workflow when `TEMPORAL_ENABLED=true`.
+- `GET /api/runs/workflows/:workflowId/status` queries Temporal workflow status for the current workspace.
+- Temporal workflow start/status endpoints return a clear `503` while Temporal is disabled, so local development and tests do not require a Temporal server.
 
 To enable real providers locally, copy `.env.example` to `.env`, add provider keys, and explicitly select the provider/model:
 
@@ -206,9 +209,10 @@ RESEARCH_PROVIDER=tavily
 TAVILY_API_KEY=...
 ```
 
-To run the Temporal worker skeleton against a local Temporal server:
+To run the Temporal worker skeleton against a local Temporal server, set `TEMPORAL_ENABLED=true`, run the API, and start the worker in a separate terminal:
 
 ```bash
+TEMPORAL_ENABLED=true npm run dev:api
 npm run worker:temporal:dev
 ```
 

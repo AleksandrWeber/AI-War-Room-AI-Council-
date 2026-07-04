@@ -8,6 +8,11 @@ import { ObservabilityModule } from '../observability/observability.module.js'
 import { PersistenceModule } from '../persistence/persistence.module.js'
 import { ResearchModule } from '../research/research.module.js'
 import { ShieldModule } from '../shield/shield.module.js'
+import {
+  TEMPORAL_RUN_CLIENT,
+  TemporalSdkRunClient,
+} from '../temporal/temporal-run-client.js'
+import { TemporalRunService } from '../temporal/temporal-run.service.js'
 import { TriageService } from '../triage/triage.service.js'
 import { UsageModule } from '../usage/usage.module.js'
 import { WorkspacesModule } from '../workspaces/workspaces.module.js'
@@ -31,6 +36,11 @@ import { RunsService } from './runs.service.js'
     AgentService,
     ModeratorService,
     ArtifactService,
+    TemporalRunService,
+    {
+      provide: TEMPORAL_RUN_CLIENT,
+      useClass: TemporalSdkRunClient,
+    },
     WorkspaceAccessGuard,
   ],
 })

@@ -460,6 +460,41 @@ describe('API skeleton', () => {
     ).toBe(true)
   })
 
+  it('exposes Temporal workflow endpoints behind explicit enablement', async () => {
+    const draftResponse = await request(app!.getHttpServer())
+      .post('/api/runs/draft')
+      .set(authHeaders)
+      .send({
+        workspaceId: 'workspace_1',
+        idempotencyKey: 'idem_temporal_disabled',
+        idea: {
+          rawIdea:
+            'Start a durable Temporal workflow for an approved AI War Room run.',
+        },
+      })
+      .expect(201)
+
+    const startResponse = await request(app!.getHttpServer())
+      .post('/api/runs/workflows')
+      .set(authHeaders)
+      .send({
+        draftRun: draftResponse.body,
+        approvedTriage: draftResponse.body.triage,
+        selectedAgents: draftResponse.body.selectedAgents,
+      })
+      .expect(503)
+
+    expect(startResponse.body.temporalEnabled).toBe(false)
+    expect(startResponse.body.message).toContain('TEMPORAL_ENABLED=true')
+
+    const statusResponse = await request(app!.getHttpServer())
+      .get('/api/runs/workflows/ai-war-room-workspace_1-run_disabled/status')
+      .set(authHeaders)
+      .expect(503)
+
+    expect(statusResponse.body.temporalEnabled).toBe(false)
+  })
+
   it('streams pipeline status and final artifacts', async () => {
     const draftResponse = await request(app!.getHttpServer())
       .post('/api/runs/draft')
