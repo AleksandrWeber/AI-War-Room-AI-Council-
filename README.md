@@ -52,16 +52,54 @@ Start the web app:
 npm run dev:web
 ```
 
+Default local ports are:
+
+- API: `http://127.0.0.1:3000`
+- Web: `http://127.0.0.1:5173`
+
+If you run custom ports, keep API CORS and web API URL aligned:
+
+```bash
+API_PORT=3006 WEB_ORIGIN=http://127.0.0.1:5175 npm run dev:api
+VITE_API_URL=http://127.0.0.1:3006/api npm run dev --workspace @ai-war-room/web -- --host 127.0.0.1 --port 5175
+```
+
 ## Verification
 
 ```bash
-npm run build
-npm run lint
-npm run typecheck
-npm run test
-npm audit --omit=dev
-docker compose config
+npm run quality:gate
 ```
+
+Run the local persistence gate:
+
+```bash
+npm run quality:infra
+```
+
+## MVP Demo Checklist
+
+1. Start infrastructure:
+
+```bash
+npm run infra:up
+npm run db:migrate
+```
+
+2. Start API and web app in separate terminals:
+
+```bash
+npm run dev:api
+npm run dev:web
+```
+
+3. Open the Vite app and verify:
+
+- API status becomes `online`.
+- Submit a raw idea.
+- Review Shield and triage metadata.
+- Edit selected agents if needed.
+- Execute the mock pipeline.
+- Confirm agent summaries and three artifacts appear: Executive Summary, PRD, Development Prompt.
 
 ## Persistence
 

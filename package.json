@@ -16,6 +16,8 @@
     "infra:up": "docker compose up -d --wait",
     "infra:down": "docker compose down",
     "lint": "npm run lint --workspaces --if-present",
+    "quality:gate": "npm run build && npm run lint && npm run typecheck && npm run test && npm audit --omit=dev && docker compose config",
+    "quality:infra": "npm run infra:up && npm run db:migrate",
     "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present"
   },
