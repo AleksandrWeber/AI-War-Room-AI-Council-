@@ -14,9 +14,11 @@ import type {
   BillingWorkspaceStatusResponse,
   BillingWorkspaceUsageResponse,
   CheckoutPaidTier,
+  LlmRolloutResponse,
   RunCapabilitiesResponse,
   TemporalRuntimeHealthResponse,
   UsageAdminSummaryResponse,
+  WorkspaceMemberAdminSummaryResponse,
 } from '@ai-war-room/schemas'
 import './App.css'
 import {
@@ -24,6 +26,11 @@ import {
   formatAuthRolloutCheckStatus,
   formatAuthRolloutStatus,
 } from './auth-ui'
+import {
+  fetchLlmRollout,
+  formatLlmRolloutCheckStatus,
+  formatLlmRolloutStatus,
+} from './llm-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -75,6 +82,11 @@ import {
   fetchUsageCapabilities,
   formatUsageAdminAction,
 } from './usage-ui'
+import {
+  executeWorkspaceMemberAdminAction,
+  fetchWorkspaceMemberAdminSummary,
+  formatWorkspaceRole,
+} from './workspace-ui'
 import {
   type TemporalRunStartResponse,
   type TemporalWorkflowRecoveryResponse,
@@ -562,6 +574,7 @@ function App() {
     useState<AuthCapabilitiesResponse | null>(null)
   const [authRollout, setAuthRollout] =
     useState<AuthRolloutResponse | null>(null)
+  const [llmRollout, setLlmRollout] = useState<LlmRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -637,6 +650,16 @@ function App() {
   } | null>(null)
   const [usageAdminSummary, setUsageAdminSummary] =
     useState<UsageAdminSummaryResponse | null>(null)
+  const [memberAdminSummary, setMemberAdminSummary] =
+    useState<WorkspaceMemberAdminSummaryResponse | null>(null)
+  const [memberAdminAction, setMemberAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [newMemberForm, setNewMemberForm] = useState({
+    userId: '',
+    role: 'member' as 'owner' | 'admin' | 'member' | 'viewer',
+    email: '',
+  })
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
     useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
@@ -720,6 +743,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setAuthRollout(null)
+        }
+      })
+
+    fetchLlmRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setLlmRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setLlmRollout(null)
         }
       })
 
@@ -1401,6 +1436,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setUsageAdminSummary(usageAdmin)
+
+      const membersAdmin = await fetchWorkspaceMemberAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMemberAdminSummary(membersAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -1461,6 +1503,43 @@ function App() {
       )
     } finally {
       setUsageAdminAction('idle')
+    }
+  }
+
+  async function handleMemberAdminAction(input: {
+    action: 'update_member_role' | 'remove_member' | 'add_member'
+    userId: string
+    role?: 'owner' | 'admin' | 'member' | 'viewer'
+    email?: string
+  }) {
+    setMemberAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeWorkspaceMemberAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        input,
+      )
+      setBillingMessage(result.message)
+      if (input.action === 'add_member') {
+        setNewMemberForm({
+          userId: '',
+          role: 'member',
+          email: '',
+        })
+      }
+      await handleLoadBillingStatus()
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run workspace member admin action.',
+      )
+    } finally {
+      setMemberAdminAction('idle')
     }
   }
 
@@ -2059,6 +2138,33 @@ function App() {
           </div>
         ) : null}
 
+        {llmRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>LLM rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${llmRollout.status}`}
+              >
+                {formatLlmRolloutStatus(llmRollout.status)}
+              </strong>
+            </div>
+            <p>{llmRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {llmRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>{formatLlmRolloutCheckStatus(check.status)}</span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {llmRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
         {billingCapabilities?.supportsBillingRollout && billingRollout ? (
           <div className="billing-rollout">
             <div className="billing-rollout__header">
@@ -2386,6 +2492,143 @@ function App() {
                   </button>
                 ))}
               </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {memberAdminSummary ? (
+          <div className="billing-admin workspace-member-admin">
+            <div className="billing-admin__header">
+              <span>Member admin tools</span>
+              <strong>{memberAdminSummary.role}</strong>
+            </div>
+            <p>{memberAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Members</span>
+                <strong>{memberAdminSummary.stats.memberCount}</strong>
+                <small>{memberAdminSummary.stats.ownerCount} owners</small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Admins</span>
+                <strong>{memberAdminSummary.stats.adminCount}</strong>
+                <small>Role-managed access</small>
+              </article>
+            </div>
+            <div className="workspace-member-list">
+              {memberAdminSummary.members.map((member) => (
+                <article className="workspace-member-card" key={member.userId}>
+                  <div>
+                    <strong>{member.userId}</strong>
+                    <p>{formatWorkspaceRole(member.role)}</p>
+                    {member.email ? <small>{member.email}</small> : null}
+                  </div>
+                  <div className="workspace-member-card__actions">
+                    {memberAdminSummary.availableActions.includes(
+                      'update_member_role',
+                    ) && member.role !== 'owner' ? (
+                      <button
+                        className="secondary-button"
+                        type="button"
+                        disabled={memberAdminAction !== 'idle'}
+                        onClick={() =>
+                          void handleMemberAdminAction({
+                            action: 'update_member_role',
+                            userId: member.userId,
+                            role: 'admin',
+                          })
+                        }
+                      >
+                        Make admin
+                      </button>
+                    ) : null}
+                    {memberAdminSummary.availableActions.includes(
+                      'remove_member',
+                    ) ? (
+                      <button
+                        className="danger-button"
+                        type="button"
+                        disabled={memberAdminAction !== 'idle'}
+                        onClick={() =>
+                          void handleMemberAdminAction({
+                            action: 'remove_member',
+                            userId: member.userId,
+                          })
+                        }
+                      >
+                        Remove
+                      </button>
+                    ) : null}
+                  </div>
+                </article>
+              ))}
+            </div>
+            {memberAdminSummary.availableActions.includes('add_member') ? (
+              <form
+                className="workspace-member-form"
+                onSubmit={(event) => {
+                  event.preventDefault()
+                  if (!newMemberForm.userId.trim()) {
+                    return
+                  }
+                  void handleMemberAdminAction({
+                    action: 'add_member',
+                    userId: newMemberForm.userId.trim(),
+                    role: newMemberForm.role,
+                    email: newMemberForm.email.trim() || undefined,
+                  })
+                }}
+              >
+                <label>
+                  User id
+                  <input
+                    value={newMemberForm.userId}
+                    onChange={(event) =>
+                      setNewMemberForm((current) => ({
+                        ...current,
+                        userId: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <label>
+                  Role
+                  <select
+                    value={newMemberForm.role}
+                    onChange={(event) =>
+                      setNewMemberForm((current) => ({
+                        ...current,
+                        role: event.target.value as typeof current.role,
+                      }))
+                    }
+                  >
+                    <option value="viewer">Viewer</option>
+                    <option value="member">Member</option>
+                    <option value="admin">Admin</option>
+                    <option value="owner">Owner</option>
+                  </select>
+                </label>
+                <label>
+                  Email
+                  <input
+                    value={newMemberForm.email}
+                    onChange={(event) =>
+                      setNewMemberForm((current) => ({
+                        ...current,
+                        email: event.target.value,
+                      }))
+                    }
+                  />
+                </label>
+                <button
+                  type="submit"
+                  disabled={
+                    memberAdminAction !== 'idle' || !newMemberForm.userId.trim()
+                  }
+                >
+                  Add test member
+                </button>
+              </form>
             ) : null}
           </div>
         ) : null}

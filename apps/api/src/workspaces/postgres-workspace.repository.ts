@@ -3,6 +3,7 @@ import { PostgresService } from '../persistence/postgres.service.js'
 import type {
   ProvisionExternalMemberInput,
   ProvisionExternalMemberResult,
+  WorkspaceMemberRecord,
   WorkspaceMembershipRecord,
   WorkspaceRepository,
 } from './workspace.repository.js'
@@ -11,6 +12,8 @@ type WorkspaceMembershipRow = {
   workspace_id: string
   user_id: string
   role: WorkspaceMembershipRecord['role']
+  email: string | null
+  display_name: string | null
 }
 
 @Injectable()
@@ -164,5 +167,127 @@ export class PostgresWorkspaceRepository implements WorkspaceRepository {
         actions,
       }
     })
+  }
+
+  async listWorkspaceMembers(workspaceId: string): Promise<WorkspaceMemberRecord[]> {
+    const result = await this.postgresService.query<WorkspaceMembershipRow>(
+      `
+        SELECT
+          wm.workspace_id,
+          wm.user_id,
+          wm.role,
+          au.email,
+          au.display_name
+        FROM workspace_memberships wm
+        LEFT JOIN app_users au ON au.user_id = wm.user_id
+        WHERE wm.workspace_id = $1
+        ORDER BY wm.user_id ASC
+      `,
+      [workspaceId],
+    )
+
+    return result.rows.map((row) => ({
+      workspaceId: row.workspace_id,
+      userId: row.user_id,
+      role: row.role,
+      email: row.email,
+      displayName: row.display_name,
+    }))
+  }
+
+  async updateMemberRole(input: {
+    workspaceId: string
+    userId: string
+    role: WorkspaceMembershipRecord['role']
+  }): Promise<WorkspaceMemberRecord | null> {
+    const result = await this.postgresService.query<WorkspaceMembershipRow>(
+      `
+        UPDATE workspace_memberships
+        SET role = $3
+        WHERE workspace_id = $1
+          AND user_id = $2
+        RETURNING workspace_id, user_id, role
+      `,
+      [input.workspaceId, input.userId, input.role],
+    )
+    const row = result.rows[0]
+
+    if (!row) {
+      return null
+    }
+
+    const profile = await this.postgresService.query<{
+      email: string | null
+      display_name: string | null
+    }>(
+      `SELECT email, display_name FROM app_users WHERE user_id = $1 LIMIT 1`,
+      [input.userId],
+    )
+
+    return {
+      workspaceId: row.workspace_id,
+      userId: row.user_id,
+      role: row.role,
+      email: profile.rows[0]?.email ?? null,
+      displayName: profile.rows[0]?.display_name ?? null,
+    }
+  }
+
+  async removeMember(input: {
+    workspaceId: string
+    userId: string
+  }): Promise<boolean> {
+    const result = await this.postgresService.query(
+      `
+        DELETE FROM workspace_memberships
+        WHERE workspace_id = $1
+          AND user_id = $2
+      `,
+      [input.workspaceId, input.userId],
+    )
+
+    return (result.rowCount ?? 0) > 0
+  }
+
+  async addWorkspaceMember(input: {
+    workspaceId: string
+    userId: string
+    role: WorkspaceMembershipRecord['role']
+    email?: string
+    displayName?: string
+  }): Promise<WorkspaceMemberRecord> {
+    await this.postgresService.query(
+      `
+        INSERT INTO app_users (user_id, email, display_name)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (user_id) DO UPDATE
+        SET email = COALESCE(EXCLUDED.email, app_users.email),
+            display_name = COALESCE(EXCLUDED.display_name, app_users.display_name)
+      `,
+      [
+        input.userId,
+        input.email ?? null,
+        input.displayName ?? input.userId,
+      ],
+    )
+
+    await this.postgresService.query(
+      `
+        INSERT INTO workspace_memberships (workspace_id, user_id, role)
+        VALUES ($1, $2, $3)
+        ON CONFLICT (workspace_id, user_id) DO UPDATE
+        SET role = EXCLUDED.role
+      `,
+      [input.workspaceId, input.userId, input.role],
+    )
+
+    const members = await this.listWorkspaceMembers(input.workspaceId)
+    const member = members.find((entry) => entry.userId === input.userId)
+
+    if (!member) {
+      throw new Error(`Workspace member ${input.userId} was not found after insert.`)
+    }
+
+    return member
   }
 }

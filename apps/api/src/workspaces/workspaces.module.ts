@@ -1,18 +1,23 @@
-import { Module } from '@nestjs/common'
+import { Module, forwardRef } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import type { ApiEnv } from '../config/env.js'
+import { AuthModule } from '../auth/auth.module.js'
 import { PersistenceModule } from '../persistence/persistence.module.js'
 import { InMemoryWorkspaceRepository } from './in-memory-workspace.repository.js'
 import { PostgresWorkspaceRepository } from './postgres-workspace.repository.js'
 import { UserProvisioningService } from './user-provisioning.service.js'
+import { WorkspaceAdminService } from './workspace-admin.service.js'
+import { WorkspacesController } from './workspaces.controller.js'
 import { WorkspaceService } from './workspace.service.js'
 import { WORKSPACE_REPOSITORY } from './workspace.repository.js'
 
 @Module({
-  imports: [PersistenceModule],
+  imports: [PersistenceModule, forwardRef(() => AuthModule)],
+  controllers: [WorkspacesController],
   providers: [
     PostgresWorkspaceRepository,
     WorkspaceService,
+    WorkspaceAdminService,
     UserProvisioningService,
     {
       provide: WORKSPACE_REPOSITORY,
@@ -27,6 +32,6 @@ import { WORKSPACE_REPOSITORY } from './workspace.repository.js'
       },
     },
   ],
-  exports: [WorkspaceService, UserProvisioningService],
+  exports: [WorkspaceService, UserProvisioningService, WorkspaceAdminService],
 })
 export class WorkspacesModule {}

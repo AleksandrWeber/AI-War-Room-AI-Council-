@@ -180,5 +180,9 @@ export function validateEnv(config: Record<string, unknown>): ApiEnv {
     )
   }
 
+  if (env.NODE_ENV === 'production' && env.LLM_PRIMARY_PROVIDER === 'mock') {
+    throw new Error('LLM_PRIMARY_PROVIDER=mock cannot be used in production.')
+  }
+
   return env
 }

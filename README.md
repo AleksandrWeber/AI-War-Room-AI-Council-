@@ -350,11 +350,32 @@ Usage admin tools:
 - Only workspace owners and admins can access usage admin endpoints.
 - The web billing panel shows usage admin stats and reset actions for authorized roles.
 
+Workspace member admin tools:
+
+- `GET /api/workspaces/:workspaceId/admin/members` returns owner/admin workspace member roster and role stats.
+- `POST /api/workspaces/:workspaceId/admin/members/actions` runs member admin actions such as role updates, removals, and local test member adds.
+- Only workspace owners and admins can access workspace member admin endpoints.
+- The web billing panel shows member roster and role management actions for authorized roles.
+
 Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
 
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+LLM rollout readiness:
+
+- `GET /api/llm/readiness` returns operator-facing production LLM checklist results (`ready` or `not_ready`).
+- Checks cover primary/fallback providers, model names, provider API keys, and research provider config.
+- Production startup rejects `LLM_PRIMARY_PROVIDER=mock`.
+- The web billing panel shows LLM rollout status and per-check guidance.
+
+Current `v5.19` behavior:
+
+- LLM rollout readiness validates production provider configuration through `GET /api/llm/readiness`.
+- Production rejects mock primary LLM providers at startup.
+- Workspace owners and admins can manage member roles from `GET /api/workspaces/:workspaceId/admin/members`.
+- The web billing panel shows LLM rollout checks and workspace member admin tools.
 
 Current `v5.18` behavior:
 

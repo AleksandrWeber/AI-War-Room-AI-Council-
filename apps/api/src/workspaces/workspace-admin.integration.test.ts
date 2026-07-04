@@ -1,0 +1,101 @@
+import { Test } from '@nestjs/testing'
+import type { TestingModule } from '@nestjs/testing'
+import {
+  FastifyAdapter,
+  type NestFastifyApplication,
+} from '@nestjs/platform-fastify'
+import request from 'supertest'
+import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+
+const authHeaders = {
+  'x-user-id': 'user_test',
+  'x-workspace-id': 'workspace_1',
+}
+
+describe('llm integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports llm capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/llm/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsLlmRollout: true,
+      primaryProvider: 'mock',
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/llm/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+})
+
+describe('workspace admin integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('returns workspace member admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/workspaces/workspace_1/admin/members')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        memberCount: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects workspace member admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/workspaces/workspace_1/admin/members')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})

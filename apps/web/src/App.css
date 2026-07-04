@@ -726,6 +726,44 @@
   gap: 0.75rem;
 }
 
+.workspace-member-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.workspace-member-card {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.workspace-member-card p,
+.workspace-member-card small {
+  margin: 0;
+  color: var(--muted);
+}
+
+.workspace-member-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.workspace-member-form {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+}
+
+.workspace-member-form label {
+  display: grid;
+  gap: 0.35rem;
+}
+
 .billing-alerts {
   display: grid;
   gap: 12px;

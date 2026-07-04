@@ -1,11 +1,21 @@
 import type {
   ProvisionExternalMemberInput,
   ProvisionExternalMemberResult,
+  WorkspaceMemberRecord,
   WorkspaceMembershipRecord,
   WorkspaceRepository,
 } from './workspace.repository.js'
 
 export class InMemoryWorkspaceRepository implements WorkspaceRepository {
+  private readonly userProfiles = new Map<
+    string,
+    { email: string | null; displayName: string | null }
+  >([
+    ['user_local', { email: 'local@ai-war-room.dev', displayName: 'Local Developer' }],
+    ['user_test', { email: 'test@ai-war-room.dev', displayName: 'Test User' }],
+    ['user_admin', { email: 'admin@ai-war-room.dev', displayName: 'Admin User' }],
+    ['user_member', { email: 'member@ai-war-room.dev', displayName: 'Member User' }],
+  ])
   private readonly memberships = new Map<string, WorkspaceMembershipRecord>([
     [
       'user_local:local_workspace',
@@ -114,6 +124,77 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
     return {
       ...existingMembership,
       actions,
+    }
+  }
+
+  async listWorkspaceMembers(workspaceId: string): Promise<WorkspaceMemberRecord[]> {
+    return [...this.memberships.values()]
+      .filter((membership) => membership.workspaceId === workspaceId)
+      .map((membership) => this.toMemberRecord(membership))
+      .sort((left, right) => left.userId.localeCompare(right.userId))
+  }
+
+  async updateMemberRole(input: {
+    workspaceId: string
+    userId: string
+    role: WorkspaceMembershipRecord['role']
+  }): Promise<WorkspaceMemberRecord | null> {
+    const key = `${input.userId}:${input.workspaceId}`
+    const existing = this.memberships.get(key)
+
+    if (!existing) {
+      return null
+    }
+
+    const updated = {
+      ...existing,
+      role: input.role,
+    }
+    this.memberships.set(key, updated)
+
+    return this.toMemberRecord(updated)
+  }
+
+  async removeMember(input: {
+    workspaceId: string
+    userId: string
+  }): Promise<boolean> {
+    return this.memberships.delete(`${input.userId}:${input.workspaceId}`)
+  }
+
+  async addWorkspaceMember(input: {
+    workspaceId: string
+    userId: string
+    role: WorkspaceMembershipRecord['role']
+    email?: string
+    displayName?: string
+  }): Promise<WorkspaceMemberRecord> {
+    this.users.add(input.userId)
+    this.workspaces.add(input.workspaceId)
+    this.userProfiles.set(input.userId, {
+      email: input.email ?? null,
+      displayName: input.displayName ?? input.userId,
+    })
+
+    const membership: WorkspaceMembershipRecord = {
+      workspaceId: input.workspaceId,
+      userId: input.userId,
+      role: input.role,
+    }
+    this.memberships.set(`${input.userId}:${input.workspaceId}`, membership)
+
+    return this.toMemberRecord(membership)
+  }
+
+  private toMemberRecord(
+    membership: WorkspaceMembershipRecord,
+  ): WorkspaceMemberRecord {
+    const profile = this.userProfiles.get(membership.userId)
+
+    return {
+      ...membership,
+      email: profile?.email ?? null,
+      displayName: profile?.displayName ?? null,
     }
   }
 }

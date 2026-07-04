@@ -10,6 +10,7 @@ import { ProviderCredentialsModule } from './provider-credentials/provider-crede
 import { RunsModule } from './runs/runs.module.js'
 import { ShieldModule } from './shield/shield.module.js'
 import { VersionModule } from './version/version.module.js'
+import { WorkspacesModule } from './workspaces/workspaces.module.js'
 
 @Module({
   imports: [
@@ -20,6 +21,7 @@ import { VersionModule } from './version/version.module.js'
     HealthModule,
     AuthModule,
     BillingModule,
+    WorkspacesModule,
     VersionModule,
     ModelRouterModule,
     ProviderCredentialsModule,
