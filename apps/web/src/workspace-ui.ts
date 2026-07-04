@@ -1,6 +1,8 @@
 import {
   workspaceMemberAdminActionResponseSchema,
   workspaceMemberAdminSummaryResponseSchema,
+  workspaceSettingsAdminActionResponseSchema,
+  workspaceSettingsAdminSummaryResponseSchema,
 } from '@ai-war-room/schemas'
 
 export async function fetchWorkspaceMemberAdminSummary(
@@ -58,6 +60,60 @@ export async function executeWorkspaceMemberAdminAction(
   }
 
   return workspaceMemberAdminActionResponseSchema.parse(await response.json())
+}
+
+export async function fetchWorkspaceSettingsAdminSummary(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/workspaces/${encodeURIComponent(workspaceId)}/admin/settings`,
+    {
+      headers,
+    },
+  )
+
+  if (response.status === 403) {
+    return null
+  }
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return workspaceSettingsAdminSummaryResponseSchema.parse(await response.json())
+}
+
+export async function executeWorkspaceSettingsAdminAction(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+  input: {
+    action: 'update_workspace_name' | 'reset_workspace_name'
+    name?: string
+  },
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/workspaces/${encodeURIComponent(workspaceId)}/admin/settings/actions`,
+    {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        workspaceId,
+        ...input,
+      }),
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return workspaceSettingsAdminActionResponseSchema.parse(await response.json())
 }
 
 export function formatWorkspaceRole(role: string) {

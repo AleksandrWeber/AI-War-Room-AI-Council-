@@ -188,5 +188,17 @@ export function validateEnv(config: Record<string, unknown>): ApiEnv {
     throw new Error('RESEARCH_PROVIDER=mock cannot be used in production.')
   }
 
+  if (
+    env.NODE_ENV === 'production' &&
+    env.TEMPORAL_ENABLED &&
+    (env.TEMPORAL_ADDRESS.includes('127.0.0.1') ||
+      env.TEMPORAL_ADDRESS.includes('localhost') ||
+      env.TEMPORAL_ADDRESS.startsWith('0.0.0.0'))
+  ) {
+    throw new Error(
+      'Production Temporal rollout requires a non-local TEMPORAL_ADDRESS when TEMPORAL_ENABLED=true.',
+    )
+  }
+
   return env
 }

@@ -384,6 +384,31 @@ LLM rollout readiness:
 - Production startup rejects `LLM_PRIMARY_PROVIDER=mock`.
 - The web billing panel shows LLM rollout status and per-check guidance.
 
+## Temporal Workflows
+
+Durable run execution can route through Temporal when enabled.
+
+Workspace settings admin tools:
+
+- `GET /api/workspaces/:workspaceId/admin/settings` returns owner/admin workspace settings summary.
+- `POST /api/workspaces/:workspaceId/admin/settings/actions` runs settings admin actions such as workspace renames and local reset.
+- Only workspace owners and admins can access workspace settings admin endpoints.
+- The web billing panel shows workspace settings admin tools for authorized roles.
+
+Temporal rollout readiness:
+
+- `GET /api/runs/temporal/readiness` returns operator-facing production Temporal checklist results (`ready`, `not_ready`, or `disabled`).
+- Checks cover Temporal address, namespace, task queue, stream config, server reachability, and worker heartbeat.
+- Production startup rejects local Temporal addresses when `TEMPORAL_ENABLED=true`.
+- The web billing panel shows Temporal rollout status and per-check guidance.
+
+Current `v5.21` behavior:
+
+- Temporal rollout readiness validates production Temporal configuration through `GET /api/runs/temporal/readiness`.
+- Production rejects local Temporal addresses when durable workflows are enabled.
+- Workspace owners and admins can manage workspace settings from `GET /api/workspaces/:workspaceId/admin/settings`.
+- The web billing panel shows Temporal rollout checks and workspace settings admin tools.
+
 Current `v5.20` behavior:
 
 - Research rollout readiness validates production research configuration through `GET /api/research/readiness`.

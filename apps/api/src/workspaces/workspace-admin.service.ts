@@ -11,6 +11,9 @@ import {
   workspaceMemberAdminActionRequestSchema,
   workspaceMemberAdminActionResponseSchema,
   workspaceMemberAdminSummaryResponseSchema,
+  workspaceSettingsAdminActionRequestSchema,
+  workspaceSettingsAdminActionResponseSchema,
+  workspaceSettingsAdminSummaryResponseSchema,
   type AuthContext,
 } from '@ai-war-room/schemas'
 import type { ApiEnv } from '../config/env.js'
@@ -20,6 +23,11 @@ import {
   getWorkspaceMemberAdminGuidance,
   resolveWorkspaceMemberAdminActions,
 } from './workspace-member-admin.helpers.js'
+import {
+  getDefaultWorkspaceName,
+  getWorkspaceSettingsAdminGuidance,
+  resolveWorkspaceSettingsAdminActions,
+} from './workspace-settings-admin.helpers.js'
 import {
   WORKSPACE_REPOSITORY,
   type WorkspaceRepository,
@@ -37,9 +45,122 @@ export class WorkspaceAdminService {
     return workspaceAdminCapabilitiesResponseSchema.parse({
       supportsWorkspaceMemberAdminTools: true,
       supportsWorkspaceAuditExport: true,
+      supportsWorkspaceSettingsAdminTools: true,
       guidance:
-        'Workspace member admin tools and audit export are available to owners and admins.',
+        'Workspace member admin tools, settings admin tools, and audit export are available to owners and admins.',
     })
+  }
+
+  async getWorkspaceSettingsAdminSummary(
+    authContext: AuthContext,
+    workspaceId: string,
+  ) {
+    this.assertCanManageWorkspaceSettings(authContext)
+
+    if (authContext.workspaceId !== workspaceId) {
+      throw new ForbiddenException({
+        message: 'Workspace header does not match request workspace.',
+      })
+    }
+
+    const settings = await this.workspaceRepository.getWorkspace(workspaceId)
+
+    if (!settings) {
+      throw new NotFoundException({
+        message: 'Workspace was not found.',
+      })
+    }
+
+    const availableActions = [
+      ...resolveWorkspaceSettingsAdminActions({
+        nodeEnv: this.configService.get('NODE_ENV', { infer: true }),
+      }),
+    ]
+
+    return workspaceSettingsAdminSummaryResponseSchema.parse({
+      workspaceId,
+      role: authContext.role,
+      settings,
+      availableActions,
+      guidance: getWorkspaceSettingsAdminGuidance({ availableActions }),
+    })
+  }
+
+  async executeWorkspaceSettingsAdminAction(
+    authContext: AuthContext,
+    input: {
+      workspaceId: string
+      action: 'update_workspace_name' | 'reset_workspace_name'
+      name?: string
+    },
+  ) {
+    this.assertCanManageWorkspaceSettings(authContext)
+
+    const payload = workspaceSettingsAdminActionRequestSchema.parse({
+      workspaceId: input.workspaceId,
+      action: input.action,
+      name: input.name,
+    })
+
+    if (payload.workspaceId !== authContext.workspaceId) {
+      throw new ForbiddenException({
+        message: 'Workspace header does not match request workspace.',
+      })
+    }
+
+    switch (payload.action) {
+      case 'update_workspace_name': {
+        if (!payload.name?.trim()) {
+          throw new BadRequestException({
+            message: 'name is required for update_workspace_name.',
+          })
+        }
+
+        const settings = await this.workspaceRepository.updateWorkspaceName({
+          workspaceId: payload.workspaceId,
+          name: payload.name.trim(),
+        })
+
+        if (!settings) {
+          throw new NotFoundException({
+            message: 'Workspace was not found.',
+          })
+        }
+
+        return workspaceSettingsAdminActionResponseSchema.parse({
+          workspaceId: payload.workspaceId,
+          action: payload.action,
+          message: `Updated workspace name to ${settings.name}.`,
+          settings,
+        })
+      }
+      case 'reset_workspace_name': {
+        if (this.configService.get('NODE_ENV', { infer: true }) === 'production') {
+          throw new BadRequestException({
+            message:
+              'Resetting workspace settings through admin tools is not available in production.',
+          })
+        }
+
+        const settings = await this.workspaceRepository.updateWorkspaceName({
+          workspaceId: payload.workspaceId,
+          name: getDefaultWorkspaceName(payload.workspaceId),
+        })
+
+        if (!settings) {
+          throw new NotFoundException({
+            message: 'Workspace was not found.',
+          })
+        }
+
+        return workspaceSettingsAdminActionResponseSchema.parse({
+          workspaceId: payload.workspaceId,
+          action: payload.action,
+          message: `Reset workspace name to ${settings.name}.`,
+          settings,
+        })
+      }
+    }
   }
 
   async getWorkspaceMemberAdminSummary(
@@ -217,6 +338,16 @@ export class WorkspaceAdminService {
 
     throw new ForbiddenException({
       message: 'Only workspace owners and admins can manage workspace members.',
+    })
+  }
+
+  private assertCanManageWorkspaceSettings(authContext: AuthContext) {
+    if (authContext.role === 'owner' || authContext.role === 'admin') {
+      return
+    }
+
+    throw new ForbiddenException({
+      message: 'Only workspace owners and admins can manage workspace settings.',
     })
   }
 }

@@ -3,6 +3,7 @@ import type {
   ProvisionExternalMemberResult,
   WorkspaceMemberRecord,
   WorkspaceMembershipRecord,
+  WorkspaceRecord,
   WorkspaceRepository,
 } from './workspace.repository.js'
 
@@ -68,11 +69,11 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
   ])
 
   private readonly users = new Set<string>(['user_local', 'user_test'])
-  private readonly workspaces = new Set<string>([
-    'local_workspace',
-    'workspace_1',
-    'workspace_tiny_quota',
-    'workspace_pro',
+  private readonly workspaces = new Map<string, { name: string; createdAt: string }>([
+    ['local_workspace', { name: 'Local Workspace', createdAt: '2026-07-04T12:00:00.000Z' }],
+    ['workspace_1', { name: 'Workspace One', createdAt: '2026-07-04T12:00:00.000Z' }],
+    ['workspace_tiny_quota', { name: 'Tiny Quota Workspace', createdAt: '2026-07-04T12:00:00.000Z' }],
+    ['workspace_pro', { name: 'Pro Workspace', createdAt: '2026-07-04T12:00:00.000Z' }],
   ])
 
   async findMembership(
@@ -98,7 +99,10 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
     const workspaceExists = this.workspaces.has(input.workspaceId)
 
     if (!workspaceExists) {
-      this.workspaces.add(input.workspaceId)
+      this.workspaces.set(input.workspaceId, {
+        name: `Workspace ${input.workspaceId}`,
+        createdAt: new Date().toISOString(),
+      })
       actions.push('created_workspace')
     }
 
@@ -170,7 +174,12 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
     displayName?: string
   }): Promise<WorkspaceMemberRecord> {
     this.users.add(input.userId)
-    this.workspaces.add(input.workspaceId)
+    if (!this.workspaces.has(input.workspaceId)) {
+      this.workspaces.set(input.workspaceId, {
+        name: `Workspace ${input.workspaceId}`,
+        createdAt: new Date().toISOString(),
+      })
+    }
     this.userProfiles.set(input.userId, {
       email: input.email ?? null,
       displayName: input.displayName ?? input.userId,
@@ -184,6 +193,43 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
     this.memberships.set(`${input.userId}:${input.workspaceId}`, membership)
 
     return this.toMemberRecord(membership)
+  }
+
+  async getWorkspace(workspaceId: string): Promise<WorkspaceRecord | null> {
+    const workspace = this.workspaces.get(workspaceId)
+
+    if (!workspace) {
+      return null
+    }
+
+    return {
+      workspaceId,
+      name: workspace.name,
+      createdAt: workspace.createdAt,
+    }
+  }
+
+  async updateWorkspaceName(input: {
+    workspaceId: string
+    name: string
+  }): Promise<WorkspaceRecord | null> {
+    const workspace = this.workspaces.get(input.workspaceId)
+
+    if (!workspace) {
+      return null
+    }
+
+    const updated = {
+      ...workspace,
+      name: input.name,
+    }
+    this.workspaces.set(input.workspaceId, updated)
+
+    return {
+      workspaceId: input.workspaceId,
+      name: updated.name,
+      createdAt: updated.createdAt,
+    }
   }
 
   private toMemberRecord(

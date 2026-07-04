@@ -772,6 +772,16 @@
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.workspace-settings-form {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.workspace-settings-form label {
+  display: grid;
+  gap: 0.35rem;
+}
+
 .billing-alerts {
   display: grid;
   gap: 12px;

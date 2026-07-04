@@ -67,6 +67,7 @@ export type WorkspaceMemberAdminActionResponse = z.infer<
 export const workspaceAdminCapabilitiesResponseSchema = z.object({
   supportsWorkspaceMemberAdminTools: z.literal(true),
   supportsWorkspaceAuditExport: z.literal(true),
+  supportsWorkspaceSettingsAdminTools: z.literal(true),
   guidance: nonEmptyStringSchema,
 })
 export type WorkspaceAdminCapabilitiesResponse = z.infer<

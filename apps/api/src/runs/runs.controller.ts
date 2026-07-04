@@ -17,6 +17,7 @@ import {
 import { StreamEventBufferService } from '../persistence/stream-event-buffer.service.js'
 import { TemporalRunService } from '../temporal/temporal-run.service.js'
 import { TemporalHealthService } from '../temporal/temporal-health.service.js'
+import { TemporalRolloutService } from '../temporal/temporal-rollout.service.js'
 import type { PipelineStreamEvent } from './pipeline-stream-event.js'
 import { RunsService } from './runs.service.js'
 
@@ -27,6 +28,7 @@ export class RunsController {
     private readonly streamEventBufferService: StreamEventBufferService,
     private readonly temporalRunService: TemporalRunService,
     private readonly temporalHealthService: TemporalHealthService,
+    private readonly temporalRolloutService: TemporalRolloutService,
   ) {}
 
   @Get('capabilities')
@@ -74,6 +76,16 @@ export class RunsController {
   @Get('temporal/health')
   getTemporalHealth() {
     return this.temporalHealthService.getRuntimeHealth()
+  }
+
+  @Get('temporal/capabilities')
+  getTemporalCapabilities() {
+    return this.temporalRolloutService.getCapabilities()
+  }
+
+  @Get('temporal/readiness')
+  getTemporalRollout() {
+    return this.temporalRolloutService.getTemporalRollout()
   }
 
   @Post('workflows')

@@ -83,4 +83,42 @@ describe('WorkspaceAdminService', () => {
 
     expect(removeResult.message).toContain('Removed user_new_member')
   })
+
+  it('returns workspace settings admin summary for owners', async () => {
+    const service = createWorkspaceAdminService()
+
+    const summary = await service.getWorkspaceSettingsAdminSummary(
+      {
+        userId: 'user_test',
+        workspaceId: 'workspace_1',
+        role: 'owner',
+      },
+      'workspace_1',
+    )
+
+    expect(summary.settings.name).toBe('Workspace One')
+    expect(summary.availableActions).toEqual(
+      expect.arrayContaining(['update_workspace_name', 'reset_workspace_name']),
+    )
+  })
+
+  it('updates workspace settings through admin actions', async () => {
+    const service = createWorkspaceAdminService()
+    const authContext = {
+      userId: 'user_test',
+      workspaceId: 'workspace_1',
+      role: 'owner' as const,
+    }
+
+    const result = await service.executeWorkspaceSettingsAdminAction(
+      authContext,
+      {
+        workspaceId: 'workspace_1',
+        action: 'update_workspace_name',
+        name: 'Renamed Workspace',
+      },
+    )
+
+    expect(result.settings.name).toBe('Renamed Workspace')
+  })
 })

@@ -5,6 +5,7 @@ import type {
   ProvisionExternalMemberResult,
   WorkspaceMemberRecord,
   WorkspaceMembershipRecord,
+  WorkspaceRecord,
   WorkspaceRepository,
 } from './workspace.repository.js'
 
@@ -14,6 +15,12 @@ type WorkspaceMembershipRow = {
   role: WorkspaceMembershipRecord['role']
   email: string | null
   display_name: string | null
+}
+
+type WorkspaceRow = {
+  workspace_id: string
+  name: string
+  created_at: Date
 }
 
 @Injectable()
@@ -289,5 +296,54 @@ export class PostgresWorkspaceRepository implements WorkspaceRepository {
     }
 
     return member
+  }
+
+  async getWorkspace(workspaceId: string): Promise<WorkspaceRecord | null> {
+    const result = await this.postgresService.query<WorkspaceRow>(
+      `
+        SELECT workspace_id, name, created_at
+        FROM workspaces
+        WHERE workspace_id = $1
+        LIMIT 1
+      `,
+      [workspaceId],
+    )
+    const row = result.rows[0]
+
+    if (!row) {
+      return null
+    }
+
+    return {
+      workspaceId: row.workspace_id,
+      name: row.name,
+      createdAt: row.created_at.toISOString(),
+    }
+  }
+
+  async updateWorkspaceName(input: {
+    workspaceId: string
+    name: string
+  }): Promise<WorkspaceRecord | null> {
+    const result = await this.postgresService.query<WorkspaceRow>(
+      `
+        UPDATE workspaces
+        SET name = $2
+        WHERE workspace_id = $1
+        RETURNING workspace_id, name, created_at
+      `,
+      [input.workspaceId, input.name],
+    )
+    const row = result.rows[0]
+
+    if (!row) {
+      return null
+    }
+
+    return {
+      workspaceId: row.workspace_id,
+      name: row.name,
+      createdAt: row.created_at.toISOString(),
+    }
   }
 }

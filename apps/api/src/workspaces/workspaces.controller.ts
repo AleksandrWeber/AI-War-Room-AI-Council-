@@ -28,6 +28,12 @@ type WorkspaceMemberAdminBody = {
   displayName?: unknown
 }
 
+type WorkspaceSettingsAdminBody = {
+  workspaceId?: unknown
+  action?: unknown
+  name?: unknown
+}
+
 @Controller('workspaces')
 export class WorkspacesController {
   constructor(
@@ -51,6 +57,47 @@ export class WorkspacesController {
     return this.workspaceAdminService.getWorkspaceMemberAdminSummary(
       request.authContext!,
       workspaceId,
+    )
+  }
+
+  @Get(':workspaceId/admin/settings')
+  @UseGuards(WorkspaceAccessGuard)
+  getWorkspaceSettingsAdminSummary(
+    @Param('workspaceId') workspaceId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    this.assertWorkspaceParam(request, workspaceId)
+
+    return this.workspaceAdminService.getWorkspaceSettingsAdminSummary(
+      request.authContext!,
+      workspaceId,
+    )
+  }
+
+  @Post(':workspaceId/admin/settings/actions')
+  @UseGuards(WorkspaceAccessGuard)
+  executeWorkspaceSettingsAdminAction(
+    @Param('workspaceId') workspaceId: string,
+    @Req() request: AuthenticatedRequest,
+    @Body() body: WorkspaceSettingsAdminBody,
+  ) {
+    this.assertWorkspaceParam(request, workspaceId)
+
+    const action = body.action
+
+    if (action !== 'update_workspace_name' && action !== 'reset_workspace_name') {
+      throw new BadRequestException({
+        message: 'Unsupported workspace settings admin action.',
+      })
+    }
+
+    return this.workspaceAdminService.executeWorkspaceSettingsAdminAction(
+      request.authContext!,
+      {
+        workspaceId,
+        action,
+        name: typeof body.name === 'string' ? body.name : undefined,
+      },
     )
   }
 

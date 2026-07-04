@@ -17,9 +17,11 @@ import type {
   LlmRolloutResponse,
   ResearchRolloutResponse,
   RunCapabilitiesResponse,
+  TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
   UsageAdminSummaryResponse,
   WorkspaceMemberAdminSummaryResponse,
+  WorkspaceSettingsAdminSummaryResponse,
 } from '@ai-war-room/schemas'
 import './App.css'
 import {
@@ -37,6 +39,11 @@ import {
   formatResearchRolloutCheckStatus,
   formatResearchRolloutStatus,
 } from './research-ui'
+import {
+  fetchTemporalRollout,
+  formatTemporalRolloutCheckStatus,
+  formatTemporalRolloutStatus,
+} from './temporal-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -90,8 +97,10 @@ import {
 } from './usage-ui'
 import {
   executeWorkspaceMemberAdminAction,
+  executeWorkspaceSettingsAdminAction,
   downloadWorkspaceAuditExport,
   fetchWorkspaceMemberAdminSummary,
+  fetchWorkspaceSettingsAdminSummary,
   formatWorkspaceRole,
 } from './workspace-ui'
 import {
@@ -584,6 +593,8 @@ function App() {
   const [llmRollout, setLlmRollout] = useState<LlmRolloutResponse | null>(null)
   const [researchRollout, setResearchRollout] =
     useState<ResearchRolloutResponse | null>(null)
+  const [temporalRollout, setTemporalRollout] =
+    useState<TemporalRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -661,6 +672,12 @@ function App() {
     useState<UsageAdminSummaryResponse | null>(null)
   const [memberAdminSummary, setMemberAdminSummary] =
     useState<WorkspaceMemberAdminSummaryResponse | null>(null)
+  const [settingsAdminSummary, setSettingsAdminSummary] =
+    useState<WorkspaceSettingsAdminSummaryResponse | null>(null)
+  const [settingsAdminAction, setSettingsAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
   const [memberAdminAction, setMemberAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -776,6 +793,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setResearchRollout(null)
+        }
+      })
+
+    fetchTemporalRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setTemporalRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTemporalRollout(null)
         }
       })
 
@@ -1464,6 +1493,14 @@ function App() {
         workspaceAuthHeaders,
       )
       setMemberAdminSummary(membersAdmin)
+
+      const settingsAdmin = await fetchWorkspaceSettingsAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSettingsAdminSummary(settingsAdmin)
+      setWorkspaceNameDraft(settingsAdmin?.settings.name ?? '')
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -1561,6 +1598,34 @@ function App() {
       )
     } finally {
       setMemberAdminAction('idle')
+    }
+  }
+
+  async function handleSettingsAdminAction(input: {
+    action: 'update_workspace_name' | 'reset_workspace_name'
+    name?: string
+  }) {
+    setSettingsAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeWorkspaceSettingsAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        input,
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run workspace settings admin action.',
+      )
+    } finally {
+      setSettingsAdminAction('idle')
     }
   }
 
@@ -2232,6 +2297,33 @@ function App() {
           </div>
         ) : null}
 
+        {temporalRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Temporal rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${temporalRollout.status}`}
+              >
+                {formatTemporalRolloutStatus(temporalRollout.status)}
+              </strong>
+            </div>
+            <p>{temporalRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {temporalRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>{formatTemporalRolloutCheckStatus(check.status)}</span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {temporalRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
         {billingCapabilities?.supportsBillingRollout && billingRollout ? (
           <div className="billing-rollout">
             <div className="billing-rollout__header">
@@ -2559,6 +2651,80 @@ function App() {
                   </button>
                 ))}
               </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {settingsAdminSummary ? (
+          <div className="billing-admin workspace-settings-admin">
+            <div className="billing-admin__header">
+              <span>Workspace settings admin</span>
+              <strong>{settingsAdminSummary.role}</strong>
+            </div>
+            <p>{settingsAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workspace name</span>
+                <strong>{settingsAdminSummary.settings.name}</strong>
+                <small>{settingsAdminSummary.settings.workspaceId}</small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Created</span>
+                <strong>{settingsAdminSummary.settings.createdAt.slice(0, 10)}</strong>
+                <small>UTC timestamp</small>
+              </article>
+            </div>
+            {settingsAdminSummary.availableActions.includes(
+              'update_workspace_name',
+            ) ? (
+              <form
+                className="workspace-settings-form"
+                onSubmit={(event) => {
+                  event.preventDefault()
+                  if (!workspaceNameDraft.trim()) {
+                    return
+                  }
+                  void handleSettingsAdminAction({
+                    action: 'update_workspace_name',
+                    name: workspaceNameDraft.trim(),
+                  })
+                }}
+              >
+                <label>
+                  Workspace name
+                  <input
+                    value={workspaceNameDraft}
+                    onChange={(event) => setWorkspaceNameDraft(event.target.value)}
+                  />
+                </label>
+                <button
+                  type="submit"
+                  disabled={
+                    settingsAdminAction !== 'idle' ||
+                    !workspaceNameDraft.trim() ||
+                    workspaceNameDraft.trim() ===
+                      settingsAdminSummary.settings.name
+                  }
+                >
+                  Save workspace name
+                </button>
+              </form>
+            ) : null}
+            {settingsAdminSummary.availableActions.includes(
+              'reset_workspace_name',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={settingsAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleSettingsAdminAction({
+                    action: 'reset_workspace_name',
+                  })
+                }
+              >
+                Reset workspace name
+              </button>
             ) : null}
           </div>
         ) : null}

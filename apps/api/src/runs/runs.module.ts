@@ -14,6 +14,7 @@ import {
 } from '../temporal/temporal-run-client.js'
 import { TemporalRunService } from '../temporal/temporal-run.service.js'
 import { TemporalHealthService } from '../temporal/temporal-health.service.js'
+import { TemporalRolloutService } from '../temporal/temporal-rollout.service.js'
 import { TriageService } from '../triage/triage.service.js'
 import { UsageModule } from '../usage/usage.module.js'
 import { BillingModule } from '../billing/billing.module.js'
@@ -42,6 +43,7 @@ import { RunsService } from './runs.service.js'
     ArtifactService,
     TemporalRunService,
     TemporalHealthService,
+    TemporalRolloutService,
     {
       provide: TEMPORAL_RUN_CLIENT,
       useClass: TemporalSdkRunClient,

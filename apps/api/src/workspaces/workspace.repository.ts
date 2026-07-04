@@ -14,6 +14,12 @@ export type WorkspaceMemberRecord = WorkspaceMembershipRecord & {
   displayName: string | null
 }
 
+export type WorkspaceRecord = {
+  workspaceId: string
+  name: string
+  createdAt: string
+}
+
 export type ProvisionExternalMemberInput = {
   userId: string
   workspaceId: string
@@ -55,6 +61,13 @@ export interface WorkspaceRepository {
     email?: string
     displayName?: string
   }): Promise<WorkspaceMemberRecord>
+
+  getWorkspace(workspaceId: string): Promise<WorkspaceRecord | null>
+
+  updateWorkspaceName(input: {
+    workspaceId: string
+    name: string
+  }): Promise<WorkspaceRecord | null>
 }
 
 export function toAuthContext(
