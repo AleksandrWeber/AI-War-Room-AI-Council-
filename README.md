@@ -110,3 +110,17 @@ Local persistence uses:
 
 Tests use an in-memory repository so they do not require Docker.
 
+## LLM Gateway
+
+The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v1.0` behavior:
+
+- Default provider is `mock`, so local development does not require API keys.
+- All JSON responses are parsed and validated with Zod schemas.
+- Invalid responses are retried with a repair instruction.
+- Repeated validation failures return a safe fallback object.
+- Token usage is estimated and returned with gateway results.
+
+Real Anthropic/OpenAI provider adapters are intentionally left for the next milestone.
+

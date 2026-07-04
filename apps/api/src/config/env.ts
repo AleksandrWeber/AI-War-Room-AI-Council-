@@ -9,6 +9,11 @@ export const envSchema = z.object({
     .default('postgres://ai_war_room:ai_war_room@127.0.0.1:5432/ai_war_room'),
   REDIS_URL: z.url().default('redis://127.0.0.1:6379'),
   IDEMPOTENCY_TTL_SECONDS: z.coerce.number().int().positive().default(86_400),
+  LLM_PRIMARY_PROVIDER: z.enum(['mock', 'anthropic', 'openai']).default('mock'),
+  LLM_FALLBACK_PROVIDER: z.enum(['mock', 'anthropic', 'openai']).default('mock'),
+  LLM_PRIMARY_MODEL: z.string().trim().min(1).default('mock-json-v1'),
+  LLM_FALLBACK_MODEL: z.string().trim().min(1).default('mock-json-v1'),
+  LLM_MAX_ATTEMPTS: z.coerce.number().int().positive().max(5).default(3),
 })
 
 export type ApiEnv = z.infer<typeof envSchema>
