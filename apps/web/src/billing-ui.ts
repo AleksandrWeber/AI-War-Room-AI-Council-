@@ -12,6 +12,7 @@ import {
   billingInvoicesResponseSchema,
   billingMeterUsageReportsResponseSchema,
   billingNotificationsResponseSchema,
+  billingRolloutResponseSchema,
   billingWorkspaceAlertsResponseSchema,
   billingWorkspaceUsageResponseSchema,
   billingWebhookEventsResponseSchema,
@@ -105,6 +106,42 @@ export async function fetchBillingCapabilities(apiBaseUrl: string) {
   }
 
   return billingCapabilitiesResponseSchema.parse(await response.json())
+}
+
+export async function fetchBillingRollout(apiBaseUrl: string) {
+  const response = await fetch(`${apiBaseUrl}/billing/readiness`)
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return billingRolloutResponseSchema.parse(await response.json())
+}
+
+export function formatBillingRolloutStatus(
+  status: 'ready' | 'not_ready' | 'disabled',
+) {
+  switch (status) {
+    case 'ready':
+      return 'Ready'
+    case 'not_ready':
+      return 'Not ready'
+    case 'disabled':
+      return 'Disabled'
+  }
+}
+
+export function formatBillingRolloutCheckStatus(
+  status: 'pass' | 'fail' | 'skip',
+) {
+  switch (status) {
+    case 'pass':
+      return 'Pass'
+    case 'fail':
+      return 'Fail'
+    case 'skip':
+      return 'Skip'
+  }
 }
 
 export async function fetchBillingWorkspaceStatus(

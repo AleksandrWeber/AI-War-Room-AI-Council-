@@ -11,6 +11,7 @@ import {
   billingCapabilitiesResponseSchema,
   billingExportFormatSchema,
   billingInvoicesResponseSchema,
+  billingRolloutResponseSchema,
   billingWorkspaceAlertsResponseSchema,
   billingWorkspaceUsageResponseSchema,
   billingWebhookEventsResponseSchema,
@@ -35,6 +36,7 @@ import {
   serializeBillingInvoicesCsv,
 } from './billing-export.helpers.js'
 import { buildWorkspaceBillingAlerts } from './billing-alerts.helpers.js'
+import { evaluateBillingRollout } from './billing-rollout.helpers.js'
 import {
   BILLING_INVOICE_REPOSITORY,
   type BillingInvoiceRepository,
@@ -87,8 +89,60 @@ export class BillingService {
       supportsMeteredUsage: this.billingMeterUsageService.supportsMeteredUsage(),
       supportsBillingNotifications:
         this.billingNotificationService.supportsBillingNotifications(),
+      supportsBillingRollout: true,
       checkoutTiers: ['pro', 'business'],
       guidance: getBillingGuidance({ enabled, adapter }),
+    })
+  }
+
+  getBillingRollout() {
+    const rollout = evaluateBillingRollout({
+      nodeEnv: this.configService.get('NODE_ENV', { infer: true }),
+      stripeEnabled: this.configService.get('STRIPE_ENABLED', { infer: true }),
+      stripeBillingAdapter: this.configService.get('STRIPE_BILLING_ADAPTER', {
+        infer: true,
+      }),
+      stripeSecretKey: this.configService.get('STRIPE_SECRET_KEY', {
+        infer: true,
+      }),
+      stripeWebhookSecret: this.configService.get('STRIPE_WEBHOOK_SECRET', {
+        infer: true,
+      }),
+      stripePriceIdPro: this.configService.get('STRIPE_PRICE_ID_PRO', {
+        infer: true,
+      }),
+      stripePriceIdBusiness: this.configService.get('STRIPE_PRICE_ID_BUSINESS', {
+        infer: true,
+      }),
+      stripeSuccessUrl: this.configService.get('STRIPE_SUCCESS_URL', {
+        infer: true,
+      }),
+      stripeCancelUrl: this.configService.get('STRIPE_CANCEL_URL', {
+        infer: true,
+      }),
+      stripePortalReturnUrl: this.configService.get('STRIPE_PORTAL_RETURN_URL', {
+        infer: true,
+      }),
+      stripeMeteredUsageEnabled: this.configService.get(
+        'STRIPE_METERED_USAGE_ENABLED',
+        { infer: true },
+      ),
+      stripeMeterEventName: this.configService.get('STRIPE_METER_EVENT_NAME', {
+        infer: true,
+      }),
+      billingNotificationAdapter: this.configService.get(
+        'BILLING_NOTIFICATION_ADAPTER',
+        { infer: true },
+      ),
+      billingNotificationRecipient: this.configService.get(
+        'BILLING_NOTIFICATION_RECIPIENT',
+        { infer: true },
+      ),
+    })
+
+    return billingRolloutResponseSchema.parse({
+      ...rollout,
+      checkedAt: new Date().toISOString(),
     })
   }
 

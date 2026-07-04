@@ -146,5 +146,15 @@ export function validateEnv(config: Record<string, unknown>): ApiEnv {
     }
   }
 
+  if (
+    env.NODE_ENV === 'production' &&
+    env.STRIPE_ENABLED &&
+    env.STRIPE_BILLING_ADAPTER === 'mock'
+  ) {
+    throw new Error(
+      'STRIPE_BILLING_ADAPTER=mock cannot be used in production when STRIPE_ENABLED=true.',
+    )
+  }
+
   return env
 }

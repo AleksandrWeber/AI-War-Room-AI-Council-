@@ -59,8 +59,21 @@ describe('billing integration', () => {
       supportsBillingAlerts: true,
       supportsMeteredUsage: true,
       supportsBillingNotifications: true,
+      supportsBillingRollout: true,
       checkoutTiers: ['pro', 'business'],
     })
+  })
+
+  it('reports billing rollout readiness for mock billing', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/billing/readiness')
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      status: 'ready',
+      adapter: 'mock',
+    })
+    expect(response.body.checks.length).toBeGreaterThan(0)
   })
 
   it('returns workspace billing status for members', async () => {

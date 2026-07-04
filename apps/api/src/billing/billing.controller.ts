@@ -33,6 +33,11 @@ export class BillingController {
     return this.billingService.getCapabilities()
   }
 
+  @Get('readiness')
+  getBillingRollout() {
+    return this.billingService.getBillingRollout()
+  }
+
   @Get('workspace/:workspaceId')
   @UseGuards(WorkspaceAccessGuard)
   getWorkspaceStatus(

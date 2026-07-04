@@ -321,11 +321,25 @@ Billing notification delivery:
 - Notifications deliver once per alert id through mock or email-stub adapters (`BILLING_NOTIFICATION_ADAPTER`).
 - Webhooks, pipeline runs, and notification reads trigger delivery sync for usage and billing status alerts.
 
+Billing rollout readiness:
+
+- `GET /api/billing/readiness` returns operator-facing Stripe production checklist results (`ready`, `not_ready`, or `disabled`).
+- Checks cover billing adapter, Stripe credentials, price ids, HTTPS checkout URLs, metered usage config, and notification delivery.
+- Production startup rejects `STRIPE_BILLING_ADAPTER=mock` when `NODE_ENV=production` and billing is enabled.
+- Copy `.env.production.billing.example` for Docker Compose production billing env wiring.
+- The web billing panel shows rollout status and per-check guidance.
+
 Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
 
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v5.16` behavior:
+
+- Billing rollout readiness validates production Stripe configuration through `GET /api/billing/readiness`.
+- Production rejects mock billing adapter when Stripe billing is enabled.
+- The web billing panel shows rollout checklist status and operator guidance.
 
 Current `v5.15` behavior:
 

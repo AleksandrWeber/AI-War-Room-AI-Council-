@@ -41,6 +41,7 @@ export const billingCapabilitiesResponseSchema = z.object({
   supportsBillingAlerts: z.boolean(),
   supportsMeteredUsage: z.boolean(),
   supportsBillingNotifications: z.boolean(),
+  supportsBillingRollout: z.boolean(),
   checkoutTiers: z.array(checkoutPaidTierSchema),
   guidance: z.string(),
 })
@@ -312,6 +313,35 @@ export const billingNotificationsResponseSchema = z.object({
 export type BillingNotificationsResponse = z.infer<
   typeof billingNotificationsResponseSchema
 >
+
+export const billingRolloutCheckStatusSchema = z.enum(['pass', 'fail', 'skip'])
+export type BillingRolloutCheckStatus = z.infer<
+  typeof billingRolloutCheckStatusSchema
+>
+
+export const billingRolloutCheckSchema = z.object({
+  name: nonEmptyStringSchema,
+  label: nonEmptyStringSchema,
+  status: billingRolloutCheckStatusSchema,
+  detail: nonEmptyStringSchema,
+})
+export type BillingRolloutCheck = z.infer<typeof billingRolloutCheckSchema>
+
+export const billingRolloutStatusSchema = z.enum([
+  'ready',
+  'not_ready',
+  'disabled',
+])
+export type BillingRolloutStatus = z.infer<typeof billingRolloutStatusSchema>
+
+export const billingRolloutResponseSchema = z.object({
+  status: billingRolloutStatusSchema,
+  adapter: billingAdapterSchema.optional(),
+  checks: z.array(billingRolloutCheckSchema),
+  guidance: nonEmptyStringSchema,
+  checkedAt: utcDateStringSchema,
+})
+export type BillingRolloutResponse = z.infer<typeof billingRolloutResponseSchema>
 
 export function getBillingGuidance(input: {
   enabled: boolean

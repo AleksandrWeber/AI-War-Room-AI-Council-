@@ -87,6 +87,16 @@ describe('BillingService', () => {
       supportsBillingAlerts: false,
       supportsMeteredUsage: false,
       supportsBillingNotifications: false,
+      supportsBillingRollout: true,
+    })
+  })
+
+  it('reports billing rollout readiness for mock development', () => {
+    const { service } = createBillingService({})
+
+    expect(service.getBillingRollout()).toMatchObject({
+      status: 'ready',
+      adapter: 'mock',
     })
   })
 

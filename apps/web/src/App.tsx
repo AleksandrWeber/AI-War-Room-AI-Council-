@@ -6,6 +6,7 @@ import type {
   BillingInvoiceRecord,
   BillingMeterUsageReport,
   BillingNotificationRecord,
+  BillingRolloutResponse,
   BillingWebhookEventRecord,
   BillingWorkspaceAlertsResponse,
   BillingWorkspaceStatusResponse,
@@ -31,6 +32,7 @@ import {
   defaultWorkspaceId,
   describeBillingCapabilities,
   fetchBillingCapabilities,
+  fetchBillingRollout,
   fetchBillingAlerts,
   fetchBillingInvoices,
   fetchBillingMeterUsageReports,
@@ -48,6 +50,8 @@ import {
   formatBillingStatus,
   formatBillingAlertSeverity,
   formatBillingNotificationStatus,
+  formatBillingRolloutCheckStatus,
+  formatBillingRolloutStatus,
   formatMeterUsageReportStatus,
   formatPaidTier,
   formatTierLimits,
@@ -573,6 +577,8 @@ function App() {
   >('idle')
   const [billingCapabilities, setBillingCapabilities] =
     useState<BillingCapabilitiesResponse | null>(null)
+  const [billingRollout, setBillingRollout] =
+    useState<BillingRolloutResponse | null>(null)
   const [billingStatus, setBillingStatus] =
     useState<BillingWorkspaceStatusResponse | null>(null)
   const [billingError, setBillingError] = useState<string | null>(null)
@@ -697,6 +703,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setBillingCapabilities(null)
+        }
+      })
+
+    fetchBillingRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setBillingRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setBillingRollout(null)
         }
       })
 
@@ -1891,6 +1909,33 @@ function App() {
             production.
           </p>
         </div>
+
+        {billingCapabilities?.supportsBillingRollout && billingRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${billingRollout.status}`}
+              >
+                {formatBillingRolloutStatus(billingRollout.status)}
+              </strong>
+            </div>
+            <p>{billingRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {billingRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>{formatBillingRolloutCheckStatus(check.status)}</span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {billingRollout.checkedAt}</small>
+          </div>
+        ) : null}
 
         {billingCapabilities?.supportsBillingAlerts && billingAlerts.length ? (
           <div className="billing-alerts">
