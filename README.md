@@ -125,7 +125,7 @@ Run mutation endpoints verify that the request workspace matches the header work
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
-Current `v3.1` behavior:
+Current `v3.2` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
 - All JSON responses are parsed and validated with Zod schemas.
@@ -160,6 +160,8 @@ Current `v3.1` behavior:
 - The research layer uses a provider abstraction with a safe mock provider for local development.
 - Retrieved research content is Shield-scanned and sanitized before it reaches downstream prompts.
 - Market Research output includes citations and sanitized research documents in `roleSpecificInsights`.
+- Prompt regression cases cover triage, base agents, Moderator, and generated artifacts.
+- `npm run eval:prompts --workspace @ai-war-room/api` evaluates schema validity, clarity, artifact usefulness, and prompt version drift.
 
 Real Anthropic/OpenAI provider adapters are still intentionally left for a later milestone.
 

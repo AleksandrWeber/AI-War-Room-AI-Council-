@@ -10,6 +10,7 @@
     "dev": "npm run build && node dist/main.js",
     "dev:watch": "tsx watch src/main.ts",
     "db:migrate": "npm run build && node dist/db/migrate.js",
+    "eval:prompts": "tsx src/evaluation/run-prompt-evaluation.ts",
     "start": "node dist/main.js",
     "lint": "oxlint .",
     "test": "vitest run",
