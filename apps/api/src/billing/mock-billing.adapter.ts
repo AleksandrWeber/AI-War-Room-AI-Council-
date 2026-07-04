@@ -1,0 +1,117 @@
+import { randomUUID } from 'node:crypto'
+import type {
+  CheckoutPaidTier,
+  CheckoutSessionResponse,
+} from '@ai-war-room/schemas'
+import type {
+  BillingCheckoutAdapter,
+  BillingWebhookEvent,
+} from './billing.adapter.js'
+
+type PendingCheckout = {
+  sessionId: string
+  workspaceId: string
+  paidTier: CheckoutPaidTier
+}
+
+export class MockBillingAdapter implements BillingCheckoutAdapter {
+  private readonly pendingCheckouts = new Map<string, PendingCheckout>()
+
+  constructor(private readonly apiBaseUrl: string) {}
+
+  async createCheckoutSession(input: {
+    workspaceId: string
+    paidTier: CheckoutPaidTier
+    successUrl: string
+    cancelUrl: string
+  }): Promise<CheckoutSessionResponse> {
+    const sessionId = `mock_cs_${randomUUID()}`
+    this.pendingCheckouts.set(sessionId, {
+      sessionId,
+      workspaceId: input.workspaceId,
+      paidTier: input.paidTier,
+    })
+
+    return {
+      sessionId,
+      checkoutUrl: `${this.apiBaseUrl}/api/billing/mock/complete?sessionId=${encodeURIComponent(sessionId)}`,
+    }
+  }
+
+  async completeMockCheckout(sessionId: string) {
+    return this.pendingCheckouts.get(sessionId) ?? null
+  }
+
+  async parseWebhookEvent(
+    payload: Buffer | string,
+  ): Promise<BillingWebhookEvent | null> {
+    const body =
+      typeof payload === 'string'
+        ? (JSON.parse(payload) as Record<string, unknown>)
+        : (JSON.parse(payload.toString('utf8')) as Record<string, unknown>)
+
+    if (body.event === 'checkout.completed') {
+      const workspaceId = body.workspaceId
+      const paidTier = body.paidTier
+
+      if (
+        typeof workspaceId !== 'string' ||
+        (paidTier !== 'pro' && paidTier !== 'business')
+      ) {
+        return null
+      }
+
+      return {
+        type: 'checkout.completed',
+        workspaceId,
+        paidTier,
+        externalCustomerId:
+          typeof body.externalCustomerId === 'string'
+            ? body.externalCustomerId
+            : undefined,
+      }
+    }
+
+    if (body.event === 'subscription.canceled') {
+      const workspaceId = body.workspaceId
+
+      if (typeof workspaceId !== 'string') {
+        return null
+      }
+
+      return {
+        type: 'subscription.canceled',
+        workspaceId,
+      }
+    }
+
+    if (body.event === 'subscription.updated') {
+      const workspaceId = body.workspaceId
+      const status = body.status
+
+      if (
+        typeof workspaceId !== 'string' ||
+        (status !== 'active' &&
+          status !== 'past_due' &&
+          status !== 'canceled' &&
+          status !== 'draft')
+      ) {
+        return null
+      }
+
+      return {
+        type: 'subscription.updated',
+        workspaceId,
+        status,
+        paidTier:
+          body.paidTier === 'pro' ||
+          body.paidTier === 'business' ||
+          body.paidTier === 'free'
+            ? body.paidTier
+            : undefined,
+      }
+    }
+
+    return null
+  }
+}

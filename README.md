@@ -209,11 +209,56 @@ For production Clerk or Auth0, switch `AUTH_EXTERNAL_ADAPTER=jwks` and configure
 
 External users can be provisioned automatically when `AUTH_EXTERNAL_AUTO_PROVISION=true`, or explicitly through `POST /api/auth/provision`.
 
+## Billing
+
+Billing checkout is disabled by default. Discover the active mode from `GET /api/billing/capabilities`.
+
+Mock billing rollout for local development:
+
+```bash
+STRIPE_ENABLED=true STRIPE_BILLING_ADAPTER=mock npm run dev:api
+```
+
+Create a checkout session:
+
+```bash
+curl -X POST http://127.0.0.1:3000/api/billing/checkout-session \
+  -H 'content-type: application/json' \
+  -H 'x-user-id: user_local' \
+  -H 'x-workspace-id: local_workspace' \
+  -d '{"workspaceId":"local_workspace","paidTier":"pro"}'
+```
+
+Open the returned `checkoutUrl` to complete mock billing locally.
+
+Production Stripe rollout:
+
+```bash
+STRIPE_ENABLED=true \
+STRIPE_BILLING_ADAPTER=stripe \
+STRIPE_SECRET_KEY=sk_live_... \
+STRIPE_WEBHOOK_SECRET=whsec_... \
+STRIPE_PRICE_ID_PRO=price_... \
+STRIPE_PRICE_ID_BUSINESS=price_... \
+npm run dev:api
+```
+
+Configure Stripe webhooks to `POST /api/billing/webhook`. Checkout metadata includes `workspaceId` and `paidTier` so subscription events upgrade workspace limits automatically.
+
 Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
 
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v5.6` behavior:
+
+- `STRIPE_ENABLED=true` activates billing checkout flows with mock or Stripe adapters.
+- `GET /api/billing/capabilities` reports whether checkout is enabled and which adapter is active.
+- `POST /api/billing/checkout-session` starts pro or business checkout for the current workspace.
+- Mock adapter completes checkout through `GET /api/billing/mock/complete?sessionId=...`.
+- Stripe webhooks at `POST /api/billing/webhook` activate or downgrade workspace tiers in PostgreSQL.
+- Subscription activation updates both `billing_records` and `workspace_usage_limits`.
 
 Current `v5.5` behavior:
 
@@ -309,7 +354,7 @@ Current `v4.3` behavior:
 - Local development uses seeded `user_local` and `local_workspace` records.
 - Completed pipeline runs write auditable usage events for agent, Moderator, and artifact LLM phases.
 - Workspace daily cost limits are checked before expensive execution starts.
-- Billing records exist as Stripe-ready local records, but Stripe integration is intentionally deferred.
+- Billing records exist as Stripe-ready local records; v5.6 adds checkout activation and webhook tier updates.
 - `GET /api/runs/artifacts/history` returns workspace-scoped persisted artifacts from previous runs.
 - `GET /api/runs/artifacts/:artifactId/export/markdown` exports the immutable persisted artifact content as Markdown.
 - The frontend includes an Artifact History panel with Markdown export controls.

@@ -1,0 +1,98 @@
+import { Test } from '@nestjs/testing'
+import type { TestingModule } from '@nestjs/testing'
+import {
+  FastifyAdapter,
+  type NestFastifyApplication,
+} from '@nestjs/platform-fastify'
+import request from 'supertest'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+
+vi.hoisted(() => {
+  process.env.STRIPE_ENABLED = 'true'
+  process.env.STRIPE_BILLING_ADAPTER = 'mock'
+})
+
+const authHeaders = {
+  'x-user-id': 'user_test',
+  'x-workspace-id': 'workspace_1',
+}
+
+describe('billing integration', () => {
+  let app: NestFastifyApplication | undefined
+  let moduleRef: TestingModule | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    moduleRef = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    delete process.env.STRIPE_ENABLED
+    delete process.env.STRIPE_BILLING_ADAPTER
+    await app?.close()
+  })
+
+  it('reports billing capabilities', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/billing/capabilities')
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      enabled: true,
+      adapter: 'mock',
+      supportsCheckout: true,
+      checkoutTiers: ['pro', 'business'],
+    })
+  })
+
+  it('returns workspace billing status for members', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/billing/workspace/workspace_1')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      billingRecord: {
+        workspaceId: 'workspace_1',
+        paidTier: 'free',
+        status: 'draft',
+      },
+    })
+  })
+
+  it('creates checkout sessions and completes mock billing', async () => {
+    const checkoutResponse = await request(app!.getHttpServer())
+      .post('/api/billing/checkout-session')
+      .set(authHeaders)
+      .send({
+        workspaceId: 'workspace_1',
+        paidTier: 'pro',
+      })
+      .expect(201)
+
+    expect(checkoutResponse.body.checkoutUrl).toContain('/api/billing/mock/complete')
+
+    const completeResponse = await request(app!.getHttpServer())
+      .get(checkoutResponse.body.checkoutUrl.replace(/^https?:\/\/[^/]+/, ''))
+      .expect(200)
+
+    expect(completeResponse.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      billingRecord: {
+        paidTier: 'pro',
+        status: 'active',
+      },
+    })
+  })
+})

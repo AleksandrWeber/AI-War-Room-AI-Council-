@@ -71,6 +71,14 @@ export const envSchema = z.object({
   AUTH_EXTERNAL_USER_ID_CLAIM: z.string().trim().min(1).default('sub'),
   AUTH_EXTERNAL_WORKSPACE_ID_CLAIM: optionalEnvStringSchema,
   AUTH_EXTERNAL_AUTO_PROVISION: booleanEnvSchema.default(true),
+  STRIPE_ENABLED: booleanEnvSchema.default(false),
+  STRIPE_BILLING_ADAPTER: z.enum(['mock', 'stripe']).default('mock'),
+  STRIPE_SECRET_KEY: optionalEnvStringSchema,
+  STRIPE_WEBHOOK_SECRET: optionalEnvStringSchema,
+  STRIPE_PRICE_ID_PRO: optionalEnvStringSchema,
+  STRIPE_PRICE_ID_BUSINESS: optionalEnvStringSchema,
+  STRIPE_SUCCESS_URL: z.url().default('http://127.0.0.1:5173/billing/success'),
+  STRIPE_CANCEL_URL: z.url().default('http://127.0.0.1:5173/billing/cancel'),
 })
 
 export type ApiEnv = z.infer<typeof envSchema>
@@ -92,6 +100,26 @@ export function validateEnv(config: Record<string, unknown>): ApiEnv {
     if (env.AUTH_EXTERNAL_ADAPTER === 'jwks' && !env.AUTH_EXTERNAL_JWKS_URL) {
       throw new Error(
         'AUTH_EXTERNAL_JWKS_URL is required when AUTH_PROVIDER=external and AUTH_EXTERNAL_ADAPTER=jwks.',
+      )
+    }
+  }
+
+  if (env.STRIPE_ENABLED && env.STRIPE_BILLING_ADAPTER === 'stripe') {
+    if (!env.STRIPE_SECRET_KEY) {
+      throw new Error(
+        'STRIPE_SECRET_KEY is required when STRIPE_ENABLED=true and STRIPE_BILLING_ADAPTER=stripe.',
+      )
+    }
+
+    if (!env.STRIPE_WEBHOOK_SECRET) {
+      throw new Error(
+        'STRIPE_WEBHOOK_SECRET is required when STRIPE_ENABLED=true and STRIPE_BILLING_ADAPTER=stripe.',
+      )
+    }
+
+    if (!env.STRIPE_PRICE_ID_PRO || !env.STRIPE_PRICE_ID_BUSINESS) {
+      throw new Error(
+        'STRIPE_PRICE_ID_PRO and STRIPE_PRICE_ID_BUSINESS are required when STRIPE_ENABLED=true and STRIPE_BILLING_ADAPTER=stripe.',
       )
     }
   }

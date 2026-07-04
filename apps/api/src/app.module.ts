@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
 import { validateEnv } from './config/env.js'
 import { AuthModule } from './auth/auth.module.js'
+import { BillingModule } from './billing/billing.module.js'
 import { HealthModule } from './health/health.module.js'
 import { LlmModule } from './llm/llm.module.js'
 import { ModelRouterModule } from './model-router/model-router.module.js'
@@ -18,6 +19,7 @@ import { VersionModule } from './version/version.module.js'
     }),
     HealthModule,
     AuthModule,
+    BillingModule,
     VersionModule,
     ModelRouterModule,
     ProviderCredentialsModule,
