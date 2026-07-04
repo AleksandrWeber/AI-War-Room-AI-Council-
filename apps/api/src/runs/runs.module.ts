@@ -6,6 +6,7 @@ import { LlmModule } from '../llm/llm.module.js'
 import { ModeratorService } from '../moderator/moderator.service.js'
 import { ObservabilityModule } from '../observability/observability.module.js'
 import { PersistenceModule } from '../persistence/persistence.module.js'
+import { ResearchModule } from '../research/research.module.js'
 import { TriageService } from '../triage/triage.service.js'
 import { UsageModule } from '../usage/usage.module.js'
 import { WorkspacesModule } from '../workspaces/workspaces.module.js'
@@ -19,6 +20,7 @@ import { RunsService } from './runs.service.js'
     WorkspacesModule,
     UsageModule,
     ObservabilityModule,
+    ResearchModule,
   ],
   controllers: [RunsController],
   providers: [

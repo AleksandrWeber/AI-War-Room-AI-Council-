@@ -45,6 +45,16 @@ export class UsageService {
     }
   }
 
+  async assertWorkspaceCanUseResearch(workspaceId: string): Promise<void> {
+    const limit = await this.usageRepository.getWorkspaceLimit(workspaceId)
+
+    if (!limit || limit.paidTier === 'free') {
+      throw new ForbiddenException({
+        message: 'Market Research Agent requires a paid or verified workspace tier.',
+      })
+    }
+  }
+
   async recordPipelineUsage(input: {
     authContext?: AuthContext
     result: MockPipelineResult

@@ -125,7 +125,7 @@ Run mutation endpoints verify that the request workspace matches the header work
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
-Current `v3.0` behavior:
+Current `v3.1` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
 - All JSON responses are parsed and validated with Zod schemas.
@@ -156,6 +156,10 @@ Current `v3.0` behavior:
 - Pipeline phases, quota checks, Shield scans, LLM validation failures, provider failures, token usage, and cost signals emit structured JSON logs.
 - Pipeline phase measurements also create OpenTelemetry API spans, ready for a future SDK/exporter configuration.
 - Cost anomaly signals are emitted when completed usage exceeds the approved estimate or crosses the local warning threshold.
+- Market Research Agent is gated behind paid workspace tiers (`pro` or `business`).
+- The research layer uses a provider abstraction with a safe mock provider for local development.
+- Retrieved research content is Shield-scanned and sanitized before it reaches downstream prompts.
+- Market Research output includes citations and sanitized research documents in `roleSpecificInsights`.
 
 Real Anthropic/OpenAI provider adapters are still intentionally left for a later milestone.
 

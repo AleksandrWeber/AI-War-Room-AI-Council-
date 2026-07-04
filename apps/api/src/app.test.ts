@@ -352,6 +352,80 @@ describe('API skeleton', () => {
     expect(replayedEvents.some((event) => event.event === 'completed')).toBe(true)
   })
 
+  it('blocks Market Research Agent for free workspaces', async () => {
+    const draftResponse = await request(app!.getHttpServer())
+      .post('/api/runs/draft')
+      .set(authHeaders)
+      .send({
+        workspaceId: 'workspace_1',
+        idempotencyKey: 'idem_research_free',
+        idea: {
+          rawIdea: 'Build a market research heavy AI planning workflow.',
+          targetAudience: 'Founders',
+        },
+      })
+      .expect(201)
+
+    const response = await request(app!.getHttpServer())
+      .post('/api/runs/mock-pipeline')
+      .set(authHeaders)
+      .send({
+        draftRun: draftResponse.body,
+        approvedTriage: draftResponse.body.triage,
+        selectedAgents: ['market_researcher', 'critic', 'moderator'],
+      })
+      .expect(403)
+
+    expect(response.body.message).toBe(
+      'Market Research Agent requires a paid or verified workspace tier.',
+    )
+  })
+
+  it('runs paid Market Research Agent with sanitized citations', async () => {
+    const proHeaders = {
+      'x-user-id': 'user_test',
+      'x-workspace-id': 'workspace_pro',
+    }
+    const draftResponse = await request(app!.getHttpServer())
+      .post('/api/runs/draft')
+      .set(proHeaders)
+      .send({
+        workspaceId: 'workspace_pro',
+        idempotencyKey: 'idem_research_pro',
+        idea: {
+          rawIdea:
+            'Build a market research injection test for AI planning products with unsafe retrieved content.',
+          targetAudience: 'Founders',
+        },
+      })
+      .expect(201)
+
+    const pipelineResponse = await request(app!.getHttpServer())
+      .post('/api/runs/mock-pipeline')
+      .set(proHeaders)
+      .send({
+        draftRun: draftResponse.body,
+        approvedTriage: draftResponse.body.triage,
+        selectedAgents: ['market_researcher', 'critic', 'moderator'],
+      })
+      .expect(201)
+
+    const marketOutput = pipelineResponse.body.agentOutputs.find(
+      (agentOutput: { agentRole: string }) =>
+        agentOutput.agentRole === 'market_researcher',
+    )
+    const insights = marketOutput.output.roleSpecificInsights
+
+    expect(marketOutput.shieldScan.status).toBe('warning')
+    expect(insights.researchCitations.length).toBeGreaterThan(0)
+    expect(insights.researchDocuments.length).toBeGreaterThan(0)
+    expect(
+      insights.researchDocuments.some((document: { content: string }) =>
+        document.content.includes('Ignore previous instructions'),
+      ),
+    ).toBe(false)
+  })
+
   it('requires workspace auth headers for run mutations', async () => {
     const response = await request(app!.getHttpServer())
       .post('/api/runs/draft')

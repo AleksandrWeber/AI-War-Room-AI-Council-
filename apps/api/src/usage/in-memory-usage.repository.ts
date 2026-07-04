@@ -30,6 +30,17 @@ export class InMemoryUsageRepository implements UsageRepository {
         updatedAt: now,
       },
     ],
+    [
+      'workspace_pro',
+      {
+        workspaceId: 'workspace_pro',
+        paidTier: 'pro',
+        dailyTokenLimit: 1_000_000,
+        dailyCostLimitUsd: 100,
+        createdAt: now,
+        updatedAt: now,
+      },
+    ],
   ])
   private readonly events: UsageEvent[] = []
 

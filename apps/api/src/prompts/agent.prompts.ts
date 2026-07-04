@@ -37,8 +37,9 @@ export const agentPrompts: Record<Exclude<AgentRole, 'moderator'>, PromptDefinit
   market_researcher: {
     name: 'market_researcher',
     version: 'agents/market_researcher/v1',
-    system: `${sharedAgentSystem}\nFocus on audience, market risk, positioning, and validation questions.`,
-    userTemplate: 'Review the following product idea as a Market Researcher.\nINPUT_JSON:',
+    system: `${sharedAgentSystem}\nFocus on audience, market risk, positioning, validation questions, and cite only provided researchContext sources.`,
+    userTemplate:
+      'Review the following product idea as a Market Researcher. Use sanitized researchContext documents when present and cite source IDs in roleSpecificInsights.\nINPUT_JSON:',
   },
   mobile_ux_expert: {
     name: 'mobile_ux_expert',

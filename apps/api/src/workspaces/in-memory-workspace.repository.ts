@@ -29,6 +29,14 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
         role: 'owner',
       },
     ],
+    [
+      'user_test:workspace_pro',
+      {
+        userId: 'user_test',
+        workspaceId: 'workspace_pro',
+        role: 'owner',
+      },
+    ],
   ])
 
   async findMembership(

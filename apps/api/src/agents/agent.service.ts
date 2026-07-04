@@ -10,6 +10,7 @@ import {
 } from '@ai-war-room/schemas'
 import { LlmGatewayService } from '../llm/llm-gateway.service.js'
 import { agentPrompts } from '../prompts/agent.prompts.js'
+import { ResearchService } from '../research/research.service.js'
 
 function createId(prefix: string) {
   return `${prefix}_${randomUUID()}`
@@ -17,7 +18,10 @@ function createId(prefix: string) {
 
 @Injectable()
 export class AgentService {
-  constructor(private readonly llmGatewayService: LlmGatewayService) {}
+  constructor(
+    private readonly llmGatewayService: LlmGatewayService,
+    private readonly researchService: ResearchService,
+  ) {}
 
   async executeAgent(input: {
     runId: string
@@ -26,6 +30,13 @@ export class AgentService {
     completedAt: string
   }): Promise<AgentExecutionResult> {
     const prompt = agentPrompts[input.agentRole]
+    const researchContext =
+      input.agentRole === 'market_researcher'
+        ? await this.researchService.createResearchContext({
+            workspaceId: input.draftRun.workspaceId,
+            draftRun: input.draftRun,
+          })
+        : null
     const fallback = this.createFallbackAgentOutput(input.agentRole, input.draftRun)
     const result = await this.llmGatewayService.generateStructuredJson({
       taskName: prompt.version,
@@ -40,16 +51,21 @@ export class AgentService {
           content: `${prompt.userTemplate}${JSON.stringify({
             draftRun: input.draftRun,
             role: input.agentRole,
+            researchContext,
           })}`,
         },
       ],
       fallback,
     })
+    const output =
+      researchContext && input.agentRole === 'market_researcher'
+        ? this.attachResearchCitations(result.value, researchContext)
+        : result.value
 
     return agentExecutionResultSchema.parse({
       runId: input.runId,
       agentRole: input.agentRole,
-      output: result.value,
+      output,
       validationStatus: result.validationStatus,
       promptVersion: prompt.version,
       modelProvider: result.providerId,
@@ -57,7 +73,7 @@ export class AgentService {
       inputTokens: result.usage.inputTokens,
       outputTokens: result.usage.outputTokens,
       estimatedCostUsd: result.usage.estimatedCostUsd,
-      shieldScan: {
+      shieldScan: researchContext?.shieldScan ?? {
         scanId: createId('scan'),
         status: 'clear',
         maxSeverity: 'none',
@@ -65,6 +81,23 @@ export class AgentService {
       },
       completedAt: input.completedAt,
     })
+  }
+
+  private attachResearchCitations(
+    output: AgentOutput,
+    researchContext: Awaited<ReturnType<ResearchService['createResearchContext']>>,
+  ): AgentOutput {
+    return {
+      ...output,
+      roleSpecificInsights: {
+        ...output.roleSpecificInsights,
+        researchProvider: researchContext.providerId,
+        researchCitations: researchContext.citations,
+        researchDocuments: researchContext.documents,
+        researchShieldStatus: researchContext.shieldScan.status,
+        researchFindingCount: researchContext.shieldScan.findings.length,
+      },
+    }
   }
 
   private createFallbackAgentOutput(
