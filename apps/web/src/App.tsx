@@ -1,6 +1,7 @@
 import { Fragment, useEffect, useRef, useState, type FormEvent } from 'react'
 import type {
   AuthCapabilitiesResponse,
+  AuthRolloutResponse,
   AuthSessionResponse,
   BillingAdminSummaryResponse,
   BillingCapabilitiesResponse,
@@ -15,8 +16,14 @@ import type {
   CheckoutPaidTier,
   RunCapabilitiesResponse,
   TemporalRuntimeHealthResponse,
+  UsageAdminSummaryResponse,
 } from '@ai-war-room/schemas'
 import './App.css'
+import {
+  fetchAuthRollout,
+  formatAuthRolloutCheckStatus,
+  formatAuthRolloutStatus,
+} from './auth-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -62,6 +69,12 @@ import {
   readBillingReturnHint,
   type MockCustomerPortalResponse,
 } from './billing-ui'
+import {
+  executeUsageAdminAction,
+  fetchUsageAdminSummary,
+  fetchUsageCapabilities,
+  formatUsageAdminAction,
+} from './usage-ui'
 import {
   type TemporalRunStartResponse,
   type TemporalWorkflowRecoveryResponse,
@@ -547,6 +560,8 @@ function App() {
     useState<RunCapabilitiesResponse | null>(null)
   const [authCapabilities, setAuthCapabilities] =
     useState<AuthCapabilitiesResponse | null>(null)
+  const [authRollout, setAuthRollout] =
+    useState<AuthRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -614,6 +629,14 @@ function App() {
   const [billingAdminAction, setBillingAdminAction] = useState<
     'idle' | 'running'
   >('idle')
+  const [usageAdminAction, setUsageAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [usageCapabilities, setUsageCapabilities] = useState<{
+    supportsUsageAdminTools: boolean
+  } | null>(null)
+  const [usageAdminSummary, setUsageAdminSummary] =
+    useState<UsageAdminSummaryResponse | null>(null)
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
     useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
@@ -685,6 +708,30 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setAuthCapabilities(null)
+        }
+      })
+
+    fetchAuthRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAuthRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAuthRollout(null)
+        }
+      })
+
+    fetchUsageCapabilities(apiBaseUrl)
+      .then((capabilities) => {
+        if (!controller.signal.aborted) {
+          setUsageCapabilities(capabilities)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setUsageCapabilities(null)
         }
       })
 
@@ -1347,6 +1394,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setBillingAdminSummary(adminSummary)
+
+      const usageAdmin = await fetchUsageAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setUsageAdminSummary(usageAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -1382,6 +1436,31 @@ function App() {
       )
     } finally {
       setBillingAdminAction('idle')
+    }
+  }
+
+  async function handleUsageAdminAction(action: 'reset_daily_usage') {
+    setUsageAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeUsageAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        action,
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run usage admin action.',
+      )
+    } finally {
+      setUsageAdminAction('idle')
     }
   }
 
@@ -1953,10 +2032,37 @@ function App() {
           </p>
         </div>
 
+        {authCapabilities?.supportsAuthRollout && authRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Auth rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${authRollout.status}`}
+              >
+                {formatAuthRolloutStatus(authRollout.status)}
+              </strong>
+            </div>
+            <p>{authRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {authRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>{formatAuthRolloutCheckStatus(check.status)}</span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {authRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
         {billingCapabilities?.supportsBillingRollout && billingRollout ? (
           <div className="billing-rollout">
             <div className="billing-rollout__header">
-              <span>Production rollout readiness</span>
+              <span>Billing rollout readiness</span>
               <strong
                 className={`billing-rollout__status billing-rollout__status--${billingRollout.status}`}
               >
@@ -2229,6 +2335,58 @@ function App() {
                 </div>
               </article>
             </div>
+          </div>
+        ) : null}
+
+        {usageCapabilities?.supportsUsageAdminTools && usageAdminSummary ? (
+          <div className="billing-admin">
+            <div className="billing-admin__header">
+              <span>Usage admin tools</span>
+              <strong>{usageAdminSummary.role}</strong>
+            </div>
+            <p>{usageAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Daily events</span>
+                <strong>{usageAdminSummary.stats.dailyEventCount}</strong>
+                <small>{usageAdminSummary.stats.distinctRunCount} runs</small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Token utilization</span>
+                <strong>{usageAdminSummary.stats.tokenUtilizationPercent}%</strong>
+                <small>
+                  {usageAdminSummary.usage.dailyUsage.totalTokens.toLocaleString()}{' '}
+                  tokens
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Cost utilization</span>
+                <strong>{usageAdminSummary.stats.costUtilizationPercent}%</strong>
+                <small>
+                  ${usageAdminSummary.usage.dailyUsage.estimatedCostUsd.toFixed(2)}{' '}
+                  used
+                </small>
+              </article>
+            </div>
+            {usageAdminSummary.availableActions.length ? (
+              <div className="billing-admin__actions">
+                {usageAdminSummary.availableActions.map((action) => (
+                  <button
+                    key={action}
+                    className="danger-button"
+                    type="button"
+                    disabled={
+                      billingAction !== 'idle' ||
+                      usageAdminAction !== 'idle' ||
+                      billingAdminAction !== 'idle'
+                    }
+                    onClick={() => void handleUsageAdminAction(action)}
+                  >
+                    {formatUsageAdminAction(action)}
+                  </button>
+                ))}
+              </div>
+            ) : null}
           </div>
         ) : null}
 

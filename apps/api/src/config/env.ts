@@ -156,5 +156,29 @@ export function validateEnv(config: Record<string, unknown>): ApiEnv {
     )
   }
 
+  if (env.NODE_ENV === 'production' && env.AUTH_PROVIDER === 'headers') {
+    throw new Error('AUTH_PROVIDER=headers cannot be used in production.')
+  }
+
+  if (
+    env.NODE_ENV === 'production' &&
+    env.AUTH_PROVIDER === 'external' &&
+    env.AUTH_EXTERNAL_ADAPTER === 'mock'
+  ) {
+    throw new Error(
+      'AUTH_EXTERNAL_ADAPTER=mock cannot be used in production when AUTH_PROVIDER=external.',
+    )
+  }
+
+  if (
+    env.NODE_ENV === 'production' &&
+    (env.AUTH_PROVIDER === 'bearer' || env.AUTH_PROVIDER === 'session') &&
+    !env.AUTH_BEARER_TOKEN
+  ) {
+    throw new Error(
+      'AUTH_BEARER_TOKEN is required in production when AUTH_PROVIDER=bearer or AUTH_PROVIDER=session.',
+    )
+  }
+
   return env
 }

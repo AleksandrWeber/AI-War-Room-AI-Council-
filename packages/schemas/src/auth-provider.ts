@@ -13,6 +13,7 @@ export const authCapabilitiesResponseSchema = z.object({
   requiresBearerToken: z.boolean(),
   supportsSessionBootstrap: z.boolean(),
   supportsExternalProvisioning: z.boolean(),
+  supportsAuthRollout: z.boolean(),
   workspaceHeadersRequired: z.boolean(),
   externalVendor: z.enum(['clerk', 'auth0']).nullable(),
   externalAdapter: z.enum(['mock', 'jwks']).nullable(),
@@ -50,3 +51,27 @@ export function authProviderSupportsSessionBootstrap(
 ) {
   return provider !== 'external'
 }
+
+export const authRolloutCheckStatusSchema = z.enum(['pass', 'fail', 'skip'])
+export type AuthRolloutCheckStatus = z.infer<typeof authRolloutCheckStatusSchema>
+
+export const authRolloutCheckSchema = z.object({
+  name: z.string().trim().min(1),
+  label: z.string().trim().min(1),
+  status: authRolloutCheckStatusSchema,
+  detail: z.string().trim().min(1),
+})
+export type AuthRolloutCheck = z.infer<typeof authRolloutCheckSchema>
+
+export const authRolloutStatusSchema = z.enum(['ready', 'not_ready'])
+export type AuthRolloutStatus = z.infer<typeof authRolloutStatusSchema>
+
+export const authRolloutResponseSchema = z.object({
+  status: authRolloutStatusSchema,
+  provider: authProviderModeSchema,
+  externalAdapter: z.enum(['mock', 'jwks']).nullable().optional(),
+  checks: z.array(authRolloutCheckSchema),
+  guidance: z.string().trim().min(1),
+  checkedAt: z.string().datetime(),
+})
+export type AuthRolloutResponse = z.infer<typeof authRolloutResponseSchema>

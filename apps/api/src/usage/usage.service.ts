@@ -1,17 +1,29 @@
 import {
+  BadRequestException,
   ForbiddenException,
   Inject,
   Injectable,
 } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { randomUUID } from 'node:crypto'
 import {
   billingWorkspaceUsageResponseSchema,
+  usageAdminActionRequestSchema,
+  usageAdminActionResponseSchema,
+  usageAdminSummaryResponseSchema,
+  usageCapabilitiesResponseSchema,
   PAID_TIER_LIMITS,
   type AuthContext,
   type MockPipelineResult,
   type UsageEvent,
   type UsagePhase,
 } from '@ai-war-room/schemas'
+import type { ApiEnv } from '../config/env.js'
+import {
+  buildUsageAdminStats,
+  getUsageAdminGuidance,
+  resolveUsageAdminActions,
+} from './usage-admin.helpers.js'
 import {
   USAGE_REPOSITORY,
   type UsageRepository,
@@ -24,9 +36,19 @@ function createId(prefix: string) {
 @Injectable()
 export class UsageService {
   constructor(
+    private readonly configService: ConfigService<ApiEnv, true>,
     @Inject(USAGE_REPOSITORY)
     private readonly usageRepository: UsageRepository,
   ) {}
+
+  getCapabilities() {
+    return usageCapabilitiesResponseSchema.parse({
+      supportsUsageSummary: true,
+      supportsUsageAdminTools: true,
+      guidance:
+        'Workspace usage summaries and admin tools are available for owners and admins.',
+    })
+  }
 
   async assertWorkspaceCanExecute(input: {
     workspaceId: string
@@ -80,6 +102,86 @@ export class UsageService {
       usagePeriodStart: usagePeriodStart.toISOString(),
       usagePeriodEnd: usagePeriodEnd.toISOString(),
     })
+  }
+
+  async getWorkspaceUsageAdminSummary(
+    authContext: AuthContext,
+    workspaceId: string,
+  ) {
+    this.assertCanManageUsageAdmin(authContext)
+
+    if (authContext.workspaceId !== workspaceId) {
+      throw new ForbiddenException({
+        message: 'Workspace header does not match request workspace.',
+      })
+    }
+
+    const [usage, metrics] = await Promise.all([
+      this.getWorkspaceUsageSummary(workspaceId),
+      this.usageRepository.getDailyUsageMetrics(workspaceId),
+    ])
+
+    const availableActions = resolveUsageAdminActions({
+      nodeEnv: this.configService.get('NODE_ENV', { infer: true }),
+      dailyEventCount: metrics.dailyEventCount,
+    })
+
+    return usageAdminSummaryResponseSchema.parse({
+      workspaceId,
+      role: authContext.role,
+      usage,
+      stats: buildUsageAdminStats({
+        usage,
+        dailyEventCount: metrics.dailyEventCount,
+        distinctRunCount: metrics.distinctRunCount,
+      }),
+      availableActions,
+      guidance: getUsageAdminGuidance({
+        role: authContext.role,
+        availableActions,
+      }),
+    })
+  }
+
+  async executeUsageAdminAction(
+    authContext: AuthContext,
+    input: {
+      workspaceId: string
+      action: 'reset_daily_usage'
+    },
+  ) {
+    this.assertCanManageUsageAdmin(authContext)
+
+    const payload = usageAdminActionRequestSchema.parse({
+      workspaceId: input.workspaceId,
+      action: input.action,
+    })
+
+    if (payload.workspaceId !== authContext.workspaceId) {
+      throw new ForbiddenException({
+        message: 'Workspace header does not match request workspace.',
+      })
+    }
+
+    switch (payload.action) {
+      case 'reset_daily_usage': {
+        if (this.configService.get('NODE_ENV', { infer: true }) === 'production') {
+          throw new BadRequestException({
+            message: 'Reset daily usage is not available in production.',
+          })
+        }
+
+        await this.usageRepository.resetDailyUsage(payload.workspaceId)
+        const usage = await this.getWorkspaceUsageSummary(payload.workspaceId)
+
+        return usageAdminActionResponseSchema.parse({
+          workspaceId: payload.workspaceId,
+          action: payload.action,
+          message: 'Daily workspace usage counters were reset for local testing.',
+          usage,
+        })
+      }
+    }
   }
 
   async assertWorkspaceCanUseResearch(workspaceId: string): Promise<void> {
@@ -175,5 +277,15 @@ export class UsageService {
     await this.usageRepository.recordUsageEvents(events)
 
     return events
+  }
+
+  private assertCanManageUsageAdmin(authContext: AuthContext) {
+    if (authContext.role === 'owner' || authContext.role === 'admin') {
+      return
+    }
+
+    throw new ForbiddenException({
+      message: 'Only workspace owners and admins can manage usage settings.',
+    })
   }
 }

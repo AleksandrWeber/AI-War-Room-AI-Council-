@@ -2,7 +2,11 @@ import type {
   UsageEvent,
   WorkspaceUsageLimit,
 } from '@ai-war-room/schemas'
-import type { DailyUsageTotal, UsageRepository } from './usage.repository.js'
+import type {
+  DailyUsageMetrics,
+  DailyUsageTotal,
+  UsageRepository,
+} from './usage.repository.js'
 
 const now = '2026-07-04T12:00:00.000Z'
 
@@ -63,6 +67,25 @@ export class InMemoryUsageRepository implements UsageRepository {
           estimatedCostUsd: 0,
         },
       )
+  }
+
+  async getDailyUsageMetrics(workspaceId: string): Promise<DailyUsageMetrics> {
+    const workspaceEvents = this.events.filter(
+      (event) => event.workspaceId === workspaceId,
+    )
+
+    return {
+      dailyEventCount: workspaceEvents.length,
+      distinctRunCount: new Set(workspaceEvents.map((event) => event.runId)).size,
+    }
+  }
+
+  async resetDailyUsage(workspaceId: string): Promise<void> {
+    const remaining = this.events.filter(
+      (event) => event.workspaceId !== workspaceId,
+    )
+    this.events.length = 0
+    this.events.push(...remaining)
   }
 
   async recordUsageEvents(events: UsageEvent[]): Promise<void> {

@@ -67,6 +67,26 @@ function createAuthService(input: {
           return input.authProvider === 'external'
         }
 
+        if (key === 'WEB_ORIGIN') {
+          return 'http://127.0.0.1:5173'
+        }
+
+        if (key === 'AUTH_EXTERNAL_JWT_SECRET') {
+          return 'external-secret'
+        }
+
+        if (key === 'AUTH_EXTERNAL_JWKS_URL') {
+          return 'https://example.com/jwks.json'
+        }
+
+        if (key === 'AUTH_EXTERNAL_ISSUER') {
+          return 'ai-war-room-external-auth'
+        }
+
+        if (key === 'AUTH_EXTERNAL_AUDIENCE') {
+          return 'ai-war-room-api'
+        }
+
         return undefined
       },
     } as never,
@@ -83,6 +103,7 @@ describe('AuthService', () => {
       requiresBearerToken: false,
       supportsSessionBootstrap: true,
       supportsExternalProvisioning: false,
+      supportsAuthRollout: true,
       externalVendor: null,
       externalAdapter: null,
     })
@@ -100,6 +121,7 @@ describe('AuthService', () => {
       requiresBearerToken: true,
       supportsSessionBootstrap: false,
       supportsExternalProvisioning: true,
+      supportsAuthRollout: true,
       workspaceHeadersRequired: false,
       externalVendor: 'auth0',
       externalAdapter: 'jwks',
@@ -225,5 +247,16 @@ describe('AuthService', () => {
         },
       }),
     ).not.toThrow()
+  })
+
+  it('reports auth rollout readiness for development header auth', () => {
+    const service = createAuthService({
+      nodeEnv: 'development',
+    })
+
+    expect(service.getAuthRollout()).toMatchObject({
+      status: 'ready',
+      provider: 'headers',
+    })
   })
 })

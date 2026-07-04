@@ -29,6 +29,11 @@ export class AuthController {
     return this.authService.getCapabilities()
   }
 
+  @Get('readiness')
+  getAuthRollout() {
+    return this.authService.getAuthRollout()
+  }
+
   @Post('session')
   async createSession(
     @Req() request: AuthenticatedRequest,

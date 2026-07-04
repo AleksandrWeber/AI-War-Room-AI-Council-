@@ -4,7 +4,11 @@ import type {
   WorkspaceUsageLimit,
 } from '@ai-war-room/schemas'
 import { PostgresService } from '../persistence/postgres.service.js'
-import type { DailyUsageTotal, UsageRepository } from './usage.repository.js'
+import type {
+  DailyUsageMetrics,
+  DailyUsageTotal,
+  UsageRepository,
+} from './usage.repository.js'
 
 type UsageLimitRow = {
   workspace_id: string
@@ -19,6 +23,11 @@ type DailyUsageRow = {
   input_tokens: string
   output_tokens: string
   estimated_cost_usd: string
+}
+
+type DailyUsageMetricsRow = {
+  daily_event_count: string
+  distinct_run_count: string
 }
 
 @Injectable()
@@ -77,6 +86,37 @@ export class PostgresUsageRepository implements UsageRepository {
       outputTokens: Number(row?.output_tokens ?? 0),
       estimatedCostUsd: Number(row?.estimated_cost_usd ?? 0),
     }
+  }
+
+  async getDailyUsageMetrics(workspaceId: string): Promise<DailyUsageMetrics> {
+    const result = await this.postgresService.query<DailyUsageMetricsRow>(
+      `
+        SELECT
+          COUNT(*)::TEXT AS daily_event_count,
+          COUNT(DISTINCT run_id)::TEXT AS distinct_run_count
+        FROM usage_events
+        WHERE workspace_id = $1
+          AND created_at >= date_trunc('day', NOW())
+      `,
+      [workspaceId],
+    )
+    const row = result.rows[0]
+
+    return {
+      dailyEventCount: Number(row?.daily_event_count ?? 0),
+      distinctRunCount: Number(row?.distinct_run_count ?? 0),
+    }
+  }
+
+  async resetDailyUsage(workspaceId: string): Promise<void> {
+    await this.postgresService.query(
+      `
+        DELETE FROM usage_events
+        WHERE workspace_id = $1
+          AND created_at >= date_trunc('day', NOW())
+      `,
+      [workspaceId],
+    )
   }
 
   async recordUsageEvents(events: UsageEvent[]): Promise<void> {

@@ -5,6 +5,7 @@ import {
 import { ConfigService } from '@nestjs/config'
 import {
   authCapabilitiesResponseSchema,
+  authRolloutResponseSchema,
   authProviderRequiresBearerToken,
   authProviderSupportsSessionBootstrap,
   authProviderWorkspaceHeadersRequired,
@@ -13,6 +14,7 @@ import {
   type ExternalAuthIdentity,
 } from '@ai-war-room/schemas'
 import { buildAuthSessionResponse, verifyAuthSessionToken } from './auth-session.crypto.js'
+import { evaluateAuthRollout } from './auth-rollout.helpers.js'
 import { getExternalAuthCapabilityGuidance } from './external-auth.adapter.js'
 import { ExternalAuthService } from './external-auth.service.js'
 import type { ApiEnv } from '../config/env.js'
@@ -43,6 +45,7 @@ export class AuthService {
       supportsExternalProvisioning:
         provider === 'external' &&
         this.configService.get('AUTH_EXTERNAL_AUTO_PROVISION', { infer: true }),
+      supportsAuthRollout: true,
       workspaceHeadersRequired: authProviderWorkspaceHeadersRequired(provider),
       externalVendor,
       externalAdapter,
@@ -50,6 +53,42 @@ export class AuthService {
         provider === 'external' && externalVendor && externalAdapter
           ? getExternalAuthCapabilityGuidance(externalVendor, externalAdapter)
           : getAuthProviderGuidance(provider),
+    })
+  }
+
+  getAuthRollout() {
+    const provider = this.configService.get('AUTH_PROVIDER', { infer: true })
+    const rollout = evaluateAuthRollout({
+      nodeEnv: this.configService.get('NODE_ENV', { infer: true }),
+      authProvider: provider,
+      authBearerToken: this.configService.get('AUTH_BEARER_TOKEN', {
+        infer: true,
+      }),
+      appEncryptionKey: this.configService.get('APP_ENCRYPTION_KEY', {
+        infer: true,
+      }),
+      webOrigin: this.configService.get('WEB_ORIGIN', { infer: true }),
+      authExternalAdapter:
+        provider === 'external'
+          ? this.configService.get('AUTH_EXTERNAL_ADAPTER', { infer: true })
+          : undefined,
+      authExternalJwtSecret: this.configService.get('AUTH_EXTERNAL_JWT_SECRET', {
+        infer: true,
+      }),
+      authExternalJwksUrl: this.configService.get('AUTH_EXTERNAL_JWKS_URL', {
+        infer: true,
+      }),
+      authExternalIssuer: this.configService.get('AUTH_EXTERNAL_ISSUER', {
+        infer: true,
+      }),
+      authExternalAudience: this.configService.get('AUTH_EXTERNAL_AUDIENCE', {
+        infer: true,
+      }),
+    })
+
+    return authRolloutResponseSchema.parse({
+      ...rollout,
+      checkedAt: new Date().toISOString(),
     })
   }
 

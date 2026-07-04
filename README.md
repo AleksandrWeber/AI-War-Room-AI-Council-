@@ -209,6 +209,13 @@ For production Clerk or Auth0, switch `AUTH_EXTERNAL_ADAPTER=jwks` and configure
 
 External users can be provisioned automatically when `AUTH_EXTERNAL_AUTO_PROVISION=true`, or explicitly through `POST /api/auth/provision`.
 
+Auth rollout readiness:
+
+- `GET /api/auth/readiness` returns operator-facing production auth checklist results (`ready` or `not_ready`).
+- Checks cover auth provider mode, bearer bootstrap token, encryption key, HTTPS web origin, and external JWKS or mock config.
+- Production startup rejects header auth, external mock adapter, and missing bearer bootstrap tokens.
+- The web billing panel shows auth rollout status and per-check guidance.
+
 ## Billing
 
 Billing checkout is disabled by default. Discover the active mode from `GET /api/billing/capabilities`.
@@ -336,11 +343,25 @@ Billing admin tools:
 - Only workspace owners and admins can access billing admin endpoints.
 - The web billing panel shows billing admin stats and action buttons for authorized roles.
 
+Usage admin tools:
+
+- `GET /api/usage/workspace/:workspaceId/admin` returns owner/admin daily usage metrics and quota utilization.
+- `POST /api/usage/workspace/:workspaceId/admin/actions` runs usage admin actions such as reset daily usage for local testing.
+- Only workspace owners and admins can access usage admin endpoints.
+- The web billing panel shows usage admin stats and reset actions for authorized roles.
+
 Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
 
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v5.18` behavior:
+
+- Auth rollout readiness validates production auth configuration through `GET /api/auth/readiness`.
+- Production rejects header auth, external mock adapter, and missing bearer bootstrap tokens.
+- Workspace owners and admins can inspect usage metrics from `GET /api/usage/workspace/:workspaceId/admin` and reset daily usage locally.
+- The web billing panel shows auth rollout checks and usage admin tools.
 
 Current `v5.17` behavior:
 

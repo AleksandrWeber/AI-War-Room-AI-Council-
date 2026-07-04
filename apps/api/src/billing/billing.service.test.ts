@@ -34,7 +34,10 @@ function createBillingService(env: Partial<ApiEnv>) {
   const webhookRepository = new InMemoryBillingWebhookRepository()
   const invoiceRepository = new InMemoryBillingInvoiceRepository()
   const adapter = new MockBillingAdapter('http://127.0.0.1:3000')
-  const usageService = new UsageService(new InMemoryUsageRepository())
+  const usageService = new UsageService(
+    configService,
+    new InMemoryUsageRepository(),
+  )
   const meterUsageRepository = new InMemoryBillingMeterUsageRepository()
   const meterUsageService = new BillingMeterUsageService(
     configService,

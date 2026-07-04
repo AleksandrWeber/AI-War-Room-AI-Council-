@@ -11,8 +11,15 @@ export type DailyUsageTotal = {
   estimatedCostUsd: number
 }
 
+export type DailyUsageMetrics = {
+  dailyEventCount: number
+  distinctRunCount: number
+}
+
 export interface UsageRepository {
   getWorkspaceLimit(workspaceId: string): Promise<WorkspaceUsageLimit | null>
   getDailyUsageTotal(workspaceId: string): Promise<DailyUsageTotal>
+  getDailyUsageMetrics(workspaceId: string): Promise<DailyUsageMetrics>
+  resetDailyUsage(workspaceId: string): Promise<void>
   recordUsageEvents(events: UsageEvent[]): Promise<void>
 }
