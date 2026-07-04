@@ -30,6 +30,55 @@ services:
       timeout: 5s
       retries: 10
 
+  api:
+    build:
+      context: .
+      target: api
+    container_name: ai-war-room-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      API_PORT: 3000
+      WEB_ORIGIN: http://127.0.0.1:5173
+      DATABASE_URL: postgres://ai_war_room:ai_war_room@postgres:5432/ai_war_room
+      REDIS_URL: redis://redis:6379
+      APP_ENCRYPTION_KEY: local-development-encryption-key-change-me
+      TEMPORAL_ENABLED: false
+    ports:
+      - '3000:3000'
+    healthcheck:
+      test: ['CMD', 'wget', '-qO-', 'http://127.0.0.1:3000/api/health/ready']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  temporal-worker:
+    profiles: ['temporal']
+    build:
+      context: .
+      target: temporal-worker
+    container_name: ai-war-room-temporal-worker
+    depends_on:
+      api:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgres://ai_war_room:ai_war_room@postgres:5432/ai_war_room
+      REDIS_URL: redis://redis:6379
+      APP_ENCRYPTION_KEY: local-development-encryption-key-change-me
+      TEMPORAL_ENABLED: true
+      TEMPORAL_ADDRESS: host.docker.internal:7233
+      TEMPORAL_NAMESPACE: default
+      TEMPORAL_TASK_QUEUE: ai-war-room-runs
+    extra_hosts:
+      - 'host.docker.internal:host-gateway'
+
 volumes:
   postgres_data:
   redis_data:

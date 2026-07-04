@@ -40,4 +40,8 @@ export class PostgresService implements OnModuleDestroy {
   async onModuleDestroy() {
     await this.pool.end()
   }
+
+  async ping() {
+    await this.query('SELECT 1')
+  }
 }

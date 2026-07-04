@@ -114,6 +114,24 @@ export class StreamEventBufferService implements OnModuleDestroy {
     }
   }
 
+  async ping() {
+    if (!this.redisClient) {
+      return true
+    }
+
+    try {
+      if (!this.redisClient.isOpen) {
+        await this.redisClient.connect()
+      }
+
+      const response = await this.redisClient.ping()
+
+      return response === 'PONG'
+    } catch {
+      return false
+    }
+  }
+
   async onModuleDestroy() {
     if (this.redisClient?.isOpen) {
       await this.redisClient.quit()

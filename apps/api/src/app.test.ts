@@ -77,6 +77,20 @@ describe('API skeleton', () => {
     })
   })
 
+  it('returns readiness status when postgres and redis are available', async () => {
+    const response = await request(app!.getHttpServer()).get('/api/health/ready')
+
+    expect(response.status).toBeGreaterThanOrEqual(200)
+    expect(response.status).toBeLessThan(600)
+    expect(response.body).toMatchObject({
+      service: 'ai-war-room-api',
+      dependencies: expect.arrayContaining([
+        expect.objectContaining({ name: 'postgres' }),
+        expect.objectContaining({ name: 'redis' }),
+      ]),
+    })
+  })
+
   it('returns version metadata', async () => {
     const response = await request(app!.getHttpServer())
       .get('/api/version')

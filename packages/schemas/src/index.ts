@@ -1,6 +1,7 @@
 export * from './agent.js'
 export * from './artifact.js'
 export * from './common.js'
+export * from './health.js'
 export * from './idea.js'
 export * from './moderator.js'
 export * from './model-router.js'

@@ -57,6 +57,35 @@ Default local ports are:
 - API: `http://127.0.0.1:3000`
 - Web: `http://127.0.0.1:5173`
 
+## Docker Deployment
+
+Build and start the production API container with PostgreSQL and Redis:
+
+```bash
+npm run docker:build
+npm run docker:up:stack
+```
+
+The API container runs database migrations on startup, then serves on port `3000`.
+
+Readiness checks:
+
+- `GET /api/health` — lightweight liveness probe.
+- `GET /api/health/ready` — returns `200` only when PostgreSQL and Redis are reachable; otherwise `503` with dependency details.
+
+To include the Temporal worker profile (requires a Temporal server reachable at `host.docker.internal:7233`):
+
+```bash
+npm run docker:up:temporal
+```
+
+Required production environment variables for the API container:
+
+- `DATABASE_URL`
+- `REDIS_URL`
+- `APP_ENCRYPTION_KEY`
+- `WEB_ORIGIN`
+
 If you run custom ports, keep API CORS and web API URL aligned:
 
 ```bash
@@ -124,6 +153,13 @@ Run mutation endpoints verify that the request workspace matches the header work
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v5.0` behavior:
+
+- `GET /api/health/ready` verifies PostgreSQL and Redis before reporting the API as ready.
+- Multi-stage Docker images build the API and optional Temporal worker from the monorepo.
+- Docker Compose can start PostgreSQL, Redis, and the production API container with migration-on-startup.
+- Root scripts `docker:build`, `docker:up:stack`, and `docker:up:temporal` wrap the deployment stack.
 
 Current `v4.8` behavior:
 
