@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   CanActivate,
   ExecutionContext,
   ForbiddenException,
@@ -19,6 +18,7 @@ type WorkspaceRequestBody = {
 export type AuthenticatedRequest = {
   headers: Record<string, string | string[] | undefined>
   body?: WorkspaceRequestBody
+  params?: Record<string, string | undefined>
   authContext?: AuthContext
 }
 
@@ -40,13 +40,9 @@ export class WorkspaceAccessGuard implements CanActivate {
       })
     }
 
-    if (!bodyWorkspaceId) {
-      throw new BadRequestException({
-        message: 'Workspace-scoped request body is missing workspaceId.',
-      })
-    }
+    const requestWorkspaceId = bodyWorkspaceId ?? headerWorkspaceId
 
-    if (headerWorkspaceId !== bodyWorkspaceId) {
+    if (bodyWorkspaceId && headerWorkspaceId !== bodyWorkspaceId) {
       throw new ForbiddenException({
         message: 'Workspace header does not match request workspace.',
       })
@@ -54,7 +50,7 @@ export class WorkspaceAccessGuard implements CanActivate {
 
     request.authContext = await this.workspaceService.requireMembership({
       userId,
-      workspaceId: bodyWorkspaceId,
+      workspaceId: requestWorkspaceId,
     })
 
     return true

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  NotFoundException,
   Inject,
   Injectable,
 } from '@nestjs/common'
@@ -8,11 +9,14 @@ import { ConfigService } from '@nestjs/config'
 import { randomUUID } from 'node:crypto'
 import {
   type AgentRole,
+  type ArtifactHistoryResponse,
+  type ArtifactHistoryItem,
   type AuthContext,
   type DraftRun,
   type MockPipelineRequest,
   type MockPipelineResult,
   agentRoleSchema,
+  artifactHistoryResponseSchema,
   createRunRequestSchema,
   draftRunSchema,
   mockPipelineRequestSchema,
@@ -94,6 +98,33 @@ export class RunsService {
         'artifacts',
       ],
     }
+  }
+
+  async listArtifactHistory(workspaceId: string): Promise<ArtifactHistoryResponse> {
+    const artifacts = await this.runRepository.listArtifacts(workspaceId)
+
+    return artifactHistoryResponseSchema.parse({
+      workspaceId,
+      artifacts,
+    })
+  }
+
+  async exportArtifactMarkdown(input: {
+    workspaceId: string
+    artifactId: string
+  }): Promise<string> {
+    const artifact = await this.runRepository.findArtifactById(
+      input.workspaceId,
+      input.artifactId,
+    )
+
+    if (!artifact) {
+      throw new NotFoundException({
+        message: 'Artifact not found.',
+      })
+    }
+
+    return this.renderArtifactMarkdown(artifact)
   }
 
   async createDraftRun(input: unknown): Promise<DraftRun> {
@@ -338,5 +369,45 @@ export class RunsService {
       startedAt: timestamp,
       completedAt: timestamp,
     }
+  }
+
+  private renderArtifactMarkdown(artifact: ArtifactHistoryItem) {
+    const lines = [
+      `# ${this.formatTitle(artifact.artifactType)}`,
+      '',
+      `- Artifact ID: ${artifact.artifactId}`,
+      `- Run ID: ${artifact.runId}`,
+      `- Version: ${artifact.artifactVersion}`,
+      `- Created: ${artifact.createdAt}`,
+      `- Prompt: ${artifact.metadata.promptVersion}`,
+      '',
+    ]
+
+    for (const [key, value] of Object.entries(artifact.artifact.content)) {
+      lines.push(`## ${this.formatTitle(key)}`, '')
+
+      if (Array.isArray(value)) {
+        for (const item of value) {
+          lines.push(`- ${String(item)}`)
+        }
+      } else {
+        lines.push(String(value))
+      }
+
+      lines.push('')
+    }
+
+    return lines.join('\n').trimEnd()
+  }
+
+  private formatTitle(value: string) {
+    if (value === 'prd') {
+      return 'PRD'
+    }
+
+    return value
+      .split('_')
+      .map((word) => word[0]?.toUpperCase() + word.slice(1))
+      .join(' ')
   }
 }

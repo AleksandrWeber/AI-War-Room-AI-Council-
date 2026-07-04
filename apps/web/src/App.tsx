@@ -110,7 +110,10 @@ type AgentExecution = {
 
 type ArtifactResult = {
   metadata: {
+    artifactId: string
+    runId: string
     artifactType: 'executive_summary' | 'prd' | 'development_prompt'
+    artifactVersion: string
     promptVersion: string
     modelProvider: string
     modelName: string
@@ -120,11 +123,28 @@ type ArtifactResult = {
       inputTokens: number
       outputTokens: number
     }
+    createdAt: string
   }
   artifact: {
     artifactType: 'executive_summary' | 'prd' | 'development_prompt'
     content: Record<string, unknown>
   }
+}
+
+type ArtifactHistoryItem = {
+  artifactId: string
+  runId: string
+  workspaceId: string
+  artifactType: ArtifactResult['metadata']['artifactType']
+  artifactVersion: string
+  createdAt: string
+  metadata: ArtifactResult['metadata']
+  artifact: ArtifactResult['artifact']
+}
+
+type ArtifactHistoryResponse = {
+  workspaceId: string
+  artifacts: ArtifactHistoryItem[]
 }
 
 type MockPipelineResult = {
@@ -335,6 +355,8 @@ function App() {
   )
   const [streamEvents, setStreamEvents] = useState<PipelineStreamEvent[]>([])
   const [streamedArtifacts, setStreamedArtifacts] = useState<ArtifactResult[]>([])
+  const [artifactHistory, setArtifactHistory] = useState<ArtifactHistoryItem[]>([])
+  const [historyError, setHistoryError] = useState<string | null>(null)
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
     useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
@@ -535,6 +557,59 @@ function App() {
         error instanceof Error
           ? error.message
           : 'Failed to execute prompt-driven pipeline.',
+      )
+    }
+  }
+
+  async function handleLoadArtifactHistory() {
+    setHistoryError(null)
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/runs/artifacts/history`, {
+        headers: localAuthHeaders,
+      })
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`)
+      }
+
+      const history = (await response.json()) as ArtifactHistoryResponse
+      setArtifactHistory(history.artifacts)
+    } catch (error) {
+      setHistoryError(
+        error instanceof Error ? error.message : 'Failed to load artifact history.',
+      )
+    }
+  }
+
+  async function handleExportMarkdown(artifactId: string) {
+    setHistoryError(null)
+
+    try {
+      const response = await fetch(
+        `${apiBaseUrl}/runs/artifacts/${artifactId}/export/markdown`,
+        {
+          headers: localAuthHeaders,
+        },
+      )
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`)
+      }
+
+      const markdown = await response.text()
+      const blob = new Blob([markdown], {
+        type: 'text/markdown;charset=utf-8',
+      })
+      const url = URL.createObjectURL(blob)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${artifactId}.md`
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      setHistoryError(
+        error instanceof Error ? error.message : 'Failed to export Markdown.',
       )
     }
   }
@@ -921,6 +996,47 @@ function App() {
           ) : null}
         </section>
       ) : null}
+
+      <section className="panel history-panel">
+        <div className="section-heading">
+          <p className="eyebrow">Artifact History</p>
+          <h2>Durable artifacts from previous runs.</h2>
+          <p>
+            History is workspace-scoped. Each artifact is immutable and can be
+            exported as Markdown from its persisted content.
+          </p>
+        </div>
+        <button
+          className="execute-button"
+          type="button"
+          onClick={handleLoadArtifactHistory}
+        >
+          Load artifact history
+        </button>
+        {historyError ? <p className="form-error">{historyError}</p> : null}
+        {artifactHistory.length > 0 ? (
+          <div className="history-list">
+            {artifactHistory.map((artifact) => (
+              <article className="history-item" key={artifact.artifactId}>
+                <div>
+                  <strong>{formatArtifactTitle(artifact.artifactType)}</strong>
+                  <p>
+                    Run {artifact.runId} - version {artifact.artifactVersion}
+                  </p>
+                  <small>{new Date(artifact.createdAt).toLocaleString()}</small>
+                </div>
+                <button
+                  className="secondary-button"
+                  type="button"
+                  onClick={() => handleExportMarkdown(artifact.artifactId)}
+                >
+                  Export Markdown
+                </button>
+              </article>
+            ))}
+          </div>
+        ) : null}
+      </section>
 
       <section className="panel" id="pipeline">
         <div className="section-heading">

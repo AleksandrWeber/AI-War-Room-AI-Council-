@@ -214,6 +214,40 @@ describe('API skeleton', () => {
     const usageTotal = await usageRepository.getDailyUsageTotal('workspace_1')
 
     expect(usageTotal.inputTokens + usageTotal.outputTokens).toBeGreaterThan(0)
+
+    const historyResponse = await request(app!.getHttpServer())
+      .get('/api/runs/artifacts/history')
+      .set(authHeaders)
+      .expect(200)
+    const exportedArtifact = historyResponse.body.artifacts.find(
+      (artifact: { runId: string }) => artifact.runId === pipelineResponse.body.runId,
+    )
+
+    expect(exportedArtifact).toBeTruthy()
+    expect(exportedArtifact.artifactVersion).toBe('v1')
+    expect(exportedArtifact.artifact.content).toEqual(
+      pipelineResponse.body.artifacts.find(
+        (artifact: { metadata: { artifactId: string } }) =>
+          artifact.metadata.artifactId === exportedArtifact.artifactId,
+      ).artifact.content,
+    )
+
+    const exportResponse = await request(app!.getHttpServer())
+      .get(`/api/runs/artifacts/${exportedArtifact.artifactId}/export/markdown`)
+      .set(authHeaders)
+      .expect(200)
+
+    const expectedTitle =
+      exportedArtifact.artifactType === 'prd'
+        ? 'PRD'
+        : exportedArtifact.artifactType
+            .split('_')
+            .map((word: string) => word[0].toUpperCase() + word.slice(1))
+            .join(' ')
+
+    expect(exportResponse.headers['content-type']).toContain('text/markdown')
+    expect(exportResponse.text).toContain(`# ${expectedTitle}`)
+    expect(exportResponse.text).toContain(`Artifact ID: ${exportedArtifact.artifactId}`)
   })
 
   it('streams pipeline status and final artifacts', async () => {

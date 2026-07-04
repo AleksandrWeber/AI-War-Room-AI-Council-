@@ -94,8 +94,26 @@ export const artifactSchema = z.object({
   artifact: artifactContentSchema,
 })
 
+export const artifactHistoryItemSchema = z.object({
+  artifactId: nonEmptyStringSchema,
+  runId: nonEmptyStringSchema,
+  workspaceId: nonEmptyStringSchema,
+  artifactType: artifactTypeSchema,
+  artifactVersion: nonEmptyStringSchema,
+  createdAt: utcDateStringSchema,
+  metadata: artifactMetadataSchema,
+  artifact: artifactContentSchema,
+})
+
+export const artifactHistoryResponseSchema = z.object({
+  workspaceId: nonEmptyStringSchema,
+  artifacts: z.array(artifactHistoryItemSchema),
+})
+
 export type ExecutiveSummary = z.infer<typeof executiveSummarySchema>
 export type Prd = z.infer<typeof prdSchema>
 export type DevelopmentPrompt = z.infer<typeof developmentPromptSchema>
 export type ArtifactMetadata = z.infer<typeof artifactMetadataSchema>
 export type Artifact = z.infer<typeof artifactSchema>
+export type ArtifactHistoryItem = z.infer<typeof artifactHistoryItemSchema>
+export type ArtifactHistoryResponse = z.infer<typeof artifactHistoryResponseSchema>

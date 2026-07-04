@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Post, Req, Res, UseGuards } from '@nestjs/common'
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common'
 import type { FastifyReply } from 'fastify'
 import { randomUUID } from 'node:crypto'
 import {
@@ -14,6 +23,28 @@ export class RunsController {
   @Get('capabilities')
   getCapabilities() {
     return this.runsService.getCapabilities()
+  }
+
+  @Get('artifacts/history')
+  @UseGuards(WorkspaceAccessGuard)
+  listArtifactHistory(@Req() request: AuthenticatedRequest) {
+    return this.runsService.listArtifactHistory(request.authContext!.workspaceId)
+  }
+
+  @Get('artifacts/:artifactId/export/markdown')
+  @UseGuards(WorkspaceAccessGuard)
+  async exportArtifactMarkdown(
+    @Param('artifactId') artifactId: string,
+    @Req() request: AuthenticatedRequest,
+    @Res() reply: FastifyReply,
+  ) {
+    const markdown = await this.runsService.exportArtifactMarkdown({
+      workspaceId: request.authContext!.workspaceId,
+      artifactId,
+    })
+
+    reply.header('Content-Type', 'text/markdown; charset=utf-8')
+    reply.send(markdown)
   }
 
   @Post('draft')

@@ -1,5 +1,9 @@
-import type { DraftRun, MockPipelineResult } from '@ai-war-room/schemas'
-import { draftRunSchema } from '@ai-war-room/schemas'
+import type {
+  ArtifactHistoryItem,
+  DraftRun,
+  MockPipelineResult,
+} from '@ai-war-room/schemas'
+import { artifactHistoryItemSchema, draftRunSchema } from '@ai-war-room/schemas'
 import { Injectable } from '@nestjs/common'
 import type {
   RunRepository,
@@ -24,6 +28,16 @@ type DraftRunRow = {
     max_severity: string
     findings: unknown
   }
+}
+
+type ArtifactHistoryRow = {
+  artifact_id: string
+  run_id: string
+  workspace_id: string
+  artifact_type: ArtifactHistoryItem['artifactType']
+  metadata: unknown
+  content: unknown
+  created_at: Date
 }
 
 @Injectable()
@@ -254,6 +268,71 @@ export class PostgresRunRepository implements RunRepository {
           ],
         )
       }
+    })
+  }
+
+  async listArtifacts(workspaceId: string): Promise<ArtifactHistoryItem[]> {
+    const result = await this.postgresService.query<ArtifactHistoryRow>(
+      `
+        SELECT
+          artifact_id,
+          run_id,
+          workspace_id,
+          artifact_type,
+          metadata,
+          content,
+          created_at
+        FROM artifacts
+        WHERE workspace_id = $1
+        ORDER BY created_at DESC, artifact_type ASC
+      `,
+      [workspaceId],
+    )
+
+    return result.rows.map((row) => this.parseArtifactHistoryRow(row))
+  }
+
+  async findArtifactById(
+    workspaceId: string,
+    artifactId: string,
+  ): Promise<ArtifactHistoryItem | null> {
+    const result = await this.postgresService.query<ArtifactHistoryRow>(
+      `
+        SELECT
+          artifact_id,
+          run_id,
+          workspace_id,
+          artifact_type,
+          metadata,
+          content,
+          created_at
+        FROM artifacts
+        WHERE workspace_id = $1
+          AND artifact_id = $2
+        LIMIT 1
+      `,
+      [workspaceId, artifactId],
+    )
+    const row = result.rows[0]
+
+    return row ? this.parseArtifactHistoryRow(row) : null
+  }
+
+  private parseArtifactHistoryRow(row: ArtifactHistoryRow): ArtifactHistoryItem {
+    const metadata = row.metadata as ArtifactHistoryItem['metadata']
+
+    return artifactHistoryItemSchema.parse({
+      artifactId: row.artifact_id,
+      runId: row.run_id,
+      workspaceId: row.workspace_id,
+      artifactType: row.artifact_type,
+      artifactVersion: metadata.artifactVersion,
+      createdAt: row.created_at.toISOString(),
+      metadata,
+      artifact: {
+        artifactType: row.artifact_type,
+        content: row.content,
+      },
     })
   }
 }

@@ -125,7 +125,7 @@ Run mutation endpoints verify that the request workspace matches the header work
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
-Current `v2.1` behavior:
+Current `v2.2` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
 - All JSON responses are parsed and validated with Zod schemas.
@@ -147,6 +147,9 @@ Current `v2.1` behavior:
 - Completed pipeline runs write auditable usage events for agent, Moderator, and artifact LLM phases.
 - Workspace daily cost limits are checked before expensive execution starts.
 - Billing records exist as Stripe-ready local records, but Stripe integration is intentionally deferred.
+- `GET /api/runs/artifacts/history` returns workspace-scoped persisted artifacts from previous runs.
+- `GET /api/runs/artifacts/:artifactId/export/markdown` exports the immutable persisted artifact content as Markdown.
+- The frontend includes an Artifact History panel with Markdown export controls.
 
 Real Anthropic/OpenAI provider adapters are still intentionally left for a later milestone.
 
