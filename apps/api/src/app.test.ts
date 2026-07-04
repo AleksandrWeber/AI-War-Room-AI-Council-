@@ -121,4 +121,38 @@ describe('API skeleton', () => {
 
     expect(response.body.message).toBe('Invalid create run request.')
   })
+
+  it('executes the deterministic mock pipeline', async () => {
+    const draftResponse = await request(app.getHttpServer())
+      .post('/api/runs/draft')
+      .send({
+        workspaceId: 'workspace_1',
+        idempotencyKey: 'idem_4',
+        idea: {
+          rawIdea:
+            'Build a multi-tenant AI War Room for product planning and PRD generation.',
+          targetAudience: 'Technical founders',
+        },
+      })
+      .expect(201)
+
+    const pipelineResponse = await request(app.getHttpServer())
+      .post('/api/runs/mock-pipeline')
+      .send({
+        draftRun: draftResponse.body,
+        approvedTriage: draftResponse.body.triage,
+        selectedAgents: draftResponse.body.selectedAgents,
+      })
+      .expect(201)
+
+    expect(pipelineResponse.body.status).toBe('completed')
+    expect(pipelineResponse.body.agentOutputs.length).toBeGreaterThan(0)
+    expect(pipelineResponse.body.moderatorSynthesis.mvpScope).toContain(
+      'Mock isolated agent analysis',
+    )
+    expect(pipelineResponse.body.artifacts).toHaveLength(3)
+    expect(pipelineResponse.body.artifacts[0].artifact.artifactType).toBe(
+      'executive_summary',
+    )
+  })
 })

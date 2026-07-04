@@ -2,13 +2,13 @@
   "files": [],
   "references": [
     {
+      "path": "./packages/schemas"
+    },
+    {
       "path": "./apps/web"
     },
     {
       "path": "./apps/api"
-    },
-    {
-      "path": "./packages/schemas"
     }
   ]
 }

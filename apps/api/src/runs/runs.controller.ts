@@ -14,4 +14,9 @@ export class RunsController {
   createDraftRun(@Body() body: unknown) {
     return this.runsService.createDraftRun(body)
   }
+
+  @Post('mock-pipeline')
+  executeMockPipeline(@Body() body: unknown) {
+    return this.runsService.executeMockPipeline(body)
+  }
 }

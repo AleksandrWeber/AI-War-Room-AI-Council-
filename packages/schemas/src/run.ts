@@ -5,7 +5,10 @@ import {
   runStatusSchema,
   utcDateStringSchema,
 } from './common.js'
+import { agentExecutionResultSchema } from './agent.js'
+import { artifactSchema } from './artifact.js'
 import { ideaSubmissionSchema } from './idea.js'
+import { moderatorSynthesisSchema } from './moderator.js'
 import { shieldScanResultSchema } from './shield.js'
 import { triageResultSchema } from './triage.js'
 
@@ -45,7 +48,26 @@ export const runStatusResponseSchema = z.object({
   updatedAt: utcDateStringSchema,
 })
 
+export const mockPipelineRequestSchema = z.object({
+  draftRun: draftRunSchema,
+  approvedTriage: triageResultSchema,
+  selectedAgents: z.array(agentRoleSchema).min(3).max(7),
+})
+
+export const mockPipelineResultSchema = z.object({
+  runId: nonEmptyStringSchema,
+  workspaceId: nonEmptyStringSchema,
+  status: z.literal('completed'),
+  steps: z.array(runStepStatusSchema),
+  agentOutputs: z.array(agentExecutionResultSchema).min(1),
+  moderatorSynthesis: moderatorSynthesisSchema,
+  artifacts: z.array(artifactSchema).length(3),
+  completedAt: utcDateStringSchema,
+})
+
 export type CreateRunRequest = z.infer<typeof createRunRequestSchema>
 export type RunStepStatus = z.infer<typeof runStepStatusSchema>
 export type DraftRun = z.infer<typeof draftRunSchema>
 export type RunStatusResponse = z.infer<typeof runStatusResponseSchema>
+export type MockPipelineRequest = z.infer<typeof mockPipelineRequestSchema>
+export type MockPipelineResult = z.infer<typeof mockPipelineResultSchema>

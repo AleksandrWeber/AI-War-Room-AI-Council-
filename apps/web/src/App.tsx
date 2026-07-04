@@ -3,6 +3,7 @@ import './App.css'
 
 type ApiHealthState = 'checking' | 'online' | 'offline'
 type SubmitState = 'idle' | 'submitting' | 'success' | 'error'
+type PipelineState = 'idle' | 'running' | 'completed' | 'error'
 
 type ShieldFinding = {
   findingId: string
@@ -55,6 +56,40 @@ type ReviewDraft = {
   selectedAgents: string[]
 }
 
+type PipelineStep = {
+  stepId: string
+  label: string
+  status: 'draft' | 'pending' | 'running' | 'completed' | 'failed' | 'blocked'
+}
+
+type AgentExecution = {
+  agentRole: string
+  output: {
+    summary: string
+    strengths: string[]
+    weaknesses: string[]
+    risks: string[]
+    recommendations: string[]
+  }
+}
+
+type ArtifactResult = {
+  metadata: {
+    artifactType: 'executive_summary' | 'prd' | 'development_prompt'
+  }
+  artifact: {
+    artifactType: 'executive_summary' | 'prd' | 'development_prompt'
+    content: Record<string, unknown>
+  }
+}
+
+type MockPipelineResult = {
+  status: 'completed'
+  steps: PipelineStep[]
+  agentOutputs: AgentExecution[]
+  artifacts: ArtifactResult[]
+}
+
 const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:3000/api'
 const reviewStorageKey = 'ai-war-room.review-draft'
 const ideaStorageKey = 'ai-war-room.idea-draft'
@@ -95,6 +130,18 @@ const agentOptions = [
   'mobile_ux_expert',
 ]
 
+const domainOptions = [
+  'software',
+  'mobile',
+  'saas',
+  'ecommerce',
+  'fintech',
+  'healthcare',
+  'education',
+  'security',
+  'other',
+]
+
 function formatAgent(agent: string) {
   return agent
     .split('_')
@@ -116,6 +163,20 @@ function getHighlightedIdea(rawIdea: string, finding?: ShieldFinding) {
   )
 }
 
+function renderArtifactValue(value: unknown) {
+  if (Array.isArray(value)) {
+    return (
+      <ul>
+        {value.map((item, index) => (
+          <li key={`${String(item)}-${index}`}>{String(item)}</li>
+        ))}
+      </ul>
+    )
+  }
+
+  return <p>{String(value)}</p>
+}
+
 function App() {
   const [apiHealth, setApiHealth] = useState<ApiHealthState>('checking')
   const [rawIdea, setRawIdea] = useState(() => {
@@ -133,6 +194,10 @@ function App() {
 
     return saved ? (JSON.parse(saved) as ReviewDraft) : null
   })
+  const [pipelineState, setPipelineState] = useState<PipelineState>('idle')
+  const [pipelineError, setPipelineError] = useState<string | null>(null)
+  const [pipelineResult, setPipelineResult] =
+    useState<MockPipelineResult | null>(null)
 
   useEffect(() => {
     const controller = new AbortController()
@@ -199,6 +264,8 @@ function App() {
         triage: nextDraftRun.triage,
         selectedAgents: nextDraftRun.selectedAgents,
       })
+      setPipelineResult(null)
+      setPipelineState('idle')
       setSubmitState('success')
     } catch (error) {
       setSubmitState('error')
@@ -242,6 +309,41 @@ function App() {
         selectedAgents,
       }
     })
+  }
+
+  async function handleExecuteMockPipeline() {
+    if (!draftRun || !reviewDraft) {
+      return
+    }
+
+    setPipelineState('running')
+    setPipelineError(null)
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/runs/mock-pipeline`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          draftRun,
+          approvedTriage: reviewDraft.triage,
+          selectedAgents: reviewDraft.selectedAgents,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`)
+      }
+
+      setPipelineResult((await response.json()) as MockPipelineResult)
+      setPipelineState('completed')
+    } catch (error) {
+      setPipelineState('error')
+      setPipelineError(
+        error instanceof Error ? error.message : 'Failed to execute mock pipeline.',
+      )
+    }
   }
 
   const firstFinding = draftRun?.shieldScan.findings[0]
@@ -336,12 +438,18 @@ function App() {
               <div className="field-grid">
                 <label>
                   Domain
-                  <input
+                  <select
                     value={reviewDraft.triage.domain}
                     onChange={(event) =>
                       updateReviewTriage('domain', event.target.value)
                     }
-                  />
+                  >
+                    {domainOptions.map((domain) => (
+                      <option key={domain} value={domain}>
+                        {domain}
+                      </option>
+                    ))}
+                  </select>
                 </label>
                 <label>
                   Complexity
@@ -416,6 +524,63 @@ function App() {
               <span>{reviewDraft.triage.estimatedDurationSeconds}s estimate</span>
               <span>${reviewDraft.triage.estimatedMaxCostUsd.toFixed(2)} max</span>
             </div>
+            <button
+              className="execute-button"
+              type="button"
+              disabled={
+                pipelineState === 'running' || reviewDraft.selectedAgents.length < 3
+              }
+              onClick={handleExecuteMockPipeline}
+            >
+              {pipelineState === 'running'
+                ? 'Executing mock pipeline...'
+                : 'Execute mock pipeline'}
+            </button>
+            {pipelineError ? <p className="form-error">{pipelineError}</p> : null}
+          </div>
+        </section>
+      ) : null}
+
+      {pipelineResult ? (
+        <section className="panel results-panel">
+          <div className="section-heading">
+            <p className="eyebrow">Mock Pipeline Result</p>
+            <h2>Artifacts generated from isolated mock agents.</h2>
+          </div>
+
+          <div className="step-list">
+            {pipelineResult.steps.map((step) => (
+              <div className="step-item" key={step.stepId}>
+                <span>{step.label}</span>
+                <strong>{step.status}</strong>
+              </div>
+            ))}
+          </div>
+
+          <div className="agent-result-grid">
+            {pipelineResult.agentOutputs.map((agentOutput) => (
+              <article className="agent-card" key={agentOutput.agentRole}>
+                <h3>{formatAgent(agentOutput.agentRole)}</h3>
+                <p>{agentOutput.output.summary}</p>
+              </article>
+            ))}
+          </div>
+
+          <div className="artifact-grid">
+            {pipelineResult.artifacts.map((artifact) => (
+              <article
+                className="artifact-card"
+                key={artifact.metadata.artifactType}
+              >
+                <span>{formatAgent(artifact.metadata.artifactType)}</span>
+                {Object.entries(artifact.artifact.content).map(([key, value]) => (
+                  <div className="artifact-section" key={key}>
+                    <strong>{formatAgent(key)}</strong>
+                    {renderArtifactValue(value)}
+                  </div>
+                ))}
+              </article>
+            ))}
           </div>
         </section>
       ) : null}
