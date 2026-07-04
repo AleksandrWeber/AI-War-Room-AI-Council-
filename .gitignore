@@ -1,0 +1,21 @@
+# Local planning artifacts
+AI_WAR_ROOM_PROJECT_SPEC.local.md
+AI_WAR_ROOM_TODO.local.md
+AI_WAR_ROOM_ROADMAP.local.md
+
+# Dependencies and builds
+node_modules
+dist
+dist-ssr
+coverage
+
+# Logs and local env
+*.log
+*.local
+.env
+.env.*
+!.env.example
+
+# System files
+.DS_Store
+
