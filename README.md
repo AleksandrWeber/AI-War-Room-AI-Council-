@@ -125,7 +125,7 @@ Run mutation endpoints verify that the request workspace matches the header work
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
-Current `v3.9` behavior:
+Current `v4.0` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
 - All JSON responses are parsed and validated with Zod schemas.
@@ -184,6 +184,10 @@ Current `v3.9` behavior:
 - Workspace provider keys are sent directly to the backend, encrypted with `APP_ENCRYPTION_KEY`, and stored in PostgreSQL.
 - The frontend only receives masked keys such as `sk-...1234`; full keys are never returned after save.
 - If no workspace or backend provider key exists, the frontend shows a first-connect setup prompt with Anthropic/OpenAI instructions.
+- Temporal SDK packages are installed as API dev dependencies for the first durable workflow skeleton.
+- `durableRunWorkflow` validates approved run input, then executes the existing pipeline through Temporal activities.
+- The Temporal worker is a separate process and does not change current REST/SSE execution behavior yet.
+- Temporal worker config is controlled through `TEMPORAL_ADDRESS`, `TEMPORAL_NAMESPACE`, and `TEMPORAL_TASK_QUEUE`.
 
 To enable real providers locally, copy `.env.example` to `.env`, add provider keys, and explicitly select the provider/model:
 
@@ -200,5 +204,11 @@ To enable external research locally:
 ```bash
 RESEARCH_PROVIDER=tavily
 TAVILY_API_KEY=...
+```
+
+To run the Temporal worker skeleton against a local Temporal server:
+
+```bash
+npm run worker:temporal:dev
 ```
 

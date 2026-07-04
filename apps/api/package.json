@@ -12,12 +12,18 @@
     "db:migrate": "npm run build && node dist/db/migrate.js",
     "eval:prompts": "tsx src/evaluation/run-prompt-evaluation.ts",
     "start": "node dist/main.js",
+    "worker:temporal": "npm run build && node dist/temporal/temporal.worker.js",
+    "worker:temporal:dev": "tsx src/temporal/temporal.worker.ts",
     "lint": "oxlint .",
     "test": "vitest run",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
     "@nestjs/testing": "^11.1.27",
+    "@temporalio/activity": "^1.19.0",
+    "@temporalio/client": "^1.19.0",
+    "@temporalio/worker": "^1.19.0",
+    "@temporalio/workflow": "^1.19.0",
     "@types/pg": "^8.20.0",
     "@types/supertest": "^7.2.0",
     "supertest": "^7.2.2",
