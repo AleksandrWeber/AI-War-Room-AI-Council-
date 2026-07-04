@@ -54,6 +54,7 @@ describe('billing integration', () => {
       supportsCustomerPortal: true,
       supportsWebhookAudit: true,
       supportsInvoiceHistory: true,
+      supportsUsageSummary: true,
       checkoutTiers: ['pro', 'business'],
     })
   })
@@ -220,5 +221,27 @@ describe('billing integration', () => {
         }),
       ]),
     )
+  })
+
+  it('returns workspace daily usage summary for members', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/billing/workspace/workspace_1/usage')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      paidTier: 'free',
+      dailyTokenLimit: 250_000,
+      dailyCostLimitUsd: 25,
+      dailyUsage: {
+        inputTokens: expect.any(Number),
+        outputTokens: expect.any(Number),
+        totalTokens: expect.any(Number),
+        estimatedCostUsd: expect.any(Number),
+      },
+    })
+    expect(response.body.usagePeriodStart).toMatch(/T00:00:00\.000Z$/)
+    expect(response.body.usagePeriodEnd).toMatch(/T00:00:00\.000Z$/)
   })
 })

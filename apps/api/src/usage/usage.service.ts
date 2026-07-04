@@ -4,11 +4,13 @@ import {
   Injectable,
 } from '@nestjs/common'
 import { randomUUID } from 'node:crypto'
-import type {
-  AuthContext,
-  MockPipelineResult,
-  UsageEvent,
-  UsagePhase,
+import {
+  billingWorkspaceUsageResponseSchema,
+  PAID_TIER_LIMITS,
+  type AuthContext,
+  type MockPipelineResult,
+  type UsageEvent,
+  type UsagePhase,
 } from '@ai-war-room/schemas'
 import {
   USAGE_REPOSITORY,
@@ -43,6 +45,41 @@ export class UsageService {
         message: 'Workspace daily cost quota exceeded.',
       })
     }
+  }
+
+  async getWorkspaceUsageSummary(workspaceId: string) {
+    const limit = await this.usageRepository.getWorkspaceLimit(workspaceId)
+    const usage = await this.usageRepository.getDailyUsageTotal(workspaceId)
+    const now = new Date()
+    const usagePeriodStart = new Date(
+      Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
+    )
+    const usagePeriodEnd = new Date(usagePeriodStart)
+    usagePeriodEnd.setUTCDate(usagePeriodEnd.getUTCDate() + 1)
+
+    const resolvedLimit = limit ?? {
+      workspaceId,
+      paidTier: 'free' as const,
+      dailyTokenLimit: PAID_TIER_LIMITS.free.dailyTokenLimit,
+      dailyCostLimitUsd: PAID_TIER_LIMITS.free.dailyCostLimitUsd,
+      createdAt: usagePeriodStart.toISOString(),
+      updatedAt: usagePeriodStart.toISOString(),
+    }
+
+    return billingWorkspaceUsageResponseSchema.parse({
+      workspaceId,
+      paidTier: resolvedLimit.paidTier,
+      dailyTokenLimit: resolvedLimit.dailyTokenLimit,
+      dailyCostLimitUsd: resolvedLimit.dailyCostLimitUsd,
+      dailyUsage: {
+        inputTokens: usage.inputTokens,
+        outputTokens: usage.outputTokens,
+        totalTokens: usage.inputTokens + usage.outputTokens,
+        estimatedCostUsd: usage.estimatedCostUsd,
+      },
+      usagePeriodStart: usagePeriodStart.toISOString(),
+      usagePeriodEnd: usagePeriodEnd.toISOString(),
+    })
   }
 
   async assertWorkspaceCanUseResearch(workspaceId: string): Promise<void> {

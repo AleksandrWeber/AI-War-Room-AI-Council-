@@ -3,6 +3,7 @@ import { ConfigService } from '@nestjs/config'
 import type { ApiEnv } from '../config/env.js'
 import { AuthModule } from '../auth/auth.module.js'
 import { PersistenceModule } from '../persistence/persistence.module.js'
+import { UsageModule } from '../usage/usage.module.js'
 import { WorkspacesModule } from '../workspaces/workspaces.module.js'
 import { BILLING_ADAPTER } from './billing.adapter.js'
 import { BillingController } from './billing.controller.js'
@@ -20,7 +21,7 @@ import { InMemoryBillingInvoiceRepository } from './in-memory-billing-invoice.re
 import { InMemoryBillingWebhookRepository } from './in-memory-billing-webhook.repository.js'
 
 @Module({
-  imports: [PersistenceModule, AuthModule, WorkspacesModule],
+  imports: [PersistenceModule, AuthModule, WorkspacesModule, UsageModule],
   controllers: [BillingController],
   providers: [
     PostgresBillingRepository,

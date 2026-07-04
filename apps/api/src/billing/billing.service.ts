@@ -10,6 +10,7 @@ import { ConfigService } from '@nestjs/config'
 import {
   billingCapabilitiesResponseSchema,
   billingInvoicesResponseSchema,
+  billingWorkspaceUsageResponseSchema,
   billingWebhookEventsResponseSchema,
   billingWebhookHandleResponseSchema,
   billingWorkspaceStatusResponseSchema,
@@ -39,6 +40,7 @@ import {
   BILLING_REPOSITORY,
   type BillingRepository,
 } from './billing.repository.js'
+import { UsageService } from '../usage/usage.service.js'
 
 @Injectable()
 export class BillingService {
@@ -52,6 +54,7 @@ export class BillingService {
     private readonly billingInvoiceRepository: BillingInvoiceRepository,
     @Inject(BILLING_ADAPTER)
     private readonly billingAdapter: BillingCheckoutAdapter,
+    private readonly usageService: UsageService,
   ) {}
 
   getCapabilities() {
@@ -67,6 +70,7 @@ export class BillingService {
       supportsCustomerPortal: enabled,
       supportsWebhookAudit: enabled,
       supportsInvoiceHistory: enabled,
+      supportsUsageSummary: enabled,
       checkoutTiers: ['pro', 'business'],
       guidance: getBillingGuidance({ enabled, adapter }),
     })
@@ -102,6 +106,12 @@ export class BillingService {
       workspaceId,
       invoices,
     })
+  }
+
+  async getWorkspaceUsageSummary(workspaceId: string) {
+    const summary = await this.usageService.getWorkspaceUsageSummary(workspaceId)
+
+    return billingWorkspaceUsageResponseSchema.parse(summary)
   }
 
   async createCheckoutSession(input: {

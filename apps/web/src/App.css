@@ -343,6 +343,63 @@
   opacity: 0.6;
 }
 
+.billing-usage-summary {
+  display: grid;
+  gap: 12px;
+}
+
+.billing-usage-summary > span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.billing-usage-meters {
+  display: grid;
+  gap: 12px;
+}
+
+.billing-usage-meter {
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+}
+
+.billing-usage-meter__header {
+  align-items: baseline;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.billing-usage-meter__header small {
+  color: var(--muted);
+}
+
+.billing-usage-meter__track {
+  background: rgba(148, 163, 184, 0.16);
+  border-radius: 999px;
+  height: 10px;
+  overflow: hidden;
+}
+
+.billing-usage-meter__fill {
+  background: linear-gradient(90deg, #38bdf8, #818cf8);
+  border-radius: inherit;
+  height: 100%;
+  min-width: 0;
+  transition: width 0.2s ease;
+}
+
+.billing-usage-meter__fill--cost {
+  background: linear-gradient(90deg, #34d399, #22d3ee);
+}
+
 .billing-webhook-events {
   display: grid;
   gap: 12px;

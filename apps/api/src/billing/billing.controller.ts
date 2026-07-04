@@ -82,6 +82,17 @@ export class BillingController {
     return this.billingService.listWorkspaceInvoices(workspaceId)
   }
 
+  @Get('workspace/:workspaceId/usage')
+  @UseGuards(WorkspaceAccessGuard)
+  getWorkspaceUsageSummary(
+    @Param('workspaceId') workspaceId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    this.assertWorkspaceParam(request, workspaceId)
+
+    return this.billingService.getWorkspaceUsageSummary(workspaceId)
+  }
+
   @Get('workspace/:workspaceId/webhook-events')
   @UseGuards(WorkspaceAccessGuard)
   listWorkspaceWebhookEvents(

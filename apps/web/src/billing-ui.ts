@@ -10,6 +10,7 @@ import {
   PAID_TIER_LIMITS,
   billingCapabilitiesResponseSchema,
   billingInvoicesResponseSchema,
+  billingWorkspaceUsageResponseSchema,
   billingWebhookEventsResponseSchema,
   billingWorkspaceStatusResponseSchema,
   checkoutSessionResponseSchema,
@@ -139,6 +140,41 @@ export async function fetchBillingInvoices(
   }
 
   return billingInvoicesResponseSchema.parse(await response.json())
+}
+
+export async function fetchBillingUsageSummary(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/billing/workspace/${encodeURIComponent(workspaceId)}/usage`,
+    {
+      headers,
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return billingWorkspaceUsageResponseSchema.parse(await response.json())
+}
+
+export function formatUsagePercent(used: number, limit: number) {
+  if (limit <= 0) {
+    return 0
+  }
+
+  return Math.min(100, Math.round((used / limit) * 100))
+}
+
+export function formatUsageMeterLabel(used: number, limit: number, unit: string) {
+  return `${used.toLocaleString()} / ${limit.toLocaleString()} ${unit}`
+}
+
+export function formatUsageCostLabel(usedUsd: number, limitUsd: number) {
+  return `$${usedUsd.toFixed(2)} / $${limitUsd.toFixed(2)} daily`
 }
 
 export function formatInvoiceStatus(status: BillingInvoiceStatus) {

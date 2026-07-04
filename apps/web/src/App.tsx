@@ -6,6 +6,7 @@ import type {
   BillingInvoiceRecord,
   BillingWebhookEventRecord,
   BillingWorkspaceStatusResponse,
+  BillingWorkspaceUsageResponse,
   CheckoutPaidTier,
   RunCapabilitiesResponse,
   TemporalRuntimeHealthResponse,
@@ -28,10 +29,14 @@ import {
   describeBillingCapabilities,
   fetchBillingCapabilities,
   fetchBillingInvoices,
+  fetchBillingUsageSummary,
   fetchBillingWebhookEvents,
   fetchBillingWorkspaceStatus,
   formatInvoiceAmount,
   formatInvoiceStatus,
+  formatUsageCostLabel,
+  formatUsageMeterLabel,
+  formatUsagePercent,
   fetchMockCustomerPortal,
   formatBillingStatus,
   formatPaidTier,
@@ -573,6 +578,8 @@ function App() {
   const [billingInvoices, setBillingInvoices] = useState<BillingInvoiceRecord[]>(
     [],
   )
+  const [billingUsageSummary, setBillingUsageSummary] =
+    useState<BillingWorkspaceUsageResponse | null>(null)
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
     useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
@@ -1259,6 +1266,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setBillingInvoices(invoices.invoices)
+
+      const usage = await fetchBillingUsageSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBillingUsageSummary(usage)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -1983,6 +1997,77 @@ function App() {
             )
           })}
         </div>
+
+        {billingCapabilities?.supportsUsageSummary && billingUsageSummary ? (
+          <div className="billing-usage-summary">
+            <span>Daily usage</span>
+            <p className="clear-copy">
+              UTC period ending{' '}
+              {new Date(billingUsageSummary.usagePeriodEnd).toLocaleString()}
+            </p>
+            <div className="billing-usage-meters">
+              <article className="billing-usage-meter">
+                <div className="billing-usage-meter__header">
+                  <strong>Tokens</strong>
+                  <small>
+                    {formatUsageMeterLabel(
+                      billingUsageSummary.dailyUsage.totalTokens,
+                      billingUsageSummary.dailyTokenLimit,
+                      'tokens',
+                    )}
+                  </small>
+                </div>
+                <div
+                  className="billing-usage-meter__track"
+                  role="progressbar"
+                  aria-valuemin={0}
+                  aria-valuemax={billingUsageSummary.dailyTokenLimit}
+                  aria-valuenow={billingUsageSummary.dailyUsage.totalTokens}
+                  aria-label="Daily token usage"
+                >
+                  <div
+                    className="billing-usage-meter__fill"
+                    style={{
+                      width: `${formatUsagePercent(
+                        billingUsageSummary.dailyUsage.totalTokens,
+                        billingUsageSummary.dailyTokenLimit,
+                      )}%`,
+                    }}
+                  />
+                </div>
+              </article>
+              <article className="billing-usage-meter">
+                <div className="billing-usage-meter__header">
+                  <strong>Estimated cost</strong>
+                  <small>
+                    {formatUsageCostLabel(
+                      billingUsageSummary.dailyUsage.estimatedCostUsd,
+                      billingUsageSummary.dailyCostLimitUsd,
+                    )}
+                  </small>
+                </div>
+                <div
+                  className="billing-usage-meter__track"
+                  role="progressbar"
+                  aria-valuemin={0}
+                  aria-valuemax={billingUsageSummary.dailyCostLimitUsd}
+                  aria-valuenow={billingUsageSummary.dailyUsage.estimatedCostUsd}
+                  aria-label="Daily estimated cost usage"
+                >
+                  <div
+                    className="billing-usage-meter__fill billing-usage-meter__fill--cost"
+                    style={{
+                      width: `${formatUsagePercent(
+                        billingUsageSummary.dailyUsage.estimatedCostUsd,
+                        billingUsageSummary.dailyCostLimitUsd,
+                      )}%`,
+                    }}
+                  />
+                </div>
+              </article>
+            </div>
+          </div>
+        ) : null}
 
         {billingCapabilities?.supportsWebhookAudit ? (
           <div className="billing-webhook-events">

@@ -35,6 +35,7 @@ export const billingCapabilitiesResponseSchema = z.object({
   supportsCustomerPortal: z.boolean(),
   supportsWebhookAudit: z.boolean(),
   supportsInvoiceHistory: z.boolean(),
+  supportsUsageSummary: z.boolean(),
   checkoutTiers: z.array(checkoutPaidTierSchema),
   guidance: z.string(),
 })
@@ -179,6 +180,27 @@ export type BillingInvoicesResponse = z.infer<
   typeof billingInvoicesResponseSchema
 >
 
+export const billingDailyUsageSchema = z.object({
+  inputTokens: z.number().int().nonnegative(),
+  outputTokens: z.number().int().nonnegative(),
+  totalTokens: z.number().int().nonnegative(),
+  estimatedCostUsd: z.number().nonnegative(),
+})
+export type BillingDailyUsage = z.infer<typeof billingDailyUsageSchema>
+
+export const billingWorkspaceUsageResponseSchema = z.object({
+  workspaceId: nonEmptyStringSchema,
+  paidTier: paidTierSchema,
+  dailyTokenLimit: z.number().int().positive(),
+  dailyCostLimitUsd: z.number().positive(),
+  dailyUsage: billingDailyUsageSchema,
+  usagePeriodStart: utcDateStringSchema,
+  usagePeriodEnd: utcDateStringSchema,
+})
+export type BillingWorkspaceUsageResponse = z.infer<
+  typeof billingWorkspaceUsageResponseSchema
+>
+
 export function getBillingGuidance(input: {
   enabled: boolean
   adapter: BillingAdapter
@@ -188,8 +210,8 @@ export function getBillingGuidance(input: {
   }
 
   if (input.adapter === 'mock') {
-    return 'Mock billing is active. Checkout, customer portal, and invoice history run locally for development and tests.'
+    return 'Mock billing is active. Checkout, customer portal, invoice history, and daily usage summary run locally for development and tests.'
   }
 
-  return 'Stripe billing is active. Use checkout for upgrades, the customer portal for subscription management, and configure webhooks for idempotent billing and invoice history updates.'
+  return 'Stripe billing is active. Use checkout for upgrades, the customer portal for subscription management, and configure webhooks for idempotent billing, invoice history, and usage summary updates.'
 }

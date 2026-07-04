@@ -6,6 +6,8 @@ import { InMemoryBillingRepository } from './in-memory-billing.repository.js'
 import { InMemoryBillingInvoiceRepository } from './in-memory-billing-invoice.repository.js'
 import { InMemoryBillingWebhookRepository } from './in-memory-billing-webhook.repository.js'
 import { BillingService } from './billing.service.js'
+import { InMemoryUsageRepository } from '../usage/in-memory-usage.repository.js'
+import { UsageService } from '../usage/usage.service.js'
 
 function createBillingService(env: Partial<ApiEnv>) {
   const config = {
@@ -26,6 +28,7 @@ function createBillingService(env: Partial<ApiEnv>) {
   const webhookRepository = new InMemoryBillingWebhookRepository()
   const invoiceRepository = new InMemoryBillingInvoiceRepository()
   const adapter = new MockBillingAdapter('http://127.0.0.1:3000')
+  const usageService = new UsageService(new InMemoryUsageRepository())
 
   return {
     service: new BillingService(
@@ -34,6 +37,7 @@ function createBillingService(env: Partial<ApiEnv>) {
       webhookRepository,
       invoiceRepository,
       adapter,
+      usageService,
     ),
     repository,
     webhookRepository,
@@ -55,7 +59,29 @@ describe('BillingService', () => {
       supportsCustomerPortal: false,
       supportsWebhookAudit: false,
       supportsInvoiceHistory: false,
+      supportsUsageSummary: false,
     })
+  })
+
+  it('returns workspace daily usage summary against tier limits', async () => {
+    const { service } = createBillingService({})
+
+    const usage = await service.getWorkspaceUsageSummary('workspace_1')
+
+    expect(usage).toMatchObject({
+      workspaceId: 'workspace_1',
+      paidTier: 'free',
+      dailyTokenLimit: 250_000,
+      dailyCostLimitUsd: 25,
+      dailyUsage: {
+        inputTokens: 0,
+        outputTokens: 0,
+        totalTokens: 0,
+        estimatedCostUsd: 0,
+      },
+    })
+    expect(usage.usagePeriodStart).toMatch(/T00:00:00\.000Z$/)
+    expect(usage.usagePeriodEnd).toMatch(/T00:00:00\.000Z$/)
   })
 
   it('creates mock customer portal sessions after checkout', async () => {

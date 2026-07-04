@@ -291,11 +291,23 @@ Invoice history:
 - Checkout and webhook flows upsert invoices with amount, status, tier, and hosted invoice URLs.
 - Mock tier amounts: Pro `$29`, Business `$99`.
 
+Usage summary:
+
+- `GET /api/billing/workspace/:workspaceId/usage` returns daily token and estimated cost totals against workspace tier limits.
+- Usage totals are computed from `usage_events` for the current UTC day.
+- The web billing panel shows token and cost progress meters for the active billing period.
+
 Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
 
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v5.11` behavior:
+
+- Billing usage summary exposes daily token and cost consumption against tier limits.
+- Workspace owners can inspect usage from the billing API and web billing panel meters.
+- Usage summary is available when billing is enabled (`supportsUsageSummary: true`).
 
 Current `v5.10` behavior:
 
