@@ -15,6 +15,7 @@ export type BillingWebhookEvent =
       workspaceId: string
       paidTier: CheckoutPaidTier
       externalCustomerId?: string
+      externalSubscriptionItemId?: string
     }
   | {
       type: 'subscription.updated'
@@ -55,6 +56,10 @@ export type ParsedBillingWebhookResult = {
   providerEvent: BillingWebhookEvent | null
 }
 
+export type MeteredUsageReportResult = {
+  externalUsageRecordId: string
+}
+
 export interface BillingCheckoutAdapter {
   createCheckoutSession(input: {
     workspaceId: string
@@ -75,4 +80,10 @@ export interface BillingCheckoutAdapter {
     externalCustomerId: string
     returnUrl: string
   }): Promise<CustomerPortalSessionResponse>
+  reportMeteredUsage(input: {
+    externalSubscriptionItemId: string
+    externalCustomerId?: string
+    quantity: number
+    timestamp?: number
+  }): Promise<MeteredUsageReportResult>
 }

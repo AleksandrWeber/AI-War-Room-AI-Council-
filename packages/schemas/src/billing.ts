@@ -21,6 +21,7 @@ export const billingRecordSchema = z.object({
   workspaceId: nonEmptyStringSchema,
   provider: z.literal('stripe'),
   externalCustomerId: z.string().nullable(),
+  externalSubscriptionItemId: z.string().nullable(),
   paidTier: paidTierSchema,
   status: billingStatusSchema,
   createdAt: utcDateStringSchema,
@@ -38,6 +39,7 @@ export const billingCapabilitiesResponseSchema = z.object({
   supportsUsageSummary: z.boolean(),
   supportsBillingExport: z.boolean(),
   supportsBillingAlerts: z.boolean(),
+  supportsMeteredUsage: z.boolean(),
   checkoutTiers: z.array(checkoutPaidTierSchema),
   guidance: z.string(),
 })
@@ -235,6 +237,41 @@ export type BillingWorkspaceAlertsResponse = z.infer<
   typeof billingWorkspaceAlertsResponseSchema
 >
 
+export const billingMeterUsageMetricSchema = z.enum(['tokens'])
+export type BillingMeterUsageMetric = z.infer<typeof billingMeterUsageMetricSchema>
+
+export const billingMeterUsageReportStatusSchema = z.enum([
+  'reported',
+  'skipped',
+  'failed',
+])
+export type BillingMeterUsageReportStatus = z.infer<
+  typeof billingMeterUsageReportStatusSchema
+>
+
+export const billingMeterUsageReportSchema = z.object({
+  billingMeterUsageReportId: nonEmptyStringSchema,
+  workspaceId: nonEmptyStringSchema,
+  provider: billingAdapterSchema,
+  externalSubscriptionItemId: z.string().nullable(),
+  externalUsageRecordId: z.string().nullable(),
+  metric: billingMeterUsageMetricSchema,
+  quantity: z.number().int().positive(),
+  status: billingMeterUsageReportStatusSchema,
+  errorMessage: z.string().nullable(),
+  runId: z.string().nullable(),
+  createdAt: utcDateStringSchema,
+})
+export type BillingMeterUsageReport = z.infer<typeof billingMeterUsageReportSchema>
+
+export const billingMeterUsageReportsResponseSchema = z.object({
+  workspaceId: nonEmptyStringSchema,
+  reports: z.array(billingMeterUsageReportSchema),
+})
+export type BillingMeterUsageReportsResponse = z.infer<
+  typeof billingMeterUsageReportsResponseSchema
+>
+
 export function getBillingGuidance(input: {
   enabled: boolean
   adapter: BillingAdapter
@@ -244,8 +281,8 @@ export function getBillingGuidance(input: {
   }
 
   if (input.adapter === 'mock') {
-    return 'Mock billing is active. Checkout, customer portal, invoice history, usage summary, billing export, and billing alerts run locally for development and tests.'
+    return 'Mock billing is active. Checkout, customer portal, invoice history, usage summary, billing export, billing alerts, and metered usage reporting run locally for development and tests.'
   }
 
-  return 'Stripe billing is active. Use checkout for upgrades, the customer portal for subscription management, and configure webhooks for idempotent billing, invoice history, usage summary, export, and alert updates.'
+  return 'Stripe billing is active. Use checkout for upgrades, the customer portal for subscription management, and configure webhooks for idempotent billing, invoice history, usage summary, export, alerts, and metered usage reporting.'
 }

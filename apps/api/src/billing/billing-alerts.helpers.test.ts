@@ -25,6 +25,7 @@ const billingRecord: BillingRecord = {
   workspaceId: 'workspace_1',
   provider: 'stripe',
   externalCustomerId: 'cus_1',
+  externalSubscriptionItemId: null,
   paidTier: 'pro',
   status: 'active',
   createdAt: '2026-07-04T00:00:00.000Z',

@@ -48,6 +48,7 @@ import {
   type BillingRepository,
 } from './billing.repository.js'
 import { UsageService } from '../usage/usage.service.js'
+import { BillingMeterUsageService } from './billing-meter-usage.service.js'
 
 @Injectable()
 export class BillingService {
@@ -62,6 +63,7 @@ export class BillingService {
     @Inject(BILLING_ADAPTER)
     private readonly billingAdapter: BillingCheckoutAdapter,
     private readonly usageService: UsageService,
+    private readonly billingMeterUsageService: BillingMeterUsageService,
   ) {}
 
   getCapabilities() {
@@ -80,6 +82,7 @@ export class BillingService {
       supportsUsageSummary: enabled,
       supportsBillingExport: enabled,
       supportsBillingAlerts: enabled,
+      supportsMeteredUsage: this.billingMeterUsageService.supportsMeteredUsage(),
       checkoutTiers: ['pro', 'business'],
       guidance: getBillingGuidance({ enabled, adapter }),
     })
@@ -137,6 +140,12 @@ export class BillingService {
         billingRecord,
       }),
     })
+  }
+
+  async listWorkspaceMeterUsageReports(workspaceId: string) {
+    return this.billingMeterUsageService.listWorkspaceMeterUsageReports(
+      workspaceId,
+    )
   }
 
   async exportWorkspaceInvoices(
@@ -332,6 +341,7 @@ export class BillingService {
       workspaceId: pending.workspaceId,
       paidTier: pending.paidTier,
       externalCustomerId: `mock_customer_${pending.workspaceId}`,
+      externalSubscriptionItemId: `mock_sub_item_${pending.workspaceId}`,
     })
 
     await this.billingInvoiceRepository.upsertInvoice(
@@ -455,6 +465,7 @@ export class BillingService {
           workspaceId: event.workspaceId,
           paidTier: event.paidTier,
           externalCustomerId: event.externalCustomerId,
+          externalSubscriptionItemId: event.externalSubscriptionItemId,
         })
         await this.billingInvoiceRepository.upsertInvoice(
           buildPaidTierInvoiceInput({

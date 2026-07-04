@@ -57,6 +57,7 @@ describe('billing integration', () => {
       supportsUsageSummary: true,
       supportsBillingExport: true,
       supportsBillingAlerts: true,
+      supportsMeteredUsage: true,
       checkoutTiers: ['pro', 'business'],
     })
   })
@@ -325,5 +326,47 @@ describe('billing integration', () => {
         }),
       ]),
     })
+  })
+
+  it('reports and lists metered token usage for paid workspaces', async () => {
+    const checkoutResponse = await request(app!.getHttpServer())
+      .post('/api/billing/checkout-session')
+      .set(authHeaders)
+      .send({
+        workspaceId: 'workspace_1',
+        paidTier: 'pro',
+      })
+      .expect(201)
+
+    await request(app!.getHttpServer())
+      .get(checkoutResponse.body.checkoutUrl.replace(/^https?:\/\/[^/]+/, ''))
+      .expect(200)
+
+    const meterUsageService = moduleRef!.get(
+      (await import('./billing-meter-usage.service.js')).BillingMeterUsageService,
+    )
+
+    await meterUsageService.reportRunTokenUsage({
+      workspaceId: 'workspace_1',
+      runId: 'run_integration_meter',
+      totalTokens: 900,
+    })
+
+    const response = await request(app!.getHttpServer())
+      .get('/api/billing/workspace/workspace_1/meter-usage-reports')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body.reports).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          workspaceId: 'workspace_1',
+          metric: 'tokens',
+          quantity: 900,
+          status: 'reported',
+          runId: 'run_integration_meter',
+        }),
+      ]),
+    )
   })
 })

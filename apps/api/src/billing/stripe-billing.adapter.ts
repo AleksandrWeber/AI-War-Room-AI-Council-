@@ -16,6 +16,7 @@ export class StripeBillingAdapter implements BillingCheckoutAdapter {
     secretKey: string,
     private readonly webhookSecret: string,
     private readonly priceIds: Record<CheckoutPaidTier, string>,
+    private readonly meterEventName?: string,
   ) {
     this.stripe = new Stripe(secretKey)
   }
@@ -75,6 +76,34 @@ export class StripeBillingAdapter implements BillingCheckoutAdapter {
     }
   }
 
+  async reportMeteredUsage(input: {
+    externalSubscriptionItemId: string
+    externalCustomerId?: string
+    quantity: number
+    timestamp?: number
+  }) {
+    void input.externalSubscriptionItemId
+
+    if (!this.meterEventName || !input.externalCustomerId) {
+      throw new Error(
+        'Stripe metered usage requires STRIPE_METER_EVENT_NAME and a billing customer id.',
+      )
+    }
+
+    const event = await this.stripe.billing.meterEvents.create({
+      event_name: this.meterEventName,
+      payload: {
+        stripe_customer_id: input.externalCustomerId,
+        value: String(input.quantity),
+      },
+      timestamp: input.timestamp ?? Math.floor(Date.now() / 1000),
+    })
+
+    return {
+      externalUsageRecordId: event.identifier,
+    }
+  }
+
   async completeMockCheckout() {
     return null
   }
@@ -110,6 +139,15 @@ export class StripeBillingAdapter implements BillingCheckoutAdapter {
           }
         }
 
+        let externalSubscriptionItemId: string | undefined
+
+        if (typeof session.subscription === 'string') {
+          const subscription = await this.stripe.subscriptions.retrieve(
+            session.subscription,
+          )
+          externalSubscriptionItemId = subscription.items.data[0]?.id
+        }
+
         return {
           externalEventId: event.id,
           eventType: event.type,
@@ -121,6 +159,7 @@ export class StripeBillingAdapter implements BillingCheckoutAdapter {
               typeof session.customer === 'string'
                 ? session.customer
                 : session.customer?.id,
+            externalSubscriptionItemId,
           },
         }
       }

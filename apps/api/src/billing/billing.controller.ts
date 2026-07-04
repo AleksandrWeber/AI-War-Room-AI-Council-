@@ -130,6 +130,17 @@ export class BillingController {
     return this.billingService.getWorkspaceBillingAlerts(workspaceId)
   }
 
+  @Get('workspace/:workspaceId/meter-usage-reports')
+  @UseGuards(WorkspaceAccessGuard)
+  listWorkspaceMeterUsageReports(
+    @Param('workspaceId') workspaceId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    this.assertWorkspaceParam(request, workspaceId)
+
+    return this.billingService.listWorkspaceMeterUsageReports(workspaceId)
+  }
+
   @Get('workspace/:workspaceId/webhook-events')
   @UseGuards(WorkspaceAccessGuard)
   listWorkspaceWebhookEvents(

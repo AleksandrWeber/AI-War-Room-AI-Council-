@@ -15,6 +15,7 @@ export interface BillingRepository {
     workspaceId: string
     paidTier: CheckoutPaidTier
     externalCustomerId?: string
+    externalSubscriptionItemId?: string
   }): Promise<BillingRecord>
   updateBillingStatus(input: {
     workspaceId: string

@@ -8,6 +8,8 @@ import { InMemoryBillingWebhookRepository } from './in-memory-billing-webhook.re
 import { BillingService } from './billing.service.js'
 import { InMemoryUsageRepository } from '../usage/in-memory-usage.repository.js'
 import { UsageService } from '../usage/usage.service.js'
+import { BillingMeterUsageService } from './billing-meter-usage.service.js'
+import { InMemoryBillingMeterUsageRepository } from './in-memory-billing-meter-usage.repository.js'
 
 function createBillingService(env: Partial<ApiEnv>) {
   const config = {
@@ -29,6 +31,13 @@ function createBillingService(env: Partial<ApiEnv>) {
   const invoiceRepository = new InMemoryBillingInvoiceRepository()
   const adapter = new MockBillingAdapter('http://127.0.0.1:3000')
   const usageService = new UsageService(new InMemoryUsageRepository())
+  const meterUsageRepository = new InMemoryBillingMeterUsageRepository()
+  const meterUsageService = new BillingMeterUsageService(
+    configService,
+    repository,
+    meterUsageRepository,
+    adapter,
+  )
 
   return {
     service: new BillingService(
@@ -38,11 +47,12 @@ function createBillingService(env: Partial<ApiEnv>) {
       invoiceRepository,
       adapter,
       usageService,
+      meterUsageService,
     ),
     repository,
     webhookRepository,
     invoiceRepository,
-    adapter,
+    meterUsageService,
   }
 }
 
@@ -62,6 +72,7 @@ describe('BillingService', () => {
       supportsUsageSummary: false,
       supportsBillingExport: false,
       supportsBillingAlerts: false,
+      supportsMeteredUsage: false,
     })
   })
 
@@ -84,6 +95,37 @@ describe('BillingService', () => {
     })
     expect(usage.usagePeriodStart).toMatch(/T00:00:00\.000Z$/)
     expect(usage.usagePeriodEnd).toMatch(/T00:00:00\.000Z$/)
+  })
+
+  it('reports metered token usage after paid checkout', async () => {
+    const { service, meterUsageService } = createBillingService({})
+
+    const checkout = await service.createCheckoutSession({
+      workspaceId: 'workspace_1',
+      paidTier: 'pro',
+      requestWorkspaceId: 'workspace_1',
+    })
+    await service.completeMockCheckout(checkout.sessionId)
+
+    await meterUsageService.reportRunTokenUsage({
+      workspaceId: 'workspace_1',
+      runId: 'run_meter_test',
+      totalTokens: 1200,
+    })
+
+    const reports = await service.listWorkspaceMeterUsageReports('workspace_1')
+
+    expect(reports.reports).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          workspaceId: 'workspace_1',
+          metric: 'tokens',
+          quantity: 1200,
+          status: 'reported',
+          runId: 'run_meter_test',
+        }),
+      ]),
+    )
   })
 
   it('returns billing alerts for past due subscriptions', async () => {

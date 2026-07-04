@@ -400,6 +400,34 @@
   background: linear-gradient(90deg, #34d399, #22d3ee);
 }
 
+.billing-meter-usage {
+  display: grid;
+  gap: 12px;
+}
+
+.billing-meter-usage > span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.billing-meter-usage-card {
+  background: rgba(15, 23, 42, 0.72);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+}
+
+.billing-meter-usage-card p,
+.billing-meter-usage-card small {
+  color: var(--muted);
+  margin: 0;
+}
+
 .billing-webhook-events {
   display: grid;
   gap: 12px;

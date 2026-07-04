@@ -56,6 +56,21 @@ export class MockBillingAdapter implements BillingCheckoutAdapter {
     }
   }
 
+  async reportMeteredUsage(input: {
+    externalSubscriptionItemId: string
+    externalCustomerId?: string
+    quantity: number
+    timestamp?: number
+  }) {
+    void input.externalSubscriptionItemId
+    void input.externalCustomerId
+    void input.timestamp
+
+    return {
+      externalUsageRecordId: `mock_ur_${randomUUID()}`,
+    }
+  }
+
   async parseWebhookEvent(
     payload: Buffer | string,
   ): Promise<ParsedBillingWebhookResult> {
@@ -96,6 +111,10 @@ export class MockBillingAdapter implements BillingCheckoutAdapter {
             typeof body.externalCustomerId === 'string'
               ? body.externalCustomerId
               : undefined,
+          externalSubscriptionItemId:
+            typeof body.externalSubscriptionItemId === 'string'
+              ? body.externalSubscriptionItemId
+              : `mock_sub_item_${workspaceId}`,
         },
       }
     }

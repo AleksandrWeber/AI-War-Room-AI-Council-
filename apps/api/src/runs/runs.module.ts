@@ -16,6 +16,7 @@ import { TemporalRunService } from '../temporal/temporal-run.service.js'
 import { TemporalHealthService } from '../temporal/temporal-health.service.js'
 import { TriageService } from '../triage/triage.service.js'
 import { UsageModule } from '../usage/usage.module.js'
+import { BillingModule } from '../billing/billing.module.js'
 import { WorkspacesModule } from '../workspaces/workspaces.module.js'
 import { RunsController } from './runs.controller.js'
 import { RunsService } from './runs.service.js'
@@ -27,6 +28,7 @@ import { RunsService } from './runs.service.js'
     AuthModule,
     WorkspacesModule,
     UsageModule,
+    BillingModule,
     ObservabilityModule,
     ResearchModule,
     ShieldModule,

@@ -17,6 +17,7 @@ function createSeedRecord(
     workspaceId,
     provider: 'stripe',
     externalCustomerId: null,
+    externalSubscriptionItemId: null,
     paidTier,
     status,
     createdAt: now,
@@ -48,6 +49,7 @@ export class InMemoryBillingRepository implements BillingRepository {
     workspaceId: string
     paidTier: CheckoutPaidTier
     externalCustomerId?: string
+    externalSubscriptionItemId?: string
   }): Promise<BillingRecord> {
     const existing =
       this.records.get(input.workspaceId) ??
@@ -58,6 +60,10 @@ export class InMemoryBillingRepository implements BillingRepository {
       paidTier: input.paidTier,
       status: 'active',
       externalCustomerId: input.externalCustomerId ?? existing.externalCustomerId,
+      externalSubscriptionItemId:
+        input.externalSubscriptionItemId ??
+        existing.externalSubscriptionItemId ??
+        `mock_sub_item_${input.workspaceId}`,
       updatedAt,
     }
 

@@ -37,6 +37,7 @@ import {
 } from '../persistence/run.repository.js'
 import { TriageService } from '../triage/triage.service.js'
 import { UsageService } from '../usage/usage.service.js'
+import { BillingMeterUsageService } from '../billing/billing-meter-usage.service.js'
 import type { PipelineStreamEvent } from './pipeline-stream-event.js'
 
 function createId(prefix: string) {
@@ -57,6 +58,7 @@ export class RunsService {
     private readonly moderatorService: ModeratorService,
     private readonly artifactService: ArtifactService,
     private readonly usageService: UsageService,
+    private readonly billingMeterUsageService: BillingMeterUsageService,
     private readonly observabilityService: ObservabilityService,
   ) {}
 
@@ -365,6 +367,15 @@ export class RunsService {
         result: pipelineResult,
       }),
     )
+    const totalTokens = usageEvents.reduce(
+      (total, event) => total + event.inputTokens + event.outputTokens,
+      0,
+    )
+    await this.billingMeterUsageService.reportRunTokenUsage({
+      workspaceId: request.draftRun.workspaceId,
+      runId: request.draftRun.runId,
+      totalTokens,
+    })
     this.recordPipelineCostSignal(request, usageEvents)
     await emit?.({
       eventId: createId('event'),

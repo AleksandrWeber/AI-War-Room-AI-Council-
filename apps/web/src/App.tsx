@@ -4,6 +4,7 @@ import type {
   AuthSessionResponse,
   BillingCapabilitiesResponse,
   BillingInvoiceRecord,
+  BillingMeterUsageReport,
   BillingWebhookEventRecord,
   BillingWorkspaceAlertsResponse,
   BillingWorkspaceStatusResponse,
@@ -31,6 +32,7 @@ import {
   fetchBillingCapabilities,
   fetchBillingAlerts,
   fetchBillingInvoices,
+  fetchBillingMeterUsageReports,
   fetchBillingUsageSummary,
   fetchBillingWebhookEvents,
   fetchBillingWorkspaceStatus,
@@ -43,6 +45,7 @@ import {
   fetchMockCustomerPortal,
   formatBillingStatus,
   formatBillingAlertSeverity,
+  formatMeterUsageReportStatus,
   formatPaidTier,
   formatTierLimits,
   readBillingReturnHint,
@@ -586,6 +589,9 @@ function App() {
     useState<BillingWorkspaceUsageResponse | null>(null)
   const [billingAlerts, setBillingAlerts] = useState<
     BillingWorkspaceAlertsResponse['alerts']
+  >([])
+  const [billingMeterUsageReports, setBillingMeterUsageReports] = useState<
+    BillingMeterUsageReport[]
   >([])
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
@@ -1287,6 +1293,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setBillingAlerts(alerts.alerts)
+
+      const meterUsage = await fetchBillingMeterUsageReports(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBillingMeterUsageReports(meterUsage.reports)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -2115,6 +2128,35 @@ function App() {
                 </div>
               </article>
             </div>
+          </div>
+        ) : null}
+
+        {billingCapabilities?.supportsMeteredUsage ? (
+          <div className="billing-meter-usage">
+            <span>Metered usage reports</span>
+            {billingMeterUsageReports.length ? (
+              billingMeterUsageReports.map((report) => (
+                <article
+                  className="billing-meter-usage-card"
+                  key={report.billingMeterUsageReportId}
+                >
+                  <strong>
+                    {report.quantity.toLocaleString()} {report.metric}
+                  </strong>
+                  <p>{formatMeterUsageReportStatus(report.status)}</p>
+                  <small>
+                    {report.runId ? `Run ${report.runId}` : 'Manual report'}
+                    {report.externalUsageRecordId
+                      ? ` · ${report.externalUsageRecordId}`
+                      : ''}
+                  </small>
+                </article>
+              ))
+            ) : (
+              <p className="clear-copy">
+                No metered usage reports recorded for this workspace yet.
+              </p>
+            )}
           </div>
         ) : null}
 

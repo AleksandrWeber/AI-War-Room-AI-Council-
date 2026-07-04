@@ -13,6 +13,7 @@ type BillingRecordRow = {
   workspace_id: string
   provider: 'stripe'
   external_customer_id: string | null
+  external_subscription_item_id: string | null
   paid_tier: BillingRecord['paidTier']
   status: BillingStatus
   created_at: Date
@@ -31,6 +32,7 @@ export class PostgresBillingRepository implements BillingRepository {
           workspace_id,
           provider,
           external_customer_id,
+          external_subscription_item_id,
           paid_tier,
           status,
           created_at,
@@ -61,6 +63,7 @@ export class PostgresBillingRepository implements BillingRepository {
           workspace_id,
           provider,
           external_customer_id,
+          external_subscription_item_id,
           paid_tier,
           status,
           created_at,
@@ -81,6 +84,7 @@ export class PostgresBillingRepository implements BillingRepository {
     workspaceId: string
     paidTier: CheckoutPaidTier
     externalCustomerId?: string
+    externalSubscriptionItemId?: string
   }): Promise<BillingRecord> {
     const limits = PAID_TIER_LIMITS[input.paidTier]
 
@@ -112,15 +116,17 @@ export class PostgresBillingRepository implements BillingRepository {
               workspace_id,
               provider,
               external_customer_id,
+              external_subscription_item_id,
               paid_tier,
               status
             )
-            VALUES ($1, $2, 'stripe', $3, $4, 'active')
+            VALUES ($1, $2, 'stripe', $3, $4, $5, 'active')
           `,
           [
             `billing_${input.workspaceId}`,
             input.workspaceId,
             input.externalCustomerId ?? null,
+            input.externalSubscriptionItemId ?? null,
             input.paidTier,
           ],
         )
@@ -131,6 +137,7 @@ export class PostgresBillingRepository implements BillingRepository {
             SET paid_tier = $2,
                 status = 'active',
                 external_customer_id = COALESCE($3, external_customer_id),
+                external_subscription_item_id = COALESCE($4, external_subscription_item_id),
                 updated_at = NOW()
             WHERE billing_record_id = $1
           `,
@@ -138,6 +145,7 @@ export class PostgresBillingRepository implements BillingRepository {
             existing.rows[0].billing_record_id,
             input.paidTier,
             input.externalCustomerId ?? null,
+            input.externalSubscriptionItemId ?? null,
           ],
         )
       }
@@ -285,6 +293,7 @@ export class PostgresBillingRepository implements BillingRepository {
       workspaceId: row.workspace_id,
       provider: row.provider,
       externalCustomerId: row.external_customer_id,
+      externalSubscriptionItemId: row.external_subscription_item_id,
       paidTier: row.paid_tier,
       status: row.status,
       createdAt: row.created_at.toISOString(),

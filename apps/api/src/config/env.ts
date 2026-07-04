@@ -82,6 +82,8 @@ export const envSchema = z.object({
   STRIPE_PORTAL_RETURN_URL: z
     .url()
     .default('http://127.0.0.1:5173/billing/portal'),
+  STRIPE_METERED_USAGE_ENABLED: booleanEnvSchema.default(false),
+  STRIPE_METER_EVENT_NAME: optionalEnvStringSchema,
 })
 
 export type ApiEnv = z.infer<typeof envSchema>
@@ -123,6 +125,12 @@ export function validateEnv(config: Record<string, unknown>): ApiEnv {
     if (!env.STRIPE_PRICE_ID_PRO || !env.STRIPE_PRICE_ID_BUSINESS) {
       throw new Error(
         'STRIPE_PRICE_ID_PRO and STRIPE_PRICE_ID_BUSINESS are required when STRIPE_ENABLED=true and STRIPE_BILLING_ADAPTER=stripe.',
+      )
+    }
+
+    if (env.STRIPE_METERED_USAGE_ENABLED && !env.STRIPE_METER_EVENT_NAME) {
+      throw new Error(
+        'STRIPE_METER_EVENT_NAME is required when STRIPE_METERED_USAGE_ENABLED=true and STRIPE_BILLING_ADAPTER=stripe.',
       )
     }
   }

@@ -10,6 +10,7 @@ import {
   PAID_TIER_LIMITS,
   billingCapabilitiesResponseSchema,
   billingInvoicesResponseSchema,
+  billingMeterUsageReportsResponseSchema,
   billingWorkspaceAlertsResponseSchema,
   billingWorkspaceUsageResponseSchema,
   billingWebhookEventsResponseSchema,
@@ -179,6 +180,38 @@ export async function fetchBillingAlerts(
   }
 
   return billingWorkspaceAlertsResponseSchema.parse(await response.json())
+}
+
+export async function fetchBillingMeterUsageReports(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/billing/workspace/${encodeURIComponent(workspaceId)}/meter-usage-reports`,
+    {
+      headers,
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return billingMeterUsageReportsResponseSchema.parse(await response.json())
+}
+
+export function formatMeterUsageReportStatus(
+  status: 'reported' | 'skipped' | 'failed',
+) {
+  switch (status) {
+    case 'reported':
+      return 'Reported'
+    case 'skipped':
+      return 'Skipped'
+    case 'failed':
+      return 'Failed'
+  }
 }
 
 export function formatBillingAlertSeverity(

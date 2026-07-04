@@ -309,11 +309,23 @@ Billing alerts:
 - Alerts fire at 80% daily token/cost usage (warning) and 100% (critical), plus `past_due` and `canceled` subscription states.
 - The web billing panel shows severity-styled alerts above billing status cards.
 
+Metered usage reporting:
+
+- Pipeline runs report token usage for active paid workspaces through mock or Stripe subscription item usage records.
+- `GET /api/billing/workspace/:workspaceId/meter-usage-reports` returns recent metered usage report history.
+- Mock billing enables metered usage automatically; Stripe requires `STRIPE_METERED_USAGE_ENABLED=true` and `STRIPE_METER_EVENT_NAME`.
+
 Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
 
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v5.14` behavior:
+
+- Paid workspaces report pipeline token usage to mock or Stripe metered billing after runs complete.
+- Billing records store Stripe subscription item ids for metered usage reporting.
+- The web billing panel shows recent metered usage report history.
 
 Current `v5.13` behavior:
 

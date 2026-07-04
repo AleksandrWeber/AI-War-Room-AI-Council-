@@ -19,6 +19,10 @@ import { BILLING_INVOICE_REPOSITORY } from './billing-invoice.repository.js'
 import { BILLING_WEBHOOK_REPOSITORY } from './billing-webhook.repository.js'
 import { InMemoryBillingInvoiceRepository } from './in-memory-billing-invoice.repository.js'
 import { InMemoryBillingWebhookRepository } from './in-memory-billing-webhook.repository.js'
+import { BillingMeterUsageService } from './billing-meter-usage.service.js'
+import { BILLING_METER_USAGE_REPOSITORY } from './billing-meter-usage.repository.js'
+import { InMemoryBillingMeterUsageRepository } from './in-memory-billing-meter-usage.repository.js'
+import { PostgresBillingMeterUsageRepository } from './postgres-billing-meter-usage.repository.js'
 
 @Module({
   imports: [PersistenceModule, AuthModule, WorkspacesModule, UsageModule],
@@ -27,7 +31,9 @@ import { InMemoryBillingWebhookRepository } from './in-memory-billing-webhook.re
     PostgresBillingRepository,
     PostgresBillingWebhookRepository,
     PostgresBillingInvoiceRepository,
+    PostgresBillingMeterUsageRepository,
     BillingService,
+    BillingMeterUsageService,
     {
       provide: BILLING_REPOSITORY,
       inject: [ConfigService, PostgresBillingRepository],
@@ -65,6 +71,18 @@ import { InMemoryBillingWebhookRepository } from './in-memory-billing-webhook.re
       },
     },
     {
+      provide: BILLING_METER_USAGE_REPOSITORY,
+      inject: [ConfigService, PostgresBillingMeterUsageRepository],
+      useFactory: (
+        configService: ConfigService<ApiEnv, true>,
+        postgresBillingMeterUsageRepository: PostgresBillingMeterUsageRepository,
+      ) => {
+        return configService.get('NODE_ENV', { infer: true }) === 'test'
+          ? new InMemoryBillingMeterUsageRepository()
+          : postgresBillingMeterUsageRepository
+      },
+    },
+    {
       provide: BILLING_ADAPTER,
       inject: [ConfigService],
       useFactory: (configService: ConfigService<ApiEnv, true>) => {
@@ -83,6 +101,7 @@ import { InMemoryBillingWebhookRepository } from './in-memory-billing-webhook.re
                 infer: true,
               })!,
             },
+            configService.get('STRIPE_METER_EVENT_NAME', { infer: true }),
           )
         }
 
@@ -90,6 +109,6 @@ import { InMemoryBillingWebhookRepository } from './in-memory-billing-webhook.re
       },
     },
   ],
-  exports: [BillingService],
+  exports: [BillingService, BillingMeterUsageService],
 })
 export class BillingModule {}
