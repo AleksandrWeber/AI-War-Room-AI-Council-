@@ -1,39 +1,73 @@
 import { UnauthorizedException } from '@nestjs/common'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { AuthService } from './auth.service.js'
+import type { ExternalAuthService } from './external-auth.service.js'
 
 function createAuthService(input: {
-  authProvider?: 'headers' | 'bearer' | 'session'
+  authProvider?: 'headers' | 'bearer' | 'session' | 'external'
   authBearerToken?: string
   nodeEnv?: 'development' | 'test' | 'production'
   sessionSecret?: string
   sessionTtlSeconds?: number
+  externalVendor?: 'clerk' | 'auth0'
+  externalAdapter?: 'mock' | 'jwks'
+  externalIdentity?: {
+    userId: string
+    workspaceId?: string
+    vendor: 'clerk' | 'auth0'
+    subject: string
+  }
 }) {
-  return new AuthService({
-    get: (key: string) => {
-      if (key === 'AUTH_PROVIDER') {
-        return input.authProvider ?? 'headers'
+  const externalAuthService = {
+    verifyToken: vi.fn(async () => {
+      if (!input.externalIdentity) {
+        throw new Error('Missing external identity mock.')
       }
 
-      if (key === 'AUTH_BEARER_TOKEN') {
-        return input.authBearerToken
+      return {
+        ...input.externalIdentity,
+        vendor: input.externalIdentity.vendor,
+        subject: input.externalIdentity.subject,
       }
+    }),
+  } as unknown as ExternalAuthService
 
-      if (key === 'NODE_ENV') {
-        return input.nodeEnv ?? 'test'
-      }
+  return new AuthService(
+    {
+      get: (key: string) => {
+        if (key === 'AUTH_PROVIDER') {
+          return input.authProvider ?? 'headers'
+        }
 
-      if (key === 'APP_ENCRYPTION_KEY') {
-        return input.sessionSecret ?? 'test-session-secret-key'
-      }
+        if (key === 'AUTH_BEARER_TOKEN') {
+          return input.authBearerToken
+        }
 
-      if (key === 'AUTH_SESSION_TTL_SECONDS') {
-        return input.sessionTtlSeconds ?? 3_600
-      }
+        if (key === 'NODE_ENV') {
+          return input.nodeEnv ?? 'test'
+        }
 
-      return undefined
-    },
-  } as never)
+        if (key === 'APP_ENCRYPTION_KEY') {
+          return input.sessionSecret ?? 'test-session-secret-key'
+        }
+
+        if (key === 'AUTH_SESSION_TTL_SECONDS') {
+          return input.sessionTtlSeconds ?? 3_600
+        }
+
+        if (key === 'AUTH_EXTERNAL_VENDOR') {
+          return input.externalVendor ?? 'clerk'
+        }
+
+        if (key === 'AUTH_EXTERNAL_ADAPTER') {
+          return input.externalAdapter ?? 'mock'
+        }
+
+        return undefined
+      },
+    } as never,
+    externalAuthService,
+  )
 }
 
 describe('AuthService', () => {
@@ -45,53 +79,62 @@ describe('AuthService', () => {
       requiresBearerToken: false,
       supportsSessionBootstrap: true,
       workspaceHeadersRequired: true,
+      externalVendor: null,
+      externalAdapter: null,
     })
   })
 
-  it('reports session auth capabilities when configured', () => {
-    const service = createAuthService({ authProvider: 'session' })
+  it('reports external auth capabilities when configured', () => {
+    const service = createAuthService({
+      authProvider: 'external',
+      externalVendor: 'auth0',
+      externalAdapter: 'jwks',
+    })
 
     expect(service.getCapabilities()).toMatchObject({
-      provider: 'session',
+      provider: 'external',
       requiresBearerToken: true,
+      supportsSessionBootstrap: false,
       workspaceHeadersRequired: false,
+      externalVendor: 'auth0',
+      externalAdapter: 'jwks',
     })
   })
 
-  it('accepts requests in header auth mode without bearer tokens', () => {
+  it('accepts requests in header auth mode without bearer tokens', async () => {
     const service = createAuthService({ authProvider: 'headers' })
 
-    expect(() =>
+    await expect(
       service.assertApiAccess({
         headers: {},
       }),
-    ).not.toThrow()
+    ).resolves.toBeUndefined()
   })
 
-  it('requires a valid bearer token in bearer auth mode', () => {
+  it('requires a valid bearer token in bearer auth mode', async () => {
     const service = createAuthService({
       authProvider: 'bearer',
       authBearerToken: 'prod-token',
     })
 
-    expect(() =>
+    await expect(
       service.assertApiAccess({
         headers: {
           authorization: 'Bearer prod-token',
         },
       }),
-    ).not.toThrow()
+    ).resolves.toBeUndefined()
 
-    expect(() =>
+    await expect(
       service.assertApiAccess({
         headers: {
           authorization: 'Bearer wrong-token',
         },
       }),
-    ).toThrow(UnauthorizedException)
+    ).rejects.toThrow(UnauthorizedException)
   })
 
-  it('stores verified session claims in session auth mode', () => {
+  it('stores verified session claims in session auth mode', async () => {
     const service = createAuthService({
       authProvider: 'session',
       sessionSecret: 'test-session-secret-key',
@@ -106,10 +149,34 @@ describe('AuthService', () => {
       },
     }
 
-    service.assertApiAccess(request)
+    await service.assertApiAccess(request)
 
     expect(service.resolveSessionClaims(request)).toMatchObject({
       userId: 'user_test',
+      workspaceId: 'workspace_1',
+    })
+  })
+
+  it('stores verified external identities in external auth mode', async () => {
+    const service = createAuthService({
+      authProvider: 'external',
+      externalIdentity: {
+        userId: 'clerk_user_external',
+        workspaceId: 'workspace_1',
+        vendor: 'clerk',
+        subject: 'user_external',
+      },
+    })
+    const request = {
+      headers: {
+        authorization: 'Bearer external-token',
+      },
+    }
+
+    await service.assertApiAccess(request)
+
+    expect(service.resolveAuthIdentity(request)).toMatchObject({
+      userId: 'clerk_user_external',
       workspaceId: 'workspace_1',
     })
   })

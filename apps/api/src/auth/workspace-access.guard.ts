@@ -5,7 +5,11 @@ import {
   Injectable,
   UnauthorizedException,
 } from '@nestjs/common'
-import type { AuthContext, AuthSessionClaims } from '@ai-war-room/schemas'
+import type {
+  AuthContext,
+  AuthSessionClaims,
+  ExternalAuthIdentity,
+} from '@ai-war-room/schemas'
 import { AuthService } from './auth.service.js'
 import { WorkspaceService } from '../workspaces/workspace.service.js'
 
@@ -22,6 +26,7 @@ export type AuthenticatedRequest = {
   params?: Record<string, string | undefined>
   authContext?: AuthContext
   sessionClaims?: AuthSessionClaims
+  externalAuthIdentity?: ExternalAuthIdentity
 }
 
 @Injectable()
@@ -33,13 +38,13 @@ export class WorkspaceAccessGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest<AuthenticatedRequest>()
-    this.authService.assertApiAccess(request)
+    await this.authService.assertApiAccess(request)
 
-    const sessionClaims = this.authService.resolveSessionClaims(request)
+    const authIdentity = this.authService.resolveAuthIdentity(request)
     const userId =
-      sessionClaims?.userId ?? this.getSingleHeader(request.headers['x-user-id'])
+      authIdentity?.userId ?? this.getSingleHeader(request.headers['x-user-id'])
     const headerWorkspaceId =
-      sessionClaims?.workspaceId ??
+      authIdentity?.workspaceId ??
       this.getSingleHeader(request.headers['x-workspace-id'])
     const bodyWorkspaceId = this.resolveBodyWorkspaceId(request.body)
 
@@ -49,12 +54,12 @@ export class WorkspaceAccessGuard implements CanActivate {
       })
     }
 
-    const requestWorkspaceId = sessionClaims
-      ? sessionClaims.workspaceId
+    const requestWorkspaceId = authIdentity
+      ? (bodyWorkspaceId ?? authIdentity.workspaceId ?? headerWorkspaceId)
       : (bodyWorkspaceId ?? headerWorkspaceId)
 
     if (
-      !sessionClaims &&
+      !authIdentity &&
       bodyWorkspaceId &&
       headerWorkspaceId !== bodyWorkspaceId
     ) {

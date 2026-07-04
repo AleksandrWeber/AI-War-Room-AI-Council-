@@ -56,6 +56,7 @@ export function buildBootstrapAuthHeaders(
   if (
     authCapabilities?.provider !== 'headers' &&
     authCapabilities?.requiresBearerToken &&
+    authCapabilities.provider !== 'external' &&
     bearerToken
   ) {
     headers.Authorization = `Bearer ${bearerToken}`
@@ -72,6 +73,12 @@ export function buildWorkspaceAuthHeaders(
   session?: Pick<AuthSessionResponse, 'token' | 'expiresAt'> | null,
 ) {
   const headers: Record<string, string> = {}
+  const externalToken = import.meta.env.VITE_AUTH_EXTERNAL_TOKEN
+
+  if (authCapabilities?.provider === 'external' && externalToken) {
+    headers.Authorization = `Bearer ${externalToken}`
+    return headers
+  }
 
   if (authCapabilities?.provider === 'session' && session?.token) {
     headers.Authorization = `Bearer ${session.token}`

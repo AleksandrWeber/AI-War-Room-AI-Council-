@@ -193,11 +193,32 @@ VITE_AUTH_BEARER_TOKEN=change-me npm run dev:web
 
 In session mode the frontend bootstraps and stores the signed token in local storage automatically.
 
+External provider rollout:
+
+```bash
+AUTH_PROVIDER=external \
+AUTH_EXTERNAL_VENDOR=clerk \
+AUTH_EXTERNAL_ADAPTER=mock \
+AUTH_EXTERNAL_JWT_SECRET=change-me \
+npm run dev:api
+
+VITE_AUTH_EXTERNAL_TOKEN=<mock-or-provider-token> npm run dev:web
+```
+
+For production Clerk or Auth0, switch `AUTH_EXTERNAL_ADAPTER=jwks` and configure `AUTH_EXTERNAL_JWKS_URL`, `AUTH_EXTERNAL_ISSUER`, and `AUTH_EXTERNAL_AUDIENCE`.
+
 Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
 
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v5.4` behavior:
+
+- `AUTH_PROVIDER=external` verifies Clerk or Auth0 JWTs through mock HS256 or JWKS adapters.
+- External tokens map provider subjects to internal user ids such as `clerk_<sub>`.
+- Workspace context can come from vendor claims (`org_id` for Clerk) or `x-workspace-id`.
+- The frontend sends `VITE_AUTH_EXTERNAL_TOKEN` when external auth is active.
 
 Current `v5.3` behavior:
 

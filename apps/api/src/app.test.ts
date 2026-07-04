@@ -112,6 +112,8 @@ describe('API skeleton', () => {
       requiresBearerToken: false,
       supportsSessionBootstrap: true,
       workspaceHeadersRequired: true,
+      externalVendor: null,
+      externalAdapter: null,
       guidance: expect.stringContaining('x-user-id'),
     })
   })

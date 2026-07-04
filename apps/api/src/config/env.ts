@@ -53,9 +53,23 @@ export const envSchema = z.object({
     .int()
     .positive()
     .default(300_000),
-  AUTH_PROVIDER: z.enum(['headers', 'bearer', 'session']).default('headers'),
+  AUTH_PROVIDER: z
+    .enum(['headers', 'bearer', 'session', 'external'])
+    .default('headers'),
   AUTH_BEARER_TOKEN: optionalEnvStringSchema,
   AUTH_SESSION_TTL_SECONDS: z.coerce.number().int().positive().default(86_400),
+  AUTH_EXTERNAL_VENDOR: z.enum(['clerk', 'auth0']).default('clerk'),
+  AUTH_EXTERNAL_ADAPTER: z.enum(['mock', 'jwks']).default('mock'),
+  AUTH_EXTERNAL_JWT_SECRET: optionalEnvStringSchema,
+  AUTH_EXTERNAL_JWKS_URL: optionalEnvStringSchema,
+  AUTH_EXTERNAL_ISSUER: z
+    .string()
+    .trim()
+    .min(1)
+    .default('ai-war-room-external-auth'),
+  AUTH_EXTERNAL_AUDIENCE: z.string().trim().min(1).default('ai-war-room-api'),
+  AUTH_EXTERNAL_USER_ID_CLAIM: z.string().trim().min(1).default('sub'),
+  AUTH_EXTERNAL_WORKSPACE_ID_CLAIM: optionalEnvStringSchema,
 })
 
 export type ApiEnv = z.infer<typeof envSchema>
@@ -65,6 +79,20 @@ export function validateEnv(config: Record<string, unknown>): ApiEnv {
 
   if (env.AUTH_PROVIDER === 'bearer' && !env.AUTH_BEARER_TOKEN) {
     throw new Error('AUTH_BEARER_TOKEN is required when AUTH_PROVIDER=bearer.')
+  }
+
+  if (env.AUTH_PROVIDER === 'external') {
+    if (env.AUTH_EXTERNAL_ADAPTER === 'mock' && !env.AUTH_EXTERNAL_JWT_SECRET) {
+      throw new Error(
+        'AUTH_EXTERNAL_JWT_SECRET is required when AUTH_PROVIDER=external and AUTH_EXTERNAL_ADAPTER=mock.',
+      )
+    }
+
+    if (env.AUTH_EXTERNAL_ADAPTER === 'jwks' && !env.AUTH_EXTERNAL_JWKS_URL) {
+      throw new Error(
+        'AUTH_EXTERNAL_JWKS_URL is required when AUTH_PROVIDER=external and AUTH_EXTERNAL_ADAPTER=jwks.',
+      )
+    }
   }
 
   return env
