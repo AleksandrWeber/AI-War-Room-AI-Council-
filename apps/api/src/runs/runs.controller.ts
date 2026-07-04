@@ -1,6 +1,7 @@
-import { Body, Controller, Get, Post, Res } from '@nestjs/common'
+import { Body, Controller, Get, Post, Res, UseGuards } from '@nestjs/common'
 import type { FastifyReply } from 'fastify'
 import { randomUUID } from 'node:crypto'
+import { WorkspaceAccessGuard } from '../auth/workspace-access.guard.js'
 import { RunsService, type PipelineStreamEvent } from './runs.service.js'
 
 @Controller('runs')
@@ -13,16 +14,19 @@ export class RunsController {
   }
 
   @Post('draft')
+  @UseGuards(WorkspaceAccessGuard)
   createDraftRun(@Body() body: unknown) {
     return this.runsService.createDraftRun(body)
   }
 
   @Post('mock-pipeline')
+  @UseGuards(WorkspaceAccessGuard)
   executeMockPipeline(@Body() body: unknown) {
     return this.runsService.executeMockPipeline(body)
   }
 
   @Post('mock-pipeline/stream')
+  @UseGuards(WorkspaceAccessGuard)
   async executeMockPipelineStream(
     @Body() body: unknown,
     @Res() reply: FastifyReply,

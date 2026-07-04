@@ -135,6 +135,10 @@ type MockPipelineResult = {
 }
 
 const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:3000/api'
+const localAuthHeaders = {
+  'x-user-id': 'user_local',
+  'x-workspace-id': 'local_workspace',
+}
 const reviewStorageKey = 'ai-war-room.review-draft'
 const ideaStorageKey = 'ai-war-room.idea-draft'
 const pipelineResultStorageKey = 'ai-war-room.pipeline-result'
@@ -394,6 +398,7 @@ function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...localAuthHeaders,
         },
         body: JSON.stringify({
           workspaceId: 'local_workspace',
@@ -485,6 +490,7 @@ function App() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          ...localAuthHeaders,
         },
         body: JSON.stringify({
           draftRun,

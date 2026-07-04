@@ -3,7 +3,9 @@ import {
   artifactSchema,
   createRunRequestSchema,
   draftRunSchema,
+  authContextSchema,
   shieldScanResultSchema,
+  workspaceMembershipSchema,
 } from './index.js'
 
 const now = '2026-07-04T12:00:00.000Z'
@@ -140,5 +142,23 @@ describe('pipeline schemas', () => {
     })
 
     expect(result.success).toBe(true)
+  })
+
+  it('validates workspace membership and auth context', () => {
+    expect(
+      workspaceMembershipSchema.safeParse({
+        workspaceId: 'workspace_1',
+        userId: 'user_1',
+        role: 'owner',
+        createdAt: now,
+      }).success,
+    ).toBe(true)
+    expect(
+      authContextSchema.safeParse({
+        workspaceId: 'workspace_1',
+        userId: 'user_1',
+        role: 'member',
+      }).success,
+    ).toBe(true)
   })
 })

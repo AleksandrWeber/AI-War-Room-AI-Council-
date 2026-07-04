@@ -106,15 +106,25 @@ npm run dev:web
 Local persistence uses:
 
 - PostgreSQL for runs, Shield scans, idempotency records, agent outputs, moderator synthesis, and artifacts.
+- PostgreSQL for local users, workspaces, and workspace memberships.
 - Redis for fast idempotency reservation.
 
 Tests use an in-memory repository so they do not require Docker.
+
+## Auth And Workspaces
+
+Current local auth is header-based until a real auth provider is selected:
+
+- `x-user-id: user_local`
+- `x-workspace-id: local_workspace`
+
+Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
 
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
-Current `v1.4` behavior:
+Current `v2.0` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
 - All JSON responses are parsed and validated with Zod schemas.
@@ -131,6 +141,8 @@ Current `v1.4` behavior:
 - The artifact viewer uses tabs with prompt/version/model metadata so generated outputs are easier to inspect.
 - `POST /api/runs/mock-pipeline/stream` streams status events, final artifact events, and a completed event using `text/event-stream`.
 - The frontend consumes the stream through `fetch`, shows live status updates, and stores the latest completed result locally for refresh recovery.
+- Run creation and execution routes are protected by workspace membership checks.
+- Local development uses seeded `user_local` and `local_workspace` records.
 
 Real Anthropic/OpenAI provider adapters are still intentionally left for a later milestone.
 

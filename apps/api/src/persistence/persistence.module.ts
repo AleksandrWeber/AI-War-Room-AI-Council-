@@ -25,6 +25,6 @@ import { RUN_REPOSITORY } from './run.repository.js'
       },
     },
   ],
-  exports: [RUN_REPOSITORY, IdempotencyService],
+  exports: [RUN_REPOSITORY, IdempotencyService, PostgresService],
 })
 export class PersistenceModule {}

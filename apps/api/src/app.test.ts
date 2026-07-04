@@ -7,6 +7,11 @@ import request from 'supertest'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { AppModule } from './app.module.js'
 
+const authHeaders = {
+  'x-user-id': 'user_test',
+  'x-workspace-id': 'workspace_1',
+}
+
 describe('API skeleton', () => {
   let app: NestFastifyApplication | undefined
 
@@ -63,6 +68,7 @@ describe('API skeleton', () => {
   it('creates a draft run with prompt-driven triage', async () => {
     const response = await request(app!.getHttpServer())
       .post('/api/runs/draft')
+      .set(authHeaders)
       .send({
         workspaceId: 'workspace_1',
         idempotencyKey: 'idem_1',
@@ -95,10 +101,12 @@ describe('API skeleton', () => {
     }
     const firstResponse = await request(app!.getHttpServer())
       .post('/api/runs/draft')
+      .set(authHeaders)
       .send(payload)
       .expect(201)
     const secondResponse = await request(app!.getHttpServer())
       .post('/api/runs/draft')
+      .set(authHeaders)
       .send(payload)
       .expect(201)
 
@@ -108,6 +116,7 @@ describe('API skeleton', () => {
   it('surfaces Shield findings for risky input spans', async () => {
     const response = await request(app!.getHttpServer())
       .post('/api/runs/draft')
+      .set(authHeaders)
       .send({
         workspaceId: 'workspace_1',
         idempotencyKey: 'idem_2',
@@ -131,6 +140,7 @@ describe('API skeleton', () => {
   it('rejects invalid draft run requests', async () => {
     const response = await request(app!.getHttpServer())
       .post('/api/runs/draft')
+      .set(authHeaders)
       .send({
         workspaceId: 'workspace_1',
         idempotencyKey: 'idem_3',
@@ -146,6 +156,7 @@ describe('API skeleton', () => {
   it('executes the prompt-driven planning pipeline', async () => {
     const draftResponse = await request(app!.getHttpServer())
       .post('/api/runs/draft')
+      .set(authHeaders)
       .send({
         workspaceId: 'workspace_1',
         idempotencyKey: 'idem_4',
@@ -159,6 +170,7 @@ describe('API skeleton', () => {
 
     const pipelineResponse = await request(app!.getHttpServer())
       .post('/api/runs/mock-pipeline')
+      .set(authHeaders)
       .send({
         draftRun: draftResponse.body,
         approvedTriage: draftResponse.body.triage,
@@ -195,6 +207,7 @@ describe('API skeleton', () => {
   it('streams pipeline status and final artifacts', async () => {
     const draftResponse = await request(app!.getHttpServer())
       .post('/api/runs/draft')
+      .set(authHeaders)
       .send({
         workspaceId: 'workspace_1',
         idempotencyKey: 'idem_stream_1',
@@ -208,6 +221,7 @@ describe('API skeleton', () => {
 
     const streamResponse = await request(app!.getHttpServer())
       .post('/api/runs/mock-pipeline/stream')
+      .set(authHeaders)
       .send({
         draftRun: draftResponse.body,
         approvedTriage: draftResponse.body.triage,
@@ -220,5 +234,60 @@ describe('API skeleton', () => {
     expect(streamResponse.text).toContain('event: artifact')
     expect(streamResponse.text).toContain('event: completed')
     expect(streamResponse.text).toContain('artifacts/development_prompt/v1')
+  })
+
+  it('requires workspace auth headers for run mutations', async () => {
+    const response = await request(app!.getHttpServer())
+      .post('/api/runs/draft')
+      .send({
+        workspaceId: 'workspace_1',
+        idempotencyKey: 'idem_auth_missing',
+        idea: {
+          rawIdea: 'Build a protected planning workflow.',
+        },
+      })
+      .expect(401)
+
+    expect(response.body.message).toBe('Missing x-user-id or x-workspace-id header.')
+  })
+
+  it('rejects workspace header mismatches', async () => {
+    const response = await request(app!.getHttpServer())
+      .post('/api/runs/draft')
+      .set({
+        'x-user-id': 'user_test',
+        'x-workspace-id': 'other_workspace',
+      })
+      .send({
+        workspaceId: 'workspace_1',
+        idempotencyKey: 'idem_auth_mismatch',
+        idea: {
+          rawIdea: 'Build a tenant-isolated planning workflow.',
+        },
+      })
+      .expect(403)
+
+    expect(response.body.message).toBe(
+      'Workspace header does not match request workspace.',
+    )
+  })
+
+  it('rejects users without workspace membership', async () => {
+    const response = await request(app!.getHttpServer())
+      .post('/api/runs/draft')
+      .set({
+        'x-user-id': 'unknown_user',
+        'x-workspace-id': 'workspace_1',
+      })
+      .send({
+        workspaceId: 'workspace_1',
+        idempotencyKey: 'idem_auth_forbidden',
+        idea: {
+          rawIdea: 'Build a tenant-isolated planning workflow.',
+        },
+      })
+      .expect(403)
+
+    expect(response.body.message).toBe('User is not a member of this workspace.')
   })
 })
