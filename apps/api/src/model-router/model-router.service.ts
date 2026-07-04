@@ -1,4 +1,5 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Optional } from '@nestjs/common'
+import { ConfigService } from '@nestjs/config'
 import { randomUUID } from 'node:crypto'
 import {
   type ModelRegistryEntry,
@@ -6,6 +7,7 @@ import {
   type ModelSelectionDecision,
   modelSelectionDecisionSchema,
 } from '@ai-war-room/schemas'
+import type { ApiEnv } from '../config/env.js'
 import { ObservabilityService } from '../observability/observability.service.js'
 
 function createId(prefix: string) {
@@ -40,7 +42,11 @@ const safetyRoles: ModelRouterRole[] = ['security_expert', 'shield_classifier']
 export class ModelRouterService {
   private readonly registry = new Map<string, ModelRegistryEntry>()
 
-  constructor(private readonly observabilityService: ObservabilityService) {
+  constructor(
+    private readonly observabilityService: ObservabilityService,
+    @Optional()
+    private readonly configService?: ConfigService<ApiEnv, true>,
+  ) {
     for (const model of this.createDefaultRegistry()) {
       this.registry.set(model.modelId, model)
     }
@@ -175,6 +181,8 @@ export class ModelRouterService {
 
   private createDefaultRegistry(): ModelRegistryEntry[] {
     const now = new Date().toISOString()
+    const anthropicStatus = this.resolveConfiguredProviderStatus('anthropic')
+    const openAiStatus = this.resolveConfiguredProviderStatus('openai')
 
     return [
       {
@@ -231,6 +239,82 @@ export class ModelRouterService {
         consecutiveFailures: 0,
         updatedAt: now,
       },
+      {
+        modelId: 'anthropic-sonnet-candidate',
+        providerId: 'anthropic',
+        modelName: this.resolveConfiguredModel(
+          'anthropic',
+          'claude-3-5-sonnet-latest',
+        ),
+        supportedRoles: allRoles,
+        contextWindowTokens: 200_000,
+        maxOutputTokens: 8_192,
+        inputCostPerMillionTokensUsd: 3,
+        outputCostPerMillionTokensUsd: 15,
+        latencyP95Ms: 2_500,
+        evaluationScore: 0.94,
+        safetyScore: 0.92,
+        reliabilityScore: 0.92,
+        lifecycleStatus: anthropicStatus,
+        healthStatus: 'healthy',
+        consecutiveFailures: 0,
+        updatedAt: now,
+      },
+      {
+        modelId: 'openai-fast-candidate',
+        providerId: 'openai',
+        modelName: this.resolveConfiguredModel('openai', 'gpt-4o-mini'),
+        supportedRoles: allRoles,
+        contextWindowTokens: 128_000,
+        maxOutputTokens: 16_384,
+        inputCostPerMillionTokensUsd: 0.15,
+        outputCostPerMillionTokensUsd: 0.6,
+        latencyP95Ms: 1_200,
+        evaluationScore: 0.86,
+        safetyScore: 0.84,
+        reliabilityScore: 0.9,
+        lifecycleStatus: openAiStatus,
+        healthStatus: 'healthy',
+        consecutiveFailures: 0,
+        updatedAt: now,
+      },
     ]
+  }
+
+  private resolveConfiguredProviderStatus(
+    providerId: 'anthropic' | 'openai',
+  ): ModelRegistryEntry['lifecycleStatus'] {
+    const primaryProvider = this.configService?.get('LLM_PRIMARY_PROVIDER', {
+      infer: true,
+    })
+    const fallbackProvider = this.configService?.get('LLM_FALLBACK_PROVIDER', {
+      infer: true,
+    })
+
+    return primaryProvider === providerId || fallbackProvider === providerId
+      ? 'active'
+      : 'candidate'
+  }
+
+  private resolveConfiguredModel(
+    providerId: 'anthropic' | 'openai',
+    defaultModel: string,
+  ) {
+    const primaryProvider = this.configService?.get('LLM_PRIMARY_PROVIDER', {
+      infer: true,
+    })
+    const fallbackProvider = this.configService?.get('LLM_FALLBACK_PROVIDER', {
+      infer: true,
+    })
+    const configuredModel =
+      primaryProvider === providerId
+        ? this.configService?.get('LLM_PRIMARY_MODEL', { infer: true })
+        : fallbackProvider === providerId
+          ? this.configService?.get('LLM_FALLBACK_MODEL', { infer: true })
+          : undefined
+
+    return configuredModel && !configuredModel.startsWith('mock-')
+      ? configuredModel
+      : defaultModel
   }
 }

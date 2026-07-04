@@ -1,4 +1,6 @@
+import { ConfigService } from '@nestjs/config'
 import { describe, expect, it } from 'vitest'
+import type { ApiEnv } from '../config/env.js'
 import type { ObservabilityEvent } from '../observability/observability.service.js'
 import { ModelRouterService } from './model-router.service.js'
 
@@ -27,6 +29,22 @@ function createRouter() {
 
   return {
     router: new ModelRouterService(observability as never),
+    observability,
+  }
+}
+
+function createConfiguredRouter(config: Partial<ApiEnv>) {
+  const observability = new TestObservability()
+  const configService = new ConfigService<ApiEnv>({
+    LLM_PRIMARY_PROVIDER: 'mock',
+    LLM_FALLBACK_PROVIDER: 'mock',
+    LLM_PRIMARY_MODEL: 'mock-json-v1',
+    LLM_FALLBACK_MODEL: 'mock-json-v1',
+    ...config,
+  })
+
+  return {
+    router: new ModelRouterService(observability as never, configService),
     observability,
   }
 }
@@ -85,5 +103,23 @@ describe('ModelRouterService', () => {
 
     expect(decision.selected.modelId).toBe(decision.deputy?.modelId)
     expect(decision.selectionReason).toBe('deputy_selected_after_champion_failure')
+  })
+
+  it('promotes explicitly configured real providers from candidate to active', () => {
+    const { router } = createConfiguredRouter({
+      LLM_PRIMARY_PROVIDER: 'anthropic',
+      LLM_FALLBACK_PROVIDER: 'openai',
+      LLM_PRIMARY_MODEL: 'claude-3-5-sonnet-latest',
+      LLM_FALLBACK_MODEL: 'gpt-4o-mini',
+    })
+
+    const models = router.getRegistrySnapshot()
+    const anthropic = models.find((model) => model.providerId === 'anthropic')
+    const openai = models.find((model) => model.providerId === 'openai')
+
+    expect(anthropic?.lifecycleStatus).toBe('active')
+    expect(anthropic?.modelName).toBe('claude-3-5-sonnet-latest')
+    expect(openai?.lifecycleStatus).toBe('active')
+    expect(openai?.modelName).toBe('gpt-4o-mini')
   })
 })

@@ -125,7 +125,7 @@ Run mutation endpoints verify that the request workspace matches the header work
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
-Current `v3.4` behavior:
+Current `v3.5` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
 - All JSON responses are parsed and validated with Zod schemas.
@@ -170,6 +170,15 @@ Current `v3.4` behavior:
 - LLM Gateway uses the role champion first and routes repair/retry attempts to the deputy model.
 - Provider failures mark the selected model as degraded so future selections can avoid it.
 - Model selection decisions emit structured observability events and `GET /api/model-router/registry` exposes the current registry snapshot.
+- Anthropic and OpenAI provider adapters are available behind the same LLM Gateway contract.
+- Real provider API keys are read from local `.env` variables and must not be committed.
+- Anthropic/OpenAI registry entries remain `candidate` by default and become active only when selected through `LLM_PRIMARY_PROVIDER` or `LLM_FALLBACK_PROVIDER`.
 
-Real Anthropic/OpenAI provider adapters are still intentionally left for a later milestone.
+To enable real providers locally, copy `.env.example` to `.env`, add provider keys, and explicitly select the provider/model:
+
+```bash
+LLM_PRIMARY_PROVIDER=anthropic
+LLM_PRIMARY_MODEL=claude-3-5-sonnet-latest
+ANTHROPIC_API_KEY=...
+```
 

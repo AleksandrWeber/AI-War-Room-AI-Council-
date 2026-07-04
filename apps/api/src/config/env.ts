@@ -1,5 +1,10 @@
 import { z } from 'zod'
 
+const optionalEnvStringSchema = z.preprocess(
+  (value) => (value === '' ? undefined : value),
+  z.string().trim().min(1).optional(),
+)
+
 export const envSchema = z.object({
   NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
   API_PORT: z.coerce.number().int().positive().default(3000),
@@ -14,6 +19,13 @@ export const envSchema = z.object({
   LLM_PRIMARY_MODEL: z.string().trim().min(1).default('mock-json-v1'),
   LLM_FALLBACK_MODEL: z.string().trim().min(1).default('mock-json-v1'),
   LLM_MAX_ATTEMPTS: z.coerce.number().int().positive().max(5).default(3),
+  LLM_REQUEST_TIMEOUT_MS: z.coerce.number().int().positive().default(30_000),
+  ANTHROPIC_API_KEY: optionalEnvStringSchema,
+  ANTHROPIC_API_URL: z.url().default('https://api.anthropic.com/v1/messages'),
+  OPENAI_API_KEY: optionalEnvStringSchema,
+  OPENAI_API_URL: z
+    .url()
+    .default('https://api.openai.com/v1/chat/completions'),
 })
 
 export type ApiEnv = z.infer<typeof envSchema>
