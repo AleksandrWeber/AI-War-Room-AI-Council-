@@ -1,4 +1,9 @@
+import { useEffect, useState } from 'react'
 import './App.css'
+
+type ApiHealthState = 'checking' | 'online' | 'offline'
+
+const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:3000/api'
 
 const pipelineSteps = [
   'Idea',
@@ -27,6 +32,28 @@ const agentCards = [
 ]
 
 function App() {
+  const [apiHealth, setApiHealth] = useState<ApiHealthState>('checking')
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    fetch(`${apiBaseUrl}/health`, {
+      signal: controller.signal,
+    })
+      .then((response) => {
+        setApiHealth(response.ok ? 'online' : 'offline')
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setApiHealth('offline')
+        }
+      })
+
+    return () => {
+      controller.abort()
+    }
+  }, [])
+
   return (
     <main className="app-shell">
       <section className="hero-section">
@@ -63,6 +90,9 @@ function App() {
           <div className="shield-status">
             <span className="status-dot"></span>
             Shield: clear by default, visible only when risk is meaningful.
+          </div>
+          <div className={`api-status api-status--${apiHealth}`}>
+            API status: {apiHealth}
           </div>
         </div>
       </section>
