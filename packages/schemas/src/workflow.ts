@@ -29,6 +29,7 @@ export type TemporalRunStartResponse = z.infer<
 >
 
 export const temporalRunStatusResponseSchema = z.object({
+  runId: nonEmptyStringSchema,
   workspaceId: nonEmptyStringSchema,
   workflowId: nonEmptyStringSchema,
   temporalRunId: z.string().trim().min(1).optional(),
@@ -39,4 +40,27 @@ export const temporalRunStatusResponseSchema = z.object({
 })
 export type TemporalRunStatusResponse = z.infer<
   typeof temporalRunStatusResponseSchema
+>
+
+export const temporalWorkflowRecordSchema = z.object({
+  runId: nonEmptyStringSchema,
+  workspaceId: nonEmptyStringSchema,
+  workflowId: nonEmptyStringSchema,
+  temporalRunId: z.string().trim().min(1).optional(),
+  taskQueue: nonEmptyStringSchema,
+  status: temporalWorkflowStatusSchema,
+  startedAt: utcDateStringSchema,
+  lastCheckedAt: utcDateStringSchema.optional(),
+  completedAt: utcDateStringSchema.optional(),
+  updatedAt: utcDateStringSchema,
+})
+export type TemporalWorkflowRecord = z.infer<
+  typeof temporalWorkflowRecordSchema
+>
+
+export const temporalWorkflowObservationResponseSchema = z.object({
+  workflow: temporalWorkflowRecordSchema,
+})
+export type TemporalWorkflowObservationResponse = z.infer<
+  typeof temporalWorkflowObservationResponseSchema
 >

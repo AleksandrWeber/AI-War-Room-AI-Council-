@@ -3,6 +3,9 @@ import type { MockPipelineRequest } from '@ai-war-room/schemas'
 import { describe, expect, it, vi } from 'vitest'
 import type { ApiEnv } from '../config/env.js'
 import type { ObservabilityService } from '../observability/observability.service.js'
+import { InMemoryTemporalWorkflowRepository } from '../persistence/in-memory-temporal-workflow.repository.js'
+import type { StreamEventBufferService } from '../persistence/stream-event-buffer.service.js'
+import type { PipelineStreamEvent } from '../runs/pipeline-stream-event.js'
 import type { TemporalRunClient } from './temporal-run-client.js'
 import { TemporalRunService } from './temporal-run.service.js'
 
@@ -38,6 +41,23 @@ function createObservabilityService() {
       return operation()
     },
   } as ObservabilityService
+}
+
+function createStreamEventBufferService() {
+  const events: PipelineStreamEvent[] = []
+
+  return {
+    append: vi.fn(async (input: { event: PipelineStreamEvent }) => {
+      const event = {
+        ...input.event,
+        eventId: `${Date.now()}-${events.length + 1}`,
+      }
+      events.push(event)
+
+      return event
+    }),
+    replayAfter: vi.fn(async () => events),
+  } as unknown as StreamEventBufferService
 }
 
 function createRequest(): MockPipelineRequest {
@@ -92,11 +112,21 @@ function createService(input: {
   enabled: boolean
   temporalRunClient: TemporalRunClient
 }) {
-  return new TemporalRunService(
+  const temporalWorkflowRepository = new InMemoryTemporalWorkflowRepository()
+  const streamEventBufferService = createStreamEventBufferService()
+  const service = new TemporalRunService(
     createConfigService(input.enabled),
     createObservabilityService(),
+    streamEventBufferService,
+    temporalWorkflowRepository,
     input.temporalRunClient,
   )
+
+  return {
+    service,
+    temporalWorkflowRepository,
+    streamEventBufferService,
+  }
 }
 
 describe('TemporalRunService', () => {
@@ -106,7 +136,7 @@ describe('TemporalRunService', () => {
       workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
       temporalRunId: 'temporal_run_1',
     }))
-    const service = createService({
+    const { service, temporalWorkflowRepository } = createService({
       enabled: true,
       temporalRunClient: {
         startDurableRun,
@@ -135,6 +165,15 @@ describe('TemporalRunService', () => {
         }),
       }),
     )
+    await expect(
+      temporalWorkflowRepository.findWorkflowById({
+        workspaceId: 'workspace_1',
+        workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+      }),
+    ).resolves.toMatchObject({
+      runId: 'run_temporal_start_1',
+      status: 'running',
+    })
   })
 
   it('maps Temporal workflow status into API status response', async () => {
@@ -143,12 +182,21 @@ describe('TemporalRunService', () => {
       temporalRunId: 'temporal_run_1',
       status: 'WORKFLOW_EXECUTION_STATUS_COMPLETED',
     }))
-    const service = createService({
+    const { service, temporalWorkflowRepository } = createService({
       enabled: true,
       temporalRunClient: {
         startDurableRun: vi.fn(),
         describeDurableRun,
       },
+    })
+    await temporalWorkflowRepository.saveStartedWorkflow({
+      runId: 'run_temporal_start_1',
+      workspaceId: 'workspace_1',
+      workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+      temporalRunId: 'temporal_run_1',
+      taskQueue: 'ai-war-room-runs',
+      status: 'running',
+      startedAt: now,
     })
 
     await expect(
@@ -157,6 +205,7 @@ describe('TemporalRunService', () => {
         authContext,
       }),
     ).resolves.toMatchObject({
+      runId: 'run_temporal_start_1',
       workspaceId: 'workspace_1',
       workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
       temporalRunId: 'temporal_run_1',
@@ -169,11 +218,62 @@ describe('TemporalRunService', () => {
       namespace: 'default',
       workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
     })
+    await expect(
+      temporalWorkflowRepository.findWorkflowById({
+        workspaceId: 'workspace_1',
+        workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+      }),
+    ).resolves.toMatchObject({
+      status: 'completed',
+      completedAt: expect.any(String),
+    })
+  })
+
+  it('returns persisted workflow observation and workflow stream events', async () => {
+    const request = createRequest()
+    const { service, streamEventBufferService } = createService({
+      enabled: true,
+      temporalRunClient: {
+        startDurableRun: vi.fn(async () => ({
+          workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+          temporalRunId: 'temporal_run_1',
+        })),
+        describeDurableRun: vi.fn(),
+      },
+    })
+
+    const startResponse = await service.startApprovedRun(request, authContext)
+
+    await expect(
+      service.getWorkflowObservation({
+        workflowId: startResponse.workflowId,
+        authContext,
+      }),
+    ).resolves.toMatchObject({
+      workflow: {
+        workflowId: startResponse.workflowId,
+        status: 'running',
+      },
+    })
+
+    await expect(
+      service.getWorkflowStreamEvents({
+        workflowId: startResponse.workflowId,
+        authContext,
+      }),
+    ).resolves.toEqual([
+      expect.objectContaining({
+        type: 'workflow_status',
+        workflowId: startResponse.workflowId,
+        status: 'running',
+      }),
+    ])
+    expect(streamEventBufferService.append).toHaveBeenCalled()
   })
 
   it('keeps workflow start disabled until Temporal is explicitly enabled', async () => {
     const startDurableRun = vi.fn()
-    const service = createService({
+    const { service } = createService({
       enabled: false,
       temporalRunClient: {
         startDurableRun,
@@ -189,7 +289,7 @@ describe('TemporalRunService', () => {
 
   it('rejects workflow IDs outside the current workspace', async () => {
     const describeDurableRun = vi.fn()
-    const service = createService({
+    const { service } = createService({
       enabled: true,
       temporalRunClient: {
         startDurableRun: vi.fn(),

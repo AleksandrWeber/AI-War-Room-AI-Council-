@@ -125,7 +125,7 @@ Run mutation endpoints verify that the request workspace matches the header work
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
-Current `v4.1` behavior:
+Current `v4.2` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
 - All JSON responses are parsed and validated with Zod schemas.
@@ -191,6 +191,10 @@ Current `v4.1` behavior:
 - `POST /api/runs/workflows` starts an approved run as a Temporal workflow when `TEMPORAL_ENABLED=true`.
 - `GET /api/runs/workflows/:workflowId/status` queries Temporal workflow status for the current workspace.
 - Temporal workflow start/status endpoints return a clear `503` while Temporal is disabled, so local development and tests do not require a Temporal server.
+- Started Temporal workflows are persisted in `run_workflows` with workspace id, run id, workflow id, Temporal run id, task queue, status, and timestamps.
+- Status checks update persisted workflow metadata and publish `workflow_status` events into the existing run stream buffer.
+- `GET /api/runs/workflows/:workflowId/observation` returns the persisted workflow metadata for the current workspace.
+- `GET /api/runs/workflows/:workflowId/stream` streams/replays workflow status events with `Last-Event-ID` support.
 
 To enable real providers locally, copy `.env.example` to `.env`, add provider keys, and explicitly select the provider/model:
 

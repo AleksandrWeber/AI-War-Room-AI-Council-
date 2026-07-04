@@ -1,4 +1,4 @@
-import type { MockPipelineResult } from '@ai-war-room/schemas'
+import type { MockPipelineResult, TemporalWorkflowStatus } from '@ai-war-room/schemas'
 
 export type PipelineStreamEvent =
   | {
@@ -26,5 +26,15 @@ export type PipelineStreamEvent =
       eventId: string
       type: 'error'
       message: string
+      timestamp: string
+    }
+  | {
+      eventId: string
+      type: 'workflow_status'
+      runId: string
+      workflowId: string
+      temporalRunId?: string
+      taskQueue: string
+      status: TemporalWorkflowStatus
       timestamp: string
     }

@@ -90,6 +90,58 @@ export class RunsController {
     })
   }
 
+  @Get('workflows/:workflowId/observation')
+  @UseGuards(WorkspaceAccessGuard)
+  getWorkflowObservation(
+    @Param('workflowId') workflowId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.temporalRunService.getWorkflowObservation({
+      workflowId,
+      authContext: request.authContext!,
+    })
+  }
+
+  @Get('workflows/:workflowId/stream')
+  @UseGuards(WorkspaceAccessGuard)
+  async streamWorkflowObservation(
+    @Param('workflowId') workflowId: string,
+    @Req() request: AuthenticatedRequest,
+    @Res() reply: FastifyReply,
+  ) {
+    const lastEventId = this.getSingleHeader(request.headers['last-event-id'])
+
+    reply.raw.writeHead(200, {
+      'Content-Type': 'text/event-stream; charset=utf-8',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive',
+    })
+
+    try {
+      const events = await this.temporalRunService.getWorkflowStreamEvents({
+        workflowId,
+        authContext: request.authContext!,
+        afterEventId: lastEventId,
+      })
+
+      for (const event of events) {
+        this.writeStreamEvent(reply, event)
+      }
+    } catch (error) {
+      this.writeStreamEvent(reply, {
+        eventId: `event_${randomUUID()}`,
+        type: 'error',
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Failed to observe Temporal workflow.',
+        timestamp: new Date().toISOString(),
+      })
+    } finally {
+      reply.raw.end()
+    }
+  }
+
   @Post('mock-pipeline/stream')
   @UseGuards(WorkspaceAccessGuard)
   async executeMockPipelineStream(

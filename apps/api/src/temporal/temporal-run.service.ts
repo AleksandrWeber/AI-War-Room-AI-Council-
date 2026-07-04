@@ -3,19 +3,28 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
+  NotFoundException,
   ServiceUnavailableException,
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import { randomUUID } from 'node:crypto'
 import {
   type AuthContext,
   type MockPipelineRequest,
+  type TemporalWorkflowRecord,
   type TemporalWorkflowStatus,
   mockPipelineRequestSchema,
   temporalRunStartResponseSchema,
   temporalRunStatusResponseSchema,
+  temporalWorkflowObservationResponseSchema,
 } from '@ai-war-room/schemas'
 import type { ApiEnv } from '../config/env.js'
 import { ObservabilityService } from '../observability/observability.service.js'
+import { StreamEventBufferService } from '../persistence/stream-event-buffer.service.js'
+import {
+  TEMPORAL_WORKFLOW_REPOSITORY,
+  type TemporalWorkflowRepository,
+} from '../persistence/temporal-workflow.repository.js'
 import { getTemporalWorkerConfig } from './temporal-worker.config.js'
 import {
   TEMPORAL_RUN_CLIENT,
@@ -27,6 +36,9 @@ export class TemporalRunService {
   constructor(
     private readonly configService: ConfigService<ApiEnv, true>,
     private readonly observabilityService: ObservabilityService,
+    private readonly streamEventBufferService: StreamEventBufferService,
+    @Inject(TEMPORAL_WORKFLOW_REPOSITORY)
+    private readonly temporalWorkflowRepository: TemporalWorkflowRepository,
     @Inject(TEMPORAL_RUN_CLIENT)
     private readonly temporalRunClient: TemporalRunClient,
   ) {}
@@ -69,7 +81,7 @@ export class TemporalRunService {
           }),
       )
 
-      return temporalRunStartResponseSchema.parse({
+      const response = temporalRunStartResponseSchema.parse({
         runId: request.draftRun.runId,
         workspaceId: request.draftRun.workspaceId,
         workflowId: startedWorkflow.workflowId,
@@ -79,6 +91,19 @@ export class TemporalRunService {
         temporalEnabled: true,
         startedAt,
       })
+      const workflow = await this.temporalWorkflowRepository.saveStartedWorkflow({
+        runId: response.runId,
+        workspaceId: response.workspaceId,
+        workflowId: response.workflowId,
+        temporalRunId: response.temporalRunId,
+        taskQueue: response.taskQueue,
+        status: response.status,
+        startedAt: response.startedAt,
+      })
+
+      await this.publishWorkflowStatus(workflow)
+
+      return response
     } catch (error) {
       throw new ServiceUnavailableException({
         message:
@@ -105,6 +130,10 @@ export class TemporalRunService {
     }
 
     this.assertWorkflowBelongsToWorkspace(input.workflowId, input.authContext.workspaceId)
+    const existingWorkflow = await this.requireWorkflow({
+      workspaceId: input.authContext.workspaceId,
+      workflowId: input.workflowId,
+    })
 
     try {
       const description = await this.observabilityService.measure(
@@ -122,14 +151,33 @@ export class TemporalRunService {
           }),
       )
 
+      const status = this.normalizeStatus(description.status)
+      const checkedAt = new Date().toISOString()
+      const workflow = await this.temporalWorkflowRepository.updateWorkflowStatus({
+        workspaceId: input.authContext.workspaceId,
+        workflowId: description.workflowId,
+        temporalRunId: description.temporalRunId,
+        status,
+        checkedAt,
+      })
+
+      if (!workflow) {
+        throw new NotFoundException({
+          message: 'Temporal workflow metadata was not found.',
+        })
+      }
+
+      await this.publishWorkflowStatus(workflow)
+
       return temporalRunStatusResponseSchema.parse({
+        runId: existingWorkflow.runId,
         workspaceId: input.authContext.workspaceId,
         workflowId: description.workflowId,
         temporalRunId: description.temporalRunId,
         taskQueue: workerConfig.taskQueue,
-        status: this.normalizeStatus(description.status),
+        status,
         temporalEnabled: true,
-        checkedAt: new Date().toISOString(),
+        checkedAt,
       })
     } catch (error) {
       throw new ServiceUnavailableException({
@@ -140,6 +188,41 @@ export class TemporalRunService {
         temporalEnabled: true,
       })
     }
+  }
+
+  async getWorkflowObservation(input: {
+    workflowId: string
+    authContext: AuthContext
+  }) {
+    const workflow = await this.requireWorkflow({
+      workspaceId: input.authContext.workspaceId,
+      workflowId: input.workflowId,
+    })
+
+    return temporalWorkflowObservationResponseSchema.parse({
+      workflow,
+    })
+  }
+
+  async getWorkflowStreamEvents(input: {
+    workflowId: string
+    authContext: AuthContext
+    afterEventId?: string
+  }) {
+    const workflow = await this.requireWorkflow({
+      workspaceId: input.authContext.workspaceId,
+      workflowId: input.workflowId,
+    })
+
+    if (!input.afterEventId) {
+      return [await this.publishWorkflowStatus(workflow)]
+    }
+
+    return this.streamEventBufferService.replayAfter({
+      workspaceId: workflow.workspaceId,
+      runId: workflow.runId,
+      afterEventId: input.afterEventId,
+    })
   }
 
   private parsePipelineRequest(input: unknown, authContext: AuthContext) {
@@ -174,6 +257,38 @@ export class TemporalRunService {
         message: 'Workflow does not belong to the current workspace.',
       })
     }
+  }
+
+  private async requireWorkflow(input: {
+    workspaceId: string
+    workflowId: string
+  }) {
+    const workflow = await this.temporalWorkflowRepository.findWorkflowById(input)
+
+    if (!workflow) {
+      throw new NotFoundException({
+        message: 'Temporal workflow metadata was not found.',
+      })
+    }
+
+    return workflow
+  }
+
+  private publishWorkflowStatus(workflow: TemporalWorkflowRecord) {
+    return this.streamEventBufferService.append({
+      workspaceId: workflow.workspaceId,
+      runId: workflow.runId,
+      event: {
+        eventId: `event_${randomUUID()}`,
+        type: 'workflow_status',
+        runId: workflow.runId,
+        workflowId: workflow.workflowId,
+        temporalRunId: workflow.temporalRunId,
+        taskQueue: workflow.taskQueue,
+        status: workflow.status,
+        timestamp: workflow.updatedAt,
+      },
+    })
   }
 
   private normalizeStatus(status: string): TemporalWorkflowStatus {
