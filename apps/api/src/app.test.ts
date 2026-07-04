@@ -182,6 +182,7 @@ describe('API skeleton', () => {
 
     const recoveryResponse = await request(app!.getHttpServer())
       .post('/api/model-router/registry/mock-json-v1-primary/recover')
+      .set(authHeaders)
       .expect(201)
 
     expect(recoveryResponse.body.healthStatus).toBe('healthy')
@@ -381,6 +382,7 @@ describe('API skeleton', () => {
   it('tracks Shield false-positive review summary', async () => {
     const response = await request(app!.getHttpServer())
       .get('/api/shield/review-summary')
+      .set(authHeaders)
       .expect(200)
 
     expect(response.body.totalCases).toBeGreaterThan(0)

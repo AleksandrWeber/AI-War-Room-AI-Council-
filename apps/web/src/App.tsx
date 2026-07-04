@@ -15,7 +15,11 @@ import type {
   BillingWorkspaceUsageResponse,
   CheckoutPaidTier,
   LlmRolloutResponse,
+  ModelRouterRolloutResponse,
+  ModelHealthAdminSummaryResponse,
   ResearchRolloutResponse,
+  ShieldRolloutResponse,
+  ShieldReviewAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -44,6 +48,25 @@ import {
   formatTemporalRolloutCheckStatus,
   formatTemporalRolloutStatus,
 } from './temporal-ui'
+import {
+  executeModelHealthAdminAction,
+  fetchModelHealthAdminSummary,
+  fetchModelRouterRollout,
+  formatModelHealthStatus,
+  formatModelLifecycleStatus,
+  formatModelRouterRolloutCheckStatus,
+  formatModelRouterRolloutStatus,
+} from './model-router-ui'
+import {
+  executeShieldReviewAdminAction,
+  fetchShieldReviewAdminSummary,
+  fetchShieldRollout,
+  formatFalsePositiveRate,
+  formatShieldReviewAdminAction,
+  formatShieldReviewStatus,
+  formatShieldRolloutCheckStatus,
+  formatShieldRolloutStatus,
+} from './shield-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -595,6 +618,11 @@ function App() {
     useState<ResearchRolloutResponse | null>(null)
   const [temporalRollout, setTemporalRollout] =
     useState<TemporalRolloutResponse | null>(null)
+  const [modelRouterRollout, setModelRouterRollout] =
+    useState<ModelRouterRolloutResponse | null>(null)
+  const [shieldRollout, setShieldRollout] = useState<ShieldRolloutResponse | null>(
+    null,
+  )
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -674,7 +702,17 @@ function App() {
     useState<WorkspaceMemberAdminSummaryResponse | null>(null)
   const [settingsAdminSummary, setSettingsAdminSummary] =
     useState<WorkspaceSettingsAdminSummaryResponse | null>(null)
+  const [modelHealthAdminSummary, setModelHealthAdminSummary] =
+    useState<ModelHealthAdminSummaryResponse | null>(null)
+  const [shieldReviewAdminSummary, setShieldReviewAdminSummary] =
+    useState<ShieldReviewAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [modelHealthAdminAction, setModelHealthAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [shieldReviewAdminAction, setShieldReviewAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -805,6 +843,30 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setTemporalRollout(null)
+        }
+      })
+
+    fetchModelRouterRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setModelRouterRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setModelRouterRollout(null)
+        }
+      })
+
+    fetchShieldRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setShieldRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setShieldRollout(null)
         }
       })
 
@@ -1501,6 +1563,20 @@ function App() {
       )
       setSettingsAdminSummary(settingsAdmin)
       setWorkspaceNameDraft(settingsAdmin?.settings.name ?? '')
+
+      const modelHealthAdmin = await fetchModelHealthAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setModelHealthAdminSummary(modelHealthAdmin)
+
+      const shieldReviewAdmin = await fetchShieldReviewAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setShieldReviewAdminSummary(shieldReviewAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -1626,6 +1702,61 @@ function App() {
       )
     } finally {
       setSettingsAdminAction('idle')
+    }
+  }
+
+  async function handleModelHealthAdminAction(modelId: string) {
+    setModelHealthAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeModelHealthAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        {
+          action: 'recover_model',
+          modelId,
+        },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run model health admin action.',
+      )
+    } finally {
+      setModelHealthAdminAction('idle')
+    }
+  }
+
+  async function handleShieldReviewAdminAction(
+    action: 'rerun_review_summary',
+  ) {
+    setShieldReviewAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeShieldReviewAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run Shield review admin action.',
+      )
+    } finally {
+      setShieldReviewAdminAction('idle')
     }
   }
 
@@ -2324,6 +2455,60 @@ function App() {
           </div>
         ) : null}
 
+        {modelRouterRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Model router rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${modelRouterRollout.status}`}
+              >
+                {formatModelRouterRolloutStatus(modelRouterRollout.status)}
+              </strong>
+            </div>
+            <p>{modelRouterRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {modelRouterRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>{formatModelRouterRolloutCheckStatus(check.status)}</span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {modelRouterRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {shieldRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Shield rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${shieldRollout.status}`}
+              >
+                {formatShieldRolloutStatus(shieldRollout.status)}
+              </strong>
+            </div>
+            <p>{shieldRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {shieldRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>{formatShieldRolloutCheckStatus(check.status)}</span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {shieldRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
         {billingCapabilities?.supportsBillingRollout && billingRollout ? (
           <div className="billing-rollout">
             <div className="billing-rollout__header">
@@ -2724,6 +2909,129 @@ function App() {
                 }
               >
                 Reset workspace name
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {modelHealthAdminSummary ? (
+          <div className="billing-admin workspace-model-health-admin">
+            <div className="billing-admin__header">
+              <span>Model health admin</span>
+              <strong>{modelHealthAdminSummary.role}</strong>
+            </div>
+            <p>{modelHealthAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Active models</span>
+                <strong>{modelHealthAdminSummary.stats.activeModels}</strong>
+                <small>
+                  {modelHealthAdminSummary.stats.totalModels} total in registry
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Degraded models</span>
+                <strong>{modelHealthAdminSummary.stats.degradedModels}</strong>
+                <small>
+                  {modelHealthAdminSummary.stats.candidateModels} candidates
+                </small>
+              </article>
+            </div>
+            <div className="workspace-model-health-list">
+              {modelHealthAdminSummary.models.map((model) => (
+                <article
+                  className={`workspace-model-health-card workspace-model-health-card--${model.healthStatus}`}
+                  key={model.modelId}
+                >
+                  <div>
+                    <strong>{model.modelId}</strong>
+                    <p>
+                      {model.providerId} · {model.modelName}
+                    </p>
+                    <small>
+                      {formatModelLifecycleStatus(model.lifecycleStatus)} ·{' '}
+                      {formatModelHealthStatus(model.healthStatus)}
+                      {model.consecutiveFailures
+                        ? ` · ${model.consecutiveFailures} failures`
+                        : ''}
+                    </small>
+                  </div>
+                  {modelHealthAdminSummary.availableActions.includes(
+                    'recover_model',
+                  ) && model.healthStatus === 'degraded' ? (
+                    <button
+                      className="secondary-button"
+                      type="button"
+                      disabled={modelHealthAdminAction !== 'idle'}
+                      onClick={() =>
+                        void handleModelHealthAdminAction(model.modelId)
+                      }
+                    >
+                      Recover model
+                    </button>
+                  ) : null}
+                </article>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
+        {shieldReviewAdminSummary ? (
+          <div className="billing-admin workspace-shield-review-admin">
+            <div className="billing-admin__header">
+              <span>Shield review admin</span>
+              <strong>{shieldReviewAdminSummary.role}</strong>
+            </div>
+            <p>{shieldReviewAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Review cases</span>
+                <strong>{shieldReviewAdminSummary.stats.totalCases}</strong>
+                <small>{shieldReviewAdminSummary.stats.passedCases} passed</small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>False positives</span>
+                <strong>{shieldReviewAdminSummary.stats.falsePositiveCount}</strong>
+                <small>
+                  {formatFalsePositiveRate(
+                    shieldReviewAdminSummary.stats.falsePositiveRate,
+                  )}{' '}
+                  rate
+                </small>
+              </article>
+            </div>
+            <p className="clear-copy">
+              Classifier: {shieldReviewAdminSummary.classifierId}
+            </p>
+            <div className="workspace-shield-review-list">
+              {shieldReviewAdminSummary.cases.map((reviewCase) => (
+                <article
+                  className={`workspace-shield-review-card workspace-shield-review-card--${reviewCase.passed ? 'pass' : 'fail'}`}
+                  key={reviewCase.caseId}
+                >
+                  <div>
+                    <strong>{reviewCase.caseId}</strong>
+                    <p>
+                      Expected {formatShieldReviewStatus(reviewCase.expectedStatus)} ·
+                      Actual {formatShieldReviewStatus(reviewCase.actualStatus)}
+                    </p>
+                    <small>{reviewCase.passed ? 'Passed' : 'Failed'}</small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {shieldReviewAdminSummary.availableActions.includes(
+              'rerun_review_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={shieldReviewAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleShieldReviewAdminAction('rerun_review_summary')
+                }
+              >
+                {formatShieldReviewAdminAction('rerun_review_summary')}
               </button>
             ) : null}
           </div>

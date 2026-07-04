@@ -772,6 +772,60 @@
   border-top: 1px solid rgba(255, 255, 255, 0.08);
 }
 
+.workspace-model-health-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.workspace-model-health-card {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: center;
+}
+
+.workspace-model-health-card p,
+.workspace-model-health-card small {
+  margin: 0;
+  color: var(--muted);
+}
+
+.workspace-model-health-card--degraded {
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
+}
+
+.workspace-model-health-card--healthy {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-shield-review-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.workspace-shield-review-card {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+}
+
+.workspace-shield-review-card p,
+.workspace-shield-review-card small {
+  margin: 0;
+  color: var(--muted);
+}
+
+.workspace-shield-review-card--pass {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-shield-review-card--fail {
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

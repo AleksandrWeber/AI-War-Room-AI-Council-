@@ -229,3 +229,147 @@ describe('temporal rollout integration', () => {
     expect(rollout.body.status).toBe('disabled')
   })
 })
+
+describe('model router rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports model router capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/model-router/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsModelRouterRollout: true,
+      supportsModelHealthAdminTools: true,
+      llmPrimaryProvider: 'mock',
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/model-router/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns model health admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/model-router/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalModels: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects model health admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/model-router/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+
+  it('requires auth for legacy model recover endpoint', async () => {
+    await request(app!.getHttpServer())
+      .post('/api/model-router/registry/mock-json-v1-primary/recover')
+      .expect(401)
+  })
+})
+
+describe('shield rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports shield capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/shield/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsShieldRollout: true,
+      supportsShieldReviewAdminTools: true,
+      classifierId: 'deterministic-shield-fallback/v1',
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/shield/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns shield review admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/shield/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalCases: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects shield review admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/shield/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+
+  it('requires auth for legacy shield review summary endpoint', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/shield/review-summary')
+      .expect(401)
+  })
+})

@@ -402,6 +402,48 @@ Temporal rollout readiness:
 - Production startup rejects local Temporal addresses when `TEMPORAL_ENABLED=true`.
 - The web billing panel shows Temporal rollout status and per-check guidance.
 
+Model router rollout readiness:
+
+- `GET /api/model-router/readiness` returns operator-facing production model router checklist results (`ready` or `not_ready`).
+- Checks cover registry population, primary/fallback provider models, champion/deputy coverage, and route alignment.
+- The web billing panel shows model router rollout status and per-check guidance.
+
+Workspace model health admin tools:
+
+- `GET /api/model-router/workspace/:workspaceId/admin` returns owner/admin model registry health summary.
+- `POST /api/model-router/workspace/:workspaceId/admin/actions` runs model health admin actions such as degraded model recovery.
+- `POST /api/model-router/registry/:modelId/recover` requires workspace owner/admin access.
+- Only workspace owners and admins can access model health admin endpoints.
+- The web billing panel shows model health admin tools for authorized roles.
+
+Shield rollout readiness:
+
+- `GET /api/shield/readiness` returns operator-facing production Shield checklist results (`ready` or `not_ready`).
+- Checks cover classifier configuration, false-positive review regression, production false-positive budget, and adversarial dataset coverage.
+- The web billing panel shows Shield rollout status and per-check guidance.
+
+Workspace Shield review admin tools:
+
+- `GET /api/shield/workspace/:workspaceId/admin` returns owner/admin Shield review summary.
+- `POST /api/shield/workspace/:workspaceId/admin/actions` runs Shield review admin actions such as rerunning the false-positive review set.
+- `GET /api/shield/review-summary` requires workspace owner/admin access.
+- Only workspace owners and admins can access Shield review admin endpoints.
+- The web billing panel shows Shield review admin tools for authorized roles.
+
+Current `v5.23` behavior:
+
+- Shield rollout readiness validates classifier review regression through `GET /api/shield/readiness`.
+- Workspace owners and admins can inspect and rerun Shield review metrics from `GET /api/shield/workspace/:workspaceId/admin`.
+- Legacy Shield review summary endpoint is gated behind workspace owner/admin access.
+- The web billing panel shows Shield rollout checks and workspace Shield review admin tools.
+
+Current `v5.22` behavior:
+
+- Model router rollout readiness validates production registry alignment through `GET /api/model-router/readiness`.
+- Workspace owners and admins can inspect and recover degraded models from `GET /api/model-router/workspace/:workspaceId/admin`.
+- Legacy model recover endpoint is gated behind workspace owner/admin access.
+- The web billing panel shows model router rollout checks and workspace model health admin tools.
+
 Current `v5.21` behavior:
 
 - Temporal rollout readiness validates production Temporal configuration through `GET /api/runs/temporal/readiness`.
@@ -621,7 +663,7 @@ Current `v4.3` behavior:
 - `npm run eval:prompts --workspace @ai-war-room/api` evaluates schema validity, clarity, artifact usefulness, and prompt version drift.
 - Advanced Shield uses a classifier interface with deterministic fallback.
 - Critical input threats are blocked before draft execution and emit abuse/quota-impact signals.
-- Low-risk review cases remain quiet, while false-positive review summary is available through `GET /api/shield/review-summary`.
+- Low-risk review cases remain quiet, while false-positive review summary is available through `GET /api/shield/review-summary` for workspace owners and admins.
 - Shield adversarial regression cases cover malicious retrieved pages, prompt injection, secret exfiltration, credential-like content, and benign false-positive controls.
 - `runShieldAdversarialEvaluation` reports Shield status/category drift for the deterministic fallback classifier.
 - Model Router chooses provider/model per role using registry capabilities, role support, quality, safety, reliability, cost, latency, and health.
@@ -631,7 +673,7 @@ Current `v4.3` behavior:
 - Model selection decisions emit structured observability events and `GET /api/model-router/registry` exposes the current registry snapshot.
 - Model registry and model health events are persisted in PostgreSQL outside of test mode.
 - `GET /api/model-router/registry/:modelId/health-events` returns degradation/recovery audit events.
-- `POST /api/model-router/registry/:modelId/recover` resets a degraded model to healthy for recovery workflows.
+- `POST /api/model-router/registry/:modelId/recover` resets a degraded model to healthy for recovery workflows (owner/admin only).
 - Anthropic and OpenAI provider adapters are available behind the same LLM Gateway contract.
 - Real provider API keys are read from local `.env` variables and must not be committed.
 - Anthropic/OpenAI registry entries remain `candidate` by default and become active only when selected through `LLM_PRIMARY_PROVIDER` or `LLM_FALLBACK_PROVIDER`.
