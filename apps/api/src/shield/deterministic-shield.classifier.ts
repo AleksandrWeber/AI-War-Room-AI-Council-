@@ -21,7 +21,7 @@ type Rule = {
 const rules: Rule[] = [
   {
     pattern:
-      /exfiltrate|steal credentials|dump secrets|send (all )?(api keys|tokens|passwords)|bypass billing/i,
+      /exfiltrate|steal credentials|dump secrets|leak (api keys|tokens|passwords|secrets)|send (all )?(api keys|tokens|passwords|secrets)|bypass billing/i,
     severity: 'critical',
     category: 'data_exfiltration',
     recommendedAction: 'block',
@@ -29,7 +29,8 @@ const rules: Rule[] = [
       'The content appears to request credential theft, data exfiltration, or abuse of billing controls.',
   },
   {
-    pattern: /ignore (all )?(previous|prior) instructions|system prompt|developer message/i,
+    pattern:
+      /ignore (all )?(previous|prior) instructions|reveal (the )?(system prompt|developer message)|show (the )?(system prompt|developer message)|print (the )?(system prompt|developer message)/i,
     severity: 'high',
     category: 'prompt_injection',
     recommendedAction: 'require_confirmation',

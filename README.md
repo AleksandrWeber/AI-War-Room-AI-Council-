@@ -125,7 +125,7 @@ Run mutation endpoints verify that the request workspace matches the header work
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
-Current `v3.8` behavior:
+Current `v3.9` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
 - All JSON responses are parsed and validated with Zod schemas.
@@ -167,6 +167,8 @@ Current `v3.8` behavior:
 - Advanced Shield uses a classifier interface with deterministic fallback.
 - Critical input threats are blocked before draft execution and emit abuse/quota-impact signals.
 - Low-risk review cases remain quiet, while false-positive review summary is available through `GET /api/shield/review-summary`.
+- Shield adversarial regression cases cover malicious retrieved pages, prompt injection, secret exfiltration, credential-like content, and benign false-positive controls.
+- `runShieldAdversarialEvaluation` reports Shield status/category drift for the deterministic fallback classifier.
 - Model Router chooses provider/model per role using registry capabilities, role support, quality, safety, reliability, cost, latency, and health.
 - Candidate models are excluded from champion/deputy selection until they are promoted to `active`.
 - LLM Gateway uses the role champion first and routes repair/retry attempts to the deputy model.
