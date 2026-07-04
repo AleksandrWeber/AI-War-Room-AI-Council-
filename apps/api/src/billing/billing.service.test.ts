@@ -61,6 +61,7 @@ describe('BillingService', () => {
       supportsInvoiceHistory: false,
       supportsUsageSummary: false,
       supportsBillingExport: false,
+      supportsBillingAlerts: false,
     })
   })
 
@@ -83,6 +84,45 @@ describe('BillingService', () => {
     })
     expect(usage.usagePeriodStart).toMatch(/T00:00:00\.000Z$/)
     expect(usage.usagePeriodEnd).toMatch(/T00:00:00\.000Z$/)
+  })
+
+  it('returns billing alerts for past due subscriptions', async () => {
+    const { service } = createBillingService({})
+
+    await service.handleWebhook(
+      JSON.stringify({
+        eventId: 'mock_evt_past_due_alert_seed',
+        event: 'checkout.completed',
+        workspaceId: 'workspace_1',
+        paidTier: 'pro',
+        externalCustomerId: 'cus_past_due_alert',
+      }),
+      undefined,
+    )
+
+    await service.handleWebhook(
+      JSON.stringify({
+        eventId: 'mock_evt_past_due_alert',
+        event: 'invoice.payment_failed',
+        workspaceId: 'workspace_1',
+        externalInvoiceId: 'mock_inv_past_due_alert',
+        externalCustomerId: 'cus_past_due_alert',
+        amountTotalUsd: 29,
+        paidTier: 'pro',
+      }),
+      undefined,
+    )
+
+    const alerts = await service.getWorkspaceBillingAlerts('workspace_1')
+
+    expect(alerts.alerts).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          type: 'billing_past_due',
+          severity: 'critical',
+        }),
+      ]),
+    )
   })
 
   it('creates mock customer portal sessions after checkout', async () => {

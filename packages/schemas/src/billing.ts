@@ -37,6 +37,7 @@ export const billingCapabilitiesResponseSchema = z.object({
   supportsInvoiceHistory: z.boolean(),
   supportsUsageSummary: z.boolean(),
   supportsBillingExport: z.boolean(),
+  supportsBillingAlerts: z.boolean(),
   checkoutTiers: z.array(checkoutPaidTierSchema),
   guidance: z.string(),
 })
@@ -205,6 +206,35 @@ export type BillingWorkspaceUsageResponse = z.infer<
 export const billingExportFormatSchema = z.enum(['csv', 'json'])
 export type BillingExportFormat = z.infer<typeof billingExportFormatSchema>
 
+export const billingAlertSeveritySchema = z.enum(['info', 'warning', 'critical'])
+export type BillingAlertSeverity = z.infer<typeof billingAlertSeveritySchema>
+
+export const billingAlertTypeSchema = z.enum([
+  'usage_tokens',
+  'usage_cost',
+  'billing_past_due',
+  'billing_canceled',
+])
+export type BillingAlertType = z.infer<typeof billingAlertTypeSchema>
+
+export const billingAlertSchema = z.object({
+  billingAlertId: nonEmptyStringSchema,
+  workspaceId: nonEmptyStringSchema,
+  type: billingAlertTypeSchema,
+  severity: billingAlertSeveritySchema,
+  message: nonEmptyStringSchema,
+  createdAt: utcDateStringSchema,
+})
+export type BillingAlert = z.infer<typeof billingAlertSchema>
+
+export const billingWorkspaceAlertsResponseSchema = z.object({
+  workspaceId: nonEmptyStringSchema,
+  alerts: z.array(billingAlertSchema),
+})
+export type BillingWorkspaceAlertsResponse = z.infer<
+  typeof billingWorkspaceAlertsResponseSchema
+>
+
 export function getBillingGuidance(input: {
   enabled: boolean
   adapter: BillingAdapter
@@ -214,8 +244,8 @@ export function getBillingGuidance(input: {
   }
 
   if (input.adapter === 'mock') {
-    return 'Mock billing is active. Checkout, customer portal, invoice history, usage summary, and billing export run locally for development and tests.'
+    return 'Mock billing is active. Checkout, customer portal, invoice history, usage summary, billing export, and billing alerts run locally for development and tests.'
   }
 
-  return 'Stripe billing is active. Use checkout for upgrades, the customer portal for subscription management, and configure webhooks for idempotent billing, invoice history, usage summary, and export updates.'
+  return 'Stripe billing is active. Use checkout for upgrades, the customer portal for subscription management, and configure webhooks for idempotent billing, invoice history, usage summary, export, and alert updates.'
 }

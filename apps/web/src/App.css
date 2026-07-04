@@ -514,6 +514,66 @@
   padding: 16px;
 }
 
+.billing-alerts {
+  display: grid;
+  gap: 12px;
+}
+
+.billing-alerts > span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.billing-alert-card {
+  border-radius: 18px;
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+}
+
+.billing-alert-card p,
+.billing-alert-card small {
+  margin: 0;
+}
+
+.billing-alert-card--info {
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.34);
+}
+
+.billing-alert-card--warning {
+  background: rgba(251, 191, 36, 0.12);
+  border: 1px solid rgba(251, 191, 36, 0.34);
+}
+
+.billing-alert-card--critical {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.34);
+}
+
+.billing-alert-card--info p,
+.billing-alert-card--info small {
+  color: #bae6fd;
+}
+
+.billing-alert-card--warning p,
+.billing-alert-card--warning small {
+  color: #fde68a;
+}
+
+.billing-alert-card--critical p,
+.billing-alert-card--critical small {
+  color: #fecaca;
+}
+
+.billing-alert {
+  border-radius: 18px;
+  padding: 16px;
+}
+
 .billing-alert--success {
   background: rgba(34, 197, 94, 0.12);
   border: 1px solid rgba(34, 197, 94, 0.32);

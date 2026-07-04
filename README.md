@@ -303,11 +303,23 @@ Billing export:
 - CSV export includes invoice ids, amounts, status, tier, and hosted invoice links.
 - The web billing panel exposes **Export CSV** and **Export JSON** actions.
 
+Billing alerts:
+
+- `GET /api/billing/workspace/:workspaceId/alerts` returns usage and billing status alerts for the workspace.
+- Alerts fire at 80% daily token/cost usage (warning) and 100% (critical), plus `past_due` and `canceled` subscription states.
+- The web billing panel shows severity-styled alerts above billing status cards.
+
 Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
 
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v5.13` behavior:
+
+- Billing alerts surface daily usage threshold warnings and subscription status issues.
+- Workspace owners can inspect alerts from the billing API and web billing panel.
+- Billing alerts are available when billing is enabled (`supportsBillingAlerts: true`).
 
 Current `v5.12` behavior:
 

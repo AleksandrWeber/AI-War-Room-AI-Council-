@@ -10,6 +10,7 @@ import {
   PAID_TIER_LIMITS,
   billingCapabilitiesResponseSchema,
   billingInvoicesResponseSchema,
+  billingWorkspaceAlertsResponseSchema,
   billingWorkspaceUsageResponseSchema,
   billingWebhookEventsResponseSchema,
   billingWorkspaceStatusResponseSchema,
@@ -159,6 +160,38 @@ export async function fetchBillingUsageSummary(
   }
 
   return billingWorkspaceUsageResponseSchema.parse(await response.json())
+}
+
+export async function fetchBillingAlerts(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/billing/workspace/${encodeURIComponent(workspaceId)}/alerts`,
+    {
+      headers,
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return billingWorkspaceAlertsResponseSchema.parse(await response.json())
+}
+
+export function formatBillingAlertSeverity(
+  severity: 'info' | 'warning' | 'critical',
+) {
+  switch (severity) {
+    case 'info':
+      return 'Info'
+    case 'warning':
+      return 'Warning'
+    case 'critical':
+      return 'Critical'
+  }
 }
 
 export function formatUsagePercent(used: number, limit: number) {

@@ -5,6 +5,7 @@ import type {
   BillingCapabilitiesResponse,
   BillingInvoiceRecord,
   BillingWebhookEventRecord,
+  BillingWorkspaceAlertsResponse,
   BillingWorkspaceStatusResponse,
   BillingWorkspaceUsageResponse,
   CheckoutPaidTier,
@@ -28,6 +29,7 @@ import {
   defaultWorkspaceId,
   describeBillingCapabilities,
   fetchBillingCapabilities,
+  fetchBillingAlerts,
   fetchBillingInvoices,
   fetchBillingUsageSummary,
   fetchBillingWebhookEvents,
@@ -40,6 +42,7 @@ import {
   formatUsagePercent,
   fetchMockCustomerPortal,
   formatBillingStatus,
+  formatBillingAlertSeverity,
   formatPaidTier,
   formatTierLimits,
   readBillingReturnHint,
@@ -581,6 +584,9 @@ function App() {
   )
   const [billingUsageSummary, setBillingUsageSummary] =
     useState<BillingWorkspaceUsageResponse | null>(null)
+  const [billingAlerts, setBillingAlerts] = useState<
+    BillingWorkspaceAlertsResponse['alerts']
+  >([])
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
     useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
@@ -1274,6 +1280,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setBillingUsageSummary(usage)
+
+      const alerts = await fetchBillingAlerts(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBillingAlerts(alerts.alerts)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -1852,6 +1865,22 @@ function App() {
             production.
           </p>
         </div>
+
+        {billingCapabilities?.supportsBillingAlerts && billingAlerts.length ? (
+          <div className="billing-alerts">
+            <span>Billing alerts</span>
+            {billingAlerts.map((alert) => (
+              <article
+                className={`billing-alert-card billing-alert-card--${alert.severity}`}
+                key={alert.billingAlertId}
+              >
+                <strong>{formatBillingAlertSeverity(alert.severity)}</strong>
+                <p>{alert.message}</p>
+                <small>{alert.type.replaceAll('_', ' ')}</small>
+              </article>
+            ))}
+          </div>
+        ) : null}
 
         <div className="billing-summary">
           <article className="billing-status-card">

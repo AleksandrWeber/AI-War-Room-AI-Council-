@@ -56,6 +56,7 @@ describe('billing integration', () => {
       supportsInvoiceHistory: true,
       supportsUsageSummary: true,
       supportsBillingExport: true,
+      supportsBillingAlerts: true,
       checkoutTiers: ['pro', 'business'],
     })
   })
@@ -283,5 +284,46 @@ describe('billing integration', () => {
         }),
       ]),
     )
+  })
+
+  it('returns workspace billing alerts for members', async () => {
+    await request(app!.getHttpServer())
+      .post('/api/billing/webhook')
+      .send({
+        eventId: 'mock_evt_alert_integration_seed',
+        event: 'checkout.completed',
+        workspaceId: 'workspace_1',
+        paidTier: 'pro',
+        externalCustomerId: 'cus_alert_integration',
+      })
+      .expect(201)
+
+    await request(app!.getHttpServer())
+      .post('/api/billing/webhook')
+      .send({
+        eventId: 'mock_evt_alert_integration',
+        event: 'invoice.payment_failed',
+        workspaceId: 'workspace_1',
+        externalInvoiceId: 'mock_inv_alert_integration',
+        externalCustomerId: 'cus_alert_integration',
+        amountTotalUsd: 29,
+        paidTier: 'pro',
+      })
+      .expect(201)
+
+    const response = await request(app!.getHttpServer())
+      .get('/api/billing/workspace/workspace_1/alerts')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      alerts: expect.arrayContaining([
+        expect.objectContaining({
+          type: 'billing_past_due',
+          severity: 'critical',
+        }),
+      ]),
+    })
   })
 })

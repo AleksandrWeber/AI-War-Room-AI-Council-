@@ -11,6 +11,7 @@ import {
   billingCapabilitiesResponseSchema,
   billingExportFormatSchema,
   billingInvoicesResponseSchema,
+  billingWorkspaceAlertsResponseSchema,
   billingWorkspaceUsageResponseSchema,
   billingWebhookEventsResponseSchema,
   billingWebhookHandleResponseSchema,
@@ -33,6 +34,7 @@ import {
   buildBillingInvoiceExportFilename,
   serializeBillingInvoicesCsv,
 } from './billing-export.helpers.js'
+import { buildWorkspaceBillingAlerts } from './billing-alerts.helpers.js'
 import {
   BILLING_INVOICE_REPOSITORY,
   type BillingInvoiceRepository,
@@ -77,6 +79,7 @@ export class BillingService {
       supportsInvoiceHistory: enabled,
       supportsUsageSummary: enabled,
       supportsBillingExport: enabled,
+      supportsBillingAlerts: enabled,
       checkoutTiers: ['pro', 'business'],
       guidance: getBillingGuidance({ enabled, adapter }),
     })
@@ -118,6 +121,22 @@ export class BillingService {
     const summary = await this.usageService.getWorkspaceUsageSummary(workspaceId)
 
     return billingWorkspaceUsageResponseSchema.parse(summary)
+  }
+
+  async getWorkspaceBillingAlerts(workspaceId: string) {
+    const [usage, billingRecord] = await Promise.all([
+      this.getWorkspaceUsageSummary(workspaceId),
+      this.billingRepository.getBillingRecord(workspaceId),
+    ])
+
+    return billingWorkspaceAlertsResponseSchema.parse({
+      workspaceId,
+      alerts: buildWorkspaceBillingAlerts({
+        workspaceId,
+        usage,
+        billingRecord,
+      }),
+    })
   }
 
   async exportWorkspaceInvoices(
