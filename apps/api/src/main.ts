@@ -12,6 +12,7 @@ export async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
     new FastifyAdapter(),
+    { rawBody: true },
   )
   const config = app.get(ConfigService<ApiEnv, true>)
   const port = config.get('API_PORT', { infer: true })

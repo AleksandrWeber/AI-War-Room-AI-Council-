@@ -3,6 +3,7 @@ import type {
   AuthCapabilitiesResponse,
   AuthSessionResponse,
   BillingCapabilitiesResponse,
+  BillingWebhookEventRecord,
   BillingWorkspaceStatusResponse,
   CheckoutPaidTier,
   RunCapabilitiesResponse,
@@ -25,6 +26,7 @@ import {
   defaultWorkspaceId,
   describeBillingCapabilities,
   fetchBillingCapabilities,
+  fetchBillingWebhookEvents,
   fetchBillingWorkspaceStatus,
   fetchMockCustomerPortal,
   formatBillingStatus,
@@ -561,6 +563,9 @@ function App() {
   >('idle')
   const [mockCustomerPortal, setMockCustomerPortal] =
     useState<MockCustomerPortalResponse | null>(null)
+  const [billingWebhookEvents, setBillingWebhookEvents] = useState<
+    BillingWebhookEventRecord[]
+  >([])
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
     useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
@@ -1233,6 +1238,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setBillingStatus(status)
+
+      const events = await fetchBillingWebhookEvents(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBillingWebhookEvents(events.events)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -1957,6 +1969,25 @@ function App() {
             )
           })}
         </div>
+
+        {billingCapabilities?.supportsWebhookAudit ? (
+          <div className="billing-webhook-events">
+            <span>Recent webhook events</span>
+            {billingWebhookEvents.length ? (
+              billingWebhookEvents.map((event) => (
+                <article className="billing-webhook-event" key={event.billingWebhookEventId}>
+                  <strong>{event.eventType}</strong>
+                  <p>
+                    {event.status} · {event.externalEventId}
+                  </p>
+                  <small>{new Date(event.receivedAt).toLocaleString()}</small>
+                </article>
+              ))
+            ) : (
+              <p className="clear-copy">No webhook events recorded for this workspace yet.</p>
+            )}
+          </div>
+        ) : null}
       </section>
 
       {draftRun && reviewDraft ? (

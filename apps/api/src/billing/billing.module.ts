@@ -11,13 +11,17 @@ import { BILLING_REPOSITORY } from './billing.repository.js'
 import { InMemoryBillingRepository } from './in-memory-billing.repository.js'
 import { MockBillingAdapter } from './mock-billing.adapter.js'
 import { PostgresBillingRepository } from './postgres-billing.repository.js'
+import { PostgresBillingWebhookRepository } from './postgres-billing-webhook.repository.js'
 import { StripeBillingAdapter } from './stripe-billing.adapter.js'
+import { BILLING_WEBHOOK_REPOSITORY } from './billing-webhook.repository.js'
+import { InMemoryBillingWebhookRepository } from './in-memory-billing-webhook.repository.js'
 
 @Module({
   imports: [PersistenceModule, AuthModule, WorkspacesModule],
   controllers: [BillingController],
   providers: [
     PostgresBillingRepository,
+    PostgresBillingWebhookRepository,
     BillingService,
     {
       provide: BILLING_REPOSITORY,
@@ -29,6 +33,18 @@ import { StripeBillingAdapter } from './stripe-billing.adapter.js'
         return configService.get('NODE_ENV', { infer: true }) === 'test'
           ? new InMemoryBillingRepository()
           : postgresBillingRepository
+      },
+    },
+    {
+      provide: BILLING_WEBHOOK_REPOSITORY,
+      inject: [ConfigService, PostgresBillingWebhookRepository],
+      useFactory: (
+        configService: ConfigService<ApiEnv, true>,
+        postgresBillingWebhookRepository: PostgresBillingWebhookRepository,
+      ) => {
+        return configService.get('NODE_ENV', { infer: true }) === 'test'
+          ? new InMemoryBillingWebhookRepository()
+          : postgresBillingWebhookRepository
       },
     },
     {

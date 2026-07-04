@@ -6,7 +6,7 @@ import type {
 } from '@ai-war-room/schemas'
 import type {
   BillingCheckoutAdapter,
-  BillingWebhookEvent,
+  ParsedBillingWebhookResult,
 } from './billing.adapter.js'
 
 export class StripeBillingAdapter implements BillingCheckoutAdapter {
@@ -82,7 +82,7 @@ export class StripeBillingAdapter implements BillingCheckoutAdapter {
   async parseWebhookEvent(
     payload: Buffer | string,
     signature: string | undefined,
-  ): Promise<BillingWebhookEvent | null> {
+  ): Promise<ParsedBillingWebhookResult> {
     if (!signature) {
       throw new Error('Missing Stripe-Signature header.')
     }
@@ -103,17 +103,25 @@ export class StripeBillingAdapter implements BillingCheckoutAdapter {
           typeof workspaceId !== 'string' ||
           (paidTier !== 'pro' && paidTier !== 'business')
         ) {
-          return null
+          return {
+            externalEventId: event.id,
+            eventType: event.type,
+            providerEvent: null,
+          }
         }
 
         return {
-          type: 'checkout.completed',
-          workspaceId,
-          paidTier,
-          externalCustomerId:
-            typeof session.customer === 'string'
-              ? session.customer
-              : session.customer?.id,
+          externalEventId: event.id,
+          eventType: event.type,
+          providerEvent: {
+            type: 'checkout.completed',
+            workspaceId,
+            paidTier,
+            externalCustomerId:
+              typeof session.customer === 'string'
+                ? session.customer
+                : session.customer?.id,
+          },
         }
       }
       case 'customer.subscription.updated': {
@@ -121,20 +129,28 @@ export class StripeBillingAdapter implements BillingCheckoutAdapter {
         const workspaceId = subscription.metadata?.workspaceId
 
         if (typeof workspaceId !== 'string') {
-          return null
+          return {
+            externalEventId: event.id,
+            eventType: event.type,
+            providerEvent: null,
+          }
         }
 
         const status = this.mapSubscriptionStatus(subscription.status)
         const paidTier = subscription.metadata?.paidTier
 
         return {
-          type: 'subscription.updated',
-          workspaceId,
-          status,
-          paidTier:
-            paidTier === 'pro' || paidTier === 'business' || paidTier === 'free'
-              ? paidTier
-              : undefined,
+          externalEventId: event.id,
+          eventType: event.type,
+          providerEvent: {
+            type: 'subscription.updated',
+            workspaceId,
+            status,
+            paidTier:
+              paidTier === 'pro' || paidTier === 'business' || paidTier === 'free'
+                ? paidTier
+                : undefined,
+          },
         }
       }
       case 'customer.subscription.deleted': {
@@ -142,16 +158,52 @@ export class StripeBillingAdapter implements BillingCheckoutAdapter {
         const workspaceId = subscription.metadata?.workspaceId
 
         if (typeof workspaceId !== 'string') {
-          return null
+          return {
+            externalEventId: event.id,
+            eventType: event.type,
+            providerEvent: null,
+          }
         }
 
         return {
-          type: 'subscription.canceled',
-          workspaceId,
+          externalEventId: event.id,
+          eventType: event.type,
+          providerEvent: {
+            type: 'subscription.canceled',
+            workspaceId,
+          },
+        }
+      }
+      case 'invoice.payment_failed': {
+        const invoice = event.data.object as Stripe.Invoice
+        const customerId =
+          typeof invoice.customer === 'string'
+            ? invoice.customer
+            : invoice.customer?.id
+
+        if (!customerId) {
+          return {
+            externalEventId: event.id,
+            eventType: event.type,
+            providerEvent: null,
+          }
+        }
+
+        return {
+          externalEventId: event.id,
+          eventType: event.type,
+          providerEvent: {
+            type: 'payment.failed',
+            externalCustomerId: customerId,
+          },
         }
       }
       default:
-        return null
+        return {
+          externalEventId: event.id,
+          eventType: event.type,
+          providerEvent: null,
+        }
     }
   }
 

@@ -24,6 +24,16 @@ export type BillingWebhookEvent =
       type: 'subscription.canceled'
       workspaceId: string
     }
+  | {
+      type: 'payment.failed'
+      externalCustomerId: string
+    }
+
+export type ParsedBillingWebhookResult = {
+  externalEventId: string
+  eventType: string
+  providerEvent: BillingWebhookEvent | null
+}
 
 export interface BillingCheckoutAdapter {
   createCheckoutSession(input: {
@@ -39,7 +49,7 @@ export interface BillingCheckoutAdapter {
   parseWebhookEvent(
     payload: Buffer | string,
     signature: string | undefined,
-  ): Promise<BillingWebhookEvent | null>
+  ): Promise<ParsedBillingWebhookResult>
   createCustomerPortalSession(input: {
     workspaceId: string
     externalCustomerId: string

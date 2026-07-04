@@ -8,6 +8,7 @@ import {
   Query,
   Req,
   UseGuards,
+  type RawBodyRequest,
 } from '@nestjs/common'
 import type { FastifyRequest } from 'fastify'
 import {
@@ -70,12 +71,23 @@ export class BillingController {
     })
   }
 
+  @Get('workspace/:workspaceId/webhook-events')
+  @UseGuards(WorkspaceAccessGuard)
+  listWorkspaceWebhookEvents(
+    @Param('workspaceId') workspaceId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    this.assertWorkspaceParam(request, workspaceId)
+
+    return this.billingService.listWorkspaceWebhookEvents(workspaceId)
+  }
+
   @Post('webhook')
-  handleWebhook(@Req() request: FastifyRequest) {
+  handleWebhook(@Req() request: RawBodyRequest<FastifyRequest>) {
     const signature = this.getSingleHeader(
       request.headers['stripe-signature'],
     )
-    const payload = request.body
+    const payload = request.rawBody ?? request.body
 
     if (payload === undefined || payload === null) {
       return this.billingService.handleWebhook('', signature)

@@ -34,6 +34,16 @@ export class InMemoryBillingRepository implements BillingRepository {
     return this.records.get(workspaceId) ?? null
   }
 
+  async getBillingRecordByExternalCustomerId(
+    externalCustomerId: string,
+  ): Promise<BillingRecord | null> {
+    return (
+      [...this.records.values()].find(
+        (record) => record.externalCustomerId === externalCustomerId,
+      ) ?? null
+    )
+  }
+
   async activateSubscription(input: {
     workspaceId: string
     paidTier: CheckoutPaidTier

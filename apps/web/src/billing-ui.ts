@@ -8,6 +8,7 @@ import type {
 import {
   PAID_TIER_LIMITS,
   billingCapabilitiesResponseSchema,
+  billingWebhookEventsResponseSchema,
   billingWorkspaceStatusResponseSchema,
   checkoutSessionResponseSchema,
   customerPortalSessionResponseSchema,
@@ -117,6 +118,25 @@ export async function fetchBillingWorkspaceStatus(
   }
 
   return billingWorkspaceStatusResponseSchema.parse(await response.json())
+}
+
+export async function fetchBillingWebhookEvents(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/billing/workspace/${encodeURIComponent(workspaceId)}/webhook-events`,
+    {
+      headers,
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return billingWebhookEventsResponseSchema.parse(await response.json())
 }
 
 export async function createBillingCheckoutSession(

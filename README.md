@@ -278,11 +278,25 @@ In the web app, use **Manage subscription** after checkout. Mock mode opens an i
 
 Configure `STRIPE_PORTAL_RETURN_URL` for production return navigation.
 
+Webhook hardening:
+
+- `POST /api/billing/webhook` processes Stripe or mock events idempotently by external event id.
+- Duplicate deliveries return `{ duplicate: true }` without re-applying tier changes.
+- `GET /api/billing/workspace/:workspaceId/webhook-events` returns recent audit events for the workspace.
+- The API enables raw request bodies for Stripe signature verification.
+
 Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
 
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v5.9` behavior:
+
+- Billing webhooks are processed idempotently and persisted in `billing_webhook_events`.
+- Duplicate webhook deliveries are ignored safely after the first successful processing.
+- Workspace billing panels can show recent webhook audit events.
+- Stripe `invoice.payment_failed` events mark the matching workspace billing record as `past_due`.
 
 Current `v5.8` behavior:
 

@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import type { ApiEnv } from '../config/env.js'
 import { MockBillingAdapter } from './mock-billing.adapter.js'
 import { InMemoryBillingRepository } from './in-memory-billing.repository.js'
+import { InMemoryBillingWebhookRepository } from './in-memory-billing-webhook.repository.js'
 import { BillingService } from './billing.service.js'
 
 function createBillingService(env: Partial<ApiEnv>) {
@@ -21,11 +22,18 @@ function createBillingService(env: Partial<ApiEnv>) {
   } as ConfigService<ApiEnv, true>
 
   const repository = new InMemoryBillingRepository()
+  const webhookRepository = new InMemoryBillingWebhookRepository()
   const adapter = new MockBillingAdapter('http://127.0.0.1:3000')
 
   return {
-    service: new BillingService(configService, repository, adapter),
+    service: new BillingService(
+      configService,
+      repository,
+      webhookRepository,
+      adapter,
+    ),
     repository,
+    webhookRepository,
     adapter,
   }
 }
@@ -41,6 +49,7 @@ describe('BillingService', () => {
       adapter: 'mock',
       supportsCheckout: false,
       supportsCustomerPortal: false,
+      supportsWebhookAudit: false,
     })
   })
 
@@ -98,20 +107,35 @@ describe('BillingService', () => {
     })
   })
 
-  it('handles mock webhook checkout completion', async () => {
+  it('handles mock webhook checkout completion with idempotency', async () => {
     const { service } = createBillingService({})
+    const payload = JSON.stringify({
+      eventId: 'mock_evt_checkout_1',
+      event: 'checkout.completed',
+      workspaceId: 'workspace_1',
+      paidTier: 'business',
+      externalCustomerId: 'cus_test',
+    })
 
-    const result = await service.handleWebhook(
-      JSON.stringify({
-        event: 'checkout.completed',
-        workspaceId: 'workspace_1',
-        paidTier: 'business',
-        externalCustomerId: 'cus_test',
-      }),
-      undefined,
-    )
+    const first = await service.handleWebhook(payload, undefined)
 
-    expect(result).toEqual({ received: true, handled: true })
+    expect(first).toEqual({
+      received: true,
+      handled: true,
+      duplicate: false,
+      externalEventId: 'mock_evt_checkout_1',
+      eventType: 'checkout.completed',
+    })
+
+    const second = await service.handleWebhook(payload, undefined)
+
+    expect(second).toEqual({
+      received: true,
+      handled: false,
+      duplicate: true,
+      externalEventId: 'mock_evt_checkout_1',
+      eventType: 'checkout.completed',
+    })
 
     const status = await service.getWorkspaceStatus('workspace_1')
 
@@ -120,5 +144,35 @@ describe('BillingService', () => {
       status: 'active',
       externalCustomerId: 'cus_test',
     })
+
+    const events = await service.listWorkspaceWebhookEvents('workspace_1')
+
+    expect(events.events).toHaveLength(1)
+    expect(events.events[0]).toMatchObject({
+      externalEventId: 'mock_evt_checkout_1',
+      status: 'processed',
+    })
+  })
+
+  it('marks unsupported mock webhook events as ignored', async () => {
+    const { service } = createBillingService({})
+
+    const result = await service.handleWebhook(
+      JSON.stringify({
+        eventId: 'mock_evt_unknown',
+        event: 'invoice.created',
+      }),
+      undefined,
+    )
+
+    expect(result).toMatchObject({
+      received: true,
+      handled: false,
+      duplicate: false,
+    })
+
+    const events = await service.listWorkspaceWebhookEvents('workspace_1')
+
+    expect(events.events).toHaveLength(0)
   })
 })

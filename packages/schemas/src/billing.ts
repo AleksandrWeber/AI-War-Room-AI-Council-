@@ -33,6 +33,7 @@ export const billingCapabilitiesResponseSchema = z.object({
   adapter: billingAdapterSchema,
   supportsCheckout: z.boolean(),
   supportsCustomerPortal: z.boolean(),
+  supportsWebhookAudit: z.boolean(),
   checkoutTiers: z.array(checkoutPaidTierSchema),
   guidance: z.string(),
 })
@@ -95,6 +96,51 @@ export type BillingWorkspaceStatusResponse = z.infer<
   typeof billingWorkspaceStatusResponseSchema
 >
 
+export const billingWebhookEventStatusSchema = z.enum([
+  'received',
+  'processed',
+  'ignored',
+  'duplicate',
+  'failed',
+])
+export type BillingWebhookEventStatus = z.infer<
+  typeof billingWebhookEventStatusSchema
+>
+
+export const billingWebhookEventRecordSchema = z.object({
+  billingWebhookEventId: nonEmptyStringSchema,
+  provider: billingAdapterSchema,
+  externalEventId: nonEmptyStringSchema,
+  eventType: nonEmptyStringSchema,
+  workspaceId: z.string().nullable(),
+  status: billingWebhookEventStatusSchema,
+  errorMessage: z.string().nullable(),
+  receivedAt: utcDateStringSchema,
+  processedAt: utcDateStringSchema.nullable(),
+})
+export type BillingWebhookEventRecord = z.infer<
+  typeof billingWebhookEventRecordSchema
+>
+
+export const billingWebhookHandleResponseSchema = z.object({
+  received: z.literal(true),
+  handled: z.boolean(),
+  duplicate: z.boolean(),
+  externalEventId: nonEmptyStringSchema.optional(),
+  eventType: nonEmptyStringSchema.optional(),
+})
+export type BillingWebhookHandleResponse = z.infer<
+  typeof billingWebhookHandleResponseSchema
+>
+
+export const billingWebhookEventsResponseSchema = z.object({
+  workspaceId: nonEmptyStringSchema,
+  events: z.array(billingWebhookEventRecordSchema),
+})
+export type BillingWebhookEventsResponse = z.infer<
+  typeof billingWebhookEventsResponseSchema
+>
+
 export function getBillingGuidance(input: {
   enabled: boolean
   adapter: BillingAdapter
@@ -107,5 +153,5 @@ export function getBillingGuidance(input: {
     return 'Mock billing is active. Checkout and customer portal flows run locally for development and tests.'
   }
 
-  return 'Stripe billing is active. Use checkout for upgrades and the customer portal to manage subscriptions, payment methods, and cancellation.'
+  return 'Stripe billing is active. Use checkout for upgrades, the customer portal for subscription management, and configure webhooks to POST /api/billing/webhook with idempotent event processing.'
 }

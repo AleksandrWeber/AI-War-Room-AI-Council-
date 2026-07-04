@@ -9,6 +9,8 @@ import {
 import { ConfigService } from '@nestjs/config'
 import {
   billingCapabilitiesResponseSchema,
+  billingWebhookEventsResponseSchema,
+  billingWebhookHandleResponseSchema,
   billingWorkspaceStatusResponseSchema,
   checkoutSessionResponseSchema,
   createCheckoutSessionRequestSchema,
@@ -24,6 +26,10 @@ import {
   type BillingWebhookEvent,
 } from './billing.adapter.js'
 import {
+  BILLING_WEBHOOK_REPOSITORY,
+  type BillingWebhookRepository,
+} from './billing-webhook.repository.js'
+import {
   BILLING_REPOSITORY,
   type BillingRepository,
 } from './billing.repository.js'
@@ -34,6 +40,8 @@ export class BillingService {
     private readonly configService: ConfigService<ApiEnv, true>,
     @Inject(BILLING_REPOSITORY)
     private readonly billingRepository: BillingRepository,
+    @Inject(BILLING_WEBHOOK_REPOSITORY)
+    private readonly billingWebhookRepository: BillingWebhookRepository,
     @Inject(BILLING_ADAPTER)
     private readonly billingAdapter: BillingCheckoutAdapter,
   ) {}
@@ -49,6 +57,7 @@ export class BillingService {
       adapter,
       supportsCheckout: enabled,
       supportsCustomerPortal: enabled,
+      supportsWebhookAudit: enabled,
       checkoutTiers: ['pro', 'business'],
       guidance: getBillingGuidance({ enabled, adapter }),
     })
@@ -61,6 +70,18 @@ export class BillingService {
     return billingWorkspaceStatusResponseSchema.parse({
       workspaceId,
       billingRecord,
+    })
+  }
+
+  async listWorkspaceWebhookEvents(workspaceId: string) {
+    const events =
+      await this.billingWebhookRepository.listWorkspaceWebhookEvents(
+        workspaceId,
+      )
+
+    return billingWebhookEventsResponseSchema.parse({
+      workspaceId,
+      events,
     })
   }
 
@@ -229,18 +250,87 @@ export class BillingService {
   async handleWebhook(payload: Buffer | string, signature: string | undefined) {
     this.assertBillingEnabled()
 
-    const event = await this.billingAdapter.parseWebhookEvent(
+    const adapter = this.configService.get('STRIPE_BILLING_ADAPTER', {
+      infer: true,
+    })
+    const parsed = await this.billingAdapter.parseWebhookEvent(
       payload,
       signature,
     )
 
-    if (!event) {
-      return { received: true, handled: false }
+    const reservation = await this.billingWebhookRepository.reserveWebhookEvent({
+      externalEventId: parsed.externalEventId,
+      provider: adapter,
+      eventType: parsed.eventType,
+      workspaceId: this.resolveWebhookWorkspaceId(parsed.providerEvent),
+    })
+
+    if (!reservation.inserted) {
+      return billingWebhookHandleResponseSchema.parse({
+        received: true,
+        handled: false,
+        duplicate: true,
+        externalEventId: parsed.externalEventId,
+        eventType: parsed.eventType,
+      })
     }
 
-    await this.applyWebhookEvent(event)
+    if (!parsed.providerEvent) {
+      await this.billingWebhookRepository.finalizeWebhookEvent({
+        billingWebhookEventId: reservation.record.billingWebhookEventId,
+        status: 'ignored',
+      })
 
-    return { received: true, handled: true }
+      return billingWebhookHandleResponseSchema.parse({
+        received: true,
+        handled: false,
+        duplicate: false,
+        externalEventId: parsed.externalEventId,
+        eventType: parsed.eventType,
+      })
+    }
+
+    try {
+      const workspaceId = await this.applyWebhookEvent(parsed.providerEvent)
+
+      await this.billingWebhookRepository.finalizeWebhookEvent({
+        billingWebhookEventId: reservation.record.billingWebhookEventId,
+        status: 'processed',
+        workspaceId,
+      })
+
+      return billingWebhookHandleResponseSchema.parse({
+        received: true,
+        handled: true,
+        duplicate: false,
+        externalEventId: parsed.externalEventId,
+        eventType: parsed.eventType,
+      })
+    } catch (error) {
+      await this.billingWebhookRepository.finalizeWebhookEvent({
+        billingWebhookEventId: reservation.record.billingWebhookEventId,
+        status: 'failed',
+        errorMessage:
+          error instanceof Error ? error.message : 'Webhook processing failed.',
+      })
+
+      throw error
+    }
+  }
+
+  private resolveWebhookWorkspaceId(event: BillingWebhookEvent | null) {
+    if (!event) {
+      return null
+    }
+
+    switch (event.type) {
+      case 'checkout.completed':
+      case 'subscription.updated':
+      case 'subscription.canceled':
+        return event.workspaceId
+      case 'payment.failed':
+        return null
+    }
   }
 
   private async applyWebhookEvent(event: BillingWebhookEvent) {
@@ -251,21 +341,40 @@ export class BillingService {
           paidTier: event.paidTier,
           externalCustomerId: event.externalCustomerId,
         })
-        return
+        return event.workspaceId
       case 'subscription.updated':
         await this.billingRepository.updateBillingStatus({
           workspaceId: event.workspaceId,
           status: event.status,
           paidTier: event.paidTier,
         })
-        return
+        return event.workspaceId
       case 'subscription.canceled':
         await this.billingRepository.updateBillingStatus({
           workspaceId: event.workspaceId,
           status: 'canceled',
           paidTier: 'free',
         })
-        return
+        return event.workspaceId
+      case 'payment.failed': {
+        const billingRecord =
+          await this.billingRepository.getBillingRecordByExternalCustomerId(
+            event.externalCustomerId,
+          )
+
+        if (!billingRecord) {
+          throw new NotFoundException({
+            message: `Billing customer ${event.externalCustomerId} was not found.`,
+          })
+        }
+
+        await this.billingRepository.updateBillingStatus({
+          workspaceId: billingRecord.workspaceId,
+          status: 'past_due',
+        })
+
+        return billingRecord.workspaceId
+      }
     }
   }
 

@@ -52,6 +52,7 @@ describe('billing integration', () => {
       adapter: 'mock',
       supportsCheckout: true,
       supportsCustomerPortal: true,
+      supportsWebhookAudit: true,
       checkoutTiers: ['pro', 'business'],
     })
   })
@@ -143,6 +144,50 @@ describe('billing integration', () => {
         paidTier: 'free',
         status: 'canceled',
       },
+    })
+  })
+
+  it('records webhook events idempotently and exposes workspace audit history', async () => {
+    const payload = {
+      eventId: 'mock_evt_integration_1',
+      event: 'checkout.completed',
+      workspaceId: 'workspace_1',
+      paidTier: 'pro',
+      externalCustomerId: 'cus_integration',
+    }
+
+    const first = await request(app!.getHttpServer())
+      .post('/api/billing/webhook')
+      .send(payload)
+      .expect(201)
+
+    expect(first.body).toMatchObject({
+      received: true,
+      handled: true,
+      duplicate: false,
+    })
+
+    const duplicate = await request(app!.getHttpServer())
+      .post('/api/billing/webhook')
+      .send(payload)
+      .expect(201)
+
+    expect(duplicate.body).toMatchObject({
+      received: true,
+      handled: false,
+      duplicate: true,
+    })
+
+    const eventsResponse = await request(app!.getHttpServer())
+      .get('/api/billing/workspace/workspace_1/webhook-events')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(eventsResponse.body.events).toHaveLength(1)
+    expect(eventsResponse.body.events[0]).toMatchObject({
+      externalEventId: 'mock_evt_integration_1',
+      status: 'processed',
+      workspaceId: 'workspace_1',
     })
   })
 })

@@ -6,7 +6,7 @@ import type {
 } from '@ai-war-room/schemas'
 import type {
   BillingCheckoutAdapter,
-  BillingWebhookEvent,
+  ParsedBillingWebhookResult,
 } from './billing.adapter.js'
 
 type PendingCheckout = {
@@ -58,11 +58,17 @@ export class MockBillingAdapter implements BillingCheckoutAdapter {
 
   async parseWebhookEvent(
     payload: Buffer | string,
-  ): Promise<BillingWebhookEvent | null> {
+  ): Promise<ParsedBillingWebhookResult> {
     const body =
       typeof payload === 'string'
         ? (JSON.parse(payload) as Record<string, unknown>)
         : (JSON.parse(payload.toString('utf8')) as Record<string, unknown>)
+    const externalEventId =
+      typeof body.eventId === 'string' && body.eventId.trim().length > 0
+        ? body.eventId
+        : `mock_evt_${randomUUID()}`
+    const eventType =
+      typeof body.event === 'string' ? body.event : 'unknown.mock_event'
 
     if (body.event === 'checkout.completed') {
       const workspaceId = body.workspaceId
@@ -72,17 +78,25 @@ export class MockBillingAdapter implements BillingCheckoutAdapter {
         typeof workspaceId !== 'string' ||
         (paidTier !== 'pro' && paidTier !== 'business')
       ) {
-        return null
+        return {
+          externalEventId,
+          eventType,
+          providerEvent: null,
+        }
       }
 
       return {
-        type: 'checkout.completed',
-        workspaceId,
-        paidTier,
-        externalCustomerId:
-          typeof body.externalCustomerId === 'string'
-            ? body.externalCustomerId
-            : undefined,
+        externalEventId,
+        eventType,
+        providerEvent: {
+          type: 'checkout.completed',
+          workspaceId,
+          paidTier,
+          externalCustomerId:
+            typeof body.externalCustomerId === 'string'
+              ? body.externalCustomerId
+              : undefined,
+        },
       }
     }
 
@@ -90,12 +104,20 @@ export class MockBillingAdapter implements BillingCheckoutAdapter {
       const workspaceId = body.workspaceId
 
       if (typeof workspaceId !== 'string') {
-        return null
+        return {
+          externalEventId,
+          eventType,
+          providerEvent: null,
+        }
       }
 
       return {
-        type: 'subscription.canceled',
-        workspaceId,
+        externalEventId,
+        eventType,
+        providerEvent: {
+          type: 'subscription.canceled',
+          workspaceId,
+        },
       }
     }
 
@@ -110,22 +132,34 @@ export class MockBillingAdapter implements BillingCheckoutAdapter {
           status !== 'canceled' &&
           status !== 'draft')
       ) {
-        return null
+        return {
+          externalEventId,
+          eventType,
+          providerEvent: null,
+        }
       }
 
       return {
-        type: 'subscription.updated',
-        workspaceId,
-        status,
-        paidTier:
-          body.paidTier === 'pro' ||
-          body.paidTier === 'business' ||
-          body.paidTier === 'free'
-            ? body.paidTier
-            : undefined,
+        externalEventId,
+        eventType,
+        providerEvent: {
+          type: 'subscription.updated',
+          workspaceId,
+          status,
+          paidTier:
+            body.paidTier === 'pro' ||
+            body.paidTier === 'business' ||
+            body.paidTier === 'free'
+              ? body.paidTier
+              : undefined,
+        },
       }
     }
 
-    return null
+    return {
+      externalEventId,
+      eventType,
+      providerEvent: null,
+    }
   }
 }

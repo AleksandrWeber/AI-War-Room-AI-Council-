@@ -51,6 +51,32 @@ export class PostgresBillingRepository implements BillingRepository {
     return this.mapRow(row)
   }
 
+  async getBillingRecordByExternalCustomerId(
+    externalCustomerId: string,
+  ): Promise<BillingRecord | null> {
+    const result = await this.postgresService.query<BillingRecordRow>(
+      `
+        SELECT
+          billing_record_id,
+          workspace_id,
+          provider,
+          external_customer_id,
+          paid_tier,
+          status,
+          created_at,
+          updated_at
+        FROM billing_records
+        WHERE external_customer_id = $1
+        ORDER BY updated_at DESC
+        LIMIT 1
+      `,
+      [externalCustomerId],
+    )
+    const row = result.rows[0]
+
+    return row ? this.mapRow(row) : null
+  }
+
   async activateSubscription(input: {
     workspaceId: string
     paidTier: CheckoutPaidTier
