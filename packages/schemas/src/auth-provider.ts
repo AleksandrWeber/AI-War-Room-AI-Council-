@@ -12,6 +12,7 @@ export const authCapabilitiesResponseSchema = z.object({
   provider: authProviderModeSchema,
   requiresBearerToken: z.boolean(),
   supportsSessionBootstrap: z.boolean(),
+  supportsExternalProvisioning: z.boolean(),
   workspaceHeadersRequired: z.boolean(),
   externalVendor: z.enum(['clerk', 'auth0']).nullable(),
   externalAdapter: z.enum(['mock', 'jwks']).nullable(),

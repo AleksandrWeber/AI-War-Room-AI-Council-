@@ -15,6 +15,7 @@ vi.hoisted(() => {
   process.env.AUTH_EXTERNAL_JWT_SECRET = 'external-integration-secret'
   process.env.AUTH_EXTERNAL_ISSUER = 'ai-war-room-external-auth'
   process.env.AUTH_EXTERNAL_AUDIENCE = 'ai-war-room-api'
+  process.env.AUTH_EXTERNAL_AUTO_PROVISION = 'true'
 })
 
 describe('external auth integration', () => {
@@ -27,7 +28,7 @@ describe('external auth integration', () => {
       secret: 'external-integration-secret',
       vendor: 'clerk',
       subject: 'user_external',
-      workspaceId: 'workspace_1',
+      workspaceId: 'workspace_external_new',
       issuer: 'ai-war-room-external-auth',
       audience: 'ai-war-room-api',
     })
@@ -66,6 +67,7 @@ describe('external auth integration', () => {
       externalVendor: 'clerk',
       externalAdapter: 'mock',
       supportsSessionBootstrap: false,
+      supportsExternalProvisioning: true,
       workspaceHeadersRequired: false,
     })
   })
@@ -77,7 +79,7 @@ describe('external auth integration', () => {
         authorization: `Bearer ${externalToken}`,
       })
       .send({
-        workspaceId: 'workspace_1',
+        workspaceId: 'workspace_external_new',
         idempotencyKey: 'idem_external_auth',
         idea: {
           rawIdea: 'Build with external auth provider tokens.',
@@ -85,6 +87,34 @@ describe('external auth integration', () => {
       })
       .expect(201)
 
-    expect(response.body.workspaceId).toBe('workspace_1')
+    expect(response.body.workspaceId).toBe('workspace_external_new')
+  })
+
+  it('provisions external users through the auth provision endpoint', async () => {
+    const token = await createMockExternalAuthToken({
+      secret: 'external-integration-secret',
+      vendor: 'clerk',
+      subject: 'user_provision',
+      workspaceId: 'workspace_provision_api',
+      issuer: 'ai-war-room-external-auth',
+      audience: 'ai-war-room-api',
+    })
+
+    const response = await request(app!.getHttpServer())
+      .post('/api/auth/provision')
+      .set({
+        authorization: `Bearer ${token}`,
+      })
+      .send({
+        workspaceId: 'workspace_provision_api',
+      })
+      .expect(201)
+
+    expect(response.body).toMatchObject({
+      userId: 'clerk_user_provision',
+      workspaceId: 'workspace_provision_api',
+      role: 'owner',
+      actions: expect.arrayContaining(['created_user', 'created_membership']),
+    })
   })
 })

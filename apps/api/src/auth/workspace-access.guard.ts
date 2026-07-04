@@ -68,6 +68,15 @@ export class WorkspaceAccessGuard implements CanActivate {
       })
     }
 
+    const externalIdentity = this.authService.resolveExternalAuthIdentity(request)
+
+    if (externalIdentity) {
+      await this.workspaceService.ensureExternalAccess(
+        externalIdentity,
+        requestWorkspaceId,
+      )
+    }
+
     request.authContext = await this.workspaceService.requireMembership({
       userId,
       workspaceId: requestWorkspaceId,

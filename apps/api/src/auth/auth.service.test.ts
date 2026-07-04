@@ -63,6 +63,10 @@ function createAuthService(input: {
           return input.externalAdapter ?? 'mock'
         }
 
+        if (key === 'AUTH_EXTERNAL_AUTO_PROVISION') {
+          return input.authProvider === 'external'
+        }
+
         return undefined
       },
     } as never,
@@ -78,7 +82,7 @@ describe('AuthService', () => {
       provider: 'headers',
       requiresBearerToken: false,
       supportsSessionBootstrap: true,
-      workspaceHeadersRequired: true,
+      supportsExternalProvisioning: false,
       externalVendor: null,
       externalAdapter: null,
     })
@@ -95,6 +99,7 @@ describe('AuthService', () => {
       provider: 'external',
       requiresBearerToken: true,
       supportsSessionBootstrap: false,
+      supportsExternalProvisioning: true,
       workspaceHeadersRequired: false,
       externalVendor: 'auth0',
       externalAdapter: 'jwks',

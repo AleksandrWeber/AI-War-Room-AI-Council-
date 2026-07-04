@@ -4,6 +4,7 @@ import type { ApiEnv } from '../config/env.js'
 import { PersistenceModule } from '../persistence/persistence.module.js'
 import { InMemoryWorkspaceRepository } from './in-memory-workspace.repository.js'
 import { PostgresWorkspaceRepository } from './postgres-workspace.repository.js'
+import { UserProvisioningService } from './user-provisioning.service.js'
 import { WorkspaceService } from './workspace.service.js'
 import { WORKSPACE_REPOSITORY } from './workspace.repository.js'
 
@@ -12,6 +13,7 @@ import { WORKSPACE_REPOSITORY } from './workspace.repository.js'
   providers: [
     PostgresWorkspaceRepository,
     WorkspaceService,
+    UserProvisioningService,
     {
       provide: WORKSPACE_REPOSITORY,
       inject: [ConfigService, PostgresWorkspaceRepository],
@@ -25,6 +27,6 @@ import { WORKSPACE_REPOSITORY } from './workspace.repository.js'
       },
     },
   ],
-  exports: [WorkspaceService],
+  exports: [WorkspaceService, UserProvisioningService],
 })
 export class WorkspacesModule {}

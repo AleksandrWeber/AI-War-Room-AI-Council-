@@ -40,6 +40,9 @@ export class AuthService {
       provider,
       requiresBearerToken: authProviderRequiresBearerToken(provider),
       supportsSessionBootstrap: authProviderSupportsSessionBootstrap(provider),
+      supportsExternalProvisioning:
+        provider === 'external' &&
+        this.configService.get('AUTH_EXTERNAL_AUTO_PROVISION', { infer: true }),
       workspaceHeadersRequired: authProviderWorkspaceHeadersRequired(provider),
       externalVendor,
       externalAdapter,

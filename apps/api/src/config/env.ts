@@ -70,6 +70,7 @@ export const envSchema = z.object({
   AUTH_EXTERNAL_AUDIENCE: z.string().trim().min(1).default('ai-war-room-api'),
   AUTH_EXTERNAL_USER_ID_CLAIM: z.string().trim().min(1).default('sub'),
   AUTH_EXTERNAL_WORKSPACE_ID_CLAIM: optionalEnvStringSchema,
+  AUTH_EXTERNAL_AUTO_PROVISION: booleanEnvSchema.default(true),
 })
 
 export type ApiEnv = z.infer<typeof envSchema>

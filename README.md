@@ -207,11 +207,19 @@ VITE_AUTH_EXTERNAL_TOKEN=<mock-or-provider-token> npm run dev:web
 
 For production Clerk or Auth0, switch `AUTH_EXTERNAL_ADAPTER=jwks` and configure `AUTH_EXTERNAL_JWKS_URL`, `AUTH_EXTERNAL_ISSUER`, and `AUTH_EXTERNAL_AUDIENCE`.
 
+External users can be provisioned automatically when `AUTH_EXTERNAL_AUTO_PROVISION=true`, or explicitly through `POST /api/auth/provision`.
+
 Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
 
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v5.5` behavior:
+
+- External auth users can be auto-provisioned into PostgreSQL users, workspaces, memberships, and default billing records.
+- `POST /api/auth/provision` explicitly bootstraps external users and returns provisioning actions.
+- `AUTH_EXTERNAL_AUTO_PROVISION=true` enables guard-time provisioning for verified external tokens.
 
 Current `v5.4` behavior:
 

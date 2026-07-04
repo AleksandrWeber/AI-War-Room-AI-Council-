@@ -111,6 +111,7 @@ describe('API skeleton', () => {
       provider: 'headers',
       requiresBearerToken: false,
       supportsSessionBootstrap: true,
+      supportsExternalProvisioning: false,
       workspaceHeadersRequired: true,
       externalVendor: null,
       externalAdapter: null,

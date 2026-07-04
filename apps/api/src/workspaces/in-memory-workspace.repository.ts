@@ -1,4 +1,6 @@
 import type {
+  ProvisionExternalMemberInput,
+  ProvisionExternalMemberResult,
   WorkspaceMembershipRecord,
   WorkspaceRepository,
 } from './workspace.repository.js'
@@ -53,14 +55,14 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
         role: 'owner',
       },
     ],
-    [
-      'clerk_user_external:workspace_1',
-      {
-        userId: 'clerk_user_external',
-        workspaceId: 'workspace_1',
-        role: 'owner',
-      },
-    ],
+  ])
+
+  private readonly users = new Set<string>(['user_local', 'user_test'])
+  private readonly workspaces = new Set<string>([
+    'local_workspace',
+    'workspace_1',
+    'workspace_tiny_quota',
+    'workspace_pro',
   ])
 
   async findMembership(
@@ -68,5 +70,50 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
     workspaceId: string,
   ): Promise<WorkspaceMembershipRecord | null> {
     return this.memberships.get(`${userId}:${workspaceId}`) ?? null
+  }
+
+  async provisionExternalMember(
+    input: ProvisionExternalMemberInput,
+  ): Promise<ProvisionExternalMemberResult> {
+    const actions: ProvisionExternalMemberResult['actions'] = []
+    const userExists = this.users.has(input.userId)
+
+    if (userExists) {
+      actions.push('updated_user')
+    } else {
+      this.users.add(input.userId)
+      actions.push('created_user')
+    }
+
+    const workspaceExists = this.workspaces.has(input.workspaceId)
+
+    if (!workspaceExists) {
+      this.workspaces.add(input.workspaceId)
+      actions.push('created_workspace')
+    }
+
+    const membershipKey = `${input.userId}:${input.workspaceId}`
+    const existingMembership = this.memberships.get(membershipKey)
+
+    if (!existingMembership) {
+      const membership: WorkspaceMembershipRecord = {
+        userId: input.userId,
+        workspaceId: input.workspaceId,
+        role: workspaceExists ? 'member' : 'owner',
+      }
+
+      this.memberships.set(membershipKey, membership)
+      actions.push('created_membership')
+
+      return {
+        ...membership,
+        actions,
+      }
+    }
+
+    return {
+      ...existingMembership,
+      actions,
+    }
   }
 }

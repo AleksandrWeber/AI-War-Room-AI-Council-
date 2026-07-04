@@ -27,6 +27,7 @@ describe('auth provider helpers', () => {
         provider: 'external',
         requiresBearerToken: true,
         supportsSessionBootstrap: false,
+        supportsExternalProvisioning: true,
         workspaceHeadersRequired: false,
         externalVendor: 'clerk',
         externalAdapter: 'jwks',

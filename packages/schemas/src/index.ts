@@ -1,3 +1,4 @@
+export * from './user-provisioning.js'
 export * from './external-auth.js'
 export * from './auth-session.js'
 export * from './auth-provider.js'
