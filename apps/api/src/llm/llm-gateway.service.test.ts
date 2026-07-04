@@ -19,6 +19,7 @@ const responseSchema = z.object({
 
 class ScriptedProvider implements LlmProvider {
   readonly providerId: LlmProviderId
+  readonly requests: LlmProviderRequest[] = []
   private calls = 0
 
   constructor(
@@ -31,6 +32,7 @@ class ScriptedProvider implements LlmProvider {
   async completeJson(
     request: LlmProviderRequest,
   ): Promise<LlmProviderResponse> {
+    this.requests.push(request)
     const rawText =
       this.responses[Math.min(this.calls, this.responses.length - 1)] ??
       '{}'
@@ -87,6 +89,8 @@ class TestModelRouter {
   private sequence = 0
   readonly degradedModelIds: string[] = []
 
+  constructor(private readonly providerId: LlmProviderId = 'mock') {}
+
   selectModel(input: { taskName: string; role: string; forceDeputy?: boolean }) {
     this.sequence += 1
     const modelId = input.forceDeputy
@@ -94,7 +98,7 @@ class TestModelRouter {
       : 'mock-json-v1-primary'
     const selected = {
       modelId,
-      providerId: 'mock',
+      providerId: this.providerId,
       modelName: input.forceDeputy ? 'deputy-model' : 'primary-model',
       score: input.forceDeputy ? 0.8 : 0.9,
       lifecycleStatus: 'active',
@@ -107,7 +111,7 @@ class TestModelRouter {
       role: input.role,
       champion: {
         modelId: 'mock-json-v1-primary',
-        providerId: 'mock',
+        providerId: this.providerId,
         modelName: 'primary-model',
         score: 0.9,
         lifecycleStatus: 'active',
@@ -115,7 +119,7 @@ class TestModelRouter {
       },
       deputy: {
         modelId: 'mock-json-v1-deputy',
-        providerId: 'mock',
+        providerId: this.providerId,
         modelName: 'deputy-model',
         score: 0.8,
         lifecycleStatus: 'active',
@@ -135,7 +139,19 @@ class TestModelRouter {
   }
 }
 
-function createGateway(providers: LlmProvider[]) {
+class TestProviderCredentials {
+  constructor(private readonly apiKey: string | null = null) {}
+
+  async resolveApiKey() {
+    return this.apiKey
+  }
+}
+
+function createGateway(
+  providers: LlmProvider[],
+  apiKey: string | null = null,
+  selectedProviderId: LlmProviderId = 'mock',
+) {
   const config = new ConfigService<ApiEnv>({
     LLM_PRIMARY_PROVIDER: 'mock',
     LLM_FALLBACK_PROVIDER: 'mock',
@@ -145,7 +161,7 @@ function createGateway(providers: LlmProvider[]) {
   })
 
   const observability = new TestObservability()
-  const modelRouter = new TestModelRouter()
+  const modelRouter = new TestModelRouter(selectedProviderId)
   const gateway = new LlmGatewayService(
     config,
     new TestRegistry(
@@ -153,6 +169,7 @@ function createGateway(providers: LlmProvider[]) {
     ) as never,
     observability as never,
     modelRouter as never,
+    new TestProviderCredentials(apiKey) as never,
   )
 
   return { gateway, observability, modelRouter }
@@ -265,5 +282,31 @@ describe('LlmGatewayService', () => {
       'llm_provider_failure',
       'llm_call_completed',
     ])
+  })
+
+  it('passes workspace provider keys to real provider requests', async () => {
+    const provider = new ScriptedProvider('anthropic', [
+      JSON.stringify({
+        summary: 'Workspace credential response',
+        risks: [],
+      }),
+    ])
+    const { gateway } = createGateway(
+      [provider],
+      'workspace-secret-key',
+      'anthropic',
+    )
+
+    const result = await gateway.generateStructuredJson({
+      taskName: 'test',
+      schema: responseSchema,
+      messages: [{ role: 'user', content: 'Return JSON.' }],
+      fallback: { summary: 'fallback', risks: [] },
+      workspaceId: 'workspace_1',
+    })
+
+    expect(result.validationStatus).toBe('valid')
+    expect(provider.requests[0]?.workspaceId).toBe('workspace_1')
+    expect(provider.requests[0]?.apiKeyOverride).toBe('workspace-secret-key')
   })
 })

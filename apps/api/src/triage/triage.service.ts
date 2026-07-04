@@ -34,6 +34,7 @@ export class TriageService {
     const result = await this.llmGatewayService.generateStructuredJson({
       taskName: triagePromptV1.version,
       schema: triageResultSchema,
+      workspaceId: request.workspaceId,
       messages: [
         {
           role: 'system',

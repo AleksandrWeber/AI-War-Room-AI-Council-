@@ -29,7 +29,9 @@ export class OpenAiLlmProvider implements LlmProvider {
   async completeJson(
     request: LlmProviderRequest,
   ): Promise<LlmProviderResponse> {
-    const apiKey = this.configService.get('OPENAI_API_KEY', { infer: true })
+    const apiKey =
+      request.apiKeyOverride ??
+      this.configService.get('OPENAI_API_KEY', { infer: true })
 
     if (!apiKey) {
       throw new Error('OPENAI_API_KEY is required for OpenAI provider.')

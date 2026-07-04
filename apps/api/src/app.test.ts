@@ -5,7 +5,7 @@ import {
   type NestFastifyApplication,
 } from '@nestjs/platform-fastify'
 import request from 'supertest'
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { AppModule } from './app.module.js'
 import { ObservabilityService } from './observability/observability.service.js'
 import {
@@ -15,6 +15,10 @@ import {
 
 const authHeaders = {
   'x-user-id': 'user_test',
+  'x-workspace-id': 'workspace_1',
+}
+const memberHeaders = {
+  'x-user-id': 'user_member',
   'x-workspace-id': 'workspace_1',
 }
 
@@ -56,6 +60,10 @@ describe('API skeleton', () => {
     await app?.close()
   })
 
+  afterEach(() => {
+    vi.unstubAllGlobals()
+  })
+
   it('returns health status', async () => {
     const response = await request(app!.getHttpServer())
       .get('/api/health')
@@ -87,6 +95,74 @@ describe('API skeleton', () => {
     expect(response.body.statuses).toContain('draft')
     expect(response.body.agentRoles).toContain('product_manager')
     expect(response.body.flow).toContain('human_review')
+  })
+
+  it('manages workspace provider credentials without returning raw keys', async () => {
+    const initialResponse = await request(app!.getHttpServer())
+      .get('/api/provider-credentials')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(initialResponse.body.needsProviderKey).toBe(true)
+    expect(initialResponse.body.instructions.anthropic.steps.length).toBeGreaterThan(0)
+
+    const createResponse = await request(app!.getHttpServer())
+      .post('/api/provider-credentials')
+      .set(authHeaders)
+      .send({
+        providerId: 'anthropic',
+        label: 'Founder Anthropic key',
+        apiKey: 'sk-ant-test-secret-1234',
+      })
+      .expect(201)
+
+    expect(createResponse.body.maskedKey).toBe('sk-...1234')
+    expect(JSON.stringify(createResponse.body)).not.toContain('test-secret')
+
+    const forbiddenResponse = await request(app!.getHttpServer())
+      .post('/api/provider-credentials')
+      .set(memberHeaders)
+      .send({
+        providerId: 'openai',
+        label: 'Member key',
+        apiKey: 'sk-test-member-secret-9999',
+      })
+      .expect(403)
+
+    expect(forbiddenResponse.body.message).toContain('owners and admins')
+
+    const updateResponse = await request(app!.getHttpServer())
+      .put(`/api/provider-credentials/${createResponse.body.credentialId}`)
+      .set(authHeaders)
+      .send({
+        providerId: 'anthropic',
+        label: 'Updated Anthropic key',
+        apiKey: 'sk-ant-updated-secret-5678',
+      })
+      .expect(200)
+
+    expect(updateResponse.body.label).toBe('Updated Anthropic key')
+    expect(updateResponse.body.maskedKey).toBe('sk-...5678')
+
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({ content: [{ type: 'text', text: '{"ok":true}' }] }),
+      }),
+    )
+
+    const testResponse = await request(app!.getHttpServer())
+      .post(`/api/provider-credentials/${createResponse.body.credentialId}/test`)
+      .set(authHeaders)
+      .expect(201)
+
+    expect(testResponse.body.status).toBe('passed')
+
+    await request(app!.getHttpServer())
+      .delete(`/api/provider-credentials/${createResponse.body.credentialId}`)
+      .set(authHeaders)
+      .expect(200)
   })
 
   it('creates a draft run with prompt-driven triage', async () => {

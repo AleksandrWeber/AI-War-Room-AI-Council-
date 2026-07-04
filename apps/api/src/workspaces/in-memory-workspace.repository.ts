@@ -22,6 +22,22 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
       },
     ],
     [
+      'user_admin:workspace_1',
+      {
+        userId: 'user_admin',
+        workspaceId: 'workspace_1',
+        role: 'admin',
+      },
+    ],
+    [
+      'user_member:workspace_1',
+      {
+        userId: 'user_member',
+        workspaceId: 'workspace_1',
+        role: 'member',
+      },
+    ],
+    [
       'user_test:workspace_tiny_quota',
       {
         userId: 'user_test',

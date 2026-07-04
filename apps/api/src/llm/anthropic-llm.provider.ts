@@ -34,7 +34,9 @@ export class AnthropicLlmProvider implements LlmProvider {
   async completeJson(
     request: LlmProviderRequest,
   ): Promise<LlmProviderResponse> {
-    const apiKey = this.configService.get('ANTHROPIC_API_KEY', { infer: true })
+    const apiKey =
+      request.apiKeyOverride ??
+      this.configService.get('ANTHROPIC_API_KEY', { infer: true })
 
     if (!apiKey) {
       throw new Error('ANTHROPIC_API_KEY is required for Anthropic provider.')

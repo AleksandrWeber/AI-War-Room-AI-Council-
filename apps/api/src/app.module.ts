@@ -4,6 +4,7 @@ import { validateEnv } from './config/env.js'
 import { HealthModule } from './health/health.module.js'
 import { LlmModule } from './llm/llm.module.js'
 import { ModelRouterModule } from './model-router/model-router.module.js'
+import { ProviderCredentialsModule } from './provider-credentials/provider-credentials.module.js'
 import { RunsModule } from './runs/runs.module.js'
 import { ShieldModule } from './shield/shield.module.js'
 import { VersionModule } from './version/version.module.js'
@@ -17,6 +18,7 @@ import { VersionModule } from './version/version.module.js'
     HealthModule,
     VersionModule,
     ModelRouterModule,
+    ProviderCredentialsModule,
     LlmModule,
     ShieldModule,
     RunsModule,

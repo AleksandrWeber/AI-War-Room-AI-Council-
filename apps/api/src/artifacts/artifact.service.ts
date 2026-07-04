@@ -48,6 +48,7 @@ export class ArtifactService {
     const result = await this.llmGatewayService.generateStructuredJson({
       taskName: prompt.version,
       schema: executiveSummarySchema,
+      workspaceId: input.draftRun.workspaceId,
       messages: this.createMessages(prompt.system, prompt.userTemplate, input),
       fallback,
     })
@@ -82,6 +83,7 @@ export class ArtifactService {
     const result = await this.llmGatewayService.generateStructuredJson({
       taskName: prompt.version,
       schema: prdSchema,
+      workspaceId: input.draftRun.workspaceId,
       messages: this.createMessages(prompt.system, prompt.userTemplate, input),
       fallback,
     })
@@ -117,6 +119,7 @@ export class ArtifactService {
     const result = await this.llmGatewayService.generateStructuredJson({
       taskName: prompt.version,
       schema: developmentPromptSchema,
+      workspaceId: input.draftRun.workspaceId,
       messages: this.createMessages(prompt.system, prompt.userTemplate, input),
       fallback,
     })

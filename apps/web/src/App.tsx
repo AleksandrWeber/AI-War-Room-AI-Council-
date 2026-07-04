@@ -147,6 +147,43 @@ type ArtifactHistoryResponse = {
   artifacts: ArtifactHistoryItem[]
 }
 
+type ProviderCredential = {
+  credentialId: string
+  workspaceId: string
+  providerId: 'anthropic' | 'openai'
+  label: string
+  maskedKey: string
+  createdByUserId: string
+  createdAt: string
+  updatedAt: string
+  lastTestedAt?: string
+  lastTestStatus: 'untested' | 'passed' | 'failed'
+  lastTestError?: string
+}
+
+type ProviderCredentialInstructions = Record<
+  'anthropic' | 'openai',
+  {
+    label: string
+    url: string
+    steps: string[]
+  }
+>
+
+type ProviderCredentialListResponse = {
+  workspaceId: string
+  credentials: ProviderCredential[]
+  needsProviderKey: boolean
+  instructions: ProviderCredentialInstructions
+}
+
+type ProviderCredentialForm = {
+  credentialId?: string
+  providerId: 'anthropic' | 'openai'
+  label: string
+  apiKey: string
+}
+
 type MockPipelineResult = {
   status: 'completed'
   steps: PipelineStep[]
@@ -162,6 +199,11 @@ const localAuthHeaders = {
 const reviewStorageKey = 'ai-war-room.review-draft'
 const ideaStorageKey = 'ai-war-room.idea-draft'
 const pipelineResultStorageKey = 'ai-war-room.pipeline-result'
+const defaultProviderCredentialForm: ProviderCredentialForm = {
+  providerId: 'anthropic',
+  label: 'Anthropic workspace key',
+  apiKey: '',
+}
 
 const pipelineSteps = [
   'Idea',
@@ -359,6 +401,16 @@ function App() {
   const [lastStreamRunId, setLastStreamRunId] = useState<string | null>(null)
   const [artifactHistory, setArtifactHistory] = useState<ArtifactHistoryItem[]>([])
   const [historyError, setHistoryError] = useState<string | null>(null)
+  const [providerCredentials, setProviderCredentials] =
+    useState<ProviderCredentialListResponse | null>(null)
+  const [providerCredentialForm, setProviderCredentialForm] =
+    useState<ProviderCredentialForm>(defaultProviderCredentialForm)
+  const [providerCredentialError, setProviderCredentialError] = useState<
+    string | null
+  >(null)
+  const [providerCredentialStatus, setProviderCredentialStatus] = useState<
+    'idle' | 'loading' | 'saving' | 'testing'
+  >('idle')
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
     useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
@@ -405,6 +457,10 @@ function App() {
   useEffect(() => {
     setActiveFindingId(draftRun?.shieldScan.findings[0]?.findingId ?? null)
   }, [draftRun])
+
+  useEffect(() => {
+    void handleLoadProviderCredentials()
+  }, [])
 
   useEffect(() => {
     if (pipelineResult?.artifacts[0]) {
@@ -627,6 +683,143 @@ function App() {
     }
   }
 
+  async function handleLoadProviderCredentials() {
+    setProviderCredentialStatus('loading')
+    setProviderCredentialError(null)
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/provider-credentials`, {
+        headers: localAuthHeaders,
+      })
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`)
+      }
+
+      setProviderCredentials(
+        (await response.json()) as ProviderCredentialListResponse,
+      )
+    } catch (error) {
+      setProviderCredentialError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to load provider credentials.',
+      )
+    } finally {
+      setProviderCredentialStatus('idle')
+    }
+  }
+
+  async function handleSaveProviderCredential(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setProviderCredentialStatus('saving')
+    setProviderCredentialError(null)
+
+    try {
+      const response = await fetch(
+        `${apiBaseUrl}/provider-credentials${
+          providerCredentialForm.credentialId
+            ? `/${providerCredentialForm.credentialId}`
+            : ''
+        }`,
+        {
+          method: providerCredentialForm.credentialId ? 'PUT' : 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...localAuthHeaders,
+          },
+          body: JSON.stringify({
+            providerId: providerCredentialForm.providerId,
+            label: providerCredentialForm.label,
+            apiKey: providerCredentialForm.apiKey,
+          }),
+        },
+      )
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`)
+      }
+
+      setProviderCredentialForm(defaultProviderCredentialForm)
+      await handleLoadProviderCredentials()
+    } catch (error) {
+      setProviderCredentialError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to save provider credential.',
+      )
+    } finally {
+      setProviderCredentialStatus('idle')
+    }
+  }
+
+  function handleEditProviderCredential(credential: ProviderCredential) {
+    setProviderCredentialForm({
+      credentialId: credential.credentialId,
+      providerId: credential.providerId,
+      label: credential.label,
+      apiKey: '',
+    })
+  }
+
+  async function handleDeleteProviderCredential(credentialId: string) {
+    setProviderCredentialStatus('saving')
+    setProviderCredentialError(null)
+
+    try {
+      const response = await fetch(
+        `${apiBaseUrl}/provider-credentials/${credentialId}`,
+        {
+          method: 'DELETE',
+          headers: localAuthHeaders,
+        },
+      )
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`)
+      }
+
+      await handleLoadProviderCredentials()
+    } catch (error) {
+      setProviderCredentialError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to delete provider credential.',
+      )
+    } finally {
+      setProviderCredentialStatus('idle')
+    }
+  }
+
+  async function handleTestProviderCredential(credentialId: string) {
+    setProviderCredentialStatus('testing')
+    setProviderCredentialError(null)
+
+    try {
+      const response = await fetch(
+        `${apiBaseUrl}/provider-credentials/${credentialId}/test`,
+        {
+          method: 'POST',
+          headers: localAuthHeaders,
+        },
+      )
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`)
+      }
+
+      await handleLoadProviderCredentials()
+    } catch (error) {
+      setProviderCredentialError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to test provider credential.',
+      )
+    } finally {
+      setProviderCredentialStatus('idle')
+    }
+  }
+
   function handlePipelineStreamEvent(event: PipelineStreamEvent) {
     setStreamEvents((current) => [...current, event])
     setLastStreamEventId(event.eventId)
@@ -722,6 +915,180 @@ function App() {
             API status: {apiHealth}
           </div>
         </div>
+      </section>
+
+      <section className="panel provider-panel">
+        <div className="section-heading">
+          <p className="eyebrow">Provider Keys</p>
+          <h2>Connect workspace AI providers.</h2>
+          <p>
+            Add Anthropic or OpenAI keys from the client UI. Keys are sent
+            directly to the backend, encrypted before PostgreSQL storage, and
+            never returned to the browser.
+          </p>
+        </div>
+
+        {providerCredentials?.needsProviderKey ? (
+          <div className="provider-alert">
+            <strong>No backend provider keys found.</strong>
+            <p>
+              Local mock mode still works, but real provider runs need a
+              workspace key or a server-side environment key.
+            </p>
+          </div>
+        ) : null}
+
+        <div className="provider-grid">
+          <form className="provider-form" onSubmit={handleSaveProviderCredential}>
+            <span>
+              {providerCredentialForm.credentialId ? 'Edit key' : 'Add key'}
+            </span>
+            <label>
+              Provider
+              <select
+                value={providerCredentialForm.providerId}
+                disabled={Boolean(providerCredentialForm.credentialId)}
+                onChange={(event) =>
+                  setProviderCredentialForm((current) => ({
+                    ...current,
+                    providerId: event.target.value as ProviderCredentialForm['providerId'],
+                    label:
+                      event.target.value === 'anthropic'
+                        ? 'Anthropic workspace key'
+                        : 'OpenAI workspace key',
+                  }))
+                }
+              >
+                <option value="anthropic">Anthropic</option>
+                <option value="openai">OpenAI</option>
+              </select>
+            </label>
+            <label>
+              Label
+              <input
+                value={providerCredentialForm.label}
+                onChange={(event) =>
+                  setProviderCredentialForm((current) => ({
+                    ...current,
+                    label: event.target.value,
+                  }))
+                }
+              />
+            </label>
+            <label>
+              API key
+              <input
+                value={providerCredentialForm.apiKey}
+                placeholder="sk-..."
+                type="password"
+                onChange={(event) =>
+                  setProviderCredentialForm((current) => ({
+                    ...current,
+                    apiKey: event.target.value,
+                  }))
+                }
+              />
+            </label>
+            <div className="provider-actions">
+              <button
+                type="submit"
+                disabled={
+                  providerCredentialStatus === 'saving' ||
+                  providerCredentialForm.apiKey.length < 12
+                }
+              >
+                {providerCredentialStatus === 'saving'
+                  ? 'Saving...'
+                  : providerCredentialForm.credentialId
+                    ? 'Update encrypted key'
+                    : 'Save encrypted key'}
+              </button>
+              {providerCredentialForm.credentialId ? (
+                <button
+                  className="secondary-button"
+                  type="button"
+                  onClick={() =>
+                    setProviderCredentialForm(defaultProviderCredentialForm)
+                  }
+                >
+                  Cancel edit
+                </button>
+              ) : null}
+            </div>
+            {providerCredentialError ? (
+              <p className="form-error">{providerCredentialError}</p>
+            ) : null}
+          </form>
+
+          <div className="provider-list">
+            <span>Saved keys</span>
+            {providerCredentialStatus === 'loading' ? (
+              <p className="clear-copy">Loading provider keys...</p>
+            ) : null}
+            {providerCredentials?.credentials.length ? (
+              providerCredentials.credentials.map((credential) => (
+                <article className="provider-key-card" key={credential.credentialId}>
+                  <div>
+                    <strong>{credential.label}</strong>
+                    <p>
+                      {credential.providerId} - {credential.maskedKey}
+                    </p>
+                    <small>
+                      Test status: {credential.lastTestStatus}
+                      {credential.lastTestError
+                        ? ` (${credential.lastTestError})`
+                        : ''}
+                    </small>
+                  </div>
+                  <div className="provider-card-actions">
+                    <button
+                      type="button"
+                      onClick={() => handleTestProviderCredential(credential.credentialId)}
+                    >
+                      Test connection
+                    </button>
+                    <button
+                      className="secondary-button"
+                      type="button"
+                      onClick={() => handleEditProviderCredential(credential)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="danger-button"
+                      type="button"
+                      onClick={() => handleDeleteProviderCredential(credential.credentialId)}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </article>
+              ))
+            ) : (
+              <p className="clear-copy">No workspace provider keys saved yet.</p>
+            )}
+          </div>
+        </div>
+
+        {providerCredentials ? (
+          <div className="provider-instructions">
+            {Object.entries(providerCredentials.instructions).map(
+              ([providerId, instruction]) => (
+                <article key={providerId}>
+                  <strong>Where to get {instruction.label} keys</strong>
+                  <a href={instruction.url} target="_blank" rel="noreferrer">
+                    Open provider console
+                  </a>
+                  <ol>
+                    {instruction.steps.map((step) => (
+                      <li key={step}>{step}</li>
+                    ))}
+                  </ol>
+                </article>
+              ),
+            )}
+          </div>
+        ) : null}
       </section>
 
       {draftRun && reviewDraft ? (

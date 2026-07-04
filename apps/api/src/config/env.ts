@@ -13,6 +13,11 @@ export const envSchema = z.object({
     .url()
     .default('postgres://ai_war_room:ai_war_room@127.0.0.1:5432/ai_war_room'),
   REDIS_URL: z.url().default('redis://127.0.0.1:6379'),
+  APP_ENCRYPTION_KEY: z
+    .string()
+    .trim()
+    .min(16)
+    .default('local-development-encryption-key-change-me'),
   IDEMPOTENCY_TTL_SECONDS: z.coerce.number().int().positive().default(86_400),
   LLM_PRIMARY_PROVIDER: z.enum(['mock', 'anthropic', 'openai']).default('mock'),
   LLM_FALLBACK_PROVIDER: z.enum(['mock', 'anthropic', 'openai']).default('mock'),

@@ -125,7 +125,7 @@ Run mutation endpoints verify that the request workspace matches the header work
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
-Current `v3.5` behavior:
+Current `v3.6` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
 - All JSON responses are parsed and validated with Zod schemas.
@@ -173,6 +173,10 @@ Current `v3.5` behavior:
 - Anthropic and OpenAI provider adapters are available behind the same LLM Gateway contract.
 - Real provider API keys are read from local `.env` variables and must not be committed.
 - Anthropic/OpenAI registry entries remain `candidate` by default and become active only when selected through `LLM_PRIMARY_PROVIDER` or `LLM_FALLBACK_PROVIDER`.
+- Workspace owners/admins can add, edit, delete, and test provider keys from the frontend Provider Keys panel.
+- Workspace provider keys are sent directly to the backend, encrypted with `APP_ENCRYPTION_KEY`, and stored in PostgreSQL.
+- The frontend only receives masked keys such as `sk-...1234`; full keys are never returned after save.
+- If no workspace or backend provider key exists, the frontend shows a first-connect setup prompt with Anthropic/OpenAI instructions.
 
 To enable real providers locally, copy `.env.example` to `.env`, add provider keys, and explicitly select the provider/model:
 
@@ -181,4 +185,6 @@ LLM_PRIMARY_PROVIDER=anthropic
 LLM_PRIMARY_MODEL=claude-3-5-sonnet-latest
 ANTHROPIC_API_KEY=...
 ```
+
+For user-managed workspace keys, use the Provider Keys panel in the web app.
 

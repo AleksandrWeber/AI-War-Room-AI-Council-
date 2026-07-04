@@ -21,6 +21,7 @@ export class ModeratorService {
     const result = await this.llmGatewayService.generateStructuredJson({
       taskName: moderatorPromptV1.version,
       schema: moderatorSynthesisSchema,
+      workspaceId: input.draftRun.workspaceId,
       messages: [
         {
           role: 'system',

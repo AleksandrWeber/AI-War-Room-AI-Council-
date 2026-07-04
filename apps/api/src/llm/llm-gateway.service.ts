@@ -5,6 +5,7 @@ import type { z } from 'zod'
 import type { ApiEnv } from '../config/env.js'
 import { ModelRouterService } from '../model-router/model-router.service.js'
 import { ObservabilityService } from '../observability/observability.service.js'
+import { ProviderCredentialsService } from '../provider-credentials/provider-credentials.service.js'
 import { LlmProviderRegistry } from './llm-provider.registry.js'
 import type { LlmMessage, StructuredJsonRequest, StructuredJsonResult } from './llm.types.js'
 import {
@@ -20,6 +21,7 @@ export class LlmGatewayService {
     private readonly providerRegistry: LlmProviderRegistry,
     private readonly observabilityService: ObservabilityService,
     private readonly modelRouterService: ModelRouterService,
+    private readonly providerCredentialsService: ProviderCredentialsService,
   ) {}
 
   async generateStructuredJson<TSchema extends z.ZodType>(
@@ -44,6 +46,13 @@ export class LlmGatewayService {
       const model = modelDecision.selected.modelName
       lastModelId = modelDecision.selected.modelId
       const provider = this.providerRegistry.getProvider(providerId)
+      const apiKeyOverride =
+        providerId === 'mock'
+          ? undefined
+          : await this.providerCredentialsService.resolveApiKey({
+              workspaceId: request.workspaceId,
+              providerId,
+            })
       const attemptStartedAt = Date.now()
       let providerResponse
 
@@ -53,6 +62,8 @@ export class LlmGatewayService {
           model,
           messages: this.createAttemptMessages(request.messages, errors),
           responseFormat: 'json_object',
+          workspaceId: request.workspaceId,
+          apiKeyOverride: apiKeyOverride ?? undefined,
         })
       } catch (error) {
         const errorMessage =

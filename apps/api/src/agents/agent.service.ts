@@ -41,6 +41,7 @@ export class AgentService {
     const result = await this.llmGatewayService.generateStructuredJson({
       taskName: prompt.version,
       schema: agentOutputSchema,
+      workspaceId: input.draftRun.workspaceId,
       messages: [
         {
           role: 'system',

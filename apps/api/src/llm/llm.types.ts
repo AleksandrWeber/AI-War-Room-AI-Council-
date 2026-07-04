@@ -19,6 +19,8 @@ export type LlmProviderRequest = {
   model: string
   messages: LlmMessage[]
   responseFormat: 'json_object'
+  workspaceId?: string
+  apiKeyOverride?: string
 }
 
 export type LlmProviderResponse = {
@@ -39,6 +41,7 @@ export type StructuredJsonRequest<TSchema extends z.ZodType> = {
   messages: LlmMessage[]
   fallback: z.infer<TSchema>
   maxAttempts?: number
+  workspaceId?: string
 }
 
 export type StructuredJsonResult<TValue> = {
