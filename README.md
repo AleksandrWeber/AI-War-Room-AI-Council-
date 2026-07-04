@@ -7,9 +7,9 @@ Structured AI planning engine that turns a raw idea into reviewed, build-ready a
 ```text
 Idea submission
 -> Shield input scan
--> Deterministic triage
+-> Prompt-driven triage through LLM Gateway
 -> Human Review Screen
--> Mock isolated agents
+-> Prompt-driven isolated agents through LLM Gateway
 -> Mock Moderator synthesis
 -> Executive Summary, PRD, Development Prompt
 ```
@@ -114,13 +114,15 @@ Tests use an in-memory repository so they do not require Docker.
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
-Current `v1.0` behavior:
+Current `v1.1` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
 - All JSON responses are parsed and validated with Zod schemas.
 - Invalid responses are retried with a repair instruction.
 - Repeated validation failures return a safe fallback object.
 - Token usage is estimated and returned with gateway results.
+- Triage and base agent outputs are produced through versioned prompts.
+- Agent outputs store prompt version, provider, model, validation status, and token metadata.
 
-Real Anthropic/OpenAI provider adapters are intentionally left for the next milestone.
+Real Anthropic/OpenAI provider adapters are still intentionally left for a later milestone.
 

@@ -80,6 +80,7 @@ describe('API skeleton', () => {
 
     expect(response.body.status).toBe('draft')
     expect(response.body.shieldScan.status).toBe('clear')
+    expect(response.body.triage.reasoningSummary).toContain('LLM gateway')
     expect(response.body.triage.recommendedAgents).toContain('product_manager')
     expect(response.body.selectedAgents).toContain('moderator')
   })
@@ -167,6 +168,11 @@ describe('API skeleton', () => {
 
     expect(pipelineResponse.body.status).toBe('completed')
     expect(pipelineResponse.body.agentOutputs.length).toBeGreaterThan(0)
+    expect(pipelineResponse.body.agentOutputs[0].promptVersion).toContain(
+      'agents/',
+    )
+    expect(pipelineResponse.body.agentOutputs[0].modelProvider).toBe('mock')
+    expect(pipelineResponse.body.agentOutputs[0].inputTokens).toBeGreaterThan(0)
     expect(pipelineResponse.body.moderatorSynthesis.mvpScope).toContain(
       'Mock isolated agent analysis',
     )
