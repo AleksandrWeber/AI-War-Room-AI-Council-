@@ -1,14 +1,14 @@
-import { Injectable } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import { randomUUID } from 'node:crypto'
 import type { DraftRun } from '@ai-war-room/schemas'
 import { ObservabilityService } from '../observability/observability.service.js'
 import { AdvancedShieldService } from '../shield/advanced-shield.service.js'
 import { UsageService } from '../usage/usage.service.js'
-import { MockResearchProvider } from './mock-research.provider.js'
 import type {
   ResearchCitation,
   ResearchProvider,
 } from './research.types.js'
+import { RESEARCH_PROVIDER } from './research.types.js'
 
 type ResearchShieldScan = NonNullable<DraftRun['shieldScan']>
 
@@ -20,7 +20,8 @@ function createId(prefix: string) {
 export class ResearchService {
   constructor(
     private readonly usageService: UsageService,
-    private readonly mockResearchProvider: MockResearchProvider,
+    @Inject(RESEARCH_PROVIDER)
+    private readonly provider: ResearchProvider,
     private readonly observabilityService: ObservabilityService,
     private readonly advancedShieldService: AdvancedShieldService,
   ) {}
@@ -79,10 +80,6 @@ export class ResearchService {
       })),
       shieldScan: combinedShieldScan,
     }
-  }
-
-  private get provider(): ResearchProvider {
-    return this.mockResearchProvider
   }
 
   private combineShieldScans(scans: ResearchShieldScan[]): ResearchShieldScan {

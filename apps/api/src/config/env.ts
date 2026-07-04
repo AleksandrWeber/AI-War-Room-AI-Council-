@@ -31,6 +31,10 @@ export const envSchema = z.object({
   OPENAI_API_URL: z
     .url()
     .default('https://api.openai.com/v1/chat/completions'),
+  RESEARCH_PROVIDER: z.enum(['mock', 'tavily']).default('mock'),
+  TAVILY_API_KEY: optionalEnvStringSchema,
+  TAVILY_API_URL: z.url().default('https://api.tavily.com/search'),
+  TAVILY_MAX_RESULTS: z.coerce.number().int().positive().max(10).default(5),
 })
 
 export type ApiEnv = z.infer<typeof envSchema>

@@ -125,7 +125,7 @@ Run mutation endpoints verify that the request workspace matches the header work
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
-Current `v3.7` behavior:
+Current `v3.8` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
 - All JSON responses are parsed and validated with Zod schemas.
@@ -158,6 +158,8 @@ Current `v3.7` behavior:
 - Cost anomaly signals are emitted when completed usage exceeds the approved estimate or crosses the local warning threshold.
 - Market Research Agent is gated behind paid workspace tiers (`pro` or `business`).
 - The research layer uses a provider abstraction with a safe mock provider for local development.
+- `RESEARCH_PROVIDER=tavily` enables an external Tavily research adapter when `TAVILY_API_KEY` is configured.
+- Tavily results are normalized into citation documents and still pass through Shield scanning before prompts see them.
 - Retrieved research content is Shield-scanned and sanitized before it reaches downstream prompts.
 - Market Research output includes citations and sanitized research documents in `roleSpecificInsights`.
 - Prompt regression cases cover triage, base agents, Moderator, and generated artifacts.
@@ -190,4 +192,11 @@ ANTHROPIC_API_KEY=...
 ```
 
 For user-managed workspace keys, use the Provider Keys panel in the web app.
+
+To enable external research locally:
+
+```bash
+RESEARCH_PROVIDER=tavily
+TAVILY_API_KEY=...
+```
 

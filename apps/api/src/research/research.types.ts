@@ -1,5 +1,7 @@
 import type { DraftRun } from '@ai-war-room/schemas'
 
+export const RESEARCH_PROVIDER = Symbol('RESEARCH_PROVIDER')
+
 export type ResearchDocument = {
   sourceId: string
   title: string
