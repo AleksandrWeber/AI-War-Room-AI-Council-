@@ -98,7 +98,7 @@ npm run dev:web
 - Submit a raw idea.
 - Review Shield and triage metadata.
 - Edit selected agents if needed.
-- Execute the prompt-driven pipeline.
+- Execute the prompt-driven pipeline and watch live status events.
 - Confirm agent summaries and three artifacts appear: Executive Summary, PRD, Development Prompt.
 
 ## Persistence
@@ -114,7 +114,7 @@ Tests use an in-memory repository so they do not require Docker.
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
-Current `v1.3` behavior:
+Current `v1.4` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
 - All JSON responses are parsed and validated with Zod schemas.
@@ -129,6 +129,8 @@ Current `v1.3` behavior:
 - Generated artifact metadata stores prompt version, provider, model, validation status, token usage, cost, and Shield status.
 - Human Review shows Shield warning cards, highlighted risky spans, click-to-explain findings, agent rationale, and cost/duration preview.
 - The artifact viewer uses tabs with prompt/version/model metadata so generated outputs are easier to inspect.
+- `POST /api/runs/mock-pipeline/stream` streams status events, final artifact events, and a completed event using `text/event-stream`.
+- The frontend consumes the stream through `fetch`, shows live status updates, and stores the latest completed result locally for refresh recovery.
 
 Real Anthropic/OpenAI provider adapters are still intentionally left for a later milestone.
 

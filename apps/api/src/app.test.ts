@@ -191,4 +191,34 @@ describe('API skeleton', () => {
       pipelineResponse.body.artifacts[2].metadata.tokenUsage.inputTokens,
     ).toBeGreaterThan(0)
   })
+
+  it('streams pipeline status and final artifacts', async () => {
+    const draftResponse = await request(app!.getHttpServer())
+      .post('/api/runs/draft')
+      .send({
+        workspaceId: 'workspace_1',
+        idempotencyKey: 'idem_stream_1',
+        idea: {
+          rawIdea:
+            'Build a streamed AI War Room pipeline for responsive product planning.',
+          targetAudience: 'Technical founders',
+        },
+      })
+      .expect(201)
+
+    const streamResponse = await request(app!.getHttpServer())
+      .post('/api/runs/mock-pipeline/stream')
+      .send({
+        draftRun: draftResponse.body,
+        approvedTriage: draftResponse.body.triage,
+        selectedAgents: draftResponse.body.selectedAgents,
+      })
+      .expect(200)
+
+    expect(streamResponse.headers['content-type']).toContain('text/event-stream')
+    expect(streamResponse.text).toContain('event: status')
+    expect(streamResponse.text).toContain('event: artifact')
+    expect(streamResponse.text).toContain('event: completed')
+    expect(streamResponse.text).toContain('artifacts/development_prompt/v1')
+  })
 })

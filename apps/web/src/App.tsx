@@ -62,6 +62,35 @@ type PipelineStep = {
   status: 'draft' | 'pending' | 'running' | 'completed' | 'failed' | 'blocked'
 }
 
+type PipelineStreamEvent =
+  | {
+      eventId: string
+      type: 'status'
+      stepId: string
+      label: string
+      status: 'running' | 'completed'
+      timestamp: string
+    }
+  | {
+      eventId: string
+      type: 'artifact'
+      artifactType: ArtifactResult['metadata']['artifactType']
+      artifact: ArtifactResult
+      timestamp: string
+    }
+  | {
+      eventId: string
+      type: 'completed'
+      result: MockPipelineResult
+      timestamp: string
+    }
+  | {
+      eventId: string
+      type: 'error'
+      message: string
+      timestamp: string
+    }
+
 type AgentExecution = {
   agentRole: string
   promptVersion: string
@@ -108,6 +137,7 @@ type MockPipelineResult = {
 const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:3000/api'
 const reviewStorageKey = 'ai-war-room.review-draft'
 const ideaStorageKey = 'ai-war-room.idea-draft'
+const pipelineResultStorageKey = 'ai-war-room.pipeline-result'
 
 const pipelineSteps = [
   'Idea',
@@ -256,6 +286,23 @@ function renderArtifactValue(value: unknown) {
   return <p>{String(value)}</p>
 }
 
+function parseSseEvents(chunk: string): PipelineStreamEvent[] {
+  return chunk
+    .split('\n\n')
+    .map((eventBlock) => {
+      const dataLine = eventBlock
+        .split('\n')
+        .find((line) => line.startsWith('data: '))
+
+      if (!dataLine) {
+        return null
+      }
+
+      return JSON.parse(dataLine.slice(6)) as PipelineStreamEvent
+    })
+    .filter((event): event is PipelineStreamEvent => Boolean(event))
+}
+
 function App() {
   const [apiHealth, setApiHealth] = useState<ApiHealthState>('checking')
   const [rawIdea, setRawIdea] = useState(() => {
@@ -275,8 +322,15 @@ function App() {
   })
   const [pipelineState, setPipelineState] = useState<PipelineState>('idle')
   const [pipelineError, setPipelineError] = useState<string | null>(null)
-  const [pipelineResult, setPipelineResult] =
-    useState<MockPipelineResult | null>(null)
+  const [pipelineResult, setPipelineResult] = useState<MockPipelineResult | null>(
+    () => {
+      const saved = localStorage.getItem(pipelineResultStorageKey)
+
+      return saved ? (JSON.parse(saved) as MockPipelineResult) : null
+    },
+  )
+  const [streamEvents, setStreamEvents] = useState<PipelineStreamEvent[]>([])
+  const [streamedArtifacts, setStreamedArtifacts] = useState<ArtifactResult[]>([])
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
     useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
@@ -310,6 +364,15 @@ function App() {
       localStorage.setItem(reviewStorageKey, JSON.stringify(reviewDraft))
     }
   }, [reviewDraft])
+
+  useEffect(() => {
+    if (pipelineResult) {
+      localStorage.setItem(
+        pipelineResultStorageKey,
+        JSON.stringify(pipelineResult),
+      )
+    }
+  }, [pipelineResult])
 
   useEffect(() => {
     setActiveFindingId(draftRun?.shieldScan.findings[0]?.findingId ?? null)
@@ -357,6 +420,9 @@ function App() {
         selectedAgents: nextDraftRun.selectedAgents,
       })
       setPipelineResult(null)
+      localStorage.removeItem(pipelineResultStorageKey)
+      setStreamEvents([])
+      setStreamedArtifacts([])
       setPipelineState('idle')
       setSubmitState('success')
     } catch (error) {
@@ -410,9 +476,12 @@ function App() {
 
     setPipelineState('running')
     setPipelineError(null)
+    setPipelineResult(null)
+    setStreamEvents([])
+    setStreamedArtifacts([])
 
     try {
-      const response = await fetch(`${apiBaseUrl}/runs/mock-pipeline`, {
+      const response = await fetch(`${apiBaseUrl}/runs/mock-pipeline/stream`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -428,13 +497,63 @@ function App() {
         throw new Error(`API returned ${response.status}`)
       }
 
-      setPipelineResult((await response.json()) as MockPipelineResult)
-      setPipelineState('completed')
+      if (!response.body) {
+        throw new Error('Streaming response body is not available.')
+      }
+
+      const reader = response.body.getReader()
+      const decoder = new TextDecoder()
+      let buffer = ''
+
+      while (true) {
+        const { done, value } = await reader.read()
+        buffer += decoder.decode(value, { stream: !done })
+        const chunks = buffer.split('\n\n')
+        buffer = chunks.pop() ?? ''
+
+        for (const event of parseSseEvents(chunks.join('\n\n'))) {
+          handlePipelineStreamEvent(event)
+        }
+
+        if (done) {
+          break
+        }
+      }
+
+      for (const event of parseSseEvents(buffer)) {
+        handlePipelineStreamEvent(event)
+      }
     } catch (error) {
       setPipelineState('error')
       setPipelineError(
-        error instanceof Error ? error.message : 'Failed to execute mock pipeline.',
+        error instanceof Error
+          ? error.message
+          : 'Failed to execute prompt-driven pipeline.',
       )
+    }
+  }
+
+  function handlePipelineStreamEvent(event: PipelineStreamEvent) {
+    setStreamEvents((current) => [...current, event])
+
+    if (event.type === 'artifact') {
+      setStreamedArtifacts((current) => {
+        if (current.length === 0) {
+          setActiveArtifactType(event.artifactType)
+        }
+
+        return [...current, event.artifact]
+      })
+    }
+
+    if (event.type === 'completed') {
+      setPipelineResult(event.result)
+      setPipelineState('completed')
+    }
+
+    if (event.type === 'error') {
+      setPipelineState('error')
+      setPipelineError(event.message)
     }
   }
 
@@ -443,9 +562,11 @@ function App() {
       (finding) => finding.findingId === activeFindingId,
     ) ?? draftRun?.shieldScan.findings[0]
   const selectedArtifact =
-    pipelineResult?.artifacts.find(
+    (pipelineResult?.artifacts ?? streamedArtifacts).find(
       (artifact) => artifact.metadata.artifactType === activeArtifactType,
-    ) ?? pipelineResult?.artifacts[0]
+    ) ?? (pipelineResult?.artifacts ?? streamedArtifacts)[0]
+  const visibleArtifacts = pipelineResult?.artifacts ?? streamedArtifacts
+  const statusEvents = streamEvents.filter((event) => event.type === 'status')
   const selectedAgentCount = reviewDraft?.selectedAgents.length ?? 0
   const selectedSpecialistCount =
     reviewDraft?.selectedAgents.filter((agent) => agent !== 'moderator').length ?? 0
@@ -709,81 +830,89 @@ function App() {
         </section>
       ) : null}
 
-      {pipelineResult ? (
+      {pipelineResult || streamEvents.length > 0 ? (
         <section className="panel results-panel">
           <div className="section-heading">
             <p className="eyebrow">Pipeline Result</p>
-            <h2>Artifacts generated from isolated prompt-driven agents.</h2>
+            <h2>
+              {pipelineState === 'running'
+                ? 'Streaming run status...'
+                : 'Artifacts generated from isolated prompt-driven agents.'}
+            </h2>
           </div>
 
           <div className="step-list">
-            {pipelineResult.steps.map((step) => (
-              <div className="step-item" key={step.stepId}>
+            {(pipelineResult?.steps ?? statusEvents).map((step) => (
+              <div className="step-item" key={`${step.stepId}-${step.status}`}>
                 <span>{step.label}</span>
                 <strong>{step.status}</strong>
               </div>
             ))}
           </div>
 
-          <div className="agent-result-grid">
-            {pipelineResult.agentOutputs.map((agentOutput) => (
-              <article className="agent-card" key={agentOutput.agentRole}>
-                <h3>{formatAgent(agentOutput.agentRole)}</h3>
-                <p>{agentOutput.output.summary}</p>
-                <div className="metadata-row">
-                  <span>{agentOutput.validationStatus}</span>
-                  <span>{agentOutput.modelProvider}</span>
-                  <span>{agentOutput.inputTokens + agentOutput.outputTokens} tokens</span>
-                </div>
-              </article>
-            ))}
-          </div>
-
-          <div className="artifact-viewer">
-            <div className="artifact-tabs" aria-label="Generated artifacts">
-              {pipelineResult.artifacts.map((artifact) => (
-                <button
-                  className={
-                    artifact.metadata.artifactType === activeArtifactType
-                      ? 'artifact-tab artifact-tab--active'
-                      : 'artifact-tab'
-                  }
-                  key={artifact.metadata.artifactType}
-                  type="button"
-                  onClick={() => setActiveArtifactType(artifact.metadata.artifactType)}
-                >
-                  {formatArtifactTitle(artifact.metadata.artifactType)}
-                </button>
+          {pipelineResult ? (
+            <div className="agent-result-grid">
+              {pipelineResult.agentOutputs.map((agentOutput) => (
+                <article className="agent-card" key={agentOutput.agentRole}>
+                  <h3>{formatAgent(agentOutput.agentRole)}</h3>
+                  <p>{agentOutput.output.summary}</p>
+                  <div className="metadata-row">
+                    <span>{agentOutput.validationStatus}</span>
+                    <span>{agentOutput.modelProvider}</span>
+                    <span>{agentOutput.inputTokens + agentOutput.outputTokens} tokens</span>
+                  </div>
+                </article>
               ))}
             </div>
+          ) : null}
 
-            {selectedArtifact ? (
-              <article className="artifact-card">
-                <div className="artifact-card-header">
-                  <span>{formatArtifactTitle(selectedArtifact.metadata.artifactType)}</span>
-                  <div className="metadata-row">
-                    <span>{selectedArtifact.metadata.validationStatus}</span>
-                    <span>{selectedArtifact.metadata.modelProvider}</span>
-                    <span>{selectedArtifact.metadata.shieldStatus} shield</span>
-                    <span>
-                      {selectedArtifact.metadata.tokenUsage.inputTokens +
-                        selectedArtifact.metadata.tokenUsage.outputTokens}{' '}
-                      tokens
-                    </span>
-                  </div>
-                </div>
-                <p className="prompt-version">
-                  Prompt version: {selectedArtifact.metadata.promptVersion}
-                </p>
-                {Object.entries(selectedArtifact.artifact.content).map(([key, value]) => (
-                  <div className="artifact-section" key={key}>
-                    <strong>{formatAgent(key)}</strong>
-                    {renderArtifactValue(value)}
-                  </div>
+          {visibleArtifacts.length > 0 ? (
+            <div className="artifact-viewer">
+              <div className="artifact-tabs" aria-label="Generated artifacts">
+                {visibleArtifacts.map((artifact) => (
+                  <button
+                    className={
+                      artifact.metadata.artifactType === activeArtifactType
+                        ? 'artifact-tab artifact-tab--active'
+                        : 'artifact-tab'
+                    }
+                    key={artifact.metadata.artifactType}
+                    type="button"
+                    onClick={() => setActiveArtifactType(artifact.metadata.artifactType)}
+                  >
+                    {formatArtifactTitle(artifact.metadata.artifactType)}
+                  </button>
                 ))}
-              </article>
-            ) : null}
-          </div>
+              </div>
+
+              {selectedArtifact ? (
+                <article className="artifact-card">
+                  <div className="artifact-card-header">
+                    <span>{formatArtifactTitle(selectedArtifact.metadata.artifactType)}</span>
+                    <div className="metadata-row">
+                      <span>{selectedArtifact.metadata.validationStatus}</span>
+                      <span>{selectedArtifact.metadata.modelProvider}</span>
+                      <span>{selectedArtifact.metadata.shieldStatus} shield</span>
+                      <span>
+                        {selectedArtifact.metadata.tokenUsage.inputTokens +
+                          selectedArtifact.metadata.tokenUsage.outputTokens}{' '}
+                        tokens
+                      </span>
+                    </div>
+                  </div>
+                  <p className="prompt-version">
+                    Prompt version: {selectedArtifact.metadata.promptVersion}
+                  </p>
+                  {Object.entries(selectedArtifact.artifact.content).map(([key, value]) => (
+                    <div className="artifact-section" key={key}>
+                      <strong>{formatAgent(key)}</strong>
+                      {renderArtifactValue(value)}
+                    </div>
+                  ))}
+                </article>
+              ) : null}
+            </div>
+          ) : null}
         </section>
       ) : null}
 

@@ -9,6 +9,7 @@ import { randomUUID } from 'node:crypto'
 import {
   type AgentRole,
   type DraftRun,
+  type MockPipelineRequest,
   type MockPipelineResult,
   agentRoleSchema,
   createRunRequestSchema,
@@ -31,6 +32,37 @@ import { TriageService } from '../triage/triage.service.js'
 function createId(prefix: string) {
   return `${prefix}_${randomUUID()}`
 }
+
+export type PipelineStreamEvent =
+  | {
+      eventId: string
+      type: 'status'
+      stepId: string
+      label: string
+      status: 'running' | 'completed'
+      timestamp: string
+    }
+  | {
+      eventId: string
+      type: 'artifact'
+      artifactType: MockPipelineResult['artifacts'][number]['metadata']['artifactType']
+      artifact: MockPipelineResult['artifacts'][number]
+      timestamp: string
+    }
+  | {
+      eventId: string
+      type: 'completed'
+      result: MockPipelineResult
+      timestamp: string
+    }
+  | {
+      eventId: string
+      type: 'error'
+      message: string
+      timestamp: string
+    }
+
+type PipelineStreamEmitter = (event: PipelineStreamEvent) => void | Promise<void>
 
 @Injectable()
 export class RunsService {
@@ -136,6 +168,21 @@ export class RunsService {
   }
 
   async executeMockPipeline(input: unknown): Promise<MockPipelineResult> {
+    const request = this.parseMockPipelineRequest(input)
+
+    return this.executeParsedPipeline(request)
+  }
+
+  async executeMockPipelineStream(
+    input: unknown,
+    emit: PipelineStreamEmitter,
+  ): Promise<MockPipelineResult> {
+    const request = this.parseMockPipelineRequest(input)
+
+    return this.executeParsedPipeline(request, emit)
+  }
+
+  private parseMockPipelineRequest(input: unknown): MockPipelineRequest {
     const parsedRequest = mockPipelineRequestSchema.safeParse(input)
 
     if (!parsedRequest.success) {
@@ -145,7 +192,13 @@ export class RunsService {
       })
     }
 
-    const request = parsedRequest.data
+    return parsedRequest.data
+  }
+
+  private async executeParsedPipeline(
+    request: MockPipelineRequest,
+    emit?: PipelineStreamEmitter,
+  ): Promise<MockPipelineResult> {
     const now = new Date().toISOString()
     const executableAgents = request.selectedAgents.filter(
       (agentRole): agentRole is Exclude<AgentRole, 'moderator'> =>
@@ -158,6 +211,7 @@ export class RunsService {
       })
     }
 
+    await this.emitStatus(emit, 'agent_pool', 'Prompt-driven agent pool', 'running')
     const agentOutputs = await Promise.all(
       executableAgents.map((agentRole) =>
         this.agentService.executeAgent({
@@ -168,16 +222,52 @@ export class RunsService {
         }),
       ),
     )
+    await this.emitStatus(emit, 'agent_pool', 'Prompt-driven agent pool', 'completed')
+
+    await this.emitStatus(
+      emit,
+      'moderator',
+      'Prompt-driven Moderator synthesis',
+      'running',
+    )
     const moderatorSynthesis = await this.moderatorService.synthesize({
       draftRun: request.draftRun,
       approvedTriage: request.approvedTriage,
       agentOutputs,
     })
+    await this.emitStatus(
+      emit,
+      'moderator',
+      'Prompt-driven Moderator synthesis',
+      'completed',
+    )
+
+    await this.emitStatus(
+      emit,
+      'artifacts',
+      'Prompt-driven artifact generation',
+      'running',
+    )
     const artifacts = await this.artifactService.generateArtifacts({
       draftRun: request.draftRun,
       moderatorSynthesis,
       completedAt: now,
     })
+    for (const artifact of artifacts) {
+      await emit?.({
+        eventId: createId('event'),
+        type: 'artifact',
+        artifactType: artifact.metadata.artifactType,
+        artifact,
+        timestamp: new Date().toISOString(),
+      })
+    }
+    await this.emitStatus(
+      emit,
+      'artifacts',
+      'Prompt-driven artifact generation',
+      'completed',
+    )
 
     const pipelineResult = mockPipelineResultSchema.parse({
       runId: request.draftRun.runId,
@@ -197,8 +287,30 @@ export class RunsService {
     })
 
     await this.runRepository.saveMockPipelineResult(pipelineResult)
+    await emit?.({
+      eventId: createId('event'),
+      type: 'completed',
+      result: pipelineResult,
+      timestamp: new Date().toISOString(),
+    })
 
     return pipelineResult
+  }
+
+  private async emitStatus(
+    emit: PipelineStreamEmitter | undefined,
+    stepId: string,
+    label: string,
+    status: 'running' | 'completed',
+  ) {
+    await emit?.({
+      eventId: createId('event'),
+      type: 'status',
+      stepId,
+      label,
+      status,
+      timestamp: new Date().toISOString(),
+    })
   }
 
   private createCompletedStep(stepId: string, label: string, timestamp: string) {
