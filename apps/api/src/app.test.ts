@@ -96,6 +96,11 @@ describe('API skeleton', () => {
     expect(response.body.statuses).toContain('draft')
     expect(response.body.agentRoles).toContain('product_manager')
     expect(response.body.flow).toContain('human_review')
+    expect(response.body.runtime).toEqual({
+      defaultPath: 'direct',
+      temporalEnabled: false,
+      taskQueue: 'ai-war-room-runs',
+    })
   })
 
   it('exposes model registry health recovery and audit events', async () => {

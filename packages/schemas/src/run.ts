@@ -71,3 +71,21 @@ export type DraftRun = z.infer<typeof draftRunSchema>
 export type RunStatusResponse = z.infer<typeof runStatusResponseSchema>
 export type MockPipelineRequest = z.infer<typeof mockPipelineRequestSchema>
 export type MockPipelineResult = z.infer<typeof mockPipelineResultSchema>
+
+export const approvedRunRuntimePathSchema = z.enum(['temporal', 'direct'])
+export type ApprovedRunRuntimePath = z.infer<typeof approvedRunRuntimePathSchema>
+
+export const runRuntimeCapabilitiesSchema = z.object({
+  defaultPath: approvedRunRuntimePathSchema,
+  temporalEnabled: z.boolean(),
+  taskQueue: nonEmptyStringSchema,
+})
+export type RunRuntimeCapabilities = z.infer<typeof runRuntimeCapabilitiesSchema>
+
+export const runCapabilitiesResponseSchema = z.object({
+  statuses: z.array(runStatusSchema),
+  agentRoles: z.array(agentRoleSchema),
+  flow: z.array(nonEmptyStringSchema),
+  runtime: runRuntimeCapabilitiesSchema,
+})
+export type RunCapabilitiesResponse = z.infer<typeof runCapabilitiesResponseSchema>

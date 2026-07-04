@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useState, type FormEvent } from 'react'
+import type { RunCapabilitiesResponse } from '@ai-war-room/schemas'
 import './App.css'
 import {
   type TemporalRunStartResponse,
@@ -6,16 +7,17 @@ import {
   type TemporalWorkflowStatus,
   canResumeTemporalWorkflow,
   createTemporalObservationTimeoutMessage,
+  describeApprovedRunRuntime,
   formatTemporalFailureMessage,
   isTemporalTerminalStatus,
   loadPersistedTemporalWorkflow,
   savePersistedTemporalWorkflow,
+  shouldUseTemporalRuntime,
   sleep,
   temporalInitialPollDelayMs,
   temporalObservationTimeoutMs,
   temporalPollIntervalMs,
   toTemporalRunStartResponse,
-  useTemporalWorkflowRuntime,
 } from './temporal-runtime'
 
 type ApiHealthState = 'checking' | 'online' | 'offline'
@@ -483,16 +485,16 @@ function App() {
   const [streamedArtifacts, setStreamedArtifacts] = useState<ArtifactResult[]>([])
   const [lastStreamEventId, setLastStreamEventId] = useState<string | null>(null)
   const [lastStreamRunId, setLastStreamRunId] = useState<string | null>(null)
+  const [runCapabilities, setRunCapabilities] =
+    useState<RunCapabilitiesResponse | null>(null)
+  const useTemporalWorkflowRuntime = shouldUseTemporalRuntime(
+    runCapabilities?.runtime ?? null,
+  )
+  const approvedRunRuntimeLabel = describeApprovedRunRuntime(
+    runCapabilities?.runtime ?? null,
+  )
   const [activeTemporalWorkflow, setActiveTemporalWorkflow] =
-    useState<TemporalRunStartResponse | null>(() => {
-      if (!useTemporalWorkflowRuntime) {
-        return null
-      }
-
-      const persisted = loadPersistedTemporalWorkflow()
-
-      return persisted ? toTemporalRunStartResponse(persisted) : null
-    })
+    useState<TemporalRunStartResponse | null>(null)
   const [temporalRecoveryHint, setTemporalRecoveryHint] = useState<string | null>(
     null,
   )
@@ -519,13 +521,17 @@ function App() {
 
     const persisted = loadPersistedTemporalWorkflow()
 
-    if (!persisted?.lastStreamEventId) {
+    if (!persisted) {
       return
     }
 
-    setLastStreamEventId(persisted.lastStreamEventId)
-    setLastStreamRunId(persisted.runId)
-  }, [])
+    setActiveTemporalWorkflow(toTemporalRunStartResponse(persisted))
+
+    if (persisted.lastStreamEventId) {
+      setLastStreamEventId(persisted.lastStreamEventId)
+      setLastStreamRunId(persisted.runId)
+    }
+  }, [useTemporalWorkflowRuntime])
 
   useEffect(() => {
     if (!useTemporalWorkflowRuntime || !activeTemporalWorkflow) {
@@ -545,7 +551,7 @@ function App() {
       lastStreamEventId,
       persistedAt: new Date().toISOString(),
     })
-  }, [activeTemporalWorkflow, lastStreamEventId])
+  }, [activeTemporalWorkflow, lastStreamEventId, useTemporalWorkflowRuntime])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -559,6 +565,21 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setApiHealth('offline')
+        }
+      })
+
+    fetch(`${apiBaseUrl}/runs/capabilities`, {
+      signal: controller.signal,
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((capabilities) => {
+        if (capabilities && !controller.signal.aborted) {
+          setRunCapabilities(capabilities as RunCapabilitiesResponse)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setRunCapabilities(null)
         }
       })
 
@@ -1679,10 +1700,12 @@ function App() {
             ) : null}
             {useTemporalWorkflowRuntime ? (
               <p className="runtime-note">
-                Temporal runtime path enabled. Make sure `TEMPORAL_ENABLED=true`
+                {approvedRunRuntimeLabel}. Make sure `TEMPORAL_ENABLED=true`
                 and the worker are running.
               </p>
-            ) : null}
+            ) : (
+              <p className="runtime-note">{approvedRunRuntimeLabel}</p>
+            )}
             {temporalRecoveryHint ? (
               <p className="runtime-note">{temporalRecoveryHint}</p>
             ) : null}

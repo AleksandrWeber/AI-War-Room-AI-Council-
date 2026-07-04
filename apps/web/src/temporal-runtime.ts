@@ -1,3 +1,11 @@
+import {
+  parseTemporalRuntimePreference,
+  resolveApprovedRunRuntime,
+  usesTemporalApprovedRunRuntime as isTemporalRuntimePath,
+  type ApprovedRunRuntimePath,
+  type RunRuntimeCapabilities,
+} from '@ai-war-room/schemas'
+
 export type TemporalWorkflowStatus =
   | 'disabled'
   | 'running'
@@ -51,15 +59,53 @@ export type TemporalWorkflowRecoveryResponse = {
 
 export const temporalWorkflowStorageKey = 'ai-war-room.temporal-workflow'
 
-export const useTemporalWorkflowRuntime =
-  import.meta.env.VITE_USE_TEMPORAL_WORKFLOWS === 'true'
-
 export const temporalObservationTimeoutMs = Number(
   import.meta.env.VITE_TEMPORAL_OBSERVATION_TIMEOUT_MS ?? 300_000,
 )
 
 export const temporalInitialPollDelayMs = 500
 export const temporalPollIntervalMs = 1_500
+
+export function parseFrontendTemporalRuntimePreference() {
+  return parseTemporalRuntimePreference(import.meta.env.VITE_USE_TEMPORAL_WORKFLOWS)
+}
+
+export function resolveFrontendApprovedRunRuntime(
+  runtime?: RunRuntimeCapabilities | null,
+): ApprovedRunRuntimePath {
+  return resolveApprovedRunRuntime({
+    preference: parseFrontendTemporalRuntimePreference(),
+    temporalEnabled: runtime?.temporalEnabled ?? false,
+    defaultPath: runtime?.defaultPath,
+  })
+}
+
+export function shouldUseTemporalRuntime(
+  runtime?: RunRuntimeCapabilities | null,
+) {
+  return isTemporalRuntimePath(resolveFrontendApprovedRunRuntime(runtime))
+}
+
+export function describeApprovedRunRuntime(
+  runtime?: RunRuntimeCapabilities | null,
+) {
+  const resolvedPath = resolveFrontendApprovedRunRuntime(runtime)
+  const preference = parseFrontendTemporalRuntimePreference()
+
+  if (resolvedPath === 'temporal') {
+    if (preference === 'force-on') {
+      return 'Temporal workflow runtime (forced on)'
+    }
+
+    return 'Temporal workflow runtime (auto-selected)'
+  }
+
+  if (preference === 'force-off') {
+    return 'Direct REST/SSE runtime (forced off)'
+  }
+
+  return 'Direct REST/SSE runtime'
+}
 
 export function isTemporalTerminalStatus(status: TemporalWorkflowStatus) {
   return !['running', 'unknown', 'disabled'].includes(status)

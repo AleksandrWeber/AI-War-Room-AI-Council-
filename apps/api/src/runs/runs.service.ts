@@ -22,6 +22,7 @@ import {
   draftRunSchema,
   mockPipelineRequestSchema,
   mockPipelineResultSchema,
+  runCapabilitiesResponseSchema,
   runStatusSchema,
 } from '@ai-war-room/schemas'
 import { AgentService } from '../agents/agent.service.js'
@@ -60,7 +61,11 @@ export class RunsService {
   ) {}
 
   getCapabilities() {
-    return {
+    const temporalEnabled = this.configService.get('TEMPORAL_ENABLED', {
+      infer: true,
+    })
+
+    return runCapabilitiesResponseSchema.parse({
       statuses: runStatusSchema.options,
       agentRoles: agentRoleSchema.options,
       flow: [
@@ -72,7 +77,12 @@ export class RunsService {
         'moderator',
         'artifacts',
       ],
-    }
+      runtime: {
+        defaultPath: temporalEnabled ? 'temporal' : 'direct',
+        temporalEnabled,
+        taskQueue: this.configService.get('TEMPORAL_TASK_QUEUE', { infer: true }),
+      },
+    })
   }
 
   async listArtifactHistory(workspaceId: string): Promise<ArtifactHistoryResponse> {

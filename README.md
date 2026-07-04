@@ -125,6 +125,13 @@ Run mutation endpoints verify that the request workspace matches the header work
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
+Current `v4.5` behavior:
+
+- `GET /api/runs/capabilities` exposes runtime metadata including `defaultPath`, `temporalEnabled`, and `taskQueue`.
+- When `VITE_USE_TEMPORAL_WORKFLOWS=auto` (default), the frontend selects Temporal execution if the API reports `TEMPORAL_ENABLED=true`.
+- `VITE_USE_TEMPORAL_WORKFLOWS=true` or `false` still force Temporal or direct REST/SSE execution.
+- The Execute panel shows which approved-run runtime path is active.
+
 Current `v4.4` behavior:
 
 - Temporal workflow observation can be resumed after page refresh, stream interruption, or observation timeout.
@@ -204,8 +211,9 @@ Current `v4.3` behavior:
 - Status checks update persisted workflow metadata and publish `workflow_status` events into the existing run stream buffer.
 - `GET /api/runs/workflows/:workflowId/observation` returns the persisted workflow metadata for the current workspace.
 - `GET /api/runs/workflows/:workflowId/stream` streams/replays workflow status events with `Last-Event-ID` support.
-- The frontend keeps the existing direct REST/SSE pipeline as the default runtime path.
-- `VITE_USE_TEMPORAL_WORKFLOWS=true` switches the Execute button to the Temporal workflow start/status/stream path.
+- The frontend keeps the existing direct REST/SSE pipeline as the fallback runtime path when Temporal is disabled.
+- `VITE_USE_TEMPORAL_WORKFLOWS=auto` is the default frontend preference and follows API runtime capabilities.
+- `VITE_USE_TEMPORAL_WORKFLOWS=true` or `false` can still force Temporal or direct execution locally.
 - In Temporal runtime mode, the frontend observes workflow status and loads generated artifacts from persisted artifact history after completion.
 - `POST /api/runs/workflows/:workflowId/recover` re-syncs workflow metadata from Temporal and returns recovery guidance.
 - `GET /api/runs/workflows/by-run/:runId` returns the latest persisted workflow metadata for a run in the current workspace.
