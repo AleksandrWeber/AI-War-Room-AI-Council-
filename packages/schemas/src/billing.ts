@@ -36,6 +36,7 @@ export const billingCapabilitiesResponseSchema = z.object({
   supportsWebhookAudit: z.boolean(),
   supportsInvoiceHistory: z.boolean(),
   supportsUsageSummary: z.boolean(),
+  supportsBillingExport: z.boolean(),
   checkoutTiers: z.array(checkoutPaidTierSchema),
   guidance: z.string(),
 })
@@ -201,6 +202,9 @@ export type BillingWorkspaceUsageResponse = z.infer<
   typeof billingWorkspaceUsageResponseSchema
 >
 
+export const billingExportFormatSchema = z.enum(['csv', 'json'])
+export type BillingExportFormat = z.infer<typeof billingExportFormatSchema>
+
 export function getBillingGuidance(input: {
   enabled: boolean
   adapter: BillingAdapter
@@ -210,8 +214,8 @@ export function getBillingGuidance(input: {
   }
 
   if (input.adapter === 'mock') {
-    return 'Mock billing is active. Checkout, customer portal, invoice history, and daily usage summary run locally for development and tests.'
+    return 'Mock billing is active. Checkout, customer portal, invoice history, usage summary, and billing export run locally for development and tests.'
   }
 
-  return 'Stripe billing is active. Use checkout for upgrades, the customer portal for subscription management, and configure webhooks for idempotent billing, invoice history, and usage summary updates.'
+  return 'Stripe billing is active. Use checkout for upgrades, the customer portal for subscription management, and configure webhooks for idempotent billing, invoice history, usage summary, and export updates.'
 }

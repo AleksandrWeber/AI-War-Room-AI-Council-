@@ -7,9 +7,11 @@ import {
   Post,
   Query,
   Req,
+  Res,
   UseGuards,
   type RawBodyRequest,
 } from '@nestjs/common'
+import type { FastifyReply } from 'fastify'
 import type { FastifyRequest } from 'fastify'
 import {
   WorkspaceAccessGuard,
@@ -69,6 +71,30 @@ export class BillingController {
       workspaceId,
       requestWorkspaceId: workspaceId,
     })
+  }
+
+  @Get('workspace/:workspaceId/invoices/export')
+  @UseGuards(WorkspaceAccessGuard)
+  async exportWorkspaceInvoices(
+    @Param('workspaceId') workspaceId: string,
+    @Query('format') format: string | undefined,
+    @Req() request: AuthenticatedRequest,
+    @Res() reply: FastifyReply,
+  ) {
+    this.assertWorkspaceParam(request, workspaceId)
+
+    const exported = await this.billingService.exportWorkspaceInvoices(
+      workspaceId,
+      format,
+    )
+
+    reply
+      .header('Content-Type', exported.contentType)
+      .header(
+        'Content-Disposition',
+        `attachment; filename="${exported.filename}"`,
+      )
+    reply.send(exported.body)
   }
 
   @Get('workspace/:workspaceId/invoices')

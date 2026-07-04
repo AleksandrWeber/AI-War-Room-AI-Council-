@@ -297,11 +297,23 @@ Usage summary:
 - Usage totals are computed from `usage_events` for the current UTC day.
 - The web billing panel shows token and cost progress meters for the active billing period.
 
+Billing export:
+
+- `GET /api/billing/workspace/:workspaceId/invoices/export?format=csv|json` downloads workspace invoice history.
+- CSV export includes invoice ids, amounts, status, tier, and hosted invoice links.
+- The web billing panel exposes **Export CSV** and **Export JSON** actions.
+
 Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
 
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v5.12` behavior:
+
+- Workspace invoice history can be exported as CSV or JSON attachments from the billing API.
+- The web billing panel provides one-click export actions for accounting workflows.
+- Billing export is available when billing is enabled (`supportsBillingExport: true`).
 
 Current `v5.11` behavior:
 

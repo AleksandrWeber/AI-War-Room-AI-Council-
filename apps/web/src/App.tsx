@@ -32,6 +32,7 @@ import {
   fetchBillingUsageSummary,
   fetchBillingWebhookEvents,
   fetchBillingWorkspaceStatus,
+  downloadBillingInvoiceExport,
   formatInvoiceAmount,
   formatInvoiceStatus,
   formatUsageCostLabel,
@@ -1284,6 +1285,25 @@ function App() {
     }
   }
 
+  async function handleExportBillingInvoices(format: 'csv' | 'json') {
+    setBillingError(null)
+
+    try {
+      await downloadBillingInvoiceExport(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        format,
+      )
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to export billing invoices.',
+      )
+    }
+  }
+
   async function handleUpgradeBillingTier(paidTier: CheckoutPaidTier) {
     setBillingAction('upgrading')
     setBillingError(null)
@@ -2090,7 +2110,27 @@ function App() {
 
         {billingCapabilities?.supportsInvoiceHistory ? (
           <div className="billing-invoice-history">
-            <span>Invoice history</span>
+            <div className="billing-invoice-history__header">
+              <span>Invoice history</span>
+              {billingCapabilities.supportsBillingExport ? (
+                <div className="billing-export-actions">
+                  <button
+                    type="button"
+                    onClick={() => handleExportBillingInvoices('csv')}
+                    disabled={billingAction !== 'idle'}
+                  >
+                    Export CSV
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleExportBillingInvoices('json')}
+                    disabled={billingAction !== 'idle'}
+                  >
+                    Export JSON
+                  </button>
+                </div>
+              ) : null}
+            </div>
             {billingInvoices.length ? (
               billingInvoices.map((invoice) => (
                 <article className="billing-invoice-card" key={invoice.billingInvoiceId}>

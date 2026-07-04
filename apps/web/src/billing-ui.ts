@@ -177,6 +177,45 @@ export function formatUsageCostLabel(usedUsd: number, limitUsd: number) {
   return `$${usedUsd.toFixed(2)} / $${limitUsd.toFixed(2)} daily`
 }
 
+function readContentDispositionFilename(contentDisposition: string | null) {
+  if (!contentDisposition) {
+    return null
+  }
+
+  const match = contentDisposition.match(/filename="([^"]+)"/)
+
+  return match?.[1] ?? null
+}
+
+export async function downloadBillingInvoiceExport(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+  format: 'csv' | 'json',
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/billing/workspace/${encodeURIComponent(workspaceId)}/invoices/export?format=${format}`,
+    {
+      headers,
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  const blob = await response.blob()
+  const filename =
+    readContentDispositionFilename(response.headers.get('content-disposition')) ??
+    `${workspaceId}-invoices.${format}`
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.click()
+  URL.revokeObjectURL(url)
+}
+
 export function formatInvoiceStatus(status: BillingInvoiceStatus) {
   switch (status) {
     case 'draft':

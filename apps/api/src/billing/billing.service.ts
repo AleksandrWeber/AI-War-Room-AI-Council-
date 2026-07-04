@@ -9,6 +9,7 @@ import {
 import { ConfigService } from '@nestjs/config'
 import {
   billingCapabilitiesResponseSchema,
+  billingExportFormatSchema,
   billingInvoicesResponseSchema,
   billingWorkspaceUsageResponseSchema,
   billingWebhookEventsResponseSchema,
@@ -28,6 +29,10 @@ import {
   type BillingWebhookEvent,
 } from './billing.adapter.js'
 import { buildPaidTierInvoiceInput } from './billing-invoice.helpers.js'
+import {
+  buildBillingInvoiceExportFilename,
+  serializeBillingInvoicesCsv,
+} from './billing-export.helpers.js'
 import {
   BILLING_INVOICE_REPOSITORY,
   type BillingInvoiceRepository,
@@ -71,6 +76,7 @@ export class BillingService {
       supportsWebhookAudit: enabled,
       supportsInvoiceHistory: enabled,
       supportsUsageSummary: enabled,
+      supportsBillingExport: enabled,
       checkoutTiers: ['pro', 'business'],
       guidance: getBillingGuidance({ enabled, adapter }),
     })
@@ -112,6 +118,45 @@ export class BillingService {
     const summary = await this.usageService.getWorkspaceUsageSummary(workspaceId)
 
     return billingWorkspaceUsageResponseSchema.parse(summary)
+  }
+
+  async exportWorkspaceInvoices(
+    workspaceId: string,
+    formatInput: string | undefined,
+  ) {
+    const parsedFormat = billingExportFormatSchema.safeParse(formatInput ?? 'csv')
+
+    if (!parsedFormat.success) {
+      throw new BadRequestException({
+        message: 'Unsupported billing export format. Use csv or json.',
+      })
+    }
+
+    const format = parsedFormat.data
+    const invoices =
+      await this.billingInvoiceRepository.listWorkspaceInvoices(workspaceId)
+    const filename = buildBillingInvoiceExportFilename(workspaceId, format)
+
+    if (format === 'json') {
+      return {
+        contentType: 'application/json; charset=utf-8',
+        filename,
+        body: JSON.stringify(
+          billingInvoicesResponseSchema.parse({
+            workspaceId,
+            invoices,
+          }),
+          null,
+          2,
+        ),
+      }
+    }
+
+    return {
+      contentType: 'text/csv; charset=utf-8',
+      filename,
+      body: serializeBillingInvoicesCsv(invoices),
+    }
   }
 
   async createCheckoutSession(input: {

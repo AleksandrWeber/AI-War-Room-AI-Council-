@@ -60,6 +60,7 @@ describe('BillingService', () => {
       supportsWebhookAudit: false,
       supportsInvoiceHistory: false,
       supportsUsageSummary: false,
+      supportsBillingExport: false,
     })
   })
 
@@ -236,6 +237,45 @@ describe('BillingService', () => {
         }),
       ]),
     )
+  })
+
+  it('exports workspace invoice history as csv and json', async () => {
+    const { service } = createBillingService({})
+
+    await service.handleWebhook(
+      JSON.stringify({
+        eventId: 'mock_evt_export_checkout',
+        event: 'checkout.completed',
+        workspaceId: 'workspace_1',
+        paidTier: 'pro',
+        externalCustomerId: 'cus_export',
+      }),
+      undefined,
+    )
+
+    const csvExport = await service.exportWorkspaceInvoices('workspace_1', 'csv')
+
+    expect(csvExport.contentType).toContain('text/csv')
+    expect(csvExport.filename).toMatch(/^workspace_1-invoices-\d{4}-\d{2}-\d{2}\.csv$/)
+    expect(csvExport.body).toContain('billingInvoiceId,externalInvoiceId')
+    expect(csvExport.body).toContain('inv_mock_evt_export_checkout')
+
+    const jsonExport = await service.exportWorkspaceInvoices('workspace_1', 'json')
+
+    expect(jsonExport.contentType).toContain('application/json')
+    expect(jsonExport.filename).toMatch(/^workspace_1-invoices-\d{4}-\d{2}-\d{2}\.json$/)
+
+    const parsed = JSON.parse(jsonExport.body)
+
+    expect(parsed).toMatchObject({
+      workspaceId: 'workspace_1',
+      invoices: expect.arrayContaining([
+        expect.objectContaining({
+          externalInvoiceId: 'inv_mock_evt_export_checkout',
+          status: 'paid',
+        }),
+      ]),
+    })
   })
 
   it('marks unsupported mock webhook events as ignored', async () => {

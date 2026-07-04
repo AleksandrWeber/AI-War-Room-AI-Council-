@@ -55,6 +55,7 @@ describe('billing integration', () => {
       supportsWebhookAudit: true,
       supportsInvoiceHistory: true,
       supportsUsageSummary: true,
+      supportsBillingExport: true,
       checkoutTiers: ['pro', 'business'],
     })
   })
@@ -243,5 +244,44 @@ describe('billing integration', () => {
     })
     expect(response.body.usagePeriodStart).toMatch(/T00:00:00\.000Z$/)
     expect(response.body.usagePeriodEnd).toMatch(/T00:00:00\.000Z$/)
+  })
+
+  it('exports workspace invoice history as csv and json attachments', async () => {
+    await request(app!.getHttpServer())
+      .post('/api/billing/webhook')
+      .send({
+        eventId: 'mock_evt_export_integration',
+        event: 'checkout.completed',
+        workspaceId: 'workspace_1',
+        paidTier: 'business',
+        externalCustomerId: 'cus_export_integration',
+      })
+      .expect(201)
+
+    const csvResponse = await request(app!.getHttpServer())
+      .get('/api/billing/workspace/workspace_1/invoices/export?format=csv')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(csvResponse.headers['content-type']).toContain('text/csv')
+    expect(csvResponse.headers['content-disposition']).toContain('attachment')
+    expect(csvResponse.text).toContain('billingInvoiceId,externalInvoiceId')
+    expect(csvResponse.text).toContain('inv_mock_evt_export_integration')
+
+    const jsonResponse = await request(app!.getHttpServer())
+      .get('/api/billing/workspace/workspace_1/invoices/export?format=json')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(jsonResponse.headers['content-type']).toContain('application/json')
+    expect(jsonResponse.body.invoices).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          externalInvoiceId: 'inv_mock_evt_export_integration',
+          paidTier: 'business',
+          status: 'paid',
+        }),
+      ]),
+    )
   })
 })
