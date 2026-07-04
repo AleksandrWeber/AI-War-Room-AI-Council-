@@ -37,7 +37,7 @@ export class LlmGatewayService {
     let lastModelId = ''
 
     for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-      const modelDecision = this.modelRouterService.selectModel({
+      const modelDecision = await this.modelRouterService.selectModel({
         taskName: request.taskName,
         role: this.resolveRouterRole(request.taskName),
         forceDeputy: attempt > 1,
@@ -80,7 +80,10 @@ export class LlmGatewayService {
           },
           'error',
         )
-        this.modelRouterService.markModelDegraded(modelDecision.selected.modelId)
+        await this.modelRouterService.markModelDegraded(
+          modelDecision.selected.modelId,
+          errorMessage,
+        )
         errors.push(errorMessage)
 
         if (attempt < maxAttempts) {
@@ -141,7 +144,7 @@ export class LlmGatewayService {
       )
     }
 
-    const fallbackDecision = this.modelRouterService.selectModel({
+    const fallbackDecision = await this.modelRouterService.selectModel({
       taskName: request.taskName,
       role: this.resolveRouterRole(request.taskName),
       forceDeputy: true,

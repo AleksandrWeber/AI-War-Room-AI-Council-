@@ -73,3 +73,12 @@ export const modelSelectionDecisionSchema = z.object({
 export type ModelSelectionDecision = z.infer<
   typeof modelSelectionDecisionSchema
 >
+
+export const modelHealthEventSchema = z.object({
+  eventId: nonEmptyStringSchema,
+  modelId: nonEmptyStringSchema,
+  eventType: z.enum(['degraded', 'recovered']),
+  reason: nonEmptyStringSchema,
+  createdAt: utcDateStringSchema,
+})
+export type ModelHealthEvent = z.infer<typeof modelHealthEventSchema>

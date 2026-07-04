@@ -7,6 +7,7 @@ import {
 import request from 'supertest'
 import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest'
 import { AppModule } from './app.module.js'
+import { ModelRouterService } from './model-router/model-router.service.js'
 import { ObservabilityService } from './observability/observability.service.js'
 import {
   USAGE_REPOSITORY,
@@ -95,6 +96,40 @@ describe('API skeleton', () => {
     expect(response.body.statuses).toContain('draft')
     expect(response.body.agentRoles).toContain('product_manager')
     expect(response.body.flow).toContain('human_review')
+  })
+
+  it('exposes model registry health recovery and audit events', async () => {
+    const modelRouterService = moduleRef!.get(ModelRouterService)
+    await modelRouterService.markModelDegraded(
+      'mock-json-v1-primary',
+      'integration test outage',
+    )
+
+    const degradedRegistryResponse = await request(app!.getHttpServer())
+      .get('/api/model-router/registry')
+      .expect(200)
+    const degradedModel = degradedRegistryResponse.body.models.find(
+      (model: { modelId: string }) => model.modelId === 'mock-json-v1-primary',
+    )
+
+    expect(degradedModel.healthStatus).toBe('degraded')
+
+    const recoveryResponse = await request(app!.getHttpServer())
+      .post('/api/model-router/registry/mock-json-v1-primary/recover')
+      .expect(201)
+
+    expect(recoveryResponse.body.healthStatus).toBe('healthy')
+    expect(recoveryResponse.body.consecutiveFailures).toBe(0)
+
+    const eventsResponse = await request(app!.getHttpServer())
+      .get('/api/model-router/registry/mock-json-v1-primary/health-events')
+      .expect(200)
+
+    expect(
+      eventsResponse.body.events.map(
+        (event: { eventType: 'degraded' | 'recovered' }) => event.eventType,
+      ),
+    ).toEqual(expect.arrayContaining(['degraded', 'recovered']))
   })
 
   it('manages workspace provider credentials without returning raw keys', async () => {

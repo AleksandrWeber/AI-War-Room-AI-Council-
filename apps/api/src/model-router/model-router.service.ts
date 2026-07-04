@@ -1,4 +1,4 @@
-import { Injectable, Optional } from '@nestjs/common'
+import { Inject, Injectable, Optional } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { randomUUID } from 'node:crypto'
 import {
@@ -9,25 +9,11 @@ import {
 } from '@ai-war-room/schemas'
 import type { ApiEnv } from '../config/env.js'
 import { ObservabilityService } from '../observability/observability.service.js'
-
-function createId(prefix: string) {
-  return `${prefix}_${randomUUID()}`
-}
-
-const allRoles: ModelRouterRole[] = [
-  'triage',
-  'product_manager',
-  'critic',
-  'moderator',
-  'security_expert',
-  'software_architect',
-  'market_researcher',
-  'mobile_ux_expert',
-  'executive_summary',
-  'prd',
-  'development_prompt',
-  'shield_classifier',
-]
+import {
+  MODEL_REGISTRY_REPOSITORY,
+  type ModelRegistryRepository,
+} from './model-registry.repository.js'
+import { createDefaultModelRegistry } from './model-router.defaults.js'
 
 const artifactRoles: ModelRouterRole[] = [
   'moderator',
@@ -38,26 +24,28 @@ const artifactRoles: ModelRouterRole[] = [
 
 const safetyRoles: ModelRouterRole[] = ['security_expert', 'shield_classifier']
 
+function createId(prefix: string) {
+  return `${prefix}_${randomUUID()}`
+}
+
 @Injectable()
 export class ModelRouterService {
-  private readonly registry = new Map<string, ModelRegistryEntry>()
+  private initialized: Promise<void> | null = null
 
   constructor(
     private readonly observabilityService: ObservabilityService,
+    @Inject(MODEL_REGISTRY_REPOSITORY)
+    private readonly modelRegistryRepository: ModelRegistryRepository,
     @Optional()
     private readonly configService?: ConfigService<ApiEnv, true>,
-  ) {
-    for (const model of this.createDefaultRegistry()) {
-      this.registry.set(model.modelId, model)
-    }
-  }
+  ) {}
 
-  selectModel(input: {
+  async selectModel(input: {
     taskName: string
     role: ModelRouterRole
     forceDeputy?: boolean
-  }): ModelSelectionDecision {
-    const ranked = this.getRankedCandidates(input.role)
+  }): Promise<ModelSelectionDecision> {
+    const ranked = await this.getRankedCandidates(input.role)
     const champion = ranked[0]
     const deputy = ranked[1]
     const selected = input.forceDeputy && deputy ? deputy : champion
@@ -95,28 +83,68 @@ export class ModelRouterService {
     return decision
   }
 
-  markModelDegraded(modelId: string) {
-    const model = this.registry.get(modelId)
+  async markModelDegraded(modelId: string, reason = 'provider_failure') {
+    await this.ensureInitialized()
+    const degraded = await this.modelRegistryRepository.markModelDegraded({
+      eventId: createId('model_health_event'),
+      modelId,
+      reason,
+      now: new Date().toISOString(),
+    })
 
-    if (!model) {
-      return
+    if (degraded) {
+      this.observabilityService.record(
+        'model_router_model_degraded',
+        {
+          modelId: degraded.modelId,
+          providerId: degraded.providerId,
+          modelName: degraded.modelName,
+          reason,
+          consecutiveFailures: degraded.consecutiveFailures,
+        },
+        'warn',
+      )
+    }
+  }
+
+  async recoverModel(modelId: string, reason = 'manual_recovery') {
+    await this.ensureInitialized()
+    const recovered = await this.modelRegistryRepository.recoverModel({
+      eventId: createId('model_health_event'),
+      modelId,
+      reason,
+      now: new Date().toISOString(),
+    })
+
+    if (recovered) {
+      this.observabilityService.record('model_router_model_recovered', {
+        modelId: recovered.modelId,
+        providerId: recovered.providerId,
+        modelName: recovered.modelName,
+        reason,
+      })
     }
 
-    this.registry.set(modelId, {
-      ...model,
-      lifecycleStatus: 'degraded',
-      healthStatus: 'degraded',
-      consecutiveFailures: model.consecutiveFailures + 1,
-      updatedAt: new Date().toISOString(),
-    })
+    return recovered
   }
 
-  getRegistrySnapshot() {
-    return [...this.registry.values()]
+  async getRegistrySnapshot() {
+    await this.ensureInitialized()
+
+    return this.modelRegistryRepository.listModels()
   }
 
-  private getRankedCandidates(role: ModelRouterRole) {
-    return [...this.registry.values()]
+  async getHealthEvents(modelId: string) {
+    await this.ensureInitialized()
+
+    return this.modelRegistryRepository.listHealthEvents(modelId)
+  }
+
+  private async getRankedCandidates(role: ModelRouterRole) {
+    await this.ensureInitialized()
+    const models = await this.modelRegistryRepository.listModels()
+
+    return models
       .filter((model) => {
         return (
           model.supportedRoles.includes(role) &&
@@ -179,142 +207,11 @@ export class ModelRouterService {
     }
   }
 
-  private createDefaultRegistry(): ModelRegistryEntry[] {
-    const now = new Date().toISOString()
-    const anthropicStatus = this.resolveConfiguredProviderStatus('anthropic')
-    const openAiStatus = this.resolveConfiguredProviderStatus('openai')
+  private async ensureInitialized() {
+    this.initialized ??= this.modelRegistryRepository.ensureDefaultModels(
+      createDefaultModelRegistry(this.configService),
+    )
 
-    return [
-      {
-        modelId: 'mock-json-v1-primary',
-        providerId: 'mock',
-        modelName: 'mock-json-v1',
-        supportedRoles: allRoles,
-        contextWindowTokens: 128_000,
-        maxOutputTokens: 8_192,
-        inputCostPerMillionTokensUsd: 0,
-        outputCostPerMillionTokensUsd: 0,
-        latencyP95Ms: 500,
-        evaluationScore: 0.88,
-        safetyScore: 0.85,
-        reliabilityScore: 0.98,
-        lifecycleStatus: 'active',
-        healthStatus: 'healthy',
-        consecutiveFailures: 0,
-        updatedAt: now,
-      },
-      {
-        modelId: 'mock-json-v1-deputy',
-        providerId: 'mock',
-        modelName: 'mock-json-v1-deputy',
-        supportedRoles: allRoles,
-        contextWindowTokens: 128_000,
-        maxOutputTokens: 8_192,
-        inputCostPerMillionTokensUsd: 0,
-        outputCostPerMillionTokensUsd: 0,
-        latencyP95Ms: 650,
-        evaluationScore: 0.82,
-        safetyScore: 0.82,
-        reliabilityScore: 0.96,
-        lifecycleStatus: 'active',
-        healthStatus: 'healthy',
-        consecutiveFailures: 0,
-        updatedAt: now,
-      },
-      {
-        modelId: 'mock-json-v2-candidate',
-        providerId: 'mock',
-        modelName: 'mock-json-v2-candidate',
-        supportedRoles: allRoles,
-        contextWindowTokens: 128_000,
-        maxOutputTokens: 8_192,
-        inputCostPerMillionTokensUsd: 0,
-        outputCostPerMillionTokensUsd: 0,
-        latencyP95Ms: 350,
-        evaluationScore: 0.99,
-        safetyScore: 0.99,
-        reliabilityScore: 0.99,
-        lifecycleStatus: 'candidate',
-        healthStatus: 'healthy',
-        consecutiveFailures: 0,
-        updatedAt: now,
-      },
-      {
-        modelId: 'anthropic-sonnet-candidate',
-        providerId: 'anthropic',
-        modelName: this.resolveConfiguredModel(
-          'anthropic',
-          'claude-3-5-sonnet-latest',
-        ),
-        supportedRoles: allRoles,
-        contextWindowTokens: 200_000,
-        maxOutputTokens: 8_192,
-        inputCostPerMillionTokensUsd: 3,
-        outputCostPerMillionTokensUsd: 15,
-        latencyP95Ms: 2_500,
-        evaluationScore: 0.94,
-        safetyScore: 0.92,
-        reliabilityScore: 0.92,
-        lifecycleStatus: anthropicStatus,
-        healthStatus: 'healthy',
-        consecutiveFailures: 0,
-        updatedAt: now,
-      },
-      {
-        modelId: 'openai-fast-candidate',
-        providerId: 'openai',
-        modelName: this.resolveConfiguredModel('openai', 'gpt-4o-mini'),
-        supportedRoles: allRoles,
-        contextWindowTokens: 128_000,
-        maxOutputTokens: 16_384,
-        inputCostPerMillionTokensUsd: 0.15,
-        outputCostPerMillionTokensUsd: 0.6,
-        latencyP95Ms: 1_200,
-        evaluationScore: 0.86,
-        safetyScore: 0.84,
-        reliabilityScore: 0.9,
-        lifecycleStatus: openAiStatus,
-        healthStatus: 'healthy',
-        consecutiveFailures: 0,
-        updatedAt: now,
-      },
-    ]
-  }
-
-  private resolveConfiguredProviderStatus(
-    providerId: 'anthropic' | 'openai',
-  ): ModelRegistryEntry['lifecycleStatus'] {
-    const primaryProvider = this.configService?.get('LLM_PRIMARY_PROVIDER', {
-      infer: true,
-    })
-    const fallbackProvider = this.configService?.get('LLM_FALLBACK_PROVIDER', {
-      infer: true,
-    })
-
-    return primaryProvider === providerId || fallbackProvider === providerId
-      ? 'active'
-      : 'candidate'
-  }
-
-  private resolveConfiguredModel(
-    providerId: 'anthropic' | 'openai',
-    defaultModel: string,
-  ) {
-    const primaryProvider = this.configService?.get('LLM_PRIMARY_PROVIDER', {
-      infer: true,
-    })
-    const fallbackProvider = this.configService?.get('LLM_FALLBACK_PROVIDER', {
-      infer: true,
-    })
-    const configuredModel =
-      primaryProvider === providerId
-        ? this.configService?.get('LLM_PRIMARY_MODEL', { infer: true })
-        : fallbackProvider === providerId
-          ? this.configService?.get('LLM_FALLBACK_MODEL', { infer: true })
-          : undefined
-
-    return configuredModel && !configuredModel.startsWith('mock-')
-      ? configuredModel
-      : defaultModel
+    await this.initialized
   }
 }

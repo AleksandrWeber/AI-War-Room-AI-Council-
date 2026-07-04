@@ -125,7 +125,7 @@ Run mutation endpoints verify that the request workspace matches the header work
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
-Current `v3.6` behavior:
+Current `v3.7` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
 - All JSON responses are parsed and validated with Zod schemas.
@@ -170,6 +170,9 @@ Current `v3.6` behavior:
 - LLM Gateway uses the role champion first and routes repair/retry attempts to the deputy model.
 - Provider failures mark the selected model as degraded so future selections can avoid it.
 - Model selection decisions emit structured observability events and `GET /api/model-router/registry` exposes the current registry snapshot.
+- Model registry and model health events are persisted in PostgreSQL outside of test mode.
+- `GET /api/model-router/registry/:modelId/health-events` returns degradation/recovery audit events.
+- `POST /api/model-router/registry/:modelId/recover` resets a degraded model to healthy for recovery workflows.
 - Anthropic and OpenAI provider adapters are available behind the same LLM Gateway contract.
 - Real provider API keys are read from local `.env` variables and must not be committed.
 - Anthropic/OpenAI registry entries remain `candidate` by default and become active only when selected through `LLM_PRIMARY_PROVIDER` or `LLM_FALLBACK_PROVIDER`.
