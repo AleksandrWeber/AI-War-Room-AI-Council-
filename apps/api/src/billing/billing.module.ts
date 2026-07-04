@@ -23,6 +23,15 @@ import { BillingMeterUsageService } from './billing-meter-usage.service.js'
 import { BILLING_METER_USAGE_REPOSITORY } from './billing-meter-usage.repository.js'
 import { InMemoryBillingMeterUsageRepository } from './in-memory-billing-meter-usage.repository.js'
 import { PostgresBillingMeterUsageRepository } from './postgres-billing-meter-usage.repository.js'
+import { BillingNotificationService } from './billing-notification.service.js'
+import { BILLING_NOTIFICATION_REPOSITORY } from './billing-notification.repository.js'
+import { InMemoryBillingNotificationRepository } from './in-memory-billing-notification.repository.js'
+import { PostgresBillingNotificationRepository } from './postgres-billing-notification.repository.js'
+import { BILLING_NOTIFICATION_ADAPTER } from './billing-notification.adapter.js'
+import {
+  EmailStubBillingNotificationAdapter,
+  MockBillingNotificationAdapter,
+} from './billing-notification.adapter.js'
 
 @Module({
   imports: [PersistenceModule, AuthModule, WorkspacesModule, UsageModule],
@@ -32,8 +41,10 @@ import { PostgresBillingMeterUsageRepository } from './postgres-billing-meter-us
     PostgresBillingWebhookRepository,
     PostgresBillingInvoiceRepository,
     PostgresBillingMeterUsageRepository,
+    PostgresBillingNotificationRepository,
     BillingService,
     BillingMeterUsageService,
+    BillingNotificationService,
     {
       provide: BILLING_REPOSITORY,
       inject: [ConfigService, PostgresBillingRepository],
@@ -83,6 +94,37 @@ import { PostgresBillingMeterUsageRepository } from './postgres-billing-meter-us
       },
     },
     {
+      provide: BILLING_NOTIFICATION_REPOSITORY,
+      inject: [ConfigService, PostgresBillingNotificationRepository],
+      useFactory: (
+        configService: ConfigService<ApiEnv, true>,
+        postgresBillingNotificationRepository: PostgresBillingNotificationRepository,
+      ) => {
+        return configService.get('NODE_ENV', { infer: true }) === 'test'
+          ? new InMemoryBillingNotificationRepository()
+          : postgresBillingNotificationRepository
+      },
+    },
+    {
+      provide: BILLING_NOTIFICATION_ADAPTER,
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService<ApiEnv, true>) => {
+        const adapter = configService.get('BILLING_NOTIFICATION_ADAPTER', {
+          infer: true,
+        })
+
+        if (adapter === 'email') {
+          return new EmailStubBillingNotificationAdapter(
+            configService.get('BILLING_NOTIFICATION_RECIPIENT', {
+              infer: true,
+            })!,
+          )
+        }
+
+        return new MockBillingNotificationAdapter()
+      },
+    },
+    {
       provide: BILLING_ADAPTER,
       inject: [ConfigService],
       useFactory: (configService: ConfigService<ApiEnv, true>) => {
@@ -109,6 +151,6 @@ import { PostgresBillingMeterUsageRepository } from './postgres-billing-meter-us
       },
     },
   ],
-  exports: [BillingService, BillingMeterUsageService],
+  exports: [BillingService, BillingMeterUsageService, BillingNotificationService],
 })
 export class BillingModule {}

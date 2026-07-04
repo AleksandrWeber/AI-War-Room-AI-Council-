@@ -10,6 +10,9 @@ import { InMemoryUsageRepository } from '../usage/in-memory-usage.repository.js'
 import { UsageService } from '../usage/usage.service.js'
 import { BillingMeterUsageService } from './billing-meter-usage.service.js'
 import { InMemoryBillingMeterUsageRepository } from './in-memory-billing-meter-usage.repository.js'
+import { BillingNotificationService } from './billing-notification.service.js'
+import { InMemoryBillingNotificationRepository } from './in-memory-billing-notification.repository.js'
+import { MockBillingNotificationAdapter } from './billing-notification.adapter.js'
 
 function createBillingService(env: Partial<ApiEnv>) {
   const config = {
@@ -18,6 +21,7 @@ function createBillingService(env: Partial<ApiEnv>) {
     STRIPE_SUCCESS_URL: 'http://127.0.0.1:5173/billing/success',
     STRIPE_CANCEL_URL: 'http://127.0.0.1:5173/billing/cancel',
     STRIPE_PORTAL_RETURN_URL: 'http://127.0.0.1:5173/billing/portal',
+    BILLING_NOTIFICATION_ADAPTER: 'mock',
     API_PORT: 3000,
     ...env,
   } as ApiEnv
@@ -38,6 +42,14 @@ function createBillingService(env: Partial<ApiEnv>) {
     meterUsageRepository,
     adapter,
   )
+  const notificationRepository = new InMemoryBillingNotificationRepository()
+  const notificationService = new BillingNotificationService(
+    configService,
+    repository,
+    notificationRepository,
+    new MockBillingNotificationAdapter(),
+    usageService,
+  )
 
   return {
     service: new BillingService(
@@ -48,6 +60,7 @@ function createBillingService(env: Partial<ApiEnv>) {
       adapter,
       usageService,
       meterUsageService,
+      notificationService,
     ),
     repository,
     webhookRepository,
@@ -73,6 +86,7 @@ describe('BillingService', () => {
       supportsBillingExport: false,
       supportsBillingAlerts: false,
       supportsMeteredUsage: false,
+      supportsBillingNotifications: false,
     })
   })
 
@@ -123,6 +137,47 @@ describe('BillingService', () => {
           quantity: 1200,
           status: 'reported',
           runId: 'run_meter_test',
+        }),
+      ]),
+    )
+  })
+
+  it('delivers billing notifications for past due subscriptions', async () => {
+    const { service } = createBillingService({})
+
+    await service.handleWebhook(
+      JSON.stringify({
+        eventId: 'mock_evt_notif_seed',
+        event: 'checkout.completed',
+        workspaceId: 'workspace_1',
+        paidTier: 'pro',
+        externalCustomerId: 'cus_notif',
+      }),
+      undefined,
+    )
+
+    await service.handleWebhook(
+      JSON.stringify({
+        eventId: 'mock_evt_notif_past_due',
+        event: 'invoice.payment_failed',
+        workspaceId: 'workspace_1',
+        externalInvoiceId: 'mock_inv_notif',
+        externalCustomerId: 'cus_notif',
+        amountTotalUsd: 29,
+        paidTier: 'pro',
+      }),
+      undefined,
+    )
+
+    const notifications = await service.listWorkspaceNotifications('workspace_1')
+
+    expect(notifications.notifications).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          alertType: 'billing_past_due',
+          severity: 'critical',
+          status: 'delivered',
+          channel: 'mock',
         }),
       ]),
     )

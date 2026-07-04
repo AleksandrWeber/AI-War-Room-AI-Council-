@@ -40,6 +40,7 @@ export const billingCapabilitiesResponseSchema = z.object({
   supportsBillingExport: z.boolean(),
   supportsBillingAlerts: z.boolean(),
   supportsMeteredUsage: z.boolean(),
+  supportsBillingNotifications: z.boolean(),
   checkoutTiers: z.array(checkoutPaidTierSchema),
   guidance: z.string(),
 })
@@ -272,6 +273,46 @@ export type BillingMeterUsageReportsResponse = z.infer<
   typeof billingMeterUsageReportsResponseSchema
 >
 
+export const billingNotificationChannelSchema = z.enum(['mock', 'email'])
+export type BillingNotificationChannel = z.infer<
+  typeof billingNotificationChannelSchema
+>
+
+export const billingNotificationStatusSchema = z.enum([
+  'pending',
+  'delivered',
+  'failed',
+])
+export type BillingNotificationStatus = z.infer<
+  typeof billingNotificationStatusSchema
+>
+
+export const billingNotificationRecordSchema = z.object({
+  billingNotificationId: nonEmptyStringSchema,
+  workspaceId: nonEmptyStringSchema,
+  alertId: nonEmptyStringSchema,
+  alertType: billingAlertTypeSchema,
+  severity: billingAlertSeveritySchema,
+  message: nonEmptyStringSchema,
+  channel: billingNotificationChannelSchema,
+  status: billingNotificationStatusSchema,
+  deliveryReference: z.string().nullable(),
+  errorMessage: z.string().nullable(),
+  deliveredAt: utcDateStringSchema.nullable(),
+  createdAt: utcDateStringSchema,
+})
+export type BillingNotificationRecord = z.infer<
+  typeof billingNotificationRecordSchema
+>
+
+export const billingNotificationsResponseSchema = z.object({
+  workspaceId: nonEmptyStringSchema,
+  notifications: z.array(billingNotificationRecordSchema),
+})
+export type BillingNotificationsResponse = z.infer<
+  typeof billingNotificationsResponseSchema
+>
+
 export function getBillingGuidance(input: {
   enabled: boolean
   adapter: BillingAdapter
@@ -281,8 +322,8 @@ export function getBillingGuidance(input: {
   }
 
   if (input.adapter === 'mock') {
-    return 'Mock billing is active. Checkout, customer portal, invoice history, usage summary, billing export, billing alerts, and metered usage reporting run locally for development and tests.'
+    return 'Mock billing is active. Checkout, customer portal, invoice history, usage summary, billing export, billing alerts, metered usage reporting, and billing notification delivery run locally for development and tests.'
   }
 
-  return 'Stripe billing is active. Use checkout for upgrades, the customer portal for subscription management, and configure webhooks for idempotent billing, invoice history, usage summary, export, alerts, and metered usage reporting.'
+  return 'Stripe billing is active. Use checkout for upgrades, the customer portal for subscription management, and configure webhooks for idempotent billing, invoice history, usage summary, export, alerts, metered usage reporting, and notification delivery.'
 }

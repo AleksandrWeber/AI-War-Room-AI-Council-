@@ -58,6 +58,7 @@ describe('billing integration', () => {
       supportsBillingExport: true,
       supportsBillingAlerts: true,
       supportsMeteredUsage: true,
+      supportsBillingNotifications: true,
       checkoutTiers: ['pro', 'business'],
     })
   })
@@ -365,6 +366,48 @@ describe('billing integration', () => {
           quantity: 900,
           status: 'reported',
           runId: 'run_integration_meter',
+        }),
+      ]),
+    )
+  })
+
+  it('delivers and lists billing notifications for past due subscriptions', async () => {
+    await request(app!.getHttpServer())
+      .post('/api/billing/webhook')
+      .send({
+        eventId: 'mock_evt_notif_integration_seed',
+        event: 'checkout.completed',
+        workspaceId: 'workspace_1',
+        paidTier: 'pro',
+        externalCustomerId: 'cus_notif_integration',
+      })
+      .expect(201)
+
+    await request(app!.getHttpServer())
+      .post('/api/billing/webhook')
+      .send({
+        eventId: 'mock_evt_notif_integration',
+        event: 'invoice.payment_failed',
+        workspaceId: 'workspace_1',
+        externalInvoiceId: 'mock_inv_notif_integration',
+        externalCustomerId: 'cus_notif_integration',
+        amountTotalUsd: 29,
+        paidTier: 'pro',
+      })
+      .expect(201)
+
+    const response = await request(app!.getHttpServer())
+      .get('/api/billing/workspace/workspace_1/notifications')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body.notifications).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          alertType: 'billing_past_due',
+          severity: 'critical',
+          status: 'delivered',
+          channel: 'mock',
         }),
       ]),
     )

@@ -130,6 +130,17 @@ export class BillingController {
     return this.billingService.getWorkspaceBillingAlerts(workspaceId)
   }
 
+  @Get('workspace/:workspaceId/notifications')
+  @UseGuards(WorkspaceAccessGuard)
+  listWorkspaceNotifications(
+    @Param('workspaceId') workspaceId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    this.assertWorkspaceParam(request, workspaceId)
+
+    return this.billingService.listWorkspaceNotifications(workspaceId)
+  }
+
   @Get('workspace/:workspaceId/meter-usage-reports')
   @UseGuards(WorkspaceAccessGuard)
   listWorkspaceMeterUsageReports(

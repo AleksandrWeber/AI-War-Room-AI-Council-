@@ -5,6 +5,7 @@ import type {
   BillingCapabilitiesResponse,
   BillingInvoiceRecord,
   BillingMeterUsageReport,
+  BillingNotificationRecord,
   BillingWebhookEventRecord,
   BillingWorkspaceAlertsResponse,
   BillingWorkspaceStatusResponse,
@@ -33,6 +34,7 @@ import {
   fetchBillingAlerts,
   fetchBillingInvoices,
   fetchBillingMeterUsageReports,
+  fetchBillingNotifications,
   fetchBillingUsageSummary,
   fetchBillingWebhookEvents,
   fetchBillingWorkspaceStatus,
@@ -45,6 +47,7 @@ import {
   fetchMockCustomerPortal,
   formatBillingStatus,
   formatBillingAlertSeverity,
+  formatBillingNotificationStatus,
   formatMeterUsageReportStatus,
   formatPaidTier,
   formatTierLimits,
@@ -592,6 +595,9 @@ function App() {
   >([])
   const [billingMeterUsageReports, setBillingMeterUsageReports] = useState<
     BillingMeterUsageReport[]
+  >([])
+  const [billingNotifications, setBillingNotifications] = useState<
+    BillingNotificationRecord[]
   >([])
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
@@ -1300,6 +1306,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setBillingMeterUsageReports(meterUsage.reports)
+
+      const notifications = await fetchBillingNotifications(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBillingNotifications(notifications.notifications)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -2155,6 +2168,34 @@ function App() {
             ) : (
               <p className="clear-copy">
                 No metered usage reports recorded for this workspace yet.
+              </p>
+            )}
+          </div>
+        ) : null}
+
+        {billingCapabilities?.supportsBillingNotifications ? (
+          <div className="billing-notifications">
+            <span>Notification delivery</span>
+            {billingNotifications.length ? (
+              billingNotifications.map((notification) => (
+                <article
+                  className={`billing-notification-card billing-notification-card--${notification.status}`}
+                  key={notification.billingNotificationId}
+                >
+                  <strong>{formatBillingAlertSeverity(notification.severity)}</strong>
+                  <p>{notification.message}</p>
+                  <small>
+                    {formatBillingNotificationStatus(notification.status)} ·{' '}
+                    {notification.channel}
+                    {notification.deliveryReference
+                      ? ` · ${notification.deliveryReference}`
+                      : ''}
+                  </small>
+                </article>
+              ))
+            ) : (
+              <p className="clear-copy">
+                No billing notifications have been delivered for this workspace yet.
               </p>
             )}
           </div>

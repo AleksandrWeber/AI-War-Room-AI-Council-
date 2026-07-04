@@ -49,6 +49,7 @@ import {
 } from './billing.repository.js'
 import { UsageService } from '../usage/usage.service.js'
 import { BillingMeterUsageService } from './billing-meter-usage.service.js'
+import { BillingNotificationService } from './billing-notification.service.js'
 
 @Injectable()
 export class BillingService {
@@ -64,6 +65,7 @@ export class BillingService {
     private readonly billingAdapter: BillingCheckoutAdapter,
     private readonly usageService: UsageService,
     private readonly billingMeterUsageService: BillingMeterUsageService,
+    private readonly billingNotificationService: BillingNotificationService,
   ) {}
 
   getCapabilities() {
@@ -83,6 +85,8 @@ export class BillingService {
       supportsBillingExport: enabled,
       supportsBillingAlerts: enabled,
       supportsMeteredUsage: this.billingMeterUsageService.supportsMeteredUsage(),
+      supportsBillingNotifications:
+        this.billingNotificationService.supportsBillingNotifications(),
       checkoutTiers: ['pro', 'business'],
       guidance: getBillingGuidance({ enabled, adapter }),
     })
@@ -144,6 +148,12 @@ export class BillingService {
 
   async listWorkspaceMeterUsageReports(workspaceId: string) {
     return this.billingMeterUsageService.listWorkspaceMeterUsageReports(
+      workspaceId,
+    )
+  }
+
+  async listWorkspaceNotifications(workspaceId: string) {
+    return this.billingNotificationService.listWorkspaceNotifications(
       workspaceId,
     )
   }
@@ -484,6 +494,9 @@ export class BillingService {
           status: event.status,
           paidTier: event.paidTier,
         })
+        await this.billingNotificationService.syncWorkspaceNotifications(
+          event.workspaceId,
+        )
         return event.workspaceId
       case 'subscription.canceled':
         await this.billingRepository.updateBillingStatus({
@@ -491,6 +504,9 @@ export class BillingService {
           status: 'canceled',
           paidTier: 'free',
         })
+        await this.billingNotificationService.syncWorkspaceNotifications(
+          event.workspaceId,
+        )
         return event.workspaceId
       case 'payment.failed': {
         const billingRecord =
@@ -525,6 +541,10 @@ export class BillingService {
             periodEnd: null,
           })
         }
+
+        await this.billingNotificationService.syncWorkspaceNotifications(
+          billingRecord.workspaceId,
+        )
 
         return billingRecord.workspaceId
       }

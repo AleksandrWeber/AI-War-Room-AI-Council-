@@ -38,6 +38,7 @@ import {
 import { TriageService } from '../triage/triage.service.js'
 import { UsageService } from '../usage/usage.service.js'
 import { BillingMeterUsageService } from '../billing/billing-meter-usage.service.js'
+import { BillingNotificationService } from '../billing/billing-notification.service.js'
 import type { PipelineStreamEvent } from './pipeline-stream-event.js'
 
 function createId(prefix: string) {
@@ -59,6 +60,7 @@ export class RunsService {
     private readonly artifactService: ArtifactService,
     private readonly usageService: UsageService,
     private readonly billingMeterUsageService: BillingMeterUsageService,
+    private readonly billingNotificationService: BillingNotificationService,
     private readonly observabilityService: ObservabilityService,
   ) {}
 
@@ -376,6 +378,9 @@ export class RunsService {
       runId: request.draftRun.runId,
       totalTokens,
     })
+    await this.billingNotificationService.syncWorkspaceNotifications(
+      request.draftRun.workspaceId,
+    )
     this.recordPipelineCostSignal(request, usageEvents)
     await emit?.({
       eventId: createId('event'),

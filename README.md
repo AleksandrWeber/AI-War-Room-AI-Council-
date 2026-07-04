@@ -315,11 +315,23 @@ Metered usage reporting:
 - `GET /api/billing/workspace/:workspaceId/meter-usage-reports` returns recent metered usage report history.
 - Mock billing enables metered usage automatically; Stripe requires `STRIPE_METERED_USAGE_ENABLED=true` and `STRIPE_METER_EVENT_NAME`.
 
+Billing notification delivery:
+
+- `GET /api/billing/workspace/:workspaceId/notifications` syncs active billing alerts and returns delivery history.
+- Notifications deliver once per alert id through mock or email-stub adapters (`BILLING_NOTIFICATION_ADAPTER`).
+- Webhooks, pipeline runs, and notification reads trigger delivery sync for usage and billing status alerts.
+
 Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
 
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v5.15` behavior:
+
+- Billing alert notifications are persisted and delivered once per alert id.
+- Mock notification delivery is enabled when billing is active; email adapter requires `BILLING_NOTIFICATION_RECIPIENT`.
+- The web billing panel shows notification delivery history with channel and status.
 
 Current `v5.14` behavior:
 

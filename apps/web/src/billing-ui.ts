@@ -11,6 +11,7 @@ import {
   billingCapabilitiesResponseSchema,
   billingInvoicesResponseSchema,
   billingMeterUsageReportsResponseSchema,
+  billingNotificationsResponseSchema,
   billingWorkspaceAlertsResponseSchema,
   billingWorkspaceUsageResponseSchema,
   billingWebhookEventsResponseSchema,
@@ -209,6 +210,38 @@ export function formatMeterUsageReportStatus(
       return 'Reported'
     case 'skipped':
       return 'Skipped'
+    case 'failed':
+      return 'Failed'
+  }
+}
+
+export async function fetchBillingNotifications(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/billing/workspace/${encodeURIComponent(workspaceId)}/notifications`,
+    {
+      headers,
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return billingNotificationsResponseSchema.parse(await response.json())
+}
+
+export function formatBillingNotificationStatus(
+  status: 'pending' | 'delivered' | 'failed',
+) {
+  switch (status) {
+    case 'pending':
+      return 'Pending'
+    case 'delivered':
+      return 'Delivered'
     case 'failed':
       return 'Failed'
   }

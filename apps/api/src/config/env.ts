@@ -84,6 +84,8 @@ export const envSchema = z.object({
     .default('http://127.0.0.1:5173/billing/portal'),
   STRIPE_METERED_USAGE_ENABLED: booleanEnvSchema.default(false),
   STRIPE_METER_EVENT_NAME: optionalEnvStringSchema,
+  BILLING_NOTIFICATION_ADAPTER: z.enum(['mock', 'email']).default('mock'),
+  BILLING_NOTIFICATION_RECIPIENT: optionalEnvStringSchema,
 })
 
 export type ApiEnv = z.infer<typeof envSchema>
@@ -131,6 +133,15 @@ export function validateEnv(config: Record<string, unknown>): ApiEnv {
     if (env.STRIPE_METERED_USAGE_ENABLED && !env.STRIPE_METER_EVENT_NAME) {
       throw new Error(
         'STRIPE_METER_EVENT_NAME is required when STRIPE_METERED_USAGE_ENABLED=true and STRIPE_BILLING_ADAPTER=stripe.',
+      )
+    }
+
+    if (
+      env.BILLING_NOTIFICATION_ADAPTER === 'email' &&
+      !env.BILLING_NOTIFICATION_RECIPIENT
+    ) {
+      throw new Error(
+        'BILLING_NOTIFICATION_RECIPIENT is required when BILLING_NOTIFICATION_ADAPTER=email.',
       )
     }
   }

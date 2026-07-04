@@ -428,6 +428,65 @@
   margin: 0;
 }
 
+.billing-notification-card small {
+  margin: 0;
+}
+
+.billing-notifications {
+  display: grid;
+  gap: 12px;
+}
+
+.billing-notifications > span {
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.billing-notification-card {
+  border-radius: 18px;
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+}
+
+.billing-notification-card p,
+.billing-notification-card small {
+  margin: 0;
+}
+
+.billing-notification-card--delivered {
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.34);
+}
+
+.billing-notification-card--pending {
+  background: rgba(56, 189, 248, 0.12);
+  border: 1px solid rgba(56, 189, 248, 0.34);
+}
+
+.billing-notification-card--failed {
+  background: rgba(239, 68, 68, 0.12);
+  border: 1px solid rgba(239, 68, 68, 0.34);
+}
+
+.billing-notification-card--delivered p,
+.billing-notification-card--delivered small {
+  color: #bbf7d0;
+}
+
+.billing-notification-card--pending p,
+.billing-notification-card--pending small {
+  color: #bae6fd;
+}
+
+.billing-notification-card--failed p,
+.billing-notification-card--failed small {
+  color: #fecaca;
+}
+
 .billing-webhook-events {
   display: grid;
   gap: 12px;
