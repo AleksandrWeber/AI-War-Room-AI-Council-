@@ -1,4 +1,4 @@
-import { Fragment, useEffect, useState, type FormEvent } from 'react'
+import { Fragment, useEffect, useRef, useState, type FormEvent } from 'react'
 import type { RunCapabilitiesResponse } from '@ai-war-room/schemas'
 import './App.css'
 import {
@@ -484,6 +484,7 @@ function App() {
   const [streamEvents, setStreamEvents] = useState<PipelineStreamEvent[]>([])
   const [streamedArtifacts, setStreamedArtifacts] = useState<ArtifactResult[]>([])
   const [lastStreamEventId, setLastStreamEventId] = useState<string | null>(null)
+  const lastStreamEventIdRef = useRef<string | null>(null)
   const [lastStreamRunId, setLastStreamRunId] = useState<string | null>(null)
   const [runCapabilities, setRunCapabilities] =
     useState<RunCapabilitiesResponse | null>(null)
@@ -528,6 +529,7 @@ function App() {
     setActiveTemporalWorkflow(toTemporalRunStartResponse(persisted))
 
     if (persisted.lastStreamEventId) {
+      lastStreamEventIdRef.current = persisted.lastStreamEventId
       setLastStreamEventId(persisted.lastStreamEventId)
       setLastStreamRunId(persisted.runId)
     }
@@ -746,6 +748,7 @@ function App() {
     if (!canReplayStream) {
       setStreamEvents([])
       setStreamedArtifacts([])
+      lastStreamEventIdRef.current = null
       setLastStreamEventId(null)
       setActiveTemporalWorkflow(null)
     }
@@ -816,6 +819,7 @@ function App() {
     setLastStreamRunId(draftRun.runId)
     setStreamEvents([])
     setStreamedArtifacts([])
+    lastStreamEventIdRef.current = null
     setLastStreamEventId(null)
     savePersistedTemporalWorkflow(null)
 
@@ -908,9 +912,10 @@ function App() {
     const headers: Record<string, string> = {
       ...localAuthHeaders,
     }
+    const afterEventId = options?.afterEventId ?? lastStreamEventIdRef.current
 
-    if (options?.afterEventId) {
-      headers['Last-Event-ID'] = options.afterEventId
+    if (afterEventId) {
+      headers['Last-Event-ID'] = afterEventId
     }
 
     const response = await fetch(`${apiBaseUrl}/runs/workflows/${workflowId}/stream`, {
@@ -955,7 +960,9 @@ function App() {
             }
           : current,
       )
-      await observeTemporalWorkflow(workflow.workflowId)
+      await observeTemporalWorkflow(workflow.workflowId, {
+        afterEventId: lastStreamEventIdRef.current,
+      })
     }
 
     if (latestStatus === 'completed') {
@@ -1180,6 +1187,7 @@ function App() {
 
   function handlePipelineStreamEvent(event: PipelineStreamEvent) {
     setStreamEvents((current) => [...current, event])
+    lastStreamEventIdRef.current = event.eventId
     setLastStreamEventId(event.eventId)
 
     if (event.type === 'artifact') {

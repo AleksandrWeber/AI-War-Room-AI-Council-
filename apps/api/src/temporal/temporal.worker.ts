@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config'
 import { NativeConnection, Worker } from '@temporalio/worker'
 import { AppModule } from '../app.module.js'
 import type { ApiEnv } from '../config/env.js'
+import { StreamEventBufferService } from '../persistence/stream-event-buffer.service.js'
 import { RunsService } from '../runs/runs.service.js'
 import { createRunWorkflowActivities } from './run-workflow.activities.js'
 import { getTemporalWorkerConfig } from './temporal-worker.config.js'
@@ -12,6 +13,7 @@ export async function startTemporalWorker() {
   const app = await NestFactory.createApplicationContext(AppModule)
   const configService = app.get(ConfigService<ApiEnv, true>)
   const runsService = app.get(RunsService)
+  const streamEventBufferService = app.get(StreamEventBufferService)
   const workerConfig = getTemporalWorkerConfig(configService)
   const connection = await NativeConnection.connect({
     address: workerConfig.address,
@@ -22,7 +24,10 @@ export async function startTemporalWorker() {
     namespace: workerConfig.namespace,
     taskQueue: workerConfig.taskQueue,
     workflowsPath: workerConfig.workflowsPath,
-    activities: createRunWorkflowActivities(runsService),
+    activities: createRunWorkflowActivities({
+      runsService,
+      streamEventBufferService,
+    }),
   })
 
   console.log(

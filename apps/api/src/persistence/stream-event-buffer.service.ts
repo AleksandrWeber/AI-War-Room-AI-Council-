@@ -91,6 +91,29 @@ export class StreamEventBufferService implements OnModuleDestroy {
     }
   }
 
+  async replayAll(input: {
+    workspaceId: string
+    runId: string
+  }): Promise<PipelineStreamEvent[]> {
+    const key = this.createKey(input.workspaceId, input.runId)
+
+    if (!this.redisClient) {
+      return (this.localStreams.get(key) ?? []).map((entry) => entry.event)
+    }
+
+    try {
+      if (!this.redisClient.isOpen) {
+        await this.redisClient.connect()
+      }
+
+      const result = await this.redisClient.sendCommand(['XRANGE', key, '-', '+'])
+
+      return this.parseRedisRange(result)
+    } catch {
+      return (this.localStreams.get(key) ?? []).map((entry) => entry.event)
+    }
+  }
+
   async onModuleDestroy() {
     if (this.redisClient?.isOpen) {
       await this.redisClient.quit()

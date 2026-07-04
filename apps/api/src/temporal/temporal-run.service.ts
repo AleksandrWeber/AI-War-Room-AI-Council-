@@ -262,14 +262,29 @@ export class TemporalRunService {
     })
 
     if (!input.afterEventId) {
+      const bufferedEvents = await this.streamEventBufferService.replayAll({
+        workspaceId: workflow.workspaceId,
+        runId: workflow.runId,
+      })
+
+      if (bufferedEvents.length > 0) {
+        return bufferedEvents
+      }
+
       return [await this.publishWorkflowStatus(workflow)]
     }
 
-    return this.streamEventBufferService.replayAfter({
+    const replayedEvents = await this.streamEventBufferService.replayAfter({
       workspaceId: workflow.workspaceId,
       runId: workflow.runId,
       afterEventId: input.afterEventId,
     })
+
+    if (replayedEvents.length > 0) {
+      return replayedEvents
+    }
+
+    return [await this.publishWorkflowStatus(workflow)]
   }
 
   private parsePipelineRequest(input: unknown, authContext: AuthContext) {

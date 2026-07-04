@@ -57,6 +57,7 @@ function createStreamEventBufferService() {
       return event
     }),
     replayAfter: vi.fn(async () => events),
+    replayAll: vi.fn(async () => events),
   } as unknown as StreamEventBufferService
 }
 
@@ -269,6 +270,42 @@ describe('TemporalRunService', () => {
       }),
     ])
     expect(streamEventBufferService.append).toHaveBeenCalled()
+  })
+
+  it('replays buffered pipeline events from the workflow stream endpoint', async () => {
+    const request = createRequest()
+    const { service, streamEventBufferService } = createService({
+      enabled: true,
+      temporalRunClient: {
+        startDurableRun: vi.fn(async () => ({
+          workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+          temporalRunId: 'temporal_run_1',
+        })),
+        describeDurableRun: vi.fn(),
+      },
+    })
+    const startResponse = await service.startApprovedRun(request, authContext)
+    const pipelineEvent = {
+      eventId: 'event_pipeline_1',
+      type: 'status' as const,
+      stepId: 'agent_pool',
+      label: 'Prompt-driven agent pool',
+      status: 'running' as const,
+      timestamp: now,
+    }
+
+    vi.mocked(streamEventBufferService.replayAll).mockResolvedValueOnce([pipelineEvent])
+
+    await expect(
+      service.getWorkflowStreamEvents({
+        workflowId: startResponse.workflowId,
+        authContext,
+      }),
+    ).resolves.toEqual([pipelineEvent])
+    expect(streamEventBufferService.replayAll).toHaveBeenCalledWith({
+      workspaceId: 'workspace_1',
+      runId: 'run_temporal_start_1',
+    })
   })
 
   it('keeps workflow start disabled until Temporal is explicitly enabled', async () => {

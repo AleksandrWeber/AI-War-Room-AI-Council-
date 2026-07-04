@@ -1,5 +1,6 @@
 import type { MockPipelineRequest, MockPipelineResult } from '@ai-war-room/schemas'
 import { describe, expect, it, vi } from 'vitest'
+import type { PipelineStreamEvent } from '../runs/pipeline-stream-event.js'
 import { createRunWorkflowActivities } from './run-workflow.activities.js'
 
 const now = '2026-01-01T00:00:00.000Z'
@@ -78,10 +79,10 @@ function createResult(): MockPipelineResult {
           recommendations: ['Add Temporal integration behind a boundary'],
           roleSpecificInsights: {},
         },
-        validationStatus: 'valid',
         promptVersion: 'agent.product_manager.v1',
         modelProvider: 'mock',
         modelName: 'mock-json-v1',
+        validationStatus: 'valid',
         inputTokens: 10,
         outputTokens: 20,
         estimatedCostUsd: 0,
@@ -142,7 +143,10 @@ function createResult(): MockPipelineResult {
   }
 }
 
-function createArtifact(artifactType: 'executive_summary' | 'prd' | 'development_prompt', content: object) {
+function createArtifact(
+  artifactType: 'executive_summary' | 'prd' | 'development_prompt',
+  content: object,
+) {
   return {
     metadata: {
       artifactId: `artifact_${artifactType}`,
@@ -169,16 +173,49 @@ function createArtifact(artifactType: 'executive_summary' | 'prd' | 'development
   }
 }
 
+function createActivities(input?: {
+  executeMockPipelineStream?: ReturnType<typeof vi.fn>
+  append?: ReturnType<typeof vi.fn>
+}) {
+  const append = input?.append ?? vi.fn(async (payload: { event: PipelineStreamEvent }) => payload.event)
+  const executeMockPipelineStream =
+    input?.executeMockPipelineStream ??
+    vi.fn(async (_request: MockPipelineRequest, emit: (event: PipelineStreamEvent) => Promise<void>) => {
+      await emit({
+        eventId: 'event_status_1',
+        type: 'status',
+        stepId: 'agent_pool',
+        label: 'Agent pool',
+        status: 'running',
+        timestamp: now,
+      })
+
+      return createResult()
+    })
+
+  const activities = createRunWorkflowActivities({
+    runsService: {
+      executeMockPipelineStream,
+    },
+    streamEventBufferService: {
+      append,
+    },
+  })
+
+  return {
+    activities,
+    append,
+    executeMockPipelineStream,
+  }
+}
+
 describe('run workflow activities', () => {
   it('validates durable workflow input with existing pipeline schemas', async () => {
-    const activities = createRunWorkflowActivities({
-      executeMockPipeline: vi.fn(),
-    })
-    const request = createRequest()
+    const { activities } = createActivities()
 
     await expect(
       activities.validateDurableRun({
-        request,
+        request: createRequest(),
         authContext: {
           userId: 'user_test',
           workspaceId: 'workspace_1',
@@ -189,32 +226,28 @@ describe('run workflow activities', () => {
     ).resolves.toMatchObject({
       request: {
         draftRun: {
-          runId: request.draftRun.runId,
+          runId: 'run_temporal_1',
         },
       },
     })
   })
 
   it('rejects invalid workflow input before executing a pipeline activity', async () => {
-    const executeMockPipeline = vi.fn()
-    const activities = createRunWorkflowActivities({
-      executeMockPipeline,
-    })
+    const { activities, executeMockPipelineStream } = createActivities()
 
     await expect(
       activities.validateDurableRun({
         requestedAt: now,
       }),
     ).rejects.toThrow()
-    expect(executeMockPipeline).not.toHaveBeenCalled()
+    expect(executeMockPipelineStream).not.toHaveBeenCalled()
   })
 
-  it('executes the approved run through the existing RunsService boundary', async () => {
+  it('executes the approved run through the streaming RunsService boundary', async () => {
     const request = createRequest()
     const result = createResult()
-    const executeMockPipeline = vi.fn(async () => result)
-    const activities = createRunWorkflowActivities({
-      executeMockPipeline,
+    const { activities, executeMockPipelineStream } = createActivities({
+      executeMockPipelineStream: vi.fn(async () => result),
     })
 
     await expect(
@@ -233,10 +266,40 @@ describe('run workflow activities', () => {
         status: 'completed',
       },
     })
-    expect(executeMockPipeline).toHaveBeenCalledWith(request, {
-      userId: 'user_test',
-      workspaceId: 'workspace_1',
-      role: 'owner',
+    expect(executeMockPipelineStream).toHaveBeenCalledWith(
+      request,
+      expect.any(Function),
+      {
+        userId: 'user_test',
+        workspaceId: 'workspace_1',
+        role: 'owner',
+      },
+    )
+  })
+
+  it('buffers pipeline stream events while executing through Temporal activities', async () => {
+    const request = createRequest()
+    const { activities, append } = createActivities()
+
+    await activities.executeApprovedRun({
+      request,
+      authContext: {
+        userId: 'user_test',
+        workspaceId: 'workspace_1',
+        role: 'owner',
+      },
+      requestedAt: now,
     })
+
+    expect(append).toHaveBeenCalledWith(
+      expect.objectContaining({
+        workspaceId: 'workspace_1',
+        runId: 'run_temporal_1',
+        event: expect.objectContaining({
+          type: 'status',
+          stepId: 'agent_pool',
+        }),
+      }),
+    )
   })
 })
