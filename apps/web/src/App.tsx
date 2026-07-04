@@ -1,5 +1,8 @@
 import { Fragment, useEffect, useRef, useState, type FormEvent } from 'react'
-import type { RunCapabilitiesResponse } from '@ai-war-room/schemas'
+import type {
+  RunCapabilitiesResponse,
+  TemporalRuntimeHealthResponse,
+} from '@ai-war-room/schemas'
 import './App.css'
 import {
   type TemporalRunStartResponse,
@@ -488,6 +491,8 @@ function App() {
   const [lastStreamRunId, setLastStreamRunId] = useState<string | null>(null)
   const [runCapabilities, setRunCapabilities] =
     useState<RunCapabilitiesResponse | null>(null)
+  const [temporalRuntimeHealth, setTemporalRuntimeHealth] =
+    useState<TemporalRuntimeHealthResponse | null>(null)
   const useTemporalWorkflowRuntime = shouldUseTemporalRuntime(
     runCapabilities?.runtime ?? null,
   )
@@ -589,6 +594,34 @@ function App() {
       controller.abort()
     }
   }, [])
+
+  useEffect(() => {
+    if (!useTemporalWorkflowRuntime) {
+      setTemporalRuntimeHealth(null)
+      return
+    }
+
+    const controller = new AbortController()
+
+    fetch(`${apiBaseUrl}/runs/temporal/health`, {
+      signal: controller.signal,
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((health) => {
+        if (health && !controller.signal.aborted) {
+          setTemporalRuntimeHealth(health as TemporalRuntimeHealthResponse)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTemporalRuntimeHealth(null)
+        }
+      })
+
+    return () => {
+      controller.abort()
+    }
+  }, [useTemporalWorkflowRuntime])
 
   useEffect(() => {
     localStorage.setItem(ideaStorageKey, rawIdea)
@@ -1714,6 +1747,12 @@ function App() {
             ) : (
               <p className="runtime-note">{approvedRunRuntimeLabel}</p>
             )}
+            {temporalRuntimeHealth && temporalRuntimeHealth.status !== 'healthy' ? (
+              <p className="form-error">{temporalRuntimeHealth.guidance}</p>
+            ) : null}
+            {temporalRuntimeHealth?.status === 'healthy' ? (
+              <p className="runtime-note">{temporalRuntimeHealth.guidance}</p>
+            ) : null}
             {temporalRecoveryHint ? (
               <p className="runtime-note">{temporalRecoveryHint}</p>
             ) : null}

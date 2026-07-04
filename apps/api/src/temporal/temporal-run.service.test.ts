@@ -142,6 +142,7 @@ describe('TemporalRunService', () => {
       temporalRunClient: {
         startDurableRun,
         describeDurableRun: vi.fn(),
+        checkServerReachable: vi.fn(async () => false),
       },
     })
 
@@ -240,6 +241,7 @@ describe('TemporalRunService', () => {
           temporalRunId: 'temporal_run_1',
         })),
         describeDurableRun: vi.fn(),
+        checkServerReachable: vi.fn(async () => false),
       },
     })
 
@@ -282,6 +284,7 @@ describe('TemporalRunService', () => {
           temporalRunId: 'temporal_run_1',
         })),
         describeDurableRun: vi.fn(),
+        checkServerReachable: vi.fn(async () => false),
       },
     })
     const startResponse = await service.startApprovedRun(request, authContext)
@@ -315,6 +318,7 @@ describe('TemporalRunService', () => {
       temporalRunClient: {
         startDurableRun,
         describeDurableRun: vi.fn(),
+        checkServerReachable: vi.fn(async () => false),
       },
     })
 
@@ -423,6 +427,7 @@ describe('TemporalRunService', () => {
       temporalRunClient: {
         startDurableRun: vi.fn(),
         describeDurableRun: vi.fn(),
+        checkServerReachable: vi.fn(async () => false),
       },
     })
     await temporalWorkflowRepository.saveStartedWorkflow({
@@ -454,6 +459,7 @@ describe('TemporalRunService', () => {
       temporalRunClient: {
         startDurableRun: vi.fn(),
         describeDurableRun: vi.fn(),
+        checkServerReachable: vi.fn(async () => false),
       },
     })
 

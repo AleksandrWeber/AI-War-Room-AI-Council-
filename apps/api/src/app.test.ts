@@ -103,6 +103,19 @@ describe('API skeleton', () => {
     })
   })
 
+  it('returns Temporal runtime health when Temporal is disabled by default', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/runs/temporal/health')
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      status: 'disabled',
+      temporalEnabled: false,
+      taskQueue: 'ai-war-room-runs',
+      guidance: expect.stringContaining('TEMPORAL_ENABLED=true'),
+    })
+  })
+
   it('exposes model registry health recovery and audit events', async () => {
     const modelRouterService = moduleRef!.get(ModelRouterService)
     await modelRouterService.markModelDegraded(

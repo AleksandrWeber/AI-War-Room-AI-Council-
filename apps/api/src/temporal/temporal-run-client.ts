@@ -35,6 +35,7 @@ export type TemporalRunClient = {
   describeDurableRun(
     input: DescribeDurableRunParams,
   ): Promise<TemporalWorkflowDescription>
+  checkServerReachable(input: { address: string }): Promise<boolean>
 }
 
 @Injectable()
@@ -78,6 +79,17 @@ export class TemporalSdkRunClient implements TemporalRunClient {
       }
     } finally {
       await connection.close()
+    }
+  }
+
+  async checkServerReachable(input: { address: string }) {
+    try {
+      const connection = await this.createConnection(input.address)
+      await connection.close()
+
+      return true
+    } catch {
+      return false
     }
   }
 

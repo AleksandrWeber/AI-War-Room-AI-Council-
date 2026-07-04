@@ -16,6 +16,7 @@ import {
 } from '../auth/workspace-access.guard.js'
 import { StreamEventBufferService } from '../persistence/stream-event-buffer.service.js'
 import { TemporalRunService } from '../temporal/temporal-run.service.js'
+import { TemporalHealthService } from '../temporal/temporal-health.service.js'
 import type { PipelineStreamEvent } from './pipeline-stream-event.js'
 import { RunsService } from './runs.service.js'
 
@@ -25,6 +26,7 @@ export class RunsController {
     private readonly runsService: RunsService,
     private readonly streamEventBufferService: StreamEventBufferService,
     private readonly temporalRunService: TemporalRunService,
+    private readonly temporalHealthService: TemporalHealthService,
   ) {}
 
   @Get('capabilities')
@@ -67,6 +69,11 @@ export class RunsController {
     @Req() request: AuthenticatedRequest,
   ) {
     return this.runsService.executeMockPipeline(body, request.authContext)
+  }
+
+  @Get('temporal/health')
+  getTemporalHealth() {
+    return this.temporalHealthService.getRuntimeHealth()
   }
 
   @Post('workflows')

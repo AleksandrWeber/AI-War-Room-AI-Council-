@@ -125,6 +125,12 @@ Run mutation endpoints verify that the request workspace matches the header work
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
+Current `v4.7` behavior:
+
+- Temporal workers publish heartbeat records to Redis every 30 seconds.
+- `GET /api/runs/temporal/health` reports server reachability, worker heartbeat freshness, and actionable runtime guidance.
+- The frontend shows Temporal runtime health guidance when auto-selected Temporal execution is active.
+
 Current `v4.6` behavior:
 
 - Temporal worker activities execute approved runs through `executeMockPipelineStream` and append pipeline events to the shared run stream buffer.
@@ -225,6 +231,7 @@ Current `v4.3` behavior:
 - `GET /api/runs/workflows/by-run/:runId` returns the latest persisted workflow metadata for a run in the current workspace.
 - The frontend stores active Temporal workflow metadata locally, supports `Resume observation`, and uses `VITE_TEMPORAL_OBSERVATION_TIMEOUT_MS` for poll timeouts.
 - Temporal activities buffer `status`, `artifact`, and `completed` pipeline stream events into the same Redis/in-memory run stream used by direct SSE execution.
+- `GET /api/runs/temporal/health` helps verify Temporal server reachability and worker heartbeat before executing approved runs.
 
 To enable real providers locally, copy `.env.example` to `.env`, add provider keys, and explicitly select the provider/model:
 

@@ -10,6 +10,7 @@ import { PostgresService } from './postgres.service.js'
 import { RUN_REPOSITORY } from './run.repository.js'
 import { StreamEventBufferService } from './stream-event-buffer.service.js'
 import { TEMPORAL_WORKFLOW_REPOSITORY } from './temporal-workflow.repository.js'
+import { TemporalWorkerHeartbeatService } from '../temporal/temporal-worker-heartbeat.service.js'
 
 @Module({
   providers: [
@@ -18,6 +19,7 @@ import { TEMPORAL_WORKFLOW_REPOSITORY } from './temporal-workflow.repository.js'
     PostgresTemporalWorkflowRepository,
     IdempotencyService,
     StreamEventBufferService,
+    TemporalWorkerHeartbeatService,
     {
       provide: RUN_REPOSITORY,
       inject: [ConfigService, PostgresRunRepository],
@@ -49,6 +51,7 @@ import { TEMPORAL_WORKFLOW_REPOSITORY } from './temporal-workflow.repository.js'
     IdempotencyService,
     PostgresService,
     StreamEventBufferService,
+    TemporalWorkerHeartbeatService,
   ],
 })
 export class PersistenceModule {}
