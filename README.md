@@ -430,6 +430,27 @@ Workspace Shield review admin tools:
 - Only workspace owners and admins can access Shield review admin endpoints.
 - The web billing panel shows Shield review admin tools for authorized roles.
 
+Provider credentials rollout readiness:
+
+- `GET /api/provider-credentials/readiness` returns operator-facing production provider credential checklist results (`ready` or `not_ready`).
+- Checks cover encryption key configuration, encryption roundtrip, PostgreSQL persistence, and active LLM provider system keys.
+- Production startup rejects the default `APP_ENCRYPTION_KEY`.
+- The web billing panel shows provider credentials rollout status and per-check guidance.
+
+Workspace provider key admin tools:
+
+- `GET /api/provider-credentials/workspace/:workspaceId/admin` returns owner/admin workspace provider key summary.
+- `POST /api/provider-credentials/workspace/:workspaceId/admin/actions` runs provider key admin actions such as testing all credentials or retesting failed credentials.
+- Only workspace owners and admins can access provider key admin endpoints.
+- The web billing panel shows provider key admin tools for authorized roles.
+
+Current `v5.24` behavior:
+
+- Provider credentials rollout readiness validates encryption and persistence through `GET /api/provider-credentials/readiness`.
+- Production rejects the default development encryption key.
+- Workspace owners and admins can inspect and test workspace provider keys from `GET /api/provider-credentials/workspace/:workspaceId/admin`.
+- The web billing panel shows provider credentials rollout checks and workspace provider key admin tools.
+
 Current `v5.23` behavior:
 
 - Shield rollout readiness validates classifier review regression through `GET /api/shield/readiness`.

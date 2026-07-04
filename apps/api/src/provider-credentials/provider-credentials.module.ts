@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { Module, forwardRef } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import type { ApiEnv } from '../config/env.js'
 import { AuthModule } from '../auth/auth.module.js'
@@ -9,17 +9,19 @@ import { PostgresProviderCredentialRepository } from './postgres-provider-creden
 import { ProviderCredentialEncryptionService } from './provider-credential-encryption.service.js'
 import { ProviderCredentialTesterService } from './provider-credential-tester.service.js'
 import { PROVIDER_CREDENTIAL_REPOSITORY } from './provider-credential.repository.js'
+import { ProviderCredentialsAdminService } from './provider-credentials-admin.service.js'
 import { ProviderCredentialsController } from './provider-credentials.controller.js'
 import { ProviderCredentialsService } from './provider-credentials.service.js'
 
 @Module({
-  imports: [PersistenceModule, AuthModule, WorkspacesModule],
+  imports: [PersistenceModule, forwardRef(() => AuthModule), WorkspacesModule],
   controllers: [ProviderCredentialsController],
   providers: [
     PostgresProviderCredentialRepository,
     ProviderCredentialEncryptionService,
     ProviderCredentialTesterService,
     ProviderCredentialsService,
+    ProviderCredentialsAdminService,
     {
       provide: PROVIDER_CREDENTIAL_REPOSITORY,
       inject: [ConfigService, PostgresProviderCredentialRepository],
@@ -33,6 +35,6 @@ import { ProviderCredentialsService } from './provider-credentials.service.js'
       },
     },
   ],
-  exports: [ProviderCredentialsService],
+  exports: [ProviderCredentialsService, ProviderCredentialsAdminService],
 })
 export class ProviderCredentialsModule {}

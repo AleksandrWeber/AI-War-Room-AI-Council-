@@ -20,6 +20,8 @@ import type {
   ResearchRolloutResponse,
   ShieldRolloutResponse,
   ShieldReviewAdminSummaryResponse,
+  ProviderCredentialsRolloutResponse,
+  ProviderKeyAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -67,6 +69,15 @@ import {
   formatShieldRolloutCheckStatus,
   formatShieldRolloutStatus,
 } from './shield-ui'
+import {
+  executeProviderKeyAdminAction,
+  fetchProviderCredentialsRollout,
+  fetchProviderKeyAdminSummary,
+  formatProviderCredentialsRolloutCheckStatus,
+  formatProviderCredentialsRolloutStatus,
+  formatProviderKeyAdminAction,
+  formatProviderKeyTestStatus,
+} from './provider-credentials-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -623,6 +634,8 @@ function App() {
   const [shieldRollout, setShieldRollout] = useState<ShieldRolloutResponse | null>(
     null,
   )
+  const [providerCredentialsRollout, setProviderCredentialsRollout] =
+    useState<ProviderCredentialsRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -706,6 +719,8 @@ function App() {
     useState<ModelHealthAdminSummaryResponse | null>(null)
   const [shieldReviewAdminSummary, setShieldReviewAdminSummary] =
     useState<ShieldReviewAdminSummaryResponse | null>(null)
+  const [providerKeyAdminSummary, setProviderKeyAdminSummary] =
+    useState<ProviderKeyAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -713,6 +728,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [shieldReviewAdminAction, setShieldReviewAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [providerKeyAdminAction, setProviderKeyAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -867,6 +885,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setShieldRollout(null)
+        }
+      })
+
+    fetchProviderCredentialsRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setProviderCredentialsRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setProviderCredentialsRollout(null)
         }
       })
 
@@ -1577,6 +1607,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setShieldReviewAdminSummary(shieldReviewAdmin)
+
+      const providerKeyAdmin = await fetchProviderKeyAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProviderKeyAdminSummary(providerKeyAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -1757,6 +1794,34 @@ function App() {
       )
     } finally {
       setShieldReviewAdminAction('idle')
+    }
+  }
+
+  async function handleProviderKeyAdminAction(
+    action: 'test_all_credentials' | 'retest_failed_credentials',
+  ) {
+    setProviderKeyAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeProviderKeyAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      await handleLoadProviderCredentials()
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run provider key admin action.',
+      )
+    } finally {
+      setProviderKeyAdminAction('idle')
     }
   }
 
@@ -2509,6 +2574,37 @@ function App() {
           </div>
         ) : null}
 
+        {providerCredentialsRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Provider credentials rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${providerCredentialsRollout.status}`}
+              >
+                {formatProviderCredentialsRolloutStatus(
+                  providerCredentialsRollout.status,
+                )}
+              </strong>
+            </div>
+            <p>{providerCredentialsRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {providerCredentialsRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatProviderCredentialsRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {providerCredentialsRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
         {billingCapabilities?.supportsBillingRollout && billingRollout ? (
           <div className="billing-rollout">
             <div className="billing-rollout__header">
@@ -3033,6 +3129,75 @@ function App() {
               >
                 {formatShieldReviewAdminAction('rerun_review_summary')}
               </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {providerKeyAdminSummary ? (
+          <div className="billing-admin workspace-provider-key-admin">
+            <div className="billing-admin__header">
+              <span>Provider key admin</span>
+              <strong>{providerKeyAdminSummary.role}</strong>
+            </div>
+            <p>{providerKeyAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workspace keys</span>
+                <strong>{providerKeyAdminSummary.stats.totalCredentials}</strong>
+                <small>
+                  {providerKeyAdminSummary.stats.passedCredentials} passed
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Failed / untested</span>
+                <strong>{providerKeyAdminSummary.stats.failedCredentials}</strong>
+                <small>
+                  {providerKeyAdminSummary.stats.untestedCredentials} untested
+                </small>
+              </article>
+            </div>
+            <div className="workspace-provider-key-list">
+              {providerKeyAdminSummary.credentials.length ? (
+                providerKeyAdminSummary.credentials.map((credential) => (
+                  <article
+                    className={`workspace-provider-key-card workspace-provider-key-card--${credential.lastTestStatus}`}
+                    key={credential.credentialId}
+                  >
+                    <div>
+                      <strong>{credential.label}</strong>
+                      <p>
+                        {credential.providerId} · {credential.maskedKey}
+                      </p>
+                      <small>
+                        {formatProviderKeyTestStatus(credential.lastTestStatus)}
+                        {credential.lastTestedAt
+                          ? ` · ${credential.lastTestedAt.slice(0, 10)}`
+                          : ''}
+                      </small>
+                    </div>
+                  </article>
+                ))
+              ) : (
+                <p className="clear-copy">
+                  No workspace provider keys saved yet. Use the Provider Keys
+                  panel to add Anthropic or OpenAI keys.
+                </p>
+              )}
+            </div>
+            {providerKeyAdminSummary.availableActions.length ? (
+              <div className="billing-admin__actions">
+                {providerKeyAdminSummary.availableActions.map((action) => (
+                  <button
+                    key={action}
+                    className="secondary-button"
+                    type="button"
+                    disabled={providerKeyAdminAction !== 'idle'}
+                    onClick={() => void handleProviderKeyAdminAction(action)}
+                  >
+                    {formatProviderKeyAdminAction(action)}
+                  </button>
+                ))}
+              </div>
             ) : null}
           </div>
         ) : null}

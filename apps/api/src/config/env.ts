@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { DEFAULT_APP_ENCRYPTION_KEY } from '@ai-war-room/schemas'
 
 const optionalEnvStringSchema = z.preprocess(
   (value) => (value === '' ? undefined : value),
@@ -186,6 +187,15 @@ export function validateEnv(config: Record<string, unknown>): ApiEnv {
 
   if (env.NODE_ENV === 'production' && env.RESEARCH_PROVIDER === 'mock') {
     throw new Error('RESEARCH_PROVIDER=mock cannot be used in production.')
+  }
+
+  if (
+    env.NODE_ENV === 'production' &&
+    env.APP_ENCRYPTION_KEY === DEFAULT_APP_ENCRYPTION_KEY
+  ) {
+    throw new Error(
+      'APP_ENCRYPTION_KEY must be changed from the default value in production.',
+    )
   }
 
   if (

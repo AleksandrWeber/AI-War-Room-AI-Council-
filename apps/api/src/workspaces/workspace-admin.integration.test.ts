@@ -373,3 +373,69 @@ describe('shield rollout integration', () => {
       .expect(401)
   })
 })
+
+describe('provider credentials rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports provider credentials capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/provider-credentials/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsProviderCredentialsRollout: true,
+      supportsProviderKeyAdminTools: true,
+      managedProviders: ['anthropic', 'openai'],
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/provider-credentials/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns provider key admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/provider-credentials/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalCredentials: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects provider key admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/provider-credentials/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
