@@ -125,6 +125,15 @@ Run mutation endpoints verify that the request workspace matches the header work
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
+Current `v4.4` behavior:
+
+- Temporal workflow observation can be resumed after page refresh, stream interruption, or observation timeout.
+- The frontend persists active Temporal workflow metadata in local storage and replays stream events with `Last-Event-ID`.
+- `POST /api/runs/workflows/:workflowId/recover` syncs persisted workflow metadata from Temporal when available and returns a recovery hint.
+- `GET /api/runs/workflows/by-run/:runId` looks up the latest persisted Temporal workflow for a run.
+- Failed terminal Temporal statuses surface actionable error messages instead of raw status codes.
+- `GET /api/runs/workflows/:workflowId/status` preserves `404`/`403` errors instead of wrapping them as `503`.
+
 Current `v4.3` behavior:
 
 - Default provider is `mock`, so local development does not require API keys.
@@ -198,6 +207,9 @@ Current `v4.3` behavior:
 - The frontend keeps the existing direct REST/SSE pipeline as the default runtime path.
 - `VITE_USE_TEMPORAL_WORKFLOWS=true` switches the Execute button to the Temporal workflow start/status/stream path.
 - In Temporal runtime mode, the frontend observes workflow status and loads generated artifacts from persisted artifact history after completion.
+- `POST /api/runs/workflows/:workflowId/recover` re-syncs workflow metadata from Temporal and returns recovery guidance.
+- `GET /api/runs/workflows/by-run/:runId` returns the latest persisted workflow metadata for a run in the current workspace.
+- The frontend stores active Temporal workflow metadata locally, supports `Resume observation`, and uses `VITE_TEMPORAL_OBSERVATION_TIMEOUT_MS` for poll timeouts.
 
 To enable real providers locally, copy `.env.example` to `.env`, add provider keys, and explicitly select the provider/model:
 

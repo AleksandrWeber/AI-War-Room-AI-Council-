@@ -69,6 +69,31 @@ export class InMemoryTemporalWorkflowRepository
     return workflow?.workspaceId === input.workspaceId ? workflow : null
   }
 
+  async findWorkflowByRunId(input: {
+    workspaceId: string
+    runId: string
+  }): Promise<TemporalWorkflowRecord | null> {
+    let latestWorkflow: TemporalWorkflowRecord | null = null
+
+    for (const workflow of this.workflowsById.values()) {
+      if (
+        workflow.workspaceId !== input.workspaceId ||
+        workflow.runId !== input.runId
+      ) {
+        continue
+      }
+
+      if (
+        !latestWorkflow ||
+        workflow.startedAt.localeCompare(latestWorkflow.startedAt) > 0
+      ) {
+        latestWorkflow = workflow
+      }
+    }
+
+    return latestWorkflow
+  }
+
   private isTerminalStatus(status: TemporalWorkflowRecord['status']) {
     return !['running', 'unknown', 'disabled'].includes(status)
   }

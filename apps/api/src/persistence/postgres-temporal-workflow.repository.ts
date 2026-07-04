@@ -122,6 +122,26 @@ export class PostgresTemporalWorkflowRepository
     return row ? this.parseRow(row) : null
   }
 
+  async findWorkflowByRunId(input: {
+    workspaceId: string
+    runId: string
+  }): Promise<TemporalWorkflowRecord | null> {
+    const result = await this.postgresService.query<TemporalWorkflowRow>(
+      `
+        SELECT *
+        FROM run_workflows
+        WHERE workspace_id = $1
+          AND run_id = $2
+        ORDER BY started_at DESC
+        LIMIT 1
+      `,
+      [input.workspaceId, input.runId],
+    )
+    const row = result.rows[0]
+
+    return row ? this.parseRow(row) : null
+  }
+
   private parseRow(row: TemporalWorkflowRow | undefined) {
     if (!row) {
       throw new Error('Temporal workflow row was not returned.')

@@ -32,4 +32,8 @@ export interface TemporalWorkflowRepository {
     workspaceId: string
     workflowId: string
   }): Promise<TemporalWorkflowRecord | null>
+  findWorkflowByRunId(input: {
+    workspaceId: string
+    runId: string
+  }): Promise<TemporalWorkflowRecord | null>
 }

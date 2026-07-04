@@ -64,3 +64,12 @@ export const temporalWorkflowObservationResponseSchema = z.object({
 export type TemporalWorkflowObservationResponse = z.infer<
   typeof temporalWorkflowObservationResponseSchema
 >
+
+export const temporalWorkflowRecoveryResponseSchema = z.object({
+  workflow: temporalWorkflowRecordSchema,
+  syncedFromTemporal: z.boolean(),
+  recoveryHint: nonEmptyStringSchema,
+})
+export type TemporalWorkflowRecoveryResponse = z.infer<
+  typeof temporalWorkflowRecoveryResponseSchema
+>

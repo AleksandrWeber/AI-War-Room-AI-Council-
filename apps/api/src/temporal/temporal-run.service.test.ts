@@ -307,4 +307,126 @@ describe('TemporalRunService', () => {
     })
     expect(describeDurableRun).not.toHaveBeenCalled()
   })
+
+  it('recovers workflow observation from Temporal when available', async () => {
+    const describeDurableRun = vi.fn(async () => ({
+      workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+      temporalRunId: 'temporal_run_1',
+      status: 'WORKFLOW_EXECUTION_STATUS_RUNNING',
+    }))
+    const { service, temporalWorkflowRepository } = createService({
+      enabled: true,
+      temporalRunClient: {
+        startDurableRun: vi.fn(),
+        describeDurableRun,
+      },
+    })
+    await temporalWorkflowRepository.saveStartedWorkflow({
+      runId: 'run_temporal_start_1',
+      workspaceId: 'workspace_1',
+      workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+      temporalRunId: 'temporal_run_1',
+      taskQueue: 'ai-war-room-runs',
+      status: 'unknown',
+      startedAt: now,
+    })
+
+    await expect(
+      service.recoverWorkflowObservation({
+        workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+        authContext,
+      }),
+    ).resolves.toMatchObject({
+      syncedFromTemporal: true,
+      workflow: {
+        status: 'running',
+      },
+      recoveryHint: expect.stringContaining('still running'),
+    })
+  })
+
+  it('returns persisted workflow metadata when Temporal recovery sync fails', async () => {
+    const describeDurableRun = vi.fn(async () => {
+      throw new Error('Temporal server unavailable')
+    })
+    const { service, temporalWorkflowRepository } = createService({
+      enabled: true,
+      temporalRunClient: {
+        startDurableRun: vi.fn(),
+        describeDurableRun,
+      },
+    })
+    await temporalWorkflowRepository.saveStartedWorkflow({
+      runId: 'run_temporal_start_1',
+      workspaceId: 'workspace_1',
+      workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+      temporalRunId: 'temporal_run_1',
+      taskQueue: 'ai-war-room-runs',
+      status: 'running',
+      startedAt: now,
+    })
+
+    await expect(
+      service.recoverWorkflowObservation({
+        workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+        authContext,
+      }),
+    ).resolves.toMatchObject({
+      syncedFromTemporal: false,
+      workflow: {
+        status: 'running',
+      },
+      recoveryHint: expect.stringContaining('persisted'),
+    })
+  })
+
+  it('looks up workflow metadata by run id', async () => {
+    const { service, temporalWorkflowRepository } = createService({
+      enabled: true,
+      temporalRunClient: {
+        startDurableRun: vi.fn(),
+        describeDurableRun: vi.fn(),
+      },
+    })
+    await temporalWorkflowRepository.saveStartedWorkflow({
+      runId: 'run_temporal_start_1',
+      workspaceId: 'workspace_1',
+      workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+      temporalRunId: 'temporal_run_1',
+      taskQueue: 'ai-war-room-runs',
+      status: 'running',
+      startedAt: now,
+    })
+
+    await expect(
+      service.getWorkflowByRunId({
+        runId: 'run_temporal_start_1',
+        authContext,
+      }),
+    ).resolves.toMatchObject({
+      workflow: {
+        workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+        status: 'running',
+      },
+    })
+  })
+
+  it('preserves not-found errors from workflow status checks', async () => {
+    const { service } = createService({
+      enabled: true,
+      temporalRunClient: {
+        startDurableRun: vi.fn(),
+        describeDurableRun: vi.fn(),
+      },
+    })
+
+    await expect(
+      service.getWorkflowStatus({
+        workflowId: 'ai-war-room-workspace_1-run_missing',
+        authContext,
+      }),
+    ).rejects.toMatchObject({
+      status: 404,
+    })
+  })
 })

@@ -1,19 +1,26 @@
 import { Fragment, useEffect, useState, type FormEvent } from 'react'
 import './App.css'
+import {
+  type TemporalRunStartResponse,
+  type TemporalWorkflowRecoveryResponse,
+  type TemporalWorkflowStatus,
+  canResumeTemporalWorkflow,
+  createTemporalObservationTimeoutMessage,
+  formatTemporalFailureMessage,
+  isTemporalTerminalStatus,
+  loadPersistedTemporalWorkflow,
+  savePersistedTemporalWorkflow,
+  sleep,
+  temporalInitialPollDelayMs,
+  temporalObservationTimeoutMs,
+  temporalPollIntervalMs,
+  toTemporalRunStartResponse,
+  useTemporalWorkflowRuntime,
+} from './temporal-runtime'
 
 type ApiHealthState = 'checking' | 'online' | 'offline'
 type SubmitState = 'idle' | 'submitting' | 'success' | 'error'
 type PipelineState = 'idle' | 'running' | 'completed' | 'error'
-type TemporalWorkflowStatus =
-  | 'disabled'
-  | 'running'
-  | 'completed'
-  | 'failed'
-  | 'canceled'
-  | 'terminated'
-  | 'timed_out'
-  | 'continued_as_new'
-  | 'unknown'
 
 type ShieldFinding = {
   findingId: string
@@ -211,17 +218,6 @@ type MockPipelineResult = {
   artifacts: ArtifactResult[]
 }
 
-type TemporalRunStartResponse = {
-  runId: string
-  workspaceId: string
-  workflowId: string
-  temporalRunId?: string
-  taskQueue: string
-  status: TemporalWorkflowStatus
-  temporalEnabled: true
-  startedAt: string
-}
-
 type TemporalRunStatusResponse = {
   runId: string
   workspaceId: string
@@ -234,8 +230,6 @@ type TemporalRunStatusResponse = {
 }
 
 const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:3000/api'
-const useTemporalWorkflowRuntime =
-  import.meta.env.VITE_USE_TEMPORAL_WORKFLOWS === 'true'
 const localAuthHeaders = {
   'x-user-id': 'user_local',
   'x-workspace-id': 'local_workspace',
@@ -413,10 +407,6 @@ function parseSseEvents(chunk: string): PipelineStreamEvent[] {
     .filter((event): event is PipelineStreamEvent => Boolean(event))
 }
 
-function isTemporalTerminalStatus(status: TemporalWorkflowStatus) {
-  return !['running', 'unknown', 'disabled'].includes(status)
-}
-
 function mapTemporalStatusToStepStatus(
   status: TemporalWorkflowStatus,
 ): PipelineStep['status'] {
@@ -494,7 +484,18 @@ function App() {
   const [lastStreamEventId, setLastStreamEventId] = useState<string | null>(null)
   const [lastStreamRunId, setLastStreamRunId] = useState<string | null>(null)
   const [activeTemporalWorkflow, setActiveTemporalWorkflow] =
-    useState<TemporalRunStartResponse | null>(null)
+    useState<TemporalRunStartResponse | null>(() => {
+      if (!useTemporalWorkflowRuntime) {
+        return null
+      }
+
+      const persisted = loadPersistedTemporalWorkflow()
+
+      return persisted ? toTemporalRunStartResponse(persisted) : null
+    })
+  const [temporalRecoveryHint, setTemporalRecoveryHint] = useState<string | null>(
+    null,
+  )
   const [artifactHistory, setArtifactHistory] = useState<ArtifactHistoryItem[]>([])
   const [historyError, setHistoryError] = useState<string | null>(null)
   const [providerCredentials, setProviderCredentials] =
@@ -510,6 +511,41 @@ function App() {
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
     useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
+
+  useEffect(() => {
+    if (!useTemporalWorkflowRuntime) {
+      return
+    }
+
+    const persisted = loadPersistedTemporalWorkflow()
+
+    if (!persisted?.lastStreamEventId) {
+      return
+    }
+
+    setLastStreamEventId(persisted.lastStreamEventId)
+    setLastStreamRunId(persisted.runId)
+  }, [])
+
+  useEffect(() => {
+    if (!useTemporalWorkflowRuntime || !activeTemporalWorkflow) {
+      return
+    }
+
+    if (isTemporalTerminalStatus(activeTemporalWorkflow.status)) {
+      if (activeTemporalWorkflow.status === 'completed') {
+        savePersistedTemporalWorkflow(null)
+      }
+
+      return
+    }
+
+    savePersistedTemporalWorkflow({
+      ...activeTemporalWorkflow,
+      lastStreamEventId,
+      persistedAt: new Date().toISOString(),
+    })
+  }, [activeTemporalWorkflow, lastStreamEventId])
 
   useEffect(() => {
     const controller = new AbortController()
@@ -730,14 +766,37 @@ function App() {
       return
     }
 
+    const recoverableWorkflow =
+      activeTemporalWorkflow ??
+      (() => {
+        const persisted = loadPersistedTemporalWorkflow()
+
+        return persisted?.runId === draftRun.runId
+          ? toTemporalRunStartResponse(persisted)
+          : null
+      })()
+
+    if (
+      canResumeTemporalWorkflow({
+        runId: draftRun.runId,
+        workflow: recoverableWorkflow,
+      }) &&
+      recoverableWorkflow
+    ) {
+      await handleResumeTemporalWorkflow(recoverableWorkflow)
+      return
+    }
+
     setPipelineState('running')
     setPipelineError(null)
     setPipelineResult(null)
+    setTemporalRecoveryHint(null)
     setActiveTemporalWorkflow(null)
     setLastStreamRunId(draftRun.runId)
     setStreamEvents([])
     setStreamedArtifacts([])
     setLastStreamEventId(null)
+    savePersistedTemporalWorkflow(null)
 
     try {
       const payload = createApprovedRunPayload()
@@ -774,9 +833,67 @@ function App() {
     }
   }
 
-  async function observeTemporalWorkflow(workflowId: string) {
+  async function handleResumeTemporalWorkflow(workflow: TemporalRunStartResponse) {
+    setPipelineState('running')
+    setPipelineError(null)
+    setTemporalRecoveryHint(null)
+    setLastStreamRunId(workflow.runId)
+    setActiveTemporalWorkflow(workflow)
+
+    try {
+      const recoverResponse = await fetch(
+        `${apiBaseUrl}/runs/workflows/${workflow.workflowId}/recover`,
+        {
+          method: 'POST',
+          headers: localAuthHeaders,
+        },
+      )
+
+      if (!recoverResponse.ok) {
+        throw new Error(`API returned ${recoverResponse.status}`)
+      }
+
+      const recovery =
+        (await recoverResponse.json()) as TemporalWorkflowRecoveryResponse
+      const resumedWorkflow = toTemporalRunStartResponse(recovery.workflow)
+
+      setTemporalRecoveryHint(recovery.recoveryHint)
+      setActiveTemporalWorkflow(resumedWorkflow)
+
+      const persistedWorkflow = loadPersistedTemporalWorkflow()
+      const replayEventId =
+        persistedWorkflow?.runId === workflow.runId
+          ? persistedWorkflow.lastStreamEventId ?? lastStreamEventId
+          : lastStreamEventId
+
+      await observeTemporalWorkflow(resumedWorkflow.workflowId, {
+        afterEventId: replayEventId,
+      })
+      await pollTemporalWorkflowStatus(resumedWorkflow)
+    } catch (error) {
+      setPipelineState('error')
+      setPipelineError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to resume Temporal workflow observation.',
+      )
+    }
+  }
+
+  async function observeTemporalWorkflow(
+    workflowId: string,
+    options?: { afterEventId?: string | null },
+  ) {
+    const headers: Record<string, string> = {
+      ...localAuthHeaders,
+    }
+
+    if (options?.afterEventId) {
+      headers['Last-Event-ID'] = options.afterEventId
+    }
+
     const response = await fetch(`${apiBaseUrl}/runs/workflows/${workflowId}/stream`, {
-      headers: localAuthHeaders,
+      headers,
     })
 
     if (!response.ok) {
@@ -788,9 +905,12 @@ function App() {
 
   async function pollTemporalWorkflowStatus(workflow: TemporalRunStartResponse) {
     let latestStatus: TemporalWorkflowStatus = workflow.status
+    const deadline = Date.now() + temporalObservationTimeoutMs
+    let attempt = 0
 
-    for (let attempt = 0; attempt < 20 && !isTemporalTerminalStatus(latestStatus); attempt += 1) {
-      await new Promise((resolve) => setTimeout(resolve, attempt === 0 ? 500 : 1_500))
+    while (!isTemporalTerminalStatus(latestStatus) && Date.now() < deadline) {
+      await sleep(attempt === 0 ? temporalInitialPollDelayMs : temporalPollIntervalMs)
+      attempt += 1
 
       const statusResponse = await fetch(
         `${apiBaseUrl}/runs/workflows/${workflow.workflowId}/status`,
@@ -818,6 +938,7 @@ function App() {
     }
 
     if (latestStatus === 'completed') {
+      savePersistedTemporalWorkflow(null)
       const history = await handleLoadArtifactHistory()
       const runArtifacts = history
         .filter((artifact) => artifact.runId === workflow.runId)
@@ -835,8 +956,11 @@ function App() {
     }
 
     if (isTemporalTerminalStatus(latestStatus)) {
-      throw new Error(`Temporal workflow ended with status: ${latestStatus}`)
+      throw new Error(formatTemporalFailureMessage(latestStatus))
     }
+
+    setPipelineState('error')
+    setPipelineError(createTemporalObservationTimeoutMessage(temporalObservationTimeoutMs))
   }
 
   async function handleLoadArtifactHistory() {
@@ -1069,7 +1193,7 @@ function App() {
 
       if (isTemporalTerminalStatus(event.status) && event.status !== 'completed') {
         setPipelineState('error')
-        setPipelineError(`Temporal workflow ended with status: ${event.status}`)
+        setPipelineError(formatTemporalFailureMessage(event.status))
       }
     }
 
@@ -1104,6 +1228,12 @@ function App() {
   const selectedAgentCount = reviewDraft?.selectedAgents.length ?? 0
   const selectedSpecialistCount =
     reviewDraft?.selectedAgents.filter((agent) => agent !== 'moderator').length ?? 0
+  const showResumeTemporalObservation =
+    useTemporalWorkflowRuntime &&
+    canResumeTemporalWorkflow({
+      runId: draftRun?.runId,
+      workflow: activeTemporalWorkflow,
+    })
 
   return (
     <main className="app-shell">
@@ -1537,11 +1667,24 @@ function App() {
                   ? 'Execute with Temporal workflow'
                   : 'Execute prompt-driven pipeline'}
             </button>
+            {showResumeTemporalObservation && activeTemporalWorkflow ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={pipelineState === 'running'}
+                onClick={() => handleResumeTemporalWorkflow(activeTemporalWorkflow)}
+              >
+                Resume observation
+              </button>
+            ) : null}
             {useTemporalWorkflowRuntime ? (
               <p className="runtime-note">
                 Temporal runtime path enabled. Make sure `TEMPORAL_ENABLED=true`
                 and the worker are running.
               </p>
+            ) : null}
+            {temporalRecoveryHint ? (
+              <p className="runtime-note">{temporalRecoveryHint}</p>
             ) : null}
             {pipelineError ? <p className="form-error">{pipelineError}</p> : null}
           </div>

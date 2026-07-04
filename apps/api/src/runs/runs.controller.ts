@@ -78,6 +78,30 @@ export class RunsController {
     return this.temporalRunService.startApprovedRun(body, request.authContext!)
   }
 
+  @Get('workflows/by-run/:runId')
+  @UseGuards(WorkspaceAccessGuard)
+  getWorkflowByRunId(
+    @Param('runId') runId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.temporalRunService.getWorkflowByRunId({
+      runId,
+      authContext: request.authContext!,
+    })
+  }
+
+  @Post('workflows/:workflowId/recover')
+  @UseGuards(WorkspaceAccessGuard)
+  recoverWorkflowObservation(
+    @Param('workflowId') workflowId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.temporalRunService.recoverWorkflowObservation({
+      workflowId,
+      authContext: request.authContext!,
+    })
+  }
+
   @Get('workflows/:workflowId/status')
   @UseGuards(WorkspaceAccessGuard)
   getWorkflowStatus(
