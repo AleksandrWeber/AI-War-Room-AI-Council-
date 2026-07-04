@@ -47,6 +47,12 @@ export const envSchema = z.object({
   TEMPORAL_ADDRESS: z.string().trim().min(1).default('127.0.0.1:7233'),
   TEMPORAL_NAMESPACE: z.string().trim().min(1).default('default'),
   TEMPORAL_TASK_QUEUE: z.string().trim().min(1).default('ai-war-room-runs'),
+  TEMPORAL_WORKFLOW_STREAM_POLL_MS: z.coerce.number().int().positive().default(1_000),
+  TEMPORAL_WORKFLOW_STREAM_TIMEOUT_MS: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(300_000),
 })
 
 export type ApiEnv = z.infer<typeof envSchema>

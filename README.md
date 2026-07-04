@@ -125,6 +125,12 @@ Run mutation endpoints verify that the request workspace matches the header work
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
 
+Current `v4.8` behavior:
+
+- `GET /api/runs/workflows/:workflowId/stream` stays open and polls the shared run stream buffer until a terminal event or stream timeout.
+- Incremental stream polls do not re-emit fallback `workflow_status` events when no new buffered events exist.
+- The frontend keeps one long-lived Temporal stream open in parallel with workflow status polling.
+
 Current `v4.7` behavior:
 
 - Temporal workers publish heartbeat records to Redis every 30 seconds.

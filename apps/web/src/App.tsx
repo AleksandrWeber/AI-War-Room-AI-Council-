@@ -879,8 +879,10 @@ function App() {
       const workflow = (await startResponse.json()) as TemporalRunStartResponse
       setActiveTemporalWorkflow(workflow)
 
-      await observeTemporalWorkflow(workflow.workflowId)
-      await pollTemporalWorkflowStatus(workflow)
+      await Promise.all([
+        observeTemporalWorkflow(workflow.workflowId),
+        pollTemporalWorkflowStatus(workflow),
+      ])
     } catch (error) {
       setPipelineState('error')
       setPipelineError(
@@ -924,10 +926,12 @@ function App() {
           ? persistedWorkflow.lastStreamEventId ?? lastStreamEventId
           : lastStreamEventId
 
-      await observeTemporalWorkflow(resumedWorkflow.workflowId, {
-        afterEventId: replayEventId,
-      })
-      await pollTemporalWorkflowStatus(resumedWorkflow)
+      await Promise.all([
+        observeTemporalWorkflow(resumedWorkflow.workflowId, {
+          afterEventId: replayEventId,
+        }),
+        pollTemporalWorkflowStatus(resumedWorkflow),
+      ])
     } catch (error) {
       setPipelineState('error')
       setPipelineError(
@@ -993,9 +997,6 @@ function App() {
             }
           : current,
       )
-      await observeTemporalWorkflow(workflow.workflowId, {
-        afterEventId: lastStreamEventIdRef.current,
-      })
     }
 
     if (latestStatus === 'completed') {

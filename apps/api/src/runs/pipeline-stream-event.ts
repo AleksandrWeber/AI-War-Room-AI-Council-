@@ -1,4 +1,5 @@
 import type { MockPipelineResult, TemporalWorkflowStatus } from '@ai-war-room/schemas'
+import { isTemporalTerminalStatus } from '@ai-war-room/schemas'
 
 export type PipelineStreamEvent =
   | {
@@ -38,3 +39,15 @@ export type PipelineStreamEvent =
       status: TemporalWorkflowStatus
       timestamp: string
     }
+
+export function isTerminalPipelineStreamEvent(event: PipelineStreamEvent) {
+  if (event.type === 'completed' || event.type === 'error') {
+    return true
+  }
+
+  if (event.type === 'workflow_status') {
+    return isTemporalTerminalStatus(event.status)
+  }
+
+  return false
+}

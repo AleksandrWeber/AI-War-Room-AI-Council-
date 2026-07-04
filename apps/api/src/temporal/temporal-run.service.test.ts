@@ -22,6 +22,8 @@ function createConfigService(enabled: boolean) {
     TEMPORAL_ADDRESS: '127.0.0.1:7233',
     TEMPORAL_NAMESPACE: 'default',
     TEMPORAL_TASK_QUEUE: 'ai-war-room-runs',
+    TEMPORAL_WORKFLOW_STREAM_POLL_MS: 1,
+    TEMPORAL_WORKFLOW_STREAM_TIMEOUT_MS: 5_000,
   }
 
   return {
@@ -471,5 +473,99 @@ describe('TemporalRunService', () => {
     ).rejects.toMatchObject({
       status: 404,
     })
+  })
+
+  it('returns no fallback status events for incremental workflow stream polls', async () => {
+    const request = createRequest()
+    const { service, streamEventBufferService } = createService({
+      enabled: true,
+      temporalRunClient: {
+        startDurableRun: vi.fn(async () => ({
+          workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+          temporalRunId: 'temporal_run_1',
+        })),
+        describeDurableRun: vi.fn(),
+        checkServerReachable: vi.fn(async () => false),
+      },
+    })
+
+    await service.startApprovedRun(request, authContext)
+    vi.mocked(streamEventBufferService.replayAfter).mockResolvedValueOnce([])
+
+    await expect(
+      service.getWorkflowStreamEvents({
+        workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+        authContext,
+        afterEventId: 'event_existing_1',
+        allowStatusFallback: false,
+      }),
+    ).resolves.toEqual([])
+  })
+
+  it('keeps workflow stream observation open until a terminal event arrives', async () => {
+    const request = createRequest()
+    const runningEvent = {
+      eventId: 'event_running_1',
+      type: 'status' as const,
+      stepId: 'agent_pool',
+      label: 'Prompt-driven agent pool',
+      status: 'running' as const,
+      timestamp: now,
+    }
+    const completedEvent = {
+      eventId: 'event_completed_1',
+      type: 'completed' as const,
+      result: {
+        runId: 'run_temporal_start_1',
+        workspaceId: 'workspace_1',
+        status: 'completed' as const,
+        steps: [],
+        agentOutputs: [],
+        moderatorSynthesis: {
+          executivePositioning: 'Done',
+          targetUsers: [],
+          coreProblem: 'Done',
+          proposedSolution: 'Done',
+          mvpScope: [],
+          nonGoals: [],
+          keyDecisions: [],
+          risks: [],
+          openQuestions: [],
+          artifactGenerationBrief: {},
+        },
+        artifacts: [],
+        completedAt: now,
+      },
+      timestamp: now,
+    }
+    const { service, streamEventBufferService } = createService({
+      enabled: true,
+      temporalRunClient: {
+        startDurableRun: vi.fn(async () => ({
+          workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+          temporalRunId: 'temporal_run_1',
+        })),
+        describeDurableRun: vi.fn(),
+        checkServerReachable: vi.fn(async () => false),
+      },
+    })
+
+    await service.startApprovedRun(request, authContext)
+    vi.mocked(streamEventBufferService.replayAll).mockResolvedValueOnce([runningEvent])
+    vi.mocked(streamEventBufferService.replayAfter)
+      .mockResolvedValueOnce([])
+      .mockResolvedValueOnce([completedEvent])
+
+    const observedEvents: PipelineStreamEvent[] = []
+
+    await service.observeWorkflowStream({
+      workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+      authContext,
+      onEvent: (event) => {
+        observedEvents.push(event)
+      },
+    })
+
+    expect(observedEvents).toEqual([runningEvent, completedEvent])
   })
 })

@@ -28,6 +28,10 @@ import {
   TEMPORAL_WORKFLOW_REPOSITORY,
   type TemporalWorkflowRepository,
 } from '../persistence/temporal-workflow.repository.js'
+import {
+  isTerminalPipelineStreamEvent,
+  type PipelineStreamEvent,
+} from '../runs/pipeline-stream-event.js'
 import { getTemporalWorkerConfig } from './temporal-worker.config.js'
 import {
   TEMPORAL_RUN_CLIENT,
@@ -255,11 +259,13 @@ export class TemporalRunService {
     workflowId: string
     authContext: AuthContext
     afterEventId?: string
+    allowStatusFallback?: boolean
   }) {
     const workflow = await this.requireWorkflow({
       workspaceId: input.authContext.workspaceId,
       workflowId: input.workflowId,
     })
+    const allowStatusFallback = input.allowStatusFallback ?? true
 
     if (!input.afterEventId) {
       const bufferedEvents = await this.streamEventBufferService.replayAll({
@@ -271,7 +277,11 @@ export class TemporalRunService {
         return bufferedEvents
       }
 
-      return [await this.publishWorkflowStatus(workflow)]
+      if (allowStatusFallback) {
+        return [await this.publishWorkflowStatus(workflow)]
+      }
+
+      return []
     }
 
     const replayedEvents = await this.streamEventBufferService.replayAfter({
@@ -284,7 +294,71 @@ export class TemporalRunService {
       return replayedEvents
     }
 
-    return [await this.publishWorkflowStatus(workflow)]
+    if (allowStatusFallback) {
+      return [await this.publishWorkflowStatus(workflow)]
+    }
+
+    return []
+  }
+
+  async observeWorkflowStream(input: {
+    workflowId: string
+    authContext: AuthContext
+    afterEventId?: string
+    onEvent: (event: PipelineStreamEvent) => void | Promise<void>
+    shouldContinue?: () => boolean
+  }) {
+    const pollIntervalMs = this.configService.get('TEMPORAL_WORKFLOW_STREAM_POLL_MS', {
+      infer: true,
+    })
+    const timeoutMs = this.configService.get('TEMPORAL_WORKFLOW_STREAM_TIMEOUT_MS', {
+      infer: true,
+    })
+    const deadline = Date.now() + timeoutMs
+    let lastEventId = input.afterEventId
+    let terminated = false
+
+    const emitBatch = async (events: PipelineStreamEvent[]) => {
+      for (const event of events) {
+        await input.onEvent(event)
+        lastEventId = event.eventId
+
+        if (isTerminalPipelineStreamEvent(event)) {
+          terminated = true
+          return
+        }
+      }
+    }
+
+    await emitBatch(
+      await this.getWorkflowStreamEvents({
+        workflowId: input.workflowId,
+        authContext: input.authContext,
+        afterEventId: lastEventId,
+        allowStatusFallback: true,
+      }),
+    )
+
+    while (
+      !terminated &&
+      Date.now() < deadline &&
+      (input.shouldContinue?.() ?? true)
+    ) {
+      await this.sleep(pollIntervalMs)
+
+      await emitBatch(
+        await this.getWorkflowStreamEvents({
+          workflowId: input.workflowId,
+          authContext: input.authContext,
+          afterEventId: lastEventId,
+          allowStatusFallback: false,
+        }),
+      )
+    }
+  }
+
+  private sleep(ms: number) {
+    return new Promise((resolve) => setTimeout(resolve, ms))
   }
 
   private parsePipelineRequest(input: unknown, authContext: AuthContext) {

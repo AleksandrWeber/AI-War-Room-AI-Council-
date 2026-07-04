@@ -149,15 +149,15 @@ export class RunsController {
     })
 
     try {
-      const events = await this.temporalRunService.getWorkflowStreamEvents({
+      await this.temporalRunService.observeWorkflowStream({
         workflowId,
         authContext: request.authContext!,
         afterEventId: lastEventId,
+        shouldContinue: () => !reply.raw.destroyed,
+        onEvent: async (event) => {
+          this.writeStreamEvent(reply, event)
+        },
       })
-
-      for (const event of events) {
-        this.writeStreamEvent(reply, event)
-      }
     } catch (error) {
       this.writeStreamEvent(reply, {
         eventId: `event_${randomUUID()}`,
