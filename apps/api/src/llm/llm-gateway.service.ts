@@ -1,15 +1,12 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
+import type { ModelRouterRole } from '@ai-war-room/schemas'
 import type { z } from 'zod'
 import type { ApiEnv } from '../config/env.js'
+import { ModelRouterService } from '../model-router/model-router.service.js'
 import { ObservabilityService } from '../observability/observability.service.js'
 import { LlmProviderRegistry } from './llm-provider.registry.js'
-import type {
-  LlmMessage,
-  LlmProviderId,
-  StructuredJsonRequest,
-  StructuredJsonResult,
-} from './llm.types.js'
+import type { LlmMessage, StructuredJsonRequest, StructuredJsonResult } from './llm.types.js'
 import {
   addUsage,
   emptyUsage,
@@ -22,6 +19,7 @@ export class LlmGatewayService {
     private readonly configService: ConfigService<ApiEnv, true>,
     private readonly providerRegistry: LlmProviderRegistry,
     private readonly observabilityService: ObservabilityService,
+    private readonly modelRouterService: ModelRouterService,
   ) {}
 
   async generateStructuredJson<TSchema extends z.ZodType>(
@@ -34,10 +32,17 @@ export class LlmGatewayService {
     const errors: string[] = []
     let usage = emptyUsage()
     let lastRawText = ''
+    let lastModelId = ''
 
     for (let attempt = 1; attempt <= maxAttempts; attempt += 1) {
-      const providerId = this.resolveProviderId(attempt)
-      const model = this.resolveModel(attempt)
+      const modelDecision = this.modelRouterService.selectModel({
+        taskName: request.taskName,
+        role: this.resolveRouterRole(request.taskName),
+        forceDeputy: attempt > 1,
+      })
+      const providerId = modelDecision.selected.providerId
+      const model = modelDecision.selected.modelName
+      lastModelId = modelDecision.selected.modelId
       const provider = this.providerRegistry.getProvider(providerId)
       const attemptStartedAt = Date.now()
       let providerResponse
@@ -50,6 +55,8 @@ export class LlmGatewayService {
           responseFormat: 'json_object',
         })
       } catch (error) {
+        const errorMessage =
+          error instanceof Error ? error.message : 'Unknown provider failure.'
         this.observabilityService.record(
           'llm_provider_failure',
           {
@@ -58,12 +65,18 @@ export class LlmGatewayService {
             model,
             attempt,
             durationMs: Date.now() - attemptStartedAt,
-            errorMessage:
-              error instanceof Error ? error.message : 'Unknown provider failure.',
+            errorMessage,
           },
           'error',
         )
-        throw error
+        this.modelRouterService.markModelDegraded(modelDecision.selected.modelId)
+        errors.push(errorMessage)
+
+        if (attempt < maxAttempts) {
+          continue
+        }
+
+        break
       }
 
       usage = addUsage(usage, providerResponse.usage)
@@ -81,6 +94,8 @@ export class LlmGatewayService {
           taskName: request.taskName,
           providerId,
           model,
+          modelId: modelDecision.selected.modelId,
+          modelSelectionDecisionId: modelDecision.decisionId,
           attempts: attempt,
           validationStatus,
           inputTokens: usage.inputTokens,
@@ -115,8 +130,13 @@ export class LlmGatewayService {
       )
     }
 
-    const providerId = this.resolveProviderId(maxAttempts)
-    const model = this.resolveModel(maxAttempts)
+    const fallbackDecision = this.modelRouterService.selectModel({
+      taskName: request.taskName,
+      role: this.resolveRouterRole(request.taskName),
+      forceDeputy: true,
+    })
+    const providerId = fallbackDecision.selected.providerId
+    const model = fallbackDecision.selected.modelName
 
     this.observabilityService.record(
       'llm_fallback_used',
@@ -124,6 +144,8 @@ export class LlmGatewayService {
         taskName: request.taskName,
         providerId,
         model,
+        modelId: lastModelId || fallbackDecision.selected.modelId,
+        modelSelectionDecisionId: fallbackDecision.decisionId,
         attempts: maxAttempts,
         validationErrorCount: errors.length,
         inputTokens: usage.inputTokens,
@@ -194,17 +216,23 @@ export class LlmGatewayService {
     ]
   }
 
-  private resolveProviderId(attempt: number): LlmProviderId {
-    return attempt === 1
-      ? this.configService.get('LLM_PRIMARY_PROVIDER', { infer: true }) ?? 'mock'
-      : this.configService.get('LLM_FALLBACK_PROVIDER', { infer: true }) ?? 'mock'
-  }
+  private resolveRouterRole(taskName: string): ModelRouterRole {
+    if (taskName === 'triage/v1') {
+      return 'triage'
+    }
 
-  private resolveModel(attempt: number) {
-    return attempt === 1
-      ? this.configService.get('LLM_PRIMARY_MODEL', { infer: true }) ??
-          'mock-json-v1'
-      : this.configService.get('LLM_FALLBACK_MODEL', { infer: true }) ??
-          'mock-json-v1'
+    if (taskName === 'moderator/v1') {
+      return 'moderator'
+    }
+
+    if (taskName.startsWith('agents/')) {
+      return (taskName.split('/')[1] as ModelRouterRole | undefined) ?? 'critic'
+    }
+
+    if (taskName.startsWith('artifacts/')) {
+      return (taskName.split('/')[1] as ModelRouterRole | undefined) ?? 'prd'
+    }
+
+    return 'critic'
   }
 }

@@ -23,7 +23,7 @@ class ScriptedProvider implements LlmProvider {
 
   constructor(
     providerId: LlmProviderId,
-    private readonly responses: string[],
+    private readonly responses: Array<string | Error>,
   ) {
     this.providerId = providerId
   }
@@ -35,6 +35,10 @@ class ScriptedProvider implements LlmProvider {
       this.responses[Math.min(this.calls, this.responses.length - 1)] ??
       '{}'
     this.calls += 1
+
+    if (rawText instanceof Error) {
+      throw rawText
+    }
 
     return {
       rawText,
@@ -79,6 +83,58 @@ class TestObservability {
   }
 }
 
+class TestModelRouter {
+  private sequence = 0
+  readonly degradedModelIds: string[] = []
+
+  selectModel(input: { taskName: string; role: string; forceDeputy?: boolean }) {
+    this.sequence += 1
+    const modelId = input.forceDeputy
+      ? 'mock-json-v1-deputy'
+      : 'mock-json-v1-primary'
+    const selected = {
+      modelId,
+      providerId: 'mock',
+      modelName: input.forceDeputy ? 'deputy-model' : 'primary-model',
+      score: input.forceDeputy ? 0.8 : 0.9,
+      lifecycleStatus: 'active',
+      healthStatus: 'healthy',
+    }
+
+    return {
+      decisionId: `decision_${this.sequence}`,
+      taskName: input.taskName,
+      role: input.role,
+      champion: {
+        modelId: 'mock-json-v1-primary',
+        providerId: 'mock',
+        modelName: 'primary-model',
+        score: 0.9,
+        lifecycleStatus: 'active',
+        healthStatus: 'healthy',
+      },
+      deputy: {
+        modelId: 'mock-json-v1-deputy',
+        providerId: 'mock',
+        modelName: 'deputy-model',
+        score: 0.8,
+        lifecycleStatus: 'active',
+        healthStatus: 'healthy',
+      },
+      selected,
+      selectionReason: input.forceDeputy
+        ? 'deputy_selected_after_champion_failure'
+        : 'champion_selected_by_role_score',
+      candidateCount: 2,
+      createdAt: new Date().toISOString(),
+    }
+  }
+
+  markModelDegraded(modelId: string) {
+    this.degradedModelIds.push(modelId)
+  }
+}
+
 function createGateway(providers: LlmProvider[]) {
   const config = new ConfigService<ApiEnv>({
     LLM_PRIMARY_PROVIDER: 'mock',
@@ -89,15 +145,17 @@ function createGateway(providers: LlmProvider[]) {
   })
 
   const observability = new TestObservability()
+  const modelRouter = new TestModelRouter()
   const gateway = new LlmGatewayService(
     config,
     new TestRegistry(
       new Map(providers.map((provider) => [provider.providerId, provider])),
     ) as never,
     observability as never,
+    modelRouter as never,
   )
 
-  return { gateway, observability }
+  return { gateway, observability, modelRouter }
 }
 
 describe('LlmGatewayService', () => {
@@ -145,6 +203,7 @@ describe('LlmGatewayService', () => {
 
     expect(result.validationStatus).toBe('repaired')
     expect(result.attempts).toBe(2)
+    expect(result.model).toBe('deputy-model')
     expect(result.errors[0]).toContain('JSON object')
     expect(result.value.summary).toBe('Repaired response')
     expect(observability.events.map((event) => event.eventName)).toEqual([
@@ -177,6 +236,34 @@ describe('LlmGatewayService', () => {
       'llm_validation_failure',
       'llm_validation_failure',
       'llm_fallback_used',
+    ])
+  })
+
+  it('routes from champion to deputy after a provider failure', async () => {
+    const { gateway, observability, modelRouter } = createGateway([
+      new ScriptedProvider('mock', [
+        new Error('champion unavailable'),
+        JSON.stringify({
+          summary: 'Deputy response',
+          risks: [],
+        }),
+      ]),
+    ])
+
+    const result = await gateway.generateStructuredJson({
+      taskName: 'test',
+      schema: responseSchema,
+      messages: [{ role: 'user', content: 'Return JSON.' }],
+      fallback: { summary: 'fallback', risks: [] },
+      maxAttempts: 2,
+    })
+
+    expect(result.validationStatus).toBe('repaired')
+    expect(result.model).toBe('deputy-model')
+    expect(modelRouter.degradedModelIds).toEqual(['mock-json-v1-primary'])
+    expect(observability.events.map((event) => event.eventName)).toEqual([
+      'llm_provider_failure',
+      'llm_call_completed',
     ])
   })
 })
