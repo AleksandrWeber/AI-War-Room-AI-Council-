@@ -1,11 +1,17 @@
 import { Fragment, useEffect, useRef, useState, type FormEvent } from 'react'
 import type {
   AuthCapabilitiesResponse,
+  AuthSessionResponse,
   RunCapabilitiesResponse,
   TemporalRuntimeHealthResponse,
 } from '@ai-war-room/schemas'
 import './App.css'
-import { buildWorkspaceAuthHeaders } from './auth-headers'
+import {
+  buildBootstrapAuthHeaders,
+  buildWorkspaceAuthHeaders,
+  loadStoredAuthSession,
+  saveStoredAuthSession,
+} from './auth-headers'
 import {
   type TemporalRunStartResponse,
   type TemporalWorkflowRecoveryResponse,
@@ -491,7 +497,13 @@ function App() {
     useState<RunCapabilitiesResponse | null>(null)
   const [authCapabilities, setAuthCapabilities] =
     useState<AuthCapabilitiesResponse | null>(null)
-  const workspaceAuthHeaders = buildWorkspaceAuthHeaders(authCapabilities)
+  const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
+    () => loadStoredAuthSession(),
+  )
+  const workspaceAuthHeaders = buildWorkspaceAuthHeaders(
+    authCapabilities,
+    authSession,
+  )
   const [temporalRuntimeHealth, setTemporalRuntimeHealth] =
     useState<TemporalRuntimeHealthResponse | null>(null)
   const useTemporalWorkflowRuntime = shouldUseTemporalRuntime(
@@ -610,6 +622,50 @@ function App() {
       controller.abort()
     }
   }, [])
+
+  useEffect(() => {
+    if (authCapabilities?.provider !== 'session') {
+      return
+    }
+
+    const storedSession = loadStoredAuthSession()
+
+    if (storedSession) {
+      setAuthSession(storedSession)
+      return
+    }
+
+    const controller = new AbortController()
+
+    fetch(`${apiBaseUrl}/auth/session`, {
+      method: 'POST',
+      signal: controller.signal,
+      headers: {
+        'Content-Type': 'application/json',
+        ...buildBootstrapAuthHeaders(authCapabilities),
+      },
+      body: JSON.stringify({
+        workspaceId: 'local_workspace',
+      }),
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((session) => {
+        if (session && !controller.signal.aborted) {
+          const nextSession = session as AuthSessionResponse
+          saveStoredAuthSession(nextSession)
+          setAuthSession(nextSession)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAuthSession(null)
+        }
+      })
+
+    return () => {
+      controller.abort()
+    }
+  }, [authCapabilities])
 
   useEffect(() => {
     if (!useTemporalWorkflowRuntime) {

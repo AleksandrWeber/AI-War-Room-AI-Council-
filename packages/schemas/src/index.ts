@@ -1,3 +1,4 @@
+export * from './auth-session.js'
 export * from './auth-provider.js'
 export * from './agent.js'
 export * from './artifact.js'

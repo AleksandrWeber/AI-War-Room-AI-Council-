@@ -110,8 +110,26 @@ describe('API skeleton', () => {
     expect(response.body).toMatchObject({
       provider: 'headers',
       requiresBearerToken: false,
+      supportsSessionBootstrap: true,
       workspaceHeadersRequired: true,
       guidance: expect.stringContaining('x-user-id'),
+    })
+  })
+
+  it('creates a signed auth session for workspace members', async () => {
+    const response = await request(app!.getHttpServer())
+      .post('/api/auth/session')
+      .set(authHeaders)
+      .send({
+        workspaceId: 'workspace_1',
+      })
+      .expect(201)
+
+    expect(response.body).toMatchObject({
+      userId: 'user_test',
+      workspaceId: 'workspace_1',
+      token: expect.any(String),
+      expiresAt: expect.any(Number),
     })
   })
 

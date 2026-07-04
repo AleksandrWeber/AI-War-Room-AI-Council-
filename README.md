@@ -162,6 +162,7 @@ Auth provider modes are configured on the API:
 
 - `AUTH_PROVIDER=headers` (default) — local development uses workspace headers only.
 - `AUTH_PROVIDER=bearer` — protected routes also require `Authorization: Bearer <AUTH_BEARER_TOKEN>`.
+- `AUTH_PROVIDER=session` — protected routes require a signed session token from `POST /api/auth/session`.
 
 Discover the active mode from `GET /api/auth/capabilities`.
 
@@ -170,18 +171,39 @@ Local development headers:
 - `x-user-id: user_local`
 - `x-workspace-id: local_workspace`
 
-For bearer rollout, set matching tokens on the API and web build:
+Bootstrap a signed session:
+
+```bash
+curl -X POST http://127.0.0.1:3000/api/auth/session \
+  -H 'content-type: application/json' \
+  -H 'x-user-id: user_local' \
+  -H 'x-workspace-id: local_workspace' \
+  -d '{"workspaceId":"local_workspace"}'
+```
+
+For bearer or session rollout, set matching tokens on the API and web build:
 
 ```bash
 AUTH_PROVIDER=bearer AUTH_BEARER_TOKEN=change-me npm run dev:api
 VITE_AUTH_BEARER_TOKEN=change-me npm run dev:web
+
+AUTH_PROVIDER=session AUTH_BEARER_TOKEN=change-me npm run dev:api
+VITE_AUTH_BEARER_TOKEN=change-me npm run dev:web
 ```
+
+In session mode the frontend bootstraps and stores the signed token in local storage automatically.
 
 Run mutation endpoints verify that the request workspace matches the header workspace and that the user is a workspace member.
 
 ## LLM Gateway
 
 The API contains an internal LLM gateway abstraction for structured JSON calls.
+
+Current `v5.3` behavior:
+
+- `POST /api/auth/session` issues HMAC-signed workspace session tokens with configurable TTL.
+- `AUTH_PROVIDER=session` accepts signed session tokens instead of workspace headers on protected routes.
+- The frontend bootstraps and persists signed sessions in local storage when session auth is active.
 
 Current `v5.2` behavior:
 

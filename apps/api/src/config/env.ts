@@ -53,8 +53,9 @@ export const envSchema = z.object({
     .int()
     .positive()
     .default(300_000),
-  AUTH_PROVIDER: z.enum(['headers', 'bearer']).default('headers'),
+  AUTH_PROVIDER: z.enum(['headers', 'bearer', 'session']).default('headers'),
   AUTH_BEARER_TOKEN: optionalEnvStringSchema,
+  AUTH_SESSION_TTL_SECONDS: z.coerce.number().int().positive().default(86_400),
 })
 
 export type ApiEnv = z.infer<typeof envSchema>
