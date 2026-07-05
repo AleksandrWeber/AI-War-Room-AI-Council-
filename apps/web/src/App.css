@@ -10065,6 +10065,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-compactionizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-compactionizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-compactionizability-card p,
+.workspace-compactionizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-compactionizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-compactionizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-ncompactionizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-ncompactionizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-ncompactionizability-card p,
+.workspace-ncompactionizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-ncompactionizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-ncompactionizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-leaderizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-leaderizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-leaderizability-card p,
+.workspace-leaderizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-leaderizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-leaderizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-followerizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-followerizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-followerizability-card p,
+.workspace-followerizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-followerizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-followerizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-consensusizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-consensusizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-consensusizability-card p,
+.workspace-consensusizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-consensusizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-consensusizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-quorumizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-quorumizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-quorumizability-card p,
+.workspace-quorumizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-quorumizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-quorumizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-snapshotizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-snapshotizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-snapshotizability-card p,
+.workspace-snapshotizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-snapshotizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-snapshotizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-journalizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-journalizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-journalizability-card p,
+.workspace-journalizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-journalizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-journalizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-appendizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-appendizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-appendizability-card p,
+.workspace-appendizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-appendizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-appendizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-walizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-walizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-walizability-card p,
+.workspace-walizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-walizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-walizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

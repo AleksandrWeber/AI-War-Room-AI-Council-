@@ -203,6 +203,16 @@ import { ShardingizabilityModule } from './shardingizability/shardingizability.m
 import { OrderingizabilityModule } from './orderingizability/orderingizability.module.js'
 import { CheckpointizabilityModule } from './checkpointizability/checkpointizability.module.js'
 import { RecoveryizabilityModule } from './recoveryizability/recoveryizability.module.js'
+import { CompactionizabilityModule } from './compactionizability/compactionizability.module.js'
+import { NcompactionizabilityModule } from './ncompactionizability/ncompactionizability.module.js'
+import { LeaderizabilityModule } from './leaderizability/leaderizability.module.js'
+import { FollowerizabilityModule } from './followerizability/followerizability.module.js'
+import { ConsensusizabilityModule } from './consensusizability/consensusizability.module.js'
+import { QuorumizabilityModule } from './quorumizability/quorumizability.module.js'
+import { SnapshotizabilityModule } from './snapshotizability/snapshotizability.module.js'
+import { JournalizabilityModule } from './journalizability/journalizability.module.js'
+import { AppendizabilityModule } from './appendizability/appendizability.module.js'
+import { WalizabilityModule } from './walizability/walizability.module.js'
 
 @Module({
   imports: [
@@ -410,6 +420,16 @@ import { RecoveryizabilityModule } from './recoveryizability/recoveryizability.m
     OrderingizabilityModule,
     CheckpointizabilityModule,
     RecoveryizabilityModule,
+    CompactionizabilityModule,
+    NcompactionizabilityModule,
+    LeaderizabilityModule,
+    FollowerizabilityModule,
+    ConsensusizabilityModule,
+    QuorumizabilityModule,
+    SnapshotizabilityModule,
+    JournalizabilityModule,
+    AppendizabilityModule,
+    WalizabilityModule,
   ],
   exports: [
     CustomizabilityModule,
