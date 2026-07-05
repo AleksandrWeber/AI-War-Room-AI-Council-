@@ -42,6 +42,8 @@ import type {
   BackupAdminSummaryResponse,
   AuditTrailRolloutResponse,
   AuditTrailAdminSummaryResponse,
+  ComplianceRolloutResponse,
+  ComplianceAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -189,6 +191,15 @@ import {
   formatAuditTrailRolloutCheckStatus,
   formatAuditTrailRolloutStatus,
 } from './audit-trail-ui'
+import {
+  executeComplianceAdminAction,
+  fetchComplianceAdminSummary,
+  fetchComplianceRollout,
+  formatComplianceAdminAction,
+  formatComplianceDomain,
+  formatComplianceRolloutCheckStatus,
+  formatComplianceRolloutStatus,
+} from './compliance-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -767,6 +778,8 @@ function App() {
     useState<BackupRolloutResponse | null>(null)
   const [auditTrailRollout, setAuditTrailRollout] =
     useState<AuditTrailRolloutResponse | null>(null)
+  const [complianceRollout, setComplianceRollout] =
+    useState<ComplianceRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -872,6 +885,8 @@ function App() {
     useState<BackupAdminSummaryResponse | null>(null)
   const [auditAdminSummary, setAuditAdminSummary] =
     useState<AuditTrailAdminSummaryResponse | null>(null)
+  const [complianceAdminSummary, setComplianceAdminSummary] =
+    useState<ComplianceAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -912,6 +927,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [auditAdminAction, setAuditAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [complianceAdminAction, setComplianceAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1198,6 +1216,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setAuditTrailRollout(null)
+        }
+      })
+
+    fetchComplianceRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setComplianceRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setComplianceRollout(null)
         }
       })
 
@@ -1985,6 +2015,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setAuditAdminSummary(auditAdmin)
+
+      const complianceAdmin = await fetchComplianceAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setComplianceAdminSummary(complianceAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -2473,6 +2510,33 @@ function App() {
       )
     } finally {
       setAuditAdminAction('idle')
+    }
+  }
+
+  async function handleComplianceAdminAction(action: 'refresh_compliance_summary') {
+    setComplianceAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeComplianceAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchComplianceRollout(apiBaseUrl)
+      setComplianceRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run compliance admin action.',
+      )
+    } finally {
+      setComplianceAdminAction('idle')
     }
   }
 
@@ -3560,6 +3624,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {auditTrailRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {complianceRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production compliance rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${complianceRollout.status}`}
+              >
+                {formatComplianceRolloutStatus(complianceRollout.status)}
+              </strong>
+            </div>
+            <p>{complianceRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {complianceRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatComplianceRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {complianceRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -4841,6 +4934,71 @@ function App() {
                 }
               >
                 {formatAuditAdminAction('refresh_audit_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {complianceAdminSummary ? (
+          <div className="billing-admin workspace-compliance-admin">
+            <div className="billing-admin__header">
+              <span>Compliance admin</span>
+              <strong>{complianceAdminSummary.role}</strong>
+            </div>
+            <p>{complianceAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Attestation records</span>
+                <strong>{complianceAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {complianceAdminSummary.stats.coveredDomains}/
+                  {complianceAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Encryption</span>
+                <strong>
+                  {complianceAdminSummary.stats.encryptionKeyConfigured
+                    ? 'Configured'
+                    : 'Default key'}
+                </strong>
+                <small>
+                  {complianceAdminSummary.stats.postgresConnectivity
+                    ? 'PostgreSQL policy tables'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-compliance-list">
+              {complianceAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-compliance-card workspace-compliance-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatComplianceDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {complianceAdminSummary.availableActions.includes(
+              'refresh_compliance_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={complianceAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleComplianceAdminAction('refresh_compliance_summary')
+                }
+              >
+                {formatComplianceAdminAction('refresh_compliance_summary')}
               </button>
             ) : null}
           </div>

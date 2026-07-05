@@ -575,6 +575,25 @@ Workspace audit trail admin tools:
 - Only workspace owners and admins can access audit trail admin endpoints.
 - The web billing panel shows audit trail admin tools for authorized roles.
 
+Production compliance rollout readiness:
+
+- `GET /api/compliance/readiness` returns operator-facing production compliance checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, policy table coverage, encryption key readiness, workspace role governance, and attestation readiness signals.
+- The web billing panel shows compliance rollout status and per-check guidance.
+
+Workspace compliance admin tools:
+
+- `GET /api/compliance/workspace/:workspaceId/admin` returns owner/admin compliance summary with workspace policy attestation domains.
+- `POST /api/compliance/workspace/:workspaceId/admin/actions` runs compliance admin actions such as refreshing the summary.
+- Only workspace owners and admins can access compliance admin endpoints.
+- The web billing panel shows compliance admin tools for authorized roles.
+
+Current `v5.35` behavior:
+
+- Production compliance rollout readiness validates policy coverage and attestation readiness through `GET /api/compliance/readiness`.
+- Workspace owners and admins can inspect workspace compliance metrics from `GET /api/compliance/workspace/:workspaceId/admin`.
+- The web billing panel shows compliance rollout checks and workspace compliance admin tools.
+
 Current `v5.34` behavior:
 
 - Production audit trail rollout readiness validates audit coverage and retention readiness through `GET /api/audit/readiness`.
