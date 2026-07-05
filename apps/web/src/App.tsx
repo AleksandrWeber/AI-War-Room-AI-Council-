@@ -70,6 +70,8 @@ import type {
   DurabilityAdminSummaryResponse,
   RecoverabilityRolloutResponse,
   RecoverabilityAdminSummaryResponse,
+  MaintainabilityRolloutResponse,
+  MaintainabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -343,6 +345,15 @@ import {
   formatRecoverabilityRolloutCheckStatus,
   formatRecoverabilityRolloutStatus,
 } from './recoverability-ui'
+import {
+  executeMaintainabilityAdminAction,
+  fetchMaintainabilityAdminSummary,
+  fetchMaintainabilityRollout,
+  formatMaintainabilityAdminAction,
+  formatMaintainabilityDomain,
+  formatMaintainabilityRolloutCheckStatus,
+  formatMaintainabilityRolloutStatus,
+} from './maintainability-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -948,6 +959,8 @@ function App() {
     useState<DurabilityRolloutResponse | null>(null)
   const [recoverabilityRollout, setRecoverabilityRollout] =
     useState<RecoverabilityRolloutResponse | null>(null)
+  const [maintainabilityRollout, setMaintainabilityRollout] =
+    useState<MaintainabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1081,6 +1094,8 @@ function App() {
     useState<DurabilityAdminSummaryResponse | null>(null)
   const [recoverabilityAdminSummary, setRecoverabilityAdminSummary] =
     useState<RecoverabilityAdminSummaryResponse | null>(null)
+  const [maintainabilityAdminSummary, setMaintainabilityAdminSummary] =
+    useState<MaintainabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1163,6 +1178,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [recoverabilityAdminAction, setRecoverabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [maintainabilityAdminAction, setMaintainabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1617,6 +1635,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setRecoverabilityRollout(null)
+        }
+      })
+
+    fetchMaintainabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setMaintainabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setMaintainabilityRollout(null)
         }
       })
 
@@ -2502,6 +2532,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setRecoverabilityAdminSummary(recoverabilityAdmin)
+
+      const maintainabilityAdmin = await fetchMaintainabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMaintainabilityAdminSummary(maintainabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -3386,6 +3423,35 @@ function App() {
       )
     } finally {
       setRecoverabilityAdminAction('idle')
+    }
+  }
+
+  async function handleMaintainabilityAdminAction(
+    action: 'refresh_maintainability_summary',
+  ) {
+    setMaintainabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeMaintainabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchMaintainabilityRollout(apiBaseUrl)
+      setMaintainabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run maintainability admin action.',
+      )
+    } finally {
+      setMaintainabilityAdminAction('idle')
     }
   }
 
@@ -4875,6 +4941,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {recoverabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {maintainabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production maintainability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${maintainabilityRollout.status}`}
+              >
+                {formatMaintainabilityRolloutStatus(maintainabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{maintainabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {maintainabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatMaintainabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {maintainabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -7027,6 +7122,73 @@ function App() {
               >
                 {formatRecoverabilityAdminAction(
                   'refresh_recoverability_summary',
+                )}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {maintainabilityAdminSummary ? (
+          <div className="billing-admin workspace-maintainability-admin">
+            <div className="billing-admin__header">
+              <span>Maintainability admin</span>
+              <strong>{maintainabilityAdminSummary.role}</strong>
+            </div>
+            <p>{maintainabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Run maintainability</span>
+                <strong>
+                  {maintainabilityAdminSummary.stats.maintainabilityPercent}%
+                </strong>
+                <small>
+                  {maintainabilityAdminSummary.stats.coveredDomains}/
+                  {maintainabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Maintainability signals</span>
+                <strong>{maintainabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {maintainabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, model health, and usage telemetry'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-maintainability-list">
+              {maintainabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-maintainability-card workspace-maintainability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatMaintainabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {maintainabilityAdminSummary.availableActions.includes(
+              'refresh_maintainability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={maintainabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleMaintainabilityAdminAction(
+                    'refresh_maintainability_summary',
+                  )
+                }
+              >
+                {formatMaintainabilityAdminAction(
+                  'refresh_maintainability_summary',
                 )}
               </button>
             ) : null}

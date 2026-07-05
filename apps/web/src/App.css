@@ -1443,6 +1443,31 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-maintainability-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.workspace-maintainability-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+}
+
+.workspace-maintainability-card p,
+.workspace-maintainability-card small {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+}
+
+.workspace-maintainability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-maintainability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

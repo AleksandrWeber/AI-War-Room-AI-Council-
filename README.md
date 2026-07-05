@@ -757,6 +757,25 @@ Workspace recoverability admin tools:
 - Only workspace owners and admins can access recoverability admin endpoints.
 - The web billing panel shows recoverability admin tools for authorized roles.
 
+Production maintainability rollout readiness:
+
+- `GET /api/maintainability/readiness` returns operator-facing production maintainability checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, maintainability signal table coverage, migration operability, model health maintainability, and operability readiness signals.
+- The web billing panel shows maintainability rollout status and per-check guidance.
+
+Workspace maintainability admin tools:
+
+- `GET /api/maintainability/workspace/:workspaceId/admin` returns owner/admin maintainability summary with workspace run outcome and telemetry domains.
+- `POST /api/maintainability/workspace/:workspaceId/admin/actions` runs maintainability admin actions such as refreshing the summary.
+- Only workspace owners and admins can access maintainability admin endpoints.
+- The web billing panel shows maintainability admin tools for authorized roles.
+
+Current `v5.49` behavior:
+
+- Production maintainability rollout readiness validates maintainability coverage and operability readiness through `GET /api/maintainability/readiness`.
+- Workspace owners and admins can inspect workspace maintainability metrics from `GET /api/maintainability/workspace/:workspaceId/admin`.
+- The web billing panel shows maintainability rollout checks and workspace maintainability admin tools.
+
 Current `v5.48` behavior:
 
 - Production recoverability rollout readiness validates recoverability coverage and recovery readiness through `GET /api/recoverability/readiness`.
