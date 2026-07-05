@@ -72,6 +72,11 @@ import { AdaptabilityModule } from './adaptability/adaptability.module.js'
 import { FlexibilityModule } from './flexibility/flexibility.module.js'
 import { ExtensibilityModule } from './extensibility/extensibility.module.js'
 import { ModifiabilityModule } from './modifiability/modifiability.module.js'
+import { ConfigurabilityModule } from './configurability/configurability.module.js'
+import { CustomizabilityModule } from './customizability/customizability.module.js'
+import { OperabilityModule } from './operability/operability.module.js'
+import { TunabilityModule } from './tunability/tunability.module.js'
+import { AdjustabilityModule } from './adjustability/adjustability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -163,6 +168,11 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     FlexibilityModule,
     ExtensibilityModule,
     ModifiabilityModule,
+    ConfigurabilityModule,
+    CustomizabilityModule,
+    OperabilityModule,
+    TunabilityModule,
+    AdjustabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

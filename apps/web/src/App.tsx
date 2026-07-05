@@ -174,6 +174,16 @@ import type {
   ExtensibilityAdminSummaryResponse,
   ModifiabilityRolloutResponse,
   ModifiabilityAdminSummaryResponse,
+  ConfigurabilityRolloutResponse,
+  ConfigurabilityAdminSummaryResponse,
+  CustomizabilityRolloutResponse,
+  CustomizabilityAdminSummaryResponse,
+  OperabilityRolloutResponse,
+  OperabilityAdminSummaryResponse,
+  TunabilityRolloutResponse,
+  TunabilityAdminSummaryResponse,
+  AdjustabilityRolloutResponse,
+  AdjustabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -916,6 +926,51 @@ import {
   formatModifiabilityRolloutStatus,
 } from './modifiability-ui'
 import {
+  executeConfigurabilityAdminAction,
+  fetchConfigurabilityAdminSummary,
+  fetchConfigurabilityRollout,
+  formatConfigurabilityAdminAction,
+  formatConfigurabilityDomain,
+  formatConfigurabilityRolloutCheckStatus,
+  formatConfigurabilityRolloutStatus,
+} from './configurability-ui'
+import {
+  executeCustomizabilityAdminAction,
+  fetchCustomizabilityAdminSummary,
+  fetchCustomizabilityRollout,
+  formatCustomizabilityAdminAction,
+  formatCustomizabilityDomain,
+  formatCustomizabilityRolloutCheckStatus,
+  formatCustomizabilityRolloutStatus,
+} from './customizability-ui'
+import {
+  executeOperabilityAdminAction,
+  fetchOperabilityAdminSummary,
+  fetchOperabilityRollout,
+  formatOperabilityAdminAction,
+  formatOperabilityDomain,
+  formatOperabilityRolloutCheckStatus,
+  formatOperabilityRolloutStatus,
+} from './operability-ui'
+import {
+  executeTunabilityAdminAction,
+  fetchTunabilityAdminSummary,
+  fetchTunabilityRollout,
+  formatTunabilityAdminAction,
+  formatTunabilityDomain,
+  formatTunabilityRolloutCheckStatus,
+  formatTunabilityRolloutStatus,
+} from './tunability-ui'
+import {
+  executeAdjustabilityAdminAction,
+  fetchAdjustabilityAdminSummary,
+  fetchAdjustabilityRollout,
+  formatAdjustabilityAdminAction,
+  formatAdjustabilityDomain,
+  formatAdjustabilityRolloutCheckStatus,
+  formatAdjustabilityRolloutStatus,
+} from './adjustability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -1624,6 +1679,16 @@ function App() {
     useState<ExtensibilityRolloutResponse | null>(null)
   const [modifiabilityRollout, setModifiabilityRollout] =
     useState<ModifiabilityRolloutResponse | null>(null)
+  const [configurabilityRollout, setConfigurabilityRollout] =
+    useState<ConfigurabilityRolloutResponse | null>(null)
+  const [customizabilityRollout, setCustomizabilityRollout] =
+    useState<CustomizabilityRolloutResponse | null>(null)
+  const [operabilityRollout, setOperabilityRollout] =
+    useState<OperabilityRolloutResponse | null>(null)
+  const [tunabilityRollout, setTunabilityRollout] =
+    useState<TunabilityRolloutResponse | null>(null)
+  const [adjustabilityRollout, setAdjustabilityRollout] =
+    useState<AdjustabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1861,6 +1926,16 @@ function App() {
     useState<ExtensibilityAdminSummaryResponse | null>(null)
   const [modifiabilityAdminSummary, setModifiabilityAdminSummary] =
     useState<ModifiabilityAdminSummaryResponse | null>(null)
+  const [configurabilityAdminSummary, setConfigurabilityAdminSummary] =
+    useState<ConfigurabilityAdminSummaryResponse | null>(null)
+  const [customizabilityAdminSummary, setCustomizabilityAdminSummary] =
+    useState<CustomizabilityAdminSummaryResponse | null>(null)
+  const [operabilityAdminSummary, setOperabilityAdminSummary] =
+    useState<OperabilityAdminSummaryResponse | null>(null)
+  const [tunabilityAdminSummary, setTunabilityAdminSummary] =
+    useState<TunabilityAdminSummaryResponse | null>(null)
+  const [adjustabilityAdminSummary, setAdjustabilityAdminSummary] =
+    useState<AdjustabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -2099,6 +2174,21 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [modifiabilityAdminAction, setModifiabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [configurabilityAdminAction, setConfigurabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [customizabilityAdminAction, setCustomizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [operabilityAdminAction, setOperabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [tunabilityAdminAction, setTunabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [adjustabilityAdminAction, setAdjustabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -3177,6 +3267,66 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setModifiabilityRollout(null)
+        }
+      })
+
+    fetchConfigurabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setConfigurabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setConfigurabilityRollout(null)
+        }
+      })
+
+    fetchCustomizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setCustomizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setCustomizabilityRollout(null)
+        }
+      })
+
+    fetchOperabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setOperabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setOperabilityRollout(null)
+        }
+      })
+
+    fetchTunabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setTunabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTunabilityRollout(null)
+        }
+      })
+
+    fetchAdjustabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAdjustabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAdjustabilityRollout(null)
         }
       })
 
@@ -4426,6 +4576,41 @@ function App() {
         workspaceAuthHeaders,
       )
       setModifiabilityAdminSummary(modifiabilityAdmin)
+
+      const configurabilityAdmin = await fetchConfigurabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConfigurabilityAdminSummary(configurabilityAdmin)
+
+      const customizabilityAdmin = await fetchCustomizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCustomizabilityAdminSummary(customizabilityAdmin)
+
+      const operabilityAdmin = await fetchOperabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setOperabilityAdminSummary(operabilityAdmin)
+
+      const tunabilityAdmin = await fetchTunabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTunabilityAdminSummary(tunabilityAdmin)
+
+      const adjustabilityAdmin = await fetchAdjustabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAdjustabilityAdminSummary(adjustabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -5658,6 +5843,151 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleAdjustabilityAdminAction(
+    action: 'refresh_adjustability_summary',
+  ) {
+    setAdjustabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAdjustabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAdjustabilityRollout(apiBaseUrl)
+      setAdjustabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run adjustability admin action.',
+      )
+    } finally {
+      setAdjustabilityAdminAction('idle')
+    }
+  }
+
+  async function handleTunabilityAdminAction(
+    action: 'refresh_tunability_summary',
+  ) {
+    setTunabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeTunabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchTunabilityRollout(apiBaseUrl)
+      setTunabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run tunability admin action.',
+      )
+    } finally {
+      setTunabilityAdminAction('idle')
+    }
+  }
+
+  async function handleOperabilityAdminAction(
+    action: 'refresh_operability_summary',
+  ) {
+    setOperabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeOperabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchOperabilityRollout(apiBaseUrl)
+      setOperabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run operability admin action.',
+      )
+    } finally {
+      setOperabilityAdminAction('idle')
+    }
+  }
+
+  async function handleCustomizabilityAdminAction(
+    action: 'refresh_customizability_summary',
+  ) {
+    setCustomizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeCustomizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchCustomizabilityRollout(apiBaseUrl)
+      setCustomizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run customizability admin action.',
+      )
+    } finally {
+      setCustomizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleConfigurabilityAdminAction(
+    action: 'refresh_configurability_summary',
+  ) {
+    setConfigurabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeConfigurabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchConfigurabilityRollout(apiBaseUrl)
+      setConfigurabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run configurability admin action.',
+      )
+    } finally {
+      setConfigurabilityAdminAction('idle')
     }
   }
 
@@ -9815,6 +10145,151 @@ function App() {
               ))}
             </div>
             <small>Checked at {compatibilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {adjustabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production adjustability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${adjustabilityRollout.status}`}
+              >
+                {formatAdjustabilityRolloutStatus(adjustabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{adjustabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {adjustabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAdjustabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {adjustabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {tunabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production tunability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${tunabilityRollout.status}`}
+              >
+                {formatTunabilityRolloutStatus(tunabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{tunabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {tunabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatTunabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {tunabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {operabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production operability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${operabilityRollout.status}`}
+              >
+                {formatOperabilityRolloutStatus(operabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{operabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {operabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatOperabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {operabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {customizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production customizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${customizabilityRollout.status}`}
+              >
+                {formatCustomizabilityRolloutStatus(customizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{customizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {customizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatCustomizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {customizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {configurabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production configurability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${configurabilityRollout.status}`}
+              >
+                {formatConfigurabilityRolloutStatus(configurabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{configurabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {configurabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatConfigurabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {configurabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -15352,6 +15827,331 @@ function App() {
                 }
               >
                 {formatCompatibilityAdminAction('refresh_compatibility_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {adjustabilityAdminSummary ? (
+          <div className="billing-admin workspace-adjustability-admin">
+            <div className="billing-admin__header">
+              <span>Adjustability admin</span>
+              <strong>{adjustabilityAdminSummary.role}</strong>
+            </div>
+            <p>{adjustabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice adjustability</span>
+                <strong>
+                  {adjustabilityAdminSummary.stats.adjustabilityPercent}%
+                </strong>
+                <small>
+                  {adjustabilityAdminSummary.stats.coveredDomains}/
+                  {adjustabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Adjustability signals</span>
+                <strong>{adjustabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {adjustabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and workspace memberships'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-adjustability-list">
+              {adjustabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-adjustability-card workspace-adjustability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAdjustabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {adjustabilityAdminSummary.availableActions.includes(
+              'refresh_adjustability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={adjustabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAdjustabilityAdminAction(
+                    'refresh_adjustability_summary',
+                  )
+                }
+              >
+                {formatAdjustabilityAdminAction('refresh_adjustability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {tunabilityAdminSummary ? (
+          <div className="billing-admin workspace-tunability-admin">
+            <div className="billing-admin__header">
+              <span>Tunability admin</span>
+              <strong>{tunabilityAdminSummary.role}</strong>
+            </div>
+            <p>{tunabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Usage event tunability</span>
+                <strong>
+                  {tunabilityAdminSummary.stats.tunabilityPercent}%
+                </strong>
+                <small>
+                  {tunabilityAdminSummary.stats.coveredDomains}/
+                  {tunabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Tunability signals</span>
+                <strong>{tunabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {tunabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, usage events, and idempotency keys'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-tunability-list">
+              {tunabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-tunability-card workspace-tunability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatTunabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {tunabilityAdminSummary.availableActions.includes(
+              'refresh_tunability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={tunabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleTunabilityAdminAction(
+                    'refresh_tunability_summary',
+                  )
+                }
+              >
+                {formatTunabilityAdminAction('refresh_tunability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {operabilityAdminSummary ? (
+          <div className="billing-admin workspace-operability-admin">
+            <div className="billing-admin__header">
+              <span>Operability admin</span>
+              <strong>{operabilityAdminSummary.role}</strong>
+            </div>
+            <p>{operabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification operability</span>
+                <strong>
+                  {operabilityAdminSummary.stats.operabilityPercent}%
+                </strong>
+                <small>
+                  {operabilityAdminSummary.stats.coveredDomains}/
+                  {operabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Operability signals</span>
+                <strong>{operabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {operabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-operability-list">
+              {operabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-operability-card workspace-operability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatOperabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {operabilityAdminSummary.availableActions.includes(
+              'refresh_operability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={operabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleOperabilityAdminAction(
+                    'refresh_operability_summary',
+                  )
+                }
+              >
+                {formatOperabilityAdminAction('refresh_operability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {customizabilityAdminSummary ? (
+          <div className="billing-admin workspace-customizability-admin">
+            <div className="billing-admin__header">
+              <span>Customizability admin</span>
+              <strong>{customizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{customizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workflow customizability</span>
+                <strong>
+                  {customizabilityAdminSummary.stats.customizabilityPercent}%
+                </strong>
+                <small>
+                  {customizabilityAdminSummary.stats.coveredDomains}/
+                  {customizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Customizability signals</span>
+                <strong>{customizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {customizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, run workflows, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-customizability-list">
+              {customizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-customizability-card workspace-customizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatCustomizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {customizabilityAdminSummary.availableActions.includes(
+              'refresh_customizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={customizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleCustomizabilityAdminAction(
+                    'refresh_customizability_summary',
+                  )
+                }
+              >
+                {formatCustomizabilityAdminAction('refresh_customizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {configurabilityAdminSummary ? (
+          <div className="billing-admin workspace-configurability-admin">
+            <div className="billing-admin__header">
+              <span>Configurability admin</span>
+              <strong>{configurabilityAdminSummary.role}</strong>
+            </div>
+            <p>{configurabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Provider credential configurability</span>
+                <strong>
+                  {configurabilityAdminSummary.stats.configurabilityPercent}%
+                </strong>
+                <small>
+                  {configurabilityAdminSummary.stats.coveredDomains}/
+                  {configurabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Configurability signals</span>
+                <strong>{configurabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {configurabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, provider credentials, and meter usage reports'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-configurability-list">
+              {configurabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-configurability-card workspace-configurability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatConfigurabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {configurabilityAdminSummary.availableActions.includes(
+              'refresh_configurability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={configurabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleConfigurabilityAdminAction(
+                    'refresh_configurability_summary',
+                  )
+                }
+              >
+                {formatConfigurabilityAdminAction('refresh_configurability_summary')}
               </button>
             ) : null}
           </div>
