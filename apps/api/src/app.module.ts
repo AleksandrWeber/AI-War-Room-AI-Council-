@@ -5,6 +5,7 @@ import { AuthModule } from './auth/auth.module.js'
 import { BillingModule } from './billing/billing.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
+import { IdempotencyModule } from './idempotency/idempotency.module.js'
 import { LlmModule } from './llm/llm.module.js'
 import { ModelRouterModule } from './model-router/model-router.module.js'
 import { ObservabilityModule } from './observability/observability.module.js'
@@ -24,6 +25,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     AuthModule,
     BillingModule,
     EvaluationModule,
+    IdempotencyModule,
     WorkspacesModule,
     VersionModule,
     ModelRouterModule,

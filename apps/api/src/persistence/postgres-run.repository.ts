@@ -292,6 +292,32 @@ export class PostgresRunRepository implements RunRepository {
     return result.rows.map((row) => this.parseArtifactHistoryRow(row))
   }
 
+  async listIdempotencyRecords(workspaceId: string) {
+    const result = await this.postgresService.query<{
+      idempotency_key: string
+      run_id: string
+      expires_at: Date
+    }>(
+      `
+        SELECT idempotency_key, run_id, expires_at
+        FROM idempotency_keys
+        WHERE workspace_id = $1
+        ORDER BY expires_at DESC
+        LIMIT 20
+      `,
+      [workspaceId],
+    )
+
+    const now = Date.now()
+
+    return result.rows.map((row) => ({
+      idempotencyKey: row.idempotency_key,
+      runId: row.run_id,
+      expiresAt: row.expires_at.toISOString(),
+      expired: row.expires_at.getTime() <= now,
+    }))
+  }
+
   async findArtifactById(
     workspaceId: string,
     artifactId: string,

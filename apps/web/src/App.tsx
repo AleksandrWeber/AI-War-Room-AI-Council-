@@ -30,6 +30,8 @@ import type {
   RunHistoryAdminSummaryResponse,
   StreamReplayRolloutResponse,
   StreamRecoveryAdminSummaryResponse,
+  IdempotencyRolloutResponse,
+  IdempotencyAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -123,6 +125,14 @@ import {
   formatStreamReplayRolloutCheckStatus,
   formatStreamReplayRolloutStatus,
 } from './stream-replay-ui'
+import {
+  executeIdempotencyAdminAction,
+  fetchIdempotencyAdminSummary,
+  fetchIdempotencyRollout,
+  formatIdempotencyAdminAction,
+  formatIdempotencyRolloutCheckStatus,
+  formatIdempotencyRolloutStatus,
+} from './idempotency-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -689,6 +699,8 @@ function App() {
     useState<RunHistoryRolloutResponse | null>(null)
   const [streamReplayRollout, setStreamReplayRollout] =
     useState<StreamReplayRolloutResponse | null>(null)
+  const [idempotencyRollout, setIdempotencyRollout] =
+    useState<IdempotencyRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -782,6 +794,8 @@ function App() {
     useState<RunHistoryAdminSummaryResponse | null>(null)
   const [streamRecoveryAdminSummary, setStreamRecoveryAdminSummary] =
     useState<StreamRecoveryAdminSummaryResponse | null>(null)
+  const [idempotencyAdminSummary, setIdempotencyAdminSummary] =
+    useState<IdempotencyAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -804,6 +818,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [streamRecoveryAdminAction, setStreamRecoveryAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [idempotencyAdminAction, setIdempotencyAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1018,6 +1035,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setStreamReplayRollout(null)
+        }
+      })
+
+    fetchIdempotencyRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setIdempotencyRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setIdempotencyRollout(null)
         }
       })
 
@@ -1763,6 +1792,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setStreamRecoveryAdminSummary(streamRecoveryAdmin)
+
+      const idempotencyAdmin = await fetchIdempotencyAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIdempotencyAdminSummary(idempotencyAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -2085,6 +2121,37 @@ function App() {
       )
     } finally {
       setStreamRecoveryAdminAction('idle')
+    }
+  }
+
+  async function handleIdempotencyAdminAction(
+    action:
+      | 'refresh_idempotency_summary'
+      | 'clear_workspace_idempotency_reservations',
+  ) {
+    setIdempotencyAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeIdempotencyAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchIdempotencyRollout(apiBaseUrl)
+      setIdempotencyRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run idempotency admin action.',
+      )
+    } finally {
+      setIdempotencyAdminAction('idle')
     }
   }
 
@@ -3003,6 +3070,35 @@ function App() {
           </div>
         ) : null}
 
+        {idempotencyRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Idempotency rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${idempotencyRollout.status}`}
+              >
+                {formatIdempotencyRolloutStatus(idempotencyRollout.status)}
+              </strong>
+            </div>
+            <p>{idempotencyRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {idempotencyRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatIdempotencyRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {idempotencyRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
         {billingCapabilities?.supportsBillingRollout && billingRollout ? (
           <div className="billing-rollout">
             <div className="billing-rollout__header">
@@ -3891,6 +3987,88 @@ function App() {
                 }
               >
                 {formatStreamRecoveryAdminAction('clear_workspace_stream_buffers')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {idempotencyAdminSummary ? (
+          <div className="billing-admin workspace-idempotency-admin">
+            <div className="billing-admin__header">
+              <span>Idempotency admin</span>
+              <strong>{idempotencyAdminSummary.role}</strong>
+            </div>
+            <p>{idempotencyAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency keys</span>
+                <strong>{idempotencyAdminSummary.stats.totalKeys}</strong>
+                <small>
+                  {idempotencyAdminSummary.stats.activeReservations} active
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Runs / expired</span>
+                <strong>{idempotencyAdminSummary.stats.linkedRunCount}</strong>
+                <small>{idempotencyAdminSummary.stats.expiredKeys} expired</small>
+              </article>
+            </div>
+            <div className="workspace-idempotency-list">
+              {idempotencyAdminSummary.records.length ? (
+                idempotencyAdminSummary.records.map((record) => (
+                  <article
+                    className={`workspace-idempotency-card workspace-idempotency-card--${record.reservationActive ? 'active' : record.expired ? 'expired' : 'idle'}`}
+                    key={record.idempotencyKey}
+                  >
+                    <div>
+                      <strong>{record.idempotencyKey}</strong>
+                      <p>{record.runId ? `Run ${record.runId}` : 'Reservation only'}</p>
+                      <small>
+                        {record.expiresAt
+                          ? record.expiresAt.slice(0, 19).replace('T', ' ')
+                          : 'No expiry recorded'}
+                        {record.reservationActive ? ' · Active reservation' : ''}
+                        {record.expired ? ' · Expired' : ''}
+                      </small>
+                    </div>
+                  </article>
+                ))
+              ) : (
+                <p className="clear-copy">
+                  No idempotency keys recorded for this workspace yet.
+                </p>
+              )}
+            </div>
+            {idempotencyAdminSummary.availableActions.includes(
+              'refresh_idempotency_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={idempotencyAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleIdempotencyAdminAction('refresh_idempotency_summary')
+                }
+              >
+                {formatIdempotencyAdminAction('refresh_idempotency_summary')}
+              </button>
+            ) : null}
+            {idempotencyAdminSummary.availableActions.includes(
+              'clear_workspace_idempotency_reservations',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={idempotencyAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleIdempotencyAdminAction(
+                    'clear_workspace_idempotency_reservations',
+                  )
+                }
+              >
+                {formatIdempotencyAdminAction(
+                  'clear_workspace_idempotency_reservations',
+                )}
               </button>
             ) : null}
           </div>

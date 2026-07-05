@@ -1,6 +1,7 @@
 import type {
   ArtifactHistoryItem,
   DraftRun,
+  IdempotencyRecord,
   MockPipelineResult,
 } from '@ai-war-room/schemas'
 import type {
@@ -53,6 +54,19 @@ export class InMemoryRunRepository implements RunRepository {
         })),
       )
       .sort((left, right) => right.createdAt.localeCompare(left.createdAt))
+  }
+
+  async listIdempotencyRecords(workspaceId: string): Promise<IdempotencyRecord[]> {
+    return [...this.draftsByIdempotencyKey.entries()]
+      .filter(([key]) => key.startsWith(`${workspaceId}:`))
+      .map(([key, draft]) => ({
+        idempotencyKey: key.slice(workspaceId.length + 1),
+        runId: draft.runId,
+        expiresAt: draft.updatedAt,
+        expired: false,
+      }))
+      .sort((left, right) => right.expiresAt.localeCompare(left.expiresAt))
+      .slice(0, 20)
   }
 
   async findArtifactById(

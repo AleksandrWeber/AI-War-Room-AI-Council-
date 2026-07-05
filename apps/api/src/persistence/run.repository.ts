@@ -1,6 +1,7 @@
 import type {
   ArtifactHistoryItem,
   DraftRun,
+  IdempotencyRecord,
   MockPipelineResult,
 } from '@ai-war-room/schemas'
 
@@ -20,6 +21,7 @@ export interface RunRepository {
   saveDraftRun(input: SaveDraftRunInput): Promise<void>
   saveMockPipelineResult(result: MockPipelineResult): Promise<void>
   listArtifacts(workspaceId: string): Promise<ArtifactHistoryItem[]>
+  listIdempotencyRecords(workspaceId: string): Promise<IdempotencyRecord[]>
   findArtifactById(
     workspaceId: string,
     artifactId: string,

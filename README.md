@@ -497,6 +497,25 @@ Workspace stream recovery admin tools:
 - Only workspace owners and admins can access stream recovery admin endpoints.
 - The web billing panel shows stream recovery admin tools for authorized roles.
 
+Idempotency rollout readiness:
+
+- `GET /api/idempotency/readiness` returns operator-facing production idempotency checklist results (`ready` or `not_ready`).
+- Checks cover Redis reservations, connectivity, persisted idempotency keys, reservation TTL, and duplicate request protection.
+- The web billing panel shows idempotency rollout status and per-check guidance.
+
+Workspace idempotency admin tools:
+
+- `GET /api/idempotency/workspace/:workspaceId/admin` returns owner/admin idempotency summary.
+- `POST /api/idempotency/workspace/:workspaceId/admin/actions` runs idempotency admin actions such as refreshing summaries or clearing workspace reservations.
+- Only workspace owners and admins can access idempotency admin endpoints.
+- The web billing panel shows idempotency admin tools for authorized roles.
+
+Current `v5.29` behavior:
+
+- Idempotency rollout readiness validates Redis reservations and persisted keys through `GET /api/idempotency/readiness`.
+- Workspace owners and admins can inspect and clear idempotency reservations from `GET /api/idempotency/workspace/:workspaceId/admin`.
+- The web billing panel shows idempotency rollout checks and workspace idempotency admin tools.
+
 Current `v5.28` behavior:
 
 - Stream replay rollout readiness validates Redis-backed SSE buffers and Last-Event-ID replay through `GET /api/runs/stream/readiness`.

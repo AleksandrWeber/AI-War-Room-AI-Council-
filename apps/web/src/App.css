@@ -951,6 +951,31 @@
   border-color: var(--border);
 }
 
+.workspace-idempotency-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.workspace-idempotency-card {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+}
+
+.workspace-idempotency-card p,
+.workspace-idempotency-card small {
+  margin: 0;
+  color: var(--muted);
+}
+
+.workspace-idempotency-card--active {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-idempotency-card--expired {
+  border-color: color-mix(in srgb, var(--danger) 35%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;
