@@ -20,6 +20,10 @@ import { UsageModule } from '../usage/usage.module.js'
 import { BillingModule } from '../billing/billing.module.js'
 import { WorkspacesModule } from '../workspaces/workspaces.module.js'
 import { RunsController } from './runs.controller.js'
+import { RunHistoryAdminService } from './run-history-admin.service.js'
+import { RunHistoryController } from './run-history.controller.js'
+import { StreamRecoveryAdminService } from './stream-recovery-admin.service.js'
+import { StreamReplayController } from './stream-replay.controller.js'
 import { RunsService } from './runs.service.js'
 
 @Module({
@@ -34,9 +38,11 @@ import { RunsService } from './runs.service.js'
     ResearchModule,
     ShieldModule,
   ],
-  controllers: [RunsController],
+  controllers: [RunsController, RunHistoryController, StreamReplayController],
   providers: [
     RunsService,
+    RunHistoryAdminService,
+    StreamRecoveryAdminService,
     TriageService,
     AgentService,
     ModeratorService,

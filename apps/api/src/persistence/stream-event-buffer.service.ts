@@ -4,9 +4,17 @@ import { createClient, type RedisClientType } from 'redis'
 import type { ApiEnv } from '../config/env.js'
 import type { PipelineStreamEvent } from '../runs/pipeline-stream-event.js'
 
+export const STREAM_BUFFER_MAX_LENGTH = 100
+
 type BufferedStreamEvent = {
   eventId: string
   event: PipelineStreamEvent
+}
+
+export type BufferedStreamSummary = {
+  runId: string
+  eventCount: number
+  lastEvent?: PipelineStreamEvent
 }
 
 @Injectable()
@@ -47,7 +55,7 @@ export class StreamEventBufferService implements OnModuleDestroy {
         key,
         'MAXLEN',
         '~',
-        '100',
+        String(STREAM_BUFFER_MAX_LENGTH),
         '*',
         'event',
         JSON.stringify(input.event),
@@ -132,6 +140,91 @@ export class StreamEventBufferService implements OnModuleDestroy {
     }
   }
 
+  usesRedisBackedBuffer() {
+    return this.redisClient !== null
+  }
+
+  getStreamBufferMaxLength() {
+    return STREAM_BUFFER_MAX_LENGTH
+  }
+
+  async listWorkspaceBufferedStreams(
+    workspaceId: string,
+  ): Promise<BufferedStreamSummary[]> {
+    const prefix = this.createWorkspacePrefix(workspaceId)
+
+    if (!this.redisClient) {
+      return this.listLocalWorkspaceBufferedStreams(prefix)
+    }
+
+    try {
+      if (!this.redisClient.isOpen) {
+        await this.redisClient.connect()
+      }
+
+      const keys = await this.scanRedisKeys(`${prefix}*`)
+      const summaries = await Promise.all(
+        keys.map(async (key) => {
+          const runId = key.slice(prefix.length)
+          const eventCount = await this.getRedisStreamLength(key)
+          const lastEvent = await this.getRedisLastEvent(key)
+
+          return {
+            runId,
+            eventCount,
+            lastEvent,
+          }
+        }),
+      )
+
+      return this.sortBufferedStreamSummaries(summaries)
+    } catch {
+      return this.listLocalWorkspaceBufferedStreams(prefix)
+    }
+  }
+
+  async clearWorkspaceStreams(workspaceId: string) {
+    const prefix = this.createWorkspacePrefix(workspaceId)
+    let clearedCount = 0
+
+    if (!this.redisClient) {
+      for (const key of this.localStreams.keys()) {
+        if (!key.startsWith(prefix)) {
+          continue
+        }
+
+        this.localStreams.delete(key)
+        clearedCount += 1
+      }
+
+      return clearedCount
+    }
+
+    try {
+      if (!this.redisClient.isOpen) {
+        await this.redisClient.connect()
+      }
+
+      const keys = await this.scanRedisKeys(`${prefix}*`)
+
+      for (const key of keys) {
+        await this.redisClient.del(key)
+        clearedCount += 1
+      }
+    } catch {
+      for (const key of this.localStreams.keys()) {
+        if (!key.startsWith(prefix)) {
+          continue
+        }
+
+        this.localStreams.delete(key)
+        clearedCount += 1
+      }
+    }
+
+    return clearedCount
+  }
+
   async onModuleDestroy() {
     if (this.redisClient?.isOpen) {
       await this.redisClient.quit()
@@ -149,9 +242,91 @@ export class StreamEventBufferService implements OnModuleDestroy {
       eventId,
       event: persistedEvent,
     })
-    this.localStreams.set(key, events.slice(-100))
+    this.localStreams.set(key, events.slice(-STREAM_BUFFER_MAX_LENGTH))
 
     return persistedEvent
+  }
+
+  private listLocalWorkspaceBufferedStreams(prefix: string) {
+    const summaries = [...this.localStreams.entries()]
+      .filter(([key]) => key.startsWith(prefix))
+      .map(([key, entries]) => {
+        const runId = key.slice(prefix.length)
+        const lastEntry = entries.at(-1)
+
+        return {
+          runId,
+          eventCount: entries.length,
+          lastEvent: lastEntry?.event,
+        }
+      })
+
+    return this.sortBufferedStreamSummaries(summaries)
+  }
+
+  private sortBufferedStreamSummaries(summaries: BufferedStreamSummary[]) {
+    return summaries
+      .slice()
+      .sort((left, right) => {
+        const leftTime = left.lastEvent?.timestamp ?? ''
+        const rightTime = right.lastEvent?.timestamp ?? ''
+
+        return rightTime.localeCompare(leftTime)
+      })
+      .slice(0, 20)
+  }
+
+  private async scanRedisKeys(pattern: string) {
+    if (!this.redisClient) {
+      return []
+    }
+
+    const keys: string[] = []
+    let cursor = '0'
+
+    do {
+      const result = (await this.redisClient.sendCommand([
+        'SCAN',
+        cursor,
+        'MATCH',
+        pattern,
+        'COUNT',
+        '100',
+      ])) as [string, string[]]
+
+      cursor = result[0]
+      keys.push(...result[1])
+    } while (cursor !== '0')
+
+    return keys
+  }
+
+  private async getRedisStreamLength(key: string) {
+    if (!this.redisClient) {
+      return 0
+    }
+
+    const length = await this.redisClient.sendCommand(['XLEN', key])
+
+    return typeof length === 'number' ? length : Number(length)
+  }
+
+  private async getRedisLastEvent(key: string) {
+    if (!this.redisClient) {
+      return undefined
+    }
+
+    const result = await this.redisClient.sendCommand([
+      'XREVRANGE',
+      key,
+      '+',
+      '-',
+      'COUNT',
+      '1',
+    ])
+    const events = this.parseRedisRange(result)
+
+    return events.at(-1)
   }
 
   private replayLocal(key: string, afterEventId: string) {
@@ -233,6 +408,10 @@ export class StreamEventBufferService implements OnModuleDestroy {
   }
 
   private createKey(workspaceId: string, runId: string) {
-    return `runs:stream:${workspaceId}:${runId}`
+    return `${this.createWorkspacePrefix(workspaceId)}${runId}`
+  }
+
+  private createWorkspacePrefix(workspaceId: string) {
+    return `runs:stream:${workspaceId}:`
   }
 }

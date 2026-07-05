@@ -470,6 +470,45 @@ Workspace prompt regression admin tools:
 - Only workspace owners and admins can access prompt regression admin endpoints.
 - The web billing panel shows prompt regression admin tools for authorized roles.
 
+Run history rollout readiness:
+
+- `GET /api/runs/history/readiness` returns operator-facing production run history checklist results (`ready` or `not_ready`).
+- Checks cover artifact persistence, markdown export, stream replay buffer, and critical artifact type coverage.
+- The web billing panel shows run history rollout status and per-check guidance.
+
+Workspace run history admin tools:
+
+- `GET /api/runs/history/workspace/:workspaceId/admin` returns owner/admin run history summary.
+- `GET /api/runs/history/workspace/:workspaceId/admin/export?format=csv|json` exports workspace run history records.
+- `POST /api/runs/history/workspace/:workspaceId/admin/actions` runs run history admin actions such as refreshing the summary.
+- Only workspace owners and admins can access run history admin endpoints.
+- The web billing panel shows run history admin tools for authorized roles.
+
+Stream replay rollout readiness:
+
+- `GET /api/runs/stream/readiness` returns operator-facing production SSE stream replay checklist results (`ready` or `not_ready`).
+- Checks cover Redis-backed buffers, connectivity, Last-Event-ID replay, full replay, and critical stream event coverage.
+- The web billing panel shows stream replay rollout status and per-check guidance.
+
+Workspace stream recovery admin tools:
+
+- `GET /api/runs/stream/workspace/:workspaceId/admin` returns owner/admin buffered stream summary.
+- `POST /api/runs/stream/workspace/:workspaceId/admin/actions` runs stream recovery admin actions such as refreshing summaries or clearing workspace stream buffers.
+- Only workspace owners and admins can access stream recovery admin endpoints.
+- The web billing panel shows stream recovery admin tools for authorized roles.
+
+Current `v5.28` behavior:
+
+- Stream replay rollout readiness validates Redis-backed SSE buffers and Last-Event-ID replay through `GET /api/runs/stream/readiness`.
+- Workspace owners and admins can inspect and clear buffered SSE runs from `GET /api/runs/stream/workspace/:workspaceId/admin`.
+- The web billing panel shows stream replay rollout checks and workspace stream recovery admin tools.
+
+Current `v5.27` behavior:
+
+- Run history rollout readiness validates artifact persistence and export readiness through `GET /api/runs/history/readiness`.
+- Workspace owners and admins can inspect and export run history metrics from `GET /api/runs/history/workspace/:workspaceId/admin`.
+- The web billing panel shows run history rollout checks and workspace run history admin tools.
+
 Current `v5.26` behavior:
 
 - Prompt evaluation rollout readiness validates regression dataset coverage through `GET /api/evaluation/readiness`.

@@ -55,4 +55,36 @@ describe('StreamEventBufferService', () => {
       expect.objectContaining({ type: 'status', stepId: 'agent_pool', status: 'completed' }),
     ])
   })
+
+  it('lists and clears workspace buffered streams', async () => {
+    const service = new StreamEventBufferService(createConfigService())
+    const event: PipelineStreamEvent = {
+      eventId: 'event_1',
+      type: 'status',
+      stepId: 'agent_pool',
+      label: 'Agent pool',
+      status: 'running',
+      timestamp: '2026-01-01T00:00:00.000Z',
+    }
+
+    await service.append({
+      workspaceId: 'workspace_1',
+      runId: 'run_1',
+      event,
+    })
+
+    await expect(
+      service.listWorkspaceBufferedStreams('workspace_1'),
+    ).resolves.toEqual([
+      expect.objectContaining({
+        runId: 'run_1',
+        eventCount: 1,
+      }),
+    ])
+
+    await expect(service.clearWorkspaceStreams('workspace_1')).resolves.toBe(1)
+    await expect(
+      service.listWorkspaceBufferedStreams('workspace_1'),
+    ).resolves.toEqual([])
+  })
 })

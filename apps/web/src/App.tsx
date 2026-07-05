@@ -26,6 +26,10 @@ import type {
   ObservabilityAdminSummaryResponse,
   PromptEvaluationRolloutResponse,
   PromptRegressionAdminSummaryResponse,
+  RunHistoryRolloutResponse,
+  RunHistoryAdminSummaryResponse,
+  StreamReplayRolloutResponse,
+  StreamRecoveryAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -100,6 +104,25 @@ import {
   formatPromptRegressionAdminAction,
   formatPromptRegressionScore,
 } from './evaluation-ui'
+import {
+  downloadRunHistoryExport,
+  executeRunHistoryAdminAction,
+  fetchRunHistoryAdminSummary,
+  fetchRunHistoryRollout,
+  formatArtifactType,
+  formatRunHistoryAdminAction,
+  formatRunHistoryRolloutCheckStatus,
+  formatRunHistoryRolloutStatus,
+} from './run-history-ui'
+import {
+  executeStreamRecoveryAdminAction,
+  fetchStreamRecoveryAdminSummary,
+  fetchStreamReplayRollout,
+  formatStreamEventType,
+  formatStreamRecoveryAdminAction,
+  formatStreamReplayRolloutCheckStatus,
+  formatStreamReplayRolloutStatus,
+} from './stream-replay-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -662,6 +685,10 @@ function App() {
     useState<ObservabilityRolloutResponse | null>(null)
   const [promptEvaluationRollout, setPromptEvaluationRollout] =
     useState<PromptEvaluationRolloutResponse | null>(null)
+  const [runHistoryRollout, setRunHistoryRollout] =
+    useState<RunHistoryRolloutResponse | null>(null)
+  const [streamReplayRollout, setStreamReplayRollout] =
+    useState<StreamReplayRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -751,6 +778,10 @@ function App() {
     useState<ObservabilityAdminSummaryResponse | null>(null)
   const [promptRegressionAdminSummary, setPromptRegressionAdminSummary] =
     useState<PromptRegressionAdminSummaryResponse | null>(null)
+  const [runHistoryAdminSummary, setRunHistoryAdminSummary] =
+    useState<RunHistoryAdminSummaryResponse | null>(null)
+  const [streamRecoveryAdminSummary, setStreamRecoveryAdminSummary] =
+    useState<StreamRecoveryAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -767,6 +798,12 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [promptRegressionAdminAction, setPromptRegressionAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [runHistoryAdminAction, setRunHistoryAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [streamRecoveryAdminAction, setStreamRecoveryAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -957,6 +994,30 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setPromptEvaluationRollout(null)
+        }
+      })
+
+    fetchRunHistoryRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setRunHistoryRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setRunHistoryRollout(null)
+        }
+      })
+
+    fetchStreamReplayRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setStreamReplayRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setStreamReplayRollout(null)
         }
       })
 
@@ -1688,6 +1749,20 @@ function App() {
         workspaceAuthHeaders,
       )
       setPromptRegressionAdminSummary(promptRegressionAdmin)
+
+      const runHistoryAdmin = await fetchRunHistoryAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRunHistoryAdminSummary(runHistoryAdmin)
+
+      const streamRecoveryAdmin = await fetchStreamRecoveryAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setStreamRecoveryAdminSummary(streamRecoveryAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -1952,6 +2027,83 @@ function App() {
       )
     } finally {
       setPromptRegressionAdminAction('idle')
+    }
+  }
+
+  async function handleRunHistoryAdminAction(
+    action: 'refresh_run_history_summary',
+  ) {
+    setRunHistoryAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeRunHistoryAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchRunHistoryRollout(apiBaseUrl)
+      setRunHistoryRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run run history admin action.',
+      )
+    } finally {
+      setRunHistoryAdminAction('idle')
+    }
+  }
+
+  async function handleStreamRecoveryAdminAction(
+    action: 'refresh_stream_recovery_summary' | 'clear_workspace_stream_buffers',
+  ) {
+    setStreamRecoveryAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeStreamRecoveryAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchStreamReplayRollout(apiBaseUrl)
+      setStreamReplayRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run stream recovery admin action.',
+      )
+    } finally {
+      setStreamRecoveryAdminAction('idle')
+    }
+  }
+
+  async function handleExportRunHistory(format: 'csv' | 'json') {
+    setBillingError(null)
+
+    try {
+      await downloadRunHistoryExport(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        format,
+      )
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to export run history.',
+      )
     }
   }
 
@@ -2793,6 +2945,64 @@ function App() {
           </div>
         ) : null}
 
+        {runHistoryRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Run history rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${runHistoryRollout.status}`}
+              >
+                {formatRunHistoryRolloutStatus(runHistoryRollout.status)}
+              </strong>
+            </div>
+            <p>{runHistoryRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {runHistoryRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatRunHistoryRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {runHistoryRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {streamReplayRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Stream replay rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${streamReplayRollout.status}`}
+              >
+                {formatStreamReplayRolloutStatus(streamReplayRollout.status)}
+              </strong>
+            </div>
+            <p>{streamReplayRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {streamReplayRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatStreamReplayRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {streamReplayRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
         {billingCapabilities?.supportsBillingRollout && billingRollout ? (
           <div className="billing-rollout">
             <div className="billing-rollout__header">
@@ -3513,6 +3723,174 @@ function App() {
                 }
               >
                 {formatPromptRegressionAdminAction('rerun_prompt_regression')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {runHistoryAdminSummary ? (
+          <div className="billing-admin workspace-run-history-admin">
+            <div className="billing-admin__header">
+              <span>Run history admin</span>
+              <strong>{runHistoryAdminSummary.role}</strong>
+            </div>
+            <p>{runHistoryAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Artifacts</span>
+                <strong>{runHistoryAdminSummary.stats.totalArtifacts}</strong>
+                <small>{runHistoryAdminSummary.stats.uniqueRunCount} runs</small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Artifact mix</span>
+                <strong>{runHistoryAdminSummary.stats.executiveSummaryCount}</strong>
+                <small>
+                  {runHistoryAdminSummary.stats.prdCount} PRD ·{' '}
+                  {runHistoryAdminSummary.stats.developmentPromptCount} dev prompt
+                </small>
+              </article>
+            </div>
+            <div className="workspace-run-history-list">
+              {runHistoryAdminSummary.artifacts.length ? (
+                runHistoryAdminSummary.artifacts.map((artifact) => (
+                  <article
+                    className="workspace-run-history-card"
+                    key={artifact.artifactId}
+                  >
+                    <div>
+                      <strong>{formatArtifactType(artifact.artifactType)}</strong>
+                      <p>
+                        Run {artifact.runId} · v{artifact.artifactVersion}
+                      </p>
+                      <small>
+                        {artifact.createdAt.slice(0, 19).replace('T', ' ')}
+                      </small>
+                    </div>
+                  </article>
+                ))
+              ) : (
+                <p className="clear-copy">
+                  No persisted run artifacts recorded for this workspace yet.
+                </p>
+              )}
+            </div>
+            <div className="billing-export-actions">
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={runHistoryAdminAction !== 'idle'}
+                onClick={() => void handleExportRunHistory('csv')}
+              >
+                Export run history CSV
+              </button>
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={runHistoryAdminAction !== 'idle'}
+                onClick={() => void handleExportRunHistory('json')}
+              >
+                Export run history JSON
+              </button>
+            </div>
+            {runHistoryAdminSummary.availableActions.includes(
+              'refresh_run_history_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={runHistoryAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleRunHistoryAdminAction('refresh_run_history_summary')
+                }
+              >
+                {formatRunHistoryAdminAction('refresh_run_history_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {streamRecoveryAdminSummary ? (
+          <div className="billing-admin workspace-stream-recovery-admin">
+            <div className="billing-admin__header">
+              <span>Stream recovery admin</span>
+              <strong>{streamRecoveryAdminSummary.role}</strong>
+            </div>
+            <p>{streamRecoveryAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Buffered runs</span>
+                <strong>{streamRecoveryAdminSummary.stats.bufferedRunCount}</strong>
+                <small>
+                  {streamRecoveryAdminSummary.stats.totalBufferedEvents} events
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Active / terminal</span>
+                <strong>{streamRecoveryAdminSummary.stats.activeRunCount}</strong>
+                <small>
+                  {streamRecoveryAdminSummary.stats.terminalRunCount} terminal
+                </small>
+              </article>
+            </div>
+            <div className="workspace-stream-recovery-list">
+              {streamRecoveryAdminSummary.bufferedRuns.length ? (
+                streamRecoveryAdminSummary.bufferedRuns.map((bufferedRun) => (
+                  <article
+                    className={`workspace-stream-recovery-card workspace-stream-recovery-card--${bufferedRun.terminal ? 'terminal' : 'active'}`}
+                    key={bufferedRun.runId}
+                  >
+                    <div>
+                      <strong>{bufferedRun.runId}</strong>
+                      <p>
+                        {formatStreamEventType(bufferedRun.lastEventType)} ·{' '}
+                        {bufferedRun.eventCount} event
+                        {bufferedRun.eventCount === 1 ? '' : 's'}
+                      </p>
+                      <small>
+                        {bufferedRun.lastEventAt
+                          ? bufferedRun.lastEventAt.slice(0, 19).replace('T', ' ')
+                          : 'No buffered events yet'}
+                        {bufferedRun.terminal ? ' · Terminal' : ' · Active'}
+                      </small>
+                    </div>
+                  </article>
+                ))
+              ) : (
+                <p className="clear-copy">
+                  No buffered SSE runs recorded for this workspace yet.
+                </p>
+              )}
+            </div>
+            {streamRecoveryAdminSummary.availableActions.includes(
+              'refresh_stream_recovery_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={streamRecoveryAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleStreamRecoveryAdminAction(
+                    'refresh_stream_recovery_summary',
+                  )
+                }
+              >
+                {formatStreamRecoveryAdminAction('refresh_stream_recovery_summary')}
+              </button>
+            ) : null}
+            {streamRecoveryAdminSummary.availableActions.includes(
+              'clear_workspace_stream_buffers',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={streamRecoveryAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleStreamRecoveryAdminAction(
+                    'clear_workspace_stream_buffers',
+                  )
+                }
+              >
+                {formatStreamRecoveryAdminAction('clear_workspace_stream_buffers')}
               </button>
             ) : null}
           </div>
