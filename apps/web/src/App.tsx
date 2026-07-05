@@ -84,6 +84,8 @@ import type {
   UtilizationAdminSummaryResponse,
   SustainabilityRolloutResponse,
   SustainabilityAdminSummaryResponse,
+  GovernanceRolloutResponse,
+  GovernanceAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -420,6 +422,15 @@ import {
   formatSustainabilityRolloutCheckStatus,
   formatSustainabilityRolloutStatus,
 } from './sustainability-ui'
+import {
+  executeGovernanceAdminAction,
+  fetchGovernanceAdminSummary,
+  fetchGovernanceRollout,
+  formatGovernanceAdminAction,
+  formatGovernanceDomain,
+  formatGovernanceRolloutCheckStatus,
+  formatGovernanceRolloutStatus,
+} from './governance-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -1039,6 +1050,8 @@ function App() {
     useState<UtilizationRolloutResponse | null>(null)
   const [sustainabilityRollout, setSustainabilityRollout] =
     useState<SustainabilityRolloutResponse | null>(null)
+  const [governanceRollout, setGovernanceRollout] =
+    useState<GovernanceRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1186,6 +1199,8 @@ function App() {
     useState<UtilizationAdminSummaryResponse | null>(null)
   const [sustainabilityAdminSummary, setSustainabilityAdminSummary] =
     useState<SustainabilityAdminSummaryResponse | null>(null)
+  const [governanceAdminSummary, setGovernanceAdminSummary] =
+    useState<GovernanceAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1289,6 +1304,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [sustainabilityAdminAction, setSustainabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [governanceAdminAction, setGovernanceAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1827,6 +1845,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setSustainabilityRollout(null)
+        }
+      })
+
+    fetchGovernanceRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setGovernanceRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setGovernanceRollout(null)
         }
       })
 
@@ -2761,6 +2791,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setSustainabilityAdminSummary(sustainabilityAdmin)
+
+      const governanceAdmin = await fetchGovernanceAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setGovernanceAdminSummary(governanceAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -3848,6 +3885,35 @@ function App() {
       )
     } finally {
       setSustainabilityAdminAction('idle')
+    }
+  }
+
+  async function handleGovernanceAdminAction(
+    action: 'refresh_governance_summary',
+  ) {
+    setGovernanceAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeGovernanceAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchGovernanceRollout(apiBaseUrl)
+      setGovernanceRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run governance admin action.',
+      )
+    } finally {
+      setGovernanceAdminAction('idle')
     }
   }
 
@@ -5540,6 +5606,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {sustainabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {governanceRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production governance rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${governanceRollout.status}`}
+              >
+                {formatGovernanceRolloutStatus(governanceRollout.status)}
+              </strong>
+            </div>
+            <p>{governanceRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {governanceRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatGovernanceRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {governanceRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -8148,6 +8243,71 @@ function App() {
                 }
               >
                 {formatSustainabilityAdminAction('refresh_sustainability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {governanceAdminSummary ? (
+          <div className="billing-admin workspace-governance-admin">
+            <div className="billing-admin__header">
+              <span>Governance admin</span>
+              <strong>{governanceAdminSummary.role}</strong>
+            </div>
+            <p>{governanceAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Credential governance</span>
+                <strong>
+                  {governanceAdminSummary.stats.governancePercent}%
+                </strong>
+                <small>
+                  {governanceAdminSummary.stats.coveredDomains}/
+                  {governanceAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Governance signals</span>
+                <strong>{governanceAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {governanceAdminSummary.stats.postgresConnectivity
+                    ? 'Memberships, credentials, shield reviews, billing'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-governance-list">
+              {governanceAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-governance-card workspace-governance-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatGovernanceDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {governanceAdminSummary.availableActions.includes(
+              'refresh_governance_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={governanceAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleGovernanceAdminAction(
+                    'refresh_governance_summary',
+                  )
+                }
+              >
+                {formatGovernanceAdminAction('refresh_governance_summary')}
               </button>
             ) : null}
           </div>
