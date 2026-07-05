@@ -13,38 +13,38 @@ import {
   type AuthenticatedRequest,
   WorkspaceAccessGuard,
 } from '../auth/workspace-access.guard.js'
-import { NcompactionizabilityAdminService } from './ncompactionizability-admin.service.js'
+import { RebalanceizabilityAdminService } from './rebalanceizability-admin.service.js'
 
-type NcompactionizabilityAdminBody = {
+type RebalanceizabilityAdminBody = {
   workspaceId?: unknown
   action?: unknown
 }
 
-@Controller('ncompactionizability')
-export class NcompactionizabilityController {
+@Controller('rebalanceizability')
+export class RebalanceizabilityController {
   constructor(
-    private readonly ncompactionizabilityAdminService: NcompactionizabilityAdminService,
+    private readonly rebalanceizabilityAdminService: RebalanceizabilityAdminService,
   ) {}
 
   @Get('capabilities')
   getCapabilities() {
-    return this.ncompactionizabilityAdminService.getCapabilities()
+    return this.rebalanceizabilityAdminService.getCapabilities()
   }
 
   @Get('readiness')
-  async getNcompactionizabilityRollout() {
-    return this.ncompactionizabilityAdminService.getNcompactionizabilityRollout()
+  async getRebalanceizabilityRollout() {
+    return this.rebalanceizabilityAdminService.getRebalanceizabilityRollout()
   }
 
   @Get('workspace/:workspaceId/admin')
   @UseGuards(WorkspaceAccessGuard)
-  async getWorkspaceNcompactionizabilityAdminSummary(
+  async getWorkspaceRebalanceizabilityAdminSummary(
     @Param('workspaceId') workspaceId: string,
     @Req() request: AuthenticatedRequest,
   ) {
     this.assertWorkspaceParam(request, workspaceId)
 
-    return this.ncompactionizabilityAdminService.getWorkspaceNcompactionizabilityAdminSummary(
+    return this.rebalanceizabilityAdminService.getWorkspaceRebalanceizabilityAdminSummary(
       request.authContext!,
       workspaceId,
     )
@@ -52,22 +52,22 @@ export class NcompactionizabilityController {
 
   @Post('workspace/:workspaceId/admin/actions')
   @UseGuards(WorkspaceAccessGuard)
-  async executeNcompactionizabilityAdminAction(
+  async executeRebalanceizabilityAdminAction(
     @Param('workspaceId') workspaceId: string,
     @Req() request: AuthenticatedRequest,
-    @Body() body: NcompactionizabilityAdminBody,
+    @Body() body: RebalanceizabilityAdminBody,
   ) {
     this.assertWorkspaceParam(request, workspaceId)
 
     const action = body.action
 
-    if (action !== 'refresh_ncompactionizability_summary') {
+    if (action !== 'refresh_rebalanceizability_summary') {
       throw new BadRequestException({
-        message: 'Unsupported ncompactionizability admin action.',
+        message: 'Unsupported rebalanceizability admin action.',
       })
     }
 
-    return this.ncompactionizabilityAdminService.executeNcompactionizabilityAdminAction(
+    return this.rebalanceizabilityAdminService.executeRebalanceizabilityAdminAction(
       request.authContext!,
       {
         workspaceId,

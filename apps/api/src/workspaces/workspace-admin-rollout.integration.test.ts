@@ -17439,28 +17439,28 @@ describe('compactionizability rollout integration', () => {
 })
 
 
-describe('ncompactionizability rollout integration', () => {
-  it('reports ncompactionizability capabilities and rollout readiness', async () => {
+describe('rebalanceizability rollout integration', () => {
+  it('reports rebalanceizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app.getHttpServer())
-      .get('/api/ncompactionizability/capabilities')
+      .get('/api/rebalanceizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsNcompactionizabilityRollout: true,
-      supportsNcompactionizabilityAdminTools: true,
-      supportsMeterUsageNcompactionizabilitySignals: true,
+      supportsRebalanceizabilityRollout: true,
+      supportsRebalanceizabilityAdminTools: true,
+      supportsMeterUsageRebalanceizabilitySignals: true,
     })
 
     const rollout = await request(app.getHttpServer())
-      .get('/api/ncompactionizability/readiness')
+      .get('/api/rebalanceizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns ncompactionizability admin summary for owners', async () => {
+  it('returns rebalanceizability admin summary for owners', async () => {
     const response = await request(app.getHttpServer())
-      .get('/api/ncompactionizability/workspace/workspace_1/admin')
+      .get('/api/rebalanceizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -17470,14 +17470,14 @@ describe('ncompactionizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        ncompactionizabilityPercent: expect.any(Number),
+        rebalanceizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects ncompactionizability admin tools for members', async () => {
+  it('rejects rebalanceizability admin tools for members', async () => {
     await request(app.getHttpServer())
-      .get('/api/ncompactionizability/workspace/workspace_1/admin')
+      .get('/api/rebalanceizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',

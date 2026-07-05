@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common'
-import type { NcompactionizabilityAdminDomain } from '@ai-war-room/schemas'
+import type { RebalanceizabilityAdminDomain } from '@ai-war-room/schemas'
 import { PostgresService } from '../persistence/postgres.service.js'
-import { CRITICAL_NCOMPACTIONIZABILITY_TABLES } from './ncompactionizability-rollout.helpers.js'
+import { CRITICAL_NCOMPACTIONIZABILITY_TABLES } from './rebalanceizability-rollout.helpers.js'
 
 const WORKSPACE_NCOMPACTIONIZABILITY_DOMAINS: Array<{
-  domain: NcompactionizabilityAdminDomain
+  domain: RebalanceizabilityAdminDomain
   tableName: string
   requiredTables: string[]
   countQuery: (workspaceId: string) => { sql: string; params: string[] }
@@ -56,7 +56,7 @@ const WORKSPACE_NCOMPACTIONIZABILITY_DOMAINS: Array<{
 ]
 
 @Injectable()
-export class NcompactionizabilityStatusService {
+export class RebalanceizabilityStatusService {
   constructor(private readonly postgresService: PostgresService) {}
 
   async pingPostgres() {
@@ -68,13 +68,13 @@ export class NcompactionizabilityStatusService {
     }
   }
 
-  async getNcompactionizabilityTableCoverage() {
+  async getRebalanceizabilityTableCoverage() {
     const existingTables = await this.listExistingTables(
       CRITICAL_NCOMPACTIONIZABILITY_TABLES,
     )
 
     return {
-      existingNcompactionizabilityTableCount: existingTables.size,
+      existingRebalanceizabilityTableCount: existingTables.size,
       existingTables,
       billingMeterUsageReportsTableExists: existingTables.has('billing_meter_usage_reports'),
       usageEventsTableExists: existingTables.has('usage_events'),
@@ -82,7 +82,7 @@ export class NcompactionizabilityStatusService {
     }
   }
 
-  async getWorkspaceNcompactionizabilityInventory(workspaceId: string) {
+  async getWorkspaceRebalanceizabilityInventory(workspaceId: string) {
     const postgresTableNames = [
       ...new Set(
         WORKSPACE_NCOMPACTIONIZABILITY_DOMAINS.flatMap((entry) => entry.requiredTables),

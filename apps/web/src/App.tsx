@@ -736,8 +736,8 @@ import type {
   RecoveryizabilityAdminSummaryResponse,
   CompactionizabilityRolloutResponse,
   CompactionizabilityAdminSummaryResponse,
-  NcompactionizabilityRolloutResponse,
-  NcompactionizabilityAdminSummaryResponse,
+  RebalanceizabilityRolloutResponse,
+  RebalanceizabilityAdminSummaryResponse,
   LeaderizabilityRolloutResponse,
   LeaderizabilityAdminSummaryResponse,
   FollowerizabilityRolloutResponse,
@@ -4025,14 +4025,14 @@ import {
   formatCompactionizabilityRolloutStatus,
 } from './compactionizability-ui'
 import {
-  executeNcompactionizabilityAdminAction,
-  fetchNcompactionizabilityAdminSummary,
-  fetchNcompactionizabilityRollout,
-  formatNcompactionizabilityAdminAction,
-  formatNcompactionizabilityDomain,
-  formatNcompactionizabilityRolloutCheckStatus,
-  formatNcompactionizabilityRolloutStatus,
-} from './ncompactionizability-ui'
+  executeRebalanceizabilityAdminAction,
+  fetchRebalanceizabilityAdminSummary,
+  fetchRebalanceizabilityRollout,
+  formatRebalanceizabilityAdminAction,
+  formatRebalanceizabilityDomain,
+  formatRebalanceizabilityRolloutCheckStatus,
+  formatRebalanceizabilityRolloutStatus,
+} from './rebalanceizability-ui'
 import {
   executeLeaderizabilityAdminAction,
   fetchLeaderizabilityAdminSummary,
@@ -5376,8 +5376,8 @@ function App() {
     useState<RecoveryizabilityRolloutResponse | null>(null)
   const [compactionizabilityRollout, setCompactionizabilityRollout] =
     useState<CompactionizabilityRolloutResponse | null>(null)
-  const [ncompactionizabilityRollout, setNcompactionizabilityRollout] =
-    useState<NcompactionizabilityRolloutResponse | null>(null)
+  const [rebalanceizabilityRollout, setRebalanceizabilityRollout] =
+    useState<RebalanceizabilityRolloutResponse | null>(null)
   const [leaderizabilityRollout, setLeaderizabilityRollout] =
     useState<LeaderizabilityRolloutResponse | null>(null)
   const [followerizabilityRollout, setFollowerizabilityRollout] =
@@ -6193,8 +6193,8 @@ function App() {
     useState<RecoveryizabilityAdminSummaryResponse | null>(null)
   const [compactionizabilityAdminSummary, setCompactionizabilityAdminSummary] =
     useState<CompactionizabilityAdminSummaryResponse | null>(null)
-  const [ncompactionizabilityAdminSummary, setNcompactionizabilityAdminSummary] =
-    useState<NcompactionizabilityAdminSummaryResponse | null>(null)
+  const [rebalanceizabilityAdminSummary, setRebalanceizabilityAdminSummary] =
+    useState<RebalanceizabilityAdminSummaryResponse | null>(null)
   const [leaderizabilityAdminSummary, setLeaderizabilityAdminSummary] =
     useState<LeaderizabilityAdminSummaryResponse | null>(null)
   const [followerizabilityAdminSummary, setFollowerizabilityAdminSummary] =
@@ -7294,7 +7294,7 @@ function App() {
   const [compactionizabilityAdminAction, setCompactionizabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
-  const [ncompactionizabilityAdminAction, setNcompactionizabilityAdminAction] = useState<
+  const [rebalanceizabilityAdminAction, setRebalanceizabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [leaderizabilityAdminAction, setLeaderizabilityAdminAction] = useState<
@@ -11772,15 +11772,15 @@ function App() {
         }
       })
 
-    fetchNcompactionizabilityRollout(apiBaseUrl)
+    fetchRebalanceizabilityRollout(apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
-          setNcompactionizabilityRollout(rollout)
+          setRebalanceizabilityRollout(rollout)
         }
       })
       .catch(() => {
         if (!controller.signal.aborted) {
-          setNcompactionizabilityRollout(null)
+          setRebalanceizabilityRollout(null)
         }
       })
 
@@ -15094,12 +15094,12 @@ function App() {
       )
       setCompactionizabilityAdminSummary(compactionizabilityAdmin)
 
-      const ncompactionizabilityAdmin = await fetchNcompactionizabilityAdminSummary(
+      const rebalanceizabilityAdmin = await fetchRebalanceizabilityAdminSummary(
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
       )
-      setNcompactionizabilityAdminSummary(ncompactionizabilityAdmin)
+      setRebalanceizabilityAdminSummary(rebalanceizabilityAdmin)
 
       const leaderizabilityAdmin = await fetchLeaderizabilityAdminSummary(
         apiBaseUrl,
@@ -16623,15 +16623,15 @@ function App() {
     }
   }
 
-  async function handleNcompactionizabilityAdminAction(
-    action: 'refresh_ncompactionizability_summary',
+  async function handleRebalanceizabilityAdminAction(
+    action: 'refresh_rebalanceizability_summary',
   ) {
-    setNcompactionizabilityAdminAction('running')
+    setRebalanceizabilityAdminAction('running')
     setBillingError(null)
     setBillingMessage(null)
 
     try {
-      const result = await executeNcompactionizabilityAdminAction(
+      const result = await executeRebalanceizabilityAdminAction(
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -16639,16 +16639,16 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchNcompactionizabilityRollout(apiBaseUrl)
-      setNcompactionizabilityRollout(rollout)
+      const rollout = await fetchRebalanceizabilityRollout(apiBaseUrl)
+      setRebalanceizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
         error instanceof Error
           ? error.message
-          : 'Failed to run ncompactionizability admin action.',
+          : 'Failed to run rebalanceizability admin action.',
       )
     } finally {
-      setNcompactionizabilityAdminAction('idle')
+      setRebalanceizabilityAdminAction('idle')
     }
   }
 
@@ -37165,32 +37165,32 @@ function App() {
           </div>
         ) : null}
 
-        {ncompactionizabilityRollout ? (
+        {rebalanceizabilityRollout ? (
           <div className="billing-rollout">
             <div className="billing-rollout__header">
-              <span>Production ncompactionizability rollout readiness</span>
+              <span>Production rebalanceizability rollout readiness</span>
               <strong
-                className={`billing-rollout__status billing-rollout__status--${ncompactionizabilityRollout.status}`}
+                className={`billing-rollout__status billing-rollout__status--${rebalanceizabilityRollout.status}`}
               >
-                {formatNcompactionizabilityRolloutStatus(ncompactionizabilityRollout.status)}
+                {formatRebalanceizabilityRolloutStatus(rebalanceizabilityRollout.status)}
               </strong>
             </div>
-            <p>{ncompactionizabilityRollout.guidance}</p>
+            <p>{rebalanceizabilityRollout.guidance}</p>
             <div className="billing-rollout__checks">
-              {ncompactionizabilityRollout.checks.map((check) => (
+              {rebalanceizabilityRollout.checks.map((check) => (
                 <article
                   className={`billing-rollout-check billing-rollout-check--${check.status}`}
                   key={check.name}
                 >
                   <strong>{check.label}</strong>
                   <span>
-                    {formatNcompactionizabilityRolloutCheckStatus(check.status)}
+                    {formatRebalanceizabilityRolloutCheckStatus(check.status)}
                   </span>
                   <p>{check.detail}</p>
                 </article>
               ))}
             </div>
-            <small>Checked at {ncompactionizabilityRollout.checkedAt}</small>
+            <small>Checked at {rebalanceizabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -61302,42 +61302,42 @@ function App() {
           </div>
         ) : null}
 
-        {ncompactionizabilityAdminSummary ? (
-          <div className="billing-admin workspace-ncompactionizability-admin">
+        {rebalanceizabilityAdminSummary ? (
+          <div className="billing-admin workspace-rebalanceizability-admin">
             <div className="billing-admin__header">
-              <span>Ncompactionizability admin</span>
-              <strong>{ncompactionizabilityAdminSummary.role}</strong>
+              <span>Rebalanceizability admin</span>
+              <strong>{rebalanceizabilityAdminSummary.role}</strong>
             </div>
-            <p>{ncompactionizabilityAdminSummary.guidance}</p>
+            <p>{rebalanceizabilityAdminSummary.guidance}</p>
             <div className="billing-admin__stats">
               <article className="billing-admin-stat">
-                <span>Meter usage ncompactionizability</span>
+                <span>Meter usage rebalanceizability</span>
                 <strong>
-                  {ncompactionizabilityAdminSummary.stats.ncompactionizabilityPercent}%
+                  {rebalanceizabilityAdminSummary.stats.rebalanceizabilityPercent}%
                 </strong>
                 <small>
-                  {ncompactionizabilityAdminSummary.stats.coveredDomains}/
-                  {ncompactionizabilityAdminSummary.stats.totalDomains} domains covered
+                  {rebalanceizabilityAdminSummary.stats.coveredDomains}/
+                  {rebalanceizabilityAdminSummary.stats.totalDomains} domains covered
                 </small>
               </article>
               <article className="billing-admin-stat">
-                <span>Ncompactionizability signals</span>
-                <strong>{ncompactionizabilityAdminSummary.stats.totalRecords}</strong>
+                <span>Rebalanceizability signals</span>
+                <strong>{rebalanceizabilityAdminSummary.stats.totalRecords}</strong>
                 <small>
-                  {ncompactionizabilityAdminSummary.stats.postgresConnectivity
+                  {rebalanceizabilityAdminSummary.stats.postgresConnectivity
                     ? 'Run outcomes, meter usage reports, and usage events'
                     : 'PostgreSQL unavailable'}
                 </small>
               </article>
             </div>
-            <div className="workspace-ncompactionizability-list">
-              {ncompactionizabilityAdminSummary.records.map((record) => (
+            <div className="workspace-rebalanceizability-list">
+              {rebalanceizabilityAdminSummary.records.map((record) => (
                 <article
-                  className={`workspace-ncompactionizability-card workspace-ncompactionizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  className={`workspace-rebalanceizability-card workspace-rebalanceizability-card--${record.tableExists ? 'ready' : 'missing'}`}
                   key={record.domain}
                 >
                   <div>
-                    <strong>{formatNcompactionizabilityDomain(record.domain)}</strong>
+                    <strong>{formatRebalanceizabilityDomain(record.domain)}</strong>
                     <p>{record.tableName}</p>
                     <small>
                       {record.tableExists
@@ -61348,20 +61348,20 @@ function App() {
                 </article>
               ))}
             </div>
-            {ncompactionizabilityAdminSummary.availableActions.includes(
-              'refresh_ncompactionizability_summary',
+            {rebalanceizabilityAdminSummary.availableActions.includes(
+              'refresh_rebalanceizability_summary',
             ) ? (
               <button
                 className="secondary-button"
                 type="button"
-                disabled={ncompactionizabilityAdminAction !== 'idle'}
+                disabled={rebalanceizabilityAdminAction !== 'idle'}
                 onClick={() =>
-                  void handleNcompactionizabilityAdminAction(
-                    'refresh_ncompactionizability_summary',
+                  void handleRebalanceizabilityAdminAction(
+                    'refresh_rebalanceizability_summary',
                   )
                 }
               >
-                {formatNcompactionizabilityAdminAction('refresh_ncompactionizability_summary')}
+                {formatRebalanceizabilityAdminAction('refresh_rebalanceizability_summary')}
               </button>
             ) : null}
           </div>

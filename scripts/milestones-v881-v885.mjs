@@ -69,13 +69,13 @@ export const milestones = [
     signalsHint: 'Run outcomes, billing webhook events, and billing records',
   },
   {
-    name: 'ncompactionizability',
-    Name: 'Ncompactionizability',
-    percent: 'ncompactionizabilityPercent',
+    name: 'rebalanceizability',
+    Name: 'Rebalanceizability',
+    percent: 'rebalanceizabilityPercent',
     metricDomain: 'billing_meter_usage_reports',
-    metricLabel: 'Meter usage ncompactionizability',
-    metricDetail: 'meter usage ncompactionizability',
-    action: 'refresh_ncompactionizability_summary',
+    metricLabel: 'Meter usage rebalanceizability',
+    metricDetail: 'meter usage rebalanceizability',
+    action: 'refresh_rebalanceizability_summary',
     tables: [
       'billing_meter_usage_reports',
       'usage_events',
@@ -83,14 +83,14 @@ export const milestones = [
     ],
     check1: {
       key: 'billingMeterUsageReportsTableExists',
-      name: 'meter_usage_ncompactionizability',
-      label: 'Meter usage ncompactionizability',
+      name: 'meter_usage_rebalanceizability',
+      label: 'Meter usage rebalanceizability',
       table: 'billing_meter_usage_reports',
     },
     check2: {
       key: 'usageEventsTableExists',
-      name: 'usage_event_ncompactionizability',
-      label: 'Usage event ncompactionizability',
+      name: 'usage_event_rebalanceizability',
+      label: 'Usage event rebalanceizability',
       table: 'usage_events',
     },
     check3Key: 'workspaceUsageLimitsTableExists',
@@ -99,14 +99,14 @@ export const milestones = [
       usage_events: 'usageEventsTableExists',
       workspace_usage_limits: 'workspaceUsageLimitsTableExists',
     },
-    readiness: 'ncompactionization_readiness_signal',
+    readiness: 'rebalanceization_readiness_signal',
     readinessLabel: 'Distributization readiness signal',
     readinessDetail:
-      'Billing meter usage reports, usage events, and workspace usage limits support ncompactionization readiness.',
-    cap1: 'supportsMeterUsageNcompactionizabilitySignals',
-    cap2: 'supportsUsageEventNcompactionizabilitySignals',
+      'Billing meter usage reports, usage events, and workspace usage limits support rebalanceization readiness.',
+    cap1: 'supportsMeterUsageRebalanceizabilitySignals',
+    cap2: 'supportsUsageEventRebalanceizabilitySignals',
     guidance:
-      'Production ncompactionizability rollout validates meter usage ncompactionizability, usage event ncompactionizability signals, workspace limit coverage, and ncompactionization readiness before production ncompactionizability tooling.',
+      'Production rebalanceizability rollout validates meter usage rebalanceizability, usage event rebalanceizability signals, workspace limit coverage, and rebalanceization readiness before production rebalanceizability tooling.',
     domains: [
       {
         domain: 'completed_runs',

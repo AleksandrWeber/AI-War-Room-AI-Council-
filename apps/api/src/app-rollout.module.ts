@@ -204,7 +204,7 @@ import { OrderingizabilityModule } from './orderingizability/orderingizability.m
 import { CheckpointizabilityModule } from './checkpointizability/checkpointizability.module.js'
 import { RecoveryizabilityModule } from './recoveryizability/recoveryizability.module.js'
 import { CompactionizabilityModule } from './compactionizability/compactionizability.module.js'
-import { NcompactionizabilityModule } from './ncompactionizability/ncompactionizability.module.js'
+import { RebalanceizabilityModule } from './rebalanceizability/rebalanceizability.module.js'
 import { LeaderizabilityModule } from './leaderizability/leaderizability.module.js'
 import { FollowerizabilityModule } from './followerizability/followerizability.module.js'
 import { ConsensusizabilityModule } from './consensusizability/consensusizability.module.js'
@@ -421,7 +421,7 @@ import { WalizabilityModule } from './walizability/walizability.module.js'
     CheckpointizabilityModule,
     RecoveryizabilityModule,
     CompactionizabilityModule,
-    NcompactionizabilityModule,
+    RebalanceizabilityModule,
     LeaderizabilityModule,
     FollowerizabilityModule,
     ConsensusizabilityModule,
