@@ -796,6 +796,36 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.115` behavior:
+
+- Production predictability rollout readiness validates predictability coverage and readiness through `GET /api/predictability/readiness`.
+- Workspace owners and admins can inspect workspace predictability metrics from `GET /api/predictability/workspace/:workspaceId/admin`.
+- The web billing panel shows predictability rollout checks and workspace predictability admin tools.
+
+Current `v5.114` behavior:
+
+- Production monitorability rollout readiness validates monitorability coverage and readiness through `GET /api/monitorability/readiness`.
+- Workspace owners and admins can inspect workspace monitorability metrics from `GET /api/monitorability/workspace/:workspaceId/admin`.
+- The web billing panel shows monitorability rollout checks and workspace monitorability admin tools.
+
+Current `v5.113` behavior:
+
+- Production automatability rollout readiness validates automatability coverage and readiness through `GET /api/automatability/readiness`.
+- Workspace owners and admins can inspect workspace automatability metrics from `GET /api/automatability/workspace/:workspaceId/admin`.
+- The web billing panel shows automatability rollout checks and workspace automatability admin tools.
+
+Current `v5.112` behavior:
+
+- Production schedulability rollout readiness validates schedulability coverage and readiness through `GET /api/schedulability/readiness`.
+- Workspace owners and admins can inspect workspace schedulability metrics from `GET /api/schedulability/workspace/:workspaceId/admin`.
+- The web billing panel shows schedulability rollout checks and workspace schedulability admin tools.
+
+Current `v5.111` behavior:
+
+- Production orchestrability rollout readiness validates orchestrability coverage and readiness through `GET /api/orchestrability/readiness`.
+- Workspace owners and admins can inspect workspace orchestrability metrics from `GET /api/orchestrability/workspace/:workspaceId/admin`.
+- The web billing panel shows orchestrability rollout checks and workspace orchestrability admin tools.
+
 Current `v5.110` behavior:
 
 - Production integrability rollout readiness validates integrability coverage and readiness through `GET /api/integrability/readiness`.

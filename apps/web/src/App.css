@@ -3045,6 +3045,136 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-orchestrability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-orchestrability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-orchestrability-card p,
+.workspace-orchestrability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-orchestrability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-orchestrability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-schedulability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-schedulability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-schedulability-card p,
+.workspace-schedulability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-schedulability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-schedulability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-automatability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-automatability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-automatability-card p,
+.workspace-automatability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-automatability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-automatability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-monitorability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-monitorability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-monitorability-card p,
+.workspace-monitorability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-monitorability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-monitorability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-predictability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-predictability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-predictability-card p,
+.workspace-predictability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-predictability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-predictability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

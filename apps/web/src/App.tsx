@@ -194,6 +194,16 @@ import type {
   ControllabilityAdminSummaryResponse,
   IntegrabilityRolloutResponse,
   IntegrabilityAdminSummaryResponse,
+  OrchestrabilityRolloutResponse,
+  OrchestrabilityAdminSummaryResponse,
+  SchedulabilityRolloutResponse,
+  SchedulabilityAdminSummaryResponse,
+  AutomatabilityRolloutResponse,
+  AutomatabilityAdminSummaryResponse,
+  MonitorabilityRolloutResponse,
+  MonitorabilityAdminSummaryResponse,
+  PredictabilityRolloutResponse,
+  PredictabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -1026,6 +1036,51 @@ import {
   formatIntegrabilityRolloutStatus,
 } from './integrability-ui'
 import {
+  executeOrchestrabilityAdminAction,
+  fetchOrchestrabilityAdminSummary,
+  fetchOrchestrabilityRollout,
+  formatOrchestrabilityAdminAction,
+  formatOrchestrabilityDomain,
+  formatOrchestrabilityRolloutCheckStatus,
+  formatOrchestrabilityRolloutStatus,
+} from './orchestrability-ui'
+import {
+  executeSchedulabilityAdminAction,
+  fetchSchedulabilityAdminSummary,
+  fetchSchedulabilityRollout,
+  formatSchedulabilityAdminAction,
+  formatSchedulabilityDomain,
+  formatSchedulabilityRolloutCheckStatus,
+  formatSchedulabilityRolloutStatus,
+} from './schedulability-ui'
+import {
+  executeAutomatabilityAdminAction,
+  fetchAutomatabilityAdminSummary,
+  fetchAutomatabilityRollout,
+  formatAutomatabilityAdminAction,
+  formatAutomatabilityDomain,
+  formatAutomatabilityRolloutCheckStatus,
+  formatAutomatabilityRolloutStatus,
+} from './automatability-ui'
+import {
+  executeMonitorabilityAdminAction,
+  fetchMonitorabilityAdminSummary,
+  fetchMonitorabilityRollout,
+  formatMonitorabilityAdminAction,
+  formatMonitorabilityDomain,
+  formatMonitorabilityRolloutCheckStatus,
+  formatMonitorabilityRolloutStatus,
+} from './monitorability-ui'
+import {
+  executePredictabilityAdminAction,
+  fetchPredictabilityAdminSummary,
+  fetchPredictabilityRollout,
+  formatPredictabilityAdminAction,
+  formatPredictabilityDomain,
+  formatPredictabilityRolloutCheckStatus,
+  formatPredictabilityRolloutStatus,
+} from './predictability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -1754,6 +1809,16 @@ function App() {
     useState<ControllabilityRolloutResponse | null>(null)
   const [integrabilityRollout, setIntegrabilityRollout] =
     useState<IntegrabilityRolloutResponse | null>(null)
+  const [orchestrabilityRollout, setOrchestrabilityRollout] =
+    useState<OrchestrabilityRolloutResponse | null>(null)
+  const [schedulabilityRollout, setSchedulabilityRollout] =
+    useState<SchedulabilityRolloutResponse | null>(null)
+  const [automatabilityRollout, setAutomatabilityRollout] =
+    useState<AutomatabilityRolloutResponse | null>(null)
+  const [monitorabilityRollout, setMonitorabilityRollout] =
+    useState<MonitorabilityRolloutResponse | null>(null)
+  const [predictabilityRollout, setPredictabilityRollout] =
+    useState<PredictabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -2011,6 +2076,16 @@ function App() {
     useState<ControllabilityAdminSummaryResponse | null>(null)
   const [integrabilityAdminSummary, setIntegrabilityAdminSummary] =
     useState<IntegrabilityAdminSummaryResponse | null>(null)
+  const [orchestrabilityAdminSummary, setOrchestrabilityAdminSummary] =
+    useState<OrchestrabilityAdminSummaryResponse | null>(null)
+  const [schedulabilityAdminSummary, setSchedulabilityAdminSummary] =
+    useState<SchedulabilityAdminSummaryResponse | null>(null)
+  const [automatabilityAdminSummary, setAutomatabilityAdminSummary] =
+    useState<AutomatabilityAdminSummaryResponse | null>(null)
+  const [monitorabilityAdminSummary, setMonitorabilityAdminSummary] =
+    useState<MonitorabilityAdminSummaryResponse | null>(null)
+  const [predictabilityAdminSummary, setPredictabilityAdminSummary] =
+    useState<PredictabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -2279,6 +2354,21 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [integrabilityAdminAction, setIntegrabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [orchestrabilityAdminAction, setOrchestrabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [schedulabilityAdminAction, setSchedulabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [automatabilityAdminAction, setAutomatabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [monitorabilityAdminAction, setMonitorabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [predictabilityAdminAction, setPredictabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -3477,6 +3567,66 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setIntegrabilityRollout(null)
+        }
+      })
+
+    fetchOrchestrabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setOrchestrabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setOrchestrabilityRollout(null)
+        }
+      })
+
+    fetchSchedulabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setSchedulabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setSchedulabilityRollout(null)
+        }
+      })
+
+    fetchAutomatabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAutomatabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAutomatabilityRollout(null)
+        }
+      })
+
+    fetchMonitorabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setMonitorabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setMonitorabilityRollout(null)
+        }
+      })
+
+    fetchPredictabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setPredictabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setPredictabilityRollout(null)
         }
       })
 
@@ -4796,6 +4946,41 @@ function App() {
         workspaceAuthHeaders,
       )
       setIntegrabilityAdminSummary(integrabilityAdmin)
+
+      const orchestrabilityAdmin = await fetchOrchestrabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setOrchestrabilityAdminSummary(orchestrabilityAdmin)
+
+      const schedulabilityAdmin = await fetchSchedulabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSchedulabilityAdminSummary(schedulabilityAdmin)
+
+      const automatabilityAdmin = await fetchAutomatabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAutomatabilityAdminSummary(automatabilityAdmin)
+
+      const monitorabilityAdmin = await fetchMonitorabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMonitorabilityAdminSummary(monitorabilityAdmin)
+
+      const predictabilityAdmin = await fetchPredictabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPredictabilityAdminSummary(predictabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -6028,6 +6213,151 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handlePredictabilityAdminAction(
+    action: 'refresh_predictability_summary',
+  ) {
+    setPredictabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executePredictabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchPredictabilityRollout(apiBaseUrl)
+      setPredictabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run predictability admin action.',
+      )
+    } finally {
+      setPredictabilityAdminAction('idle')
+    }
+  }
+
+  async function handleMonitorabilityAdminAction(
+    action: 'refresh_monitorability_summary',
+  ) {
+    setMonitorabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeMonitorabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchMonitorabilityRollout(apiBaseUrl)
+      setMonitorabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run monitorability admin action.',
+      )
+    } finally {
+      setMonitorabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAutomatabilityAdminAction(
+    action: 'refresh_automatability_summary',
+  ) {
+    setAutomatabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAutomatabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAutomatabilityRollout(apiBaseUrl)
+      setAutomatabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run automatability admin action.',
+      )
+    } finally {
+      setAutomatabilityAdminAction('idle')
+    }
+  }
+
+  async function handleSchedulabilityAdminAction(
+    action: 'refresh_schedulability_summary',
+  ) {
+    setSchedulabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeSchedulabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchSchedulabilityRollout(apiBaseUrl)
+      setSchedulabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run schedulability admin action.',
+      )
+    } finally {
+      setSchedulabilityAdminAction('idle')
+    }
+  }
+
+  async function handleOrchestrabilityAdminAction(
+    action: 'refresh_orchestrability_summary',
+  ) {
+    setOrchestrabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeOrchestrabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchOrchestrabilityRollout(apiBaseUrl)
+      setOrchestrabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run orchestrability admin action.',
+      )
+    } finally {
+      setOrchestrabilityAdminAction('idle')
     }
   }
 
@@ -10765,6 +11095,151 @@ function App() {
               ))}
             </div>
             <small>Checked at {programmabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {predictabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production predictability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${predictabilityRollout.status}`}
+              >
+                {formatPredictabilityRolloutStatus(predictabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{predictabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {predictabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatPredictabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {predictabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {monitorabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production monitorability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${monitorabilityRollout.status}`}
+              >
+                {formatMonitorabilityRolloutStatus(monitorabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{monitorabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {monitorabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatMonitorabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {monitorabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {automatabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production automatability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${automatabilityRollout.status}`}
+              >
+                {formatAutomatabilityRolloutStatus(automatabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{automatabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {automatabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAutomatabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {automatabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {schedulabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production schedulability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${schedulabilityRollout.status}`}
+              >
+                {formatSchedulabilityRolloutStatus(schedulabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{schedulabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {schedulabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatSchedulabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {schedulabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {orchestrabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production orchestrability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${orchestrabilityRollout.status}`}
+              >
+                {formatOrchestrabilityRolloutStatus(orchestrabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{orchestrabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {orchestrabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatOrchestrabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {orchestrabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -16952,6 +17427,331 @@ function App() {
                 }
               >
                 {formatProgrammabilityAdminAction('refresh_programmability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {predictabilityAdminSummary ? (
+          <div className="billing-admin workspace-predictability-admin">
+            <div className="billing-admin__header">
+              <span>Predictability admin</span>
+              <strong>{predictabilityAdminSummary.role}</strong>
+            </div>
+            <p>{predictabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Moderator synthesis predictability</span>
+                <strong>
+                  {predictabilityAdminSummary.stats.predictabilityPercent}%
+                </strong>
+                <small>
+                  {predictabilityAdminSummary.stats.coveredDomains}/
+                  {predictabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Predictability signals</span>
+                <strong>{predictabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {predictabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, moderator syntheses, and billing invoices'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-predictability-list">
+              {predictabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-predictability-card workspace-predictability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatPredictabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {predictabilityAdminSummary.availableActions.includes(
+              'refresh_predictability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={predictabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handlePredictabilityAdminAction(
+                    'refresh_predictability_summary',
+                  )
+                }
+              >
+                {formatPredictabilityAdminAction('refresh_predictability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {monitorabilityAdminSummary ? (
+          <div className="billing-admin workspace-monitorability-admin">
+            <div className="billing-admin__header">
+              <span>Monitorability admin</span>
+              <strong>{monitorabilityAdminSummary.role}</strong>
+            </div>
+            <p>{monitorabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Usage event monitorability</span>
+                <strong>
+                  {monitorabilityAdminSummary.stats.monitorabilityPercent}%
+                </strong>
+                <small>
+                  {monitorabilityAdminSummary.stats.coveredDomains}/
+                  {monitorabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Monitorability signals</span>
+                <strong>{monitorabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {monitorabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, usage events, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-monitorability-list">
+              {monitorabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-monitorability-card workspace-monitorability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatMonitorabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {monitorabilityAdminSummary.availableActions.includes(
+              'refresh_monitorability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={monitorabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleMonitorabilityAdminAction(
+                    'refresh_monitorability_summary',
+                  )
+                }
+              >
+                {formatMonitorabilityAdminAction('refresh_monitorability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {automatabilityAdminSummary ? (
+          <div className="billing-admin workspace-automatability-admin">
+            <div className="billing-admin__header">
+              <span>Automatability admin</span>
+              <strong>{automatabilityAdminSummary.role}</strong>
+            </div>
+            <p>{automatabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Agent output automatability</span>
+                <strong>
+                  {automatabilityAdminSummary.stats.automatabilityPercent}%
+                </strong>
+                <small>
+                  {automatabilityAdminSummary.stats.coveredDomains}/
+                  {automatabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Automatability signals</span>
+                <strong>{automatabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {automatabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, agent outputs, and artifacts'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-automatability-list">
+              {automatabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-automatability-card workspace-automatability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAutomatabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {automatabilityAdminSummary.availableActions.includes(
+              'refresh_automatability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={automatabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAutomatabilityAdminAction(
+                    'refresh_automatability_summary',
+                  )
+                }
+              >
+                {formatAutomatabilityAdminAction('refresh_automatability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {schedulabilityAdminSummary ? (
+          <div className="billing-admin workspace-schedulability-admin">
+            <div className="billing-admin__header">
+              <span>Schedulability admin</span>
+              <strong>{schedulabilityAdminSummary.role}</strong>
+            </div>
+            <p>{schedulabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Meter usage schedulability</span>
+                <strong>
+                  {schedulabilityAdminSummary.stats.schedulabilityPercent}%
+                </strong>
+                <small>
+                  {schedulabilityAdminSummary.stats.coveredDomains}/
+                  {schedulabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Schedulability signals</span>
+                <strong>{schedulabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {schedulabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, meter usage reports, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-schedulability-list">
+              {schedulabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-schedulability-card workspace-schedulability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatSchedulabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {schedulabilityAdminSummary.availableActions.includes(
+              'refresh_schedulability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={schedulabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleSchedulabilityAdminAction(
+                    'refresh_schedulability_summary',
+                  )
+                }
+              >
+                {formatSchedulabilityAdminAction('refresh_schedulability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {orchestrabilityAdminSummary ? (
+          <div className="billing-admin workspace-orchestrability-admin">
+            <div className="billing-admin__header">
+              <span>Orchestrability admin</span>
+              <strong>{orchestrabilityAdminSummary.role}</strong>
+            </div>
+            <p>{orchestrabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workflow orchestrability</span>
+                <strong>
+                  {orchestrabilityAdminSummary.stats.orchestrabilityPercent}%
+                </strong>
+                <small>
+                  {orchestrabilityAdminSummary.stats.coveredDomains}/
+                  {orchestrabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Orchestrability signals</span>
+                <strong>{orchestrabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {orchestrabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, run workflows, and billing notifications'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-orchestrability-list">
+              {orchestrabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-orchestrability-card workspace-orchestrability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatOrchestrabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {orchestrabilityAdminSummary.availableActions.includes(
+              'refresh_orchestrability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={orchestrabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleOrchestrabilityAdminAction(
+                    'refresh_orchestrability_summary',
+                  )
+                }
+              >
+                {formatOrchestrabilityAdminAction('refresh_orchestrability_summary')}
               </button>
             ) : null}
           </div>

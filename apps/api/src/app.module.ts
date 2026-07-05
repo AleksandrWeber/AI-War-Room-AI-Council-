@@ -82,6 +82,11 @@ import { DeployabilityModule } from './deployability/deployability.module.js'
 import { ManageabilityModule } from './manageability/manageability.module.js'
 import { ControllabilityModule } from './controllability/controllability.module.js'
 import { IntegrabilityModule } from './integrability/integrability.module.js'
+import { OrchestrabilityModule } from './orchestrability/orchestrability.module.js'
+import { SchedulabilityModule } from './schedulability/schedulability.module.js'
+import { AutomatabilityModule } from './automatability/automatability.module.js'
+import { MonitorabilityModule } from './monitorability/monitorability.module.js'
+import { PredictabilityModule } from './predictability/predictability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -183,6 +188,11 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     ManageabilityModule,
     ControllabilityModule,
     IntegrabilityModule,
+    OrchestrabilityModule,
+    SchedulabilityModule,
+    AutomatabilityModule,
+    MonitorabilityModule,
+    PredictabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,
