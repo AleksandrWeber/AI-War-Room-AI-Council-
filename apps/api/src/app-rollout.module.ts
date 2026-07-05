@@ -253,6 +253,16 @@ import { JoinizabilityModule } from './joinizability/joinizability.module.js'
 import { MergeizabilityModule } from './mergeizability/mergeizability.module.js'
 import { SplitizabilityModule } from './splitizability/splitizability.module.js'
 import { ProjectizabilityModule } from './projectizability/projectizability.module.js'
+import { TransformizabilityModule } from './transformizability/transformizability.module.js'
+import { MapizabilityModule } from './mapizability/mapizability.module.js'
+import { ReduceizabilityModule } from './reduceizability/reduceizability.module.js'
+import { FoldizabilityModule } from './foldizability/foldizability.module.js'
+import { ScanizabilityModule } from './scanizability/scanizability.module.js'
+import { ChainingizabilityModule } from './chainingizability/chainingizability.module.js'
+import { PipeliningizabilityModule } from './pipeliningizability/pipeliningizability.module.js'
+import { BatchingizabilityModule } from './batchingizability/batchingizability.module.js'
+import { StreamizabilityModule } from './streamizability/streamizability.module.js'
+import { WindowizabilityModule } from './windowizability/windowizability.module.js'
 
 @Module({
   imports: [
@@ -510,6 +520,16 @@ import { ProjectizabilityModule } from './projectizability/projectizability.modu
     MergeizabilityModule,
     SplitizabilityModule,
     ProjectizabilityModule,
+    TransformizabilityModule,
+    MapizabilityModule,
+    ReduceizabilityModule,
+    FoldizabilityModule,
+    ScanizabilityModule,
+    ChainingizabilityModule,
+    PipeliningizabilityModule,
+    BatchingizabilityModule,
+    StreamizabilityModule,
+    WindowizabilityModule,
   ],
   exports: [
     CustomizabilityModule,

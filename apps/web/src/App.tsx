@@ -834,6 +834,26 @@ import type {
   SplitizabilityAdminSummaryResponse,
   ProjectizabilityRolloutResponse,
   ProjectizabilityAdminSummaryResponse,
+  TransformizabilityRolloutResponse,
+  TransformizabilityAdminSummaryResponse,
+  MapizabilityRolloutResponse,
+  MapizabilityAdminSummaryResponse,
+  ReduceizabilityRolloutResponse,
+  ReduceizabilityAdminSummaryResponse,
+  FoldizabilityRolloutResponse,
+  FoldizabilityAdminSummaryResponse,
+  ScanizabilityRolloutResponse,
+  ScanizabilityAdminSummaryResponse,
+  ChainingizabilityRolloutResponse,
+  ChainingizabilityAdminSummaryResponse,
+  PipeliningizabilityRolloutResponse,
+  PipeliningizabilityAdminSummaryResponse,
+  BatchingizabilityRolloutResponse,
+  BatchingizabilityAdminSummaryResponse,
+  StreamizabilityRolloutResponse,
+  StreamizabilityAdminSummaryResponse,
+  WindowizabilityRolloutResponse,
+  WindowizabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -4546,6 +4566,96 @@ import {
   formatProjectizabilityRolloutStatus,
 } from './projectizability-ui'
 import {
+  executeTransformizabilityAdminAction,
+  fetchTransformizabilityAdminSummary,
+  fetchTransformizabilityRollout,
+  formatTransformizabilityAdminAction,
+  formatTransformizabilityDomain,
+  formatTransformizabilityRolloutCheckStatus,
+  formatTransformizabilityRolloutStatus,
+} from './transformizability-ui'
+import {
+  executeMapizabilityAdminAction,
+  fetchMapizabilityAdminSummary,
+  fetchMapizabilityRollout,
+  formatMapizabilityAdminAction,
+  formatMapizabilityDomain,
+  formatMapizabilityRolloutCheckStatus,
+  formatMapizabilityRolloutStatus,
+} from './mapizability-ui'
+import {
+  executeReduceizabilityAdminAction,
+  fetchReduceizabilityAdminSummary,
+  fetchReduceizabilityRollout,
+  formatReduceizabilityAdminAction,
+  formatReduceizabilityDomain,
+  formatReduceizabilityRolloutCheckStatus,
+  formatReduceizabilityRolloutStatus,
+} from './reduceizability-ui'
+import {
+  executeFoldizabilityAdminAction,
+  fetchFoldizabilityAdminSummary,
+  fetchFoldizabilityRollout,
+  formatFoldizabilityAdminAction,
+  formatFoldizabilityDomain,
+  formatFoldizabilityRolloutCheckStatus,
+  formatFoldizabilityRolloutStatus,
+} from './foldizability-ui'
+import {
+  executeScanizabilityAdminAction,
+  fetchScanizabilityAdminSummary,
+  fetchScanizabilityRollout,
+  formatScanizabilityAdminAction,
+  formatScanizabilityDomain,
+  formatScanizabilityRolloutCheckStatus,
+  formatScanizabilityRolloutStatus,
+} from './scanizability-ui'
+import {
+  executeChainingizabilityAdminAction,
+  fetchChainingizabilityAdminSummary,
+  fetchChainingizabilityRollout,
+  formatChainingizabilityAdminAction,
+  formatChainingizabilityDomain,
+  formatChainingizabilityRolloutCheckStatus,
+  formatChainingizabilityRolloutStatus,
+} from './chainingizability-ui'
+import {
+  executePipeliningizabilityAdminAction,
+  fetchPipeliningizabilityAdminSummary,
+  fetchPipeliningizabilityRollout,
+  formatPipeliningizabilityAdminAction,
+  formatPipeliningizabilityDomain,
+  formatPipeliningizabilityRolloutCheckStatus,
+  formatPipeliningizabilityRolloutStatus,
+} from './pipeliningizability-ui'
+import {
+  executeBatchingizabilityAdminAction,
+  fetchBatchingizabilityAdminSummary,
+  fetchBatchingizabilityRollout,
+  formatBatchingizabilityAdminAction,
+  formatBatchingizabilityDomain,
+  formatBatchingizabilityRolloutCheckStatus,
+  formatBatchingizabilityRolloutStatus,
+} from './batchingizability-ui'
+import {
+  executeStreamizabilityAdminAction,
+  fetchStreamizabilityAdminSummary,
+  fetchStreamizabilityRollout,
+  formatStreamizabilityAdminAction,
+  formatStreamizabilityDomain,
+  formatStreamizabilityRolloutCheckStatus,
+  formatStreamizabilityRolloutStatus,
+} from './streamizability-ui'
+import {
+  executeWindowizabilityAdminAction,
+  fetchWindowizabilityAdminSummary,
+  fetchWindowizabilityRollout,
+  formatWindowizabilityAdminAction,
+  formatWindowizabilityDomain,
+  formatWindowizabilityRolloutCheckStatus,
+  formatWindowizabilityRolloutStatus,
+} from './windowizability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -5914,6 +6024,26 @@ function App() {
     useState<SplitizabilityRolloutResponse | null>(null)
   const [projectizabilityRollout, setProjectizabilityRollout] =
     useState<ProjectizabilityRolloutResponse | null>(null)
+  const [transformizabilityRollout, setTransformizabilityRollout] =
+    useState<TransformizabilityRolloutResponse | null>(null)
+  const [mapizabilityRollout, setMapizabilityRollout] =
+    useState<MapizabilityRolloutResponse | null>(null)
+  const [reduceizabilityRollout, setReduceizabilityRollout] =
+    useState<ReduceizabilityRolloutResponse | null>(null)
+  const [foldizabilityRollout, setFoldizabilityRollout] =
+    useState<FoldizabilityRolloutResponse | null>(null)
+  const [scanizabilityRollout, setScanizabilityRollout] =
+    useState<ScanizabilityRolloutResponse | null>(null)
+  const [chainingizabilityRollout, setChainingizabilityRollout] =
+    useState<ChainingizabilityRolloutResponse | null>(null)
+  const [pipeliningizabilityRollout, setPipeliningizabilityRollout] =
+    useState<PipeliningizabilityRolloutResponse | null>(null)
+  const [batchingizabilityRollout, setBatchingizabilityRollout] =
+    useState<BatchingizabilityRolloutResponse | null>(null)
+  const [streamizabilityRollout, setStreamizabilityRollout] =
+    useState<StreamizabilityRolloutResponse | null>(null)
+  const [windowizabilityRollout, setWindowizabilityRollout] =
+    useState<WindowizabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -6811,6 +6941,26 @@ function App() {
     useState<SplitizabilityAdminSummaryResponse | null>(null)
   const [projectizabilityAdminSummary, setProjectizabilityAdminSummary] =
     useState<ProjectizabilityAdminSummaryResponse | null>(null)
+  const [transformizabilityAdminSummary, setTransformizabilityAdminSummary] =
+    useState<TransformizabilityAdminSummaryResponse | null>(null)
+  const [mapizabilityAdminSummary, setMapizabilityAdminSummary] =
+    useState<MapizabilityAdminSummaryResponse | null>(null)
+  const [reduceizabilityAdminSummary, setReduceizabilityAdminSummary] =
+    useState<ReduceizabilityAdminSummaryResponse | null>(null)
+  const [foldizabilityAdminSummary, setFoldizabilityAdminSummary] =
+    useState<FoldizabilityAdminSummaryResponse | null>(null)
+  const [scanizabilityAdminSummary, setScanizabilityAdminSummary] =
+    useState<ScanizabilityAdminSummaryResponse | null>(null)
+  const [chainingizabilityAdminSummary, setChainingizabilityAdminSummary] =
+    useState<ChainingizabilityAdminSummaryResponse | null>(null)
+  const [pipeliningizabilityAdminSummary, setPipeliningizabilityAdminSummary] =
+    useState<PipeliningizabilityAdminSummaryResponse | null>(null)
+  const [batchingizabilityAdminSummary, setBatchingizabilityAdminSummary] =
+    useState<BatchingizabilityAdminSummaryResponse | null>(null)
+  const [streamizabilityAdminSummary, setStreamizabilityAdminSummary] =
+    useState<StreamizabilityAdminSummaryResponse | null>(null)
+  const [windowizabilityAdminSummary, setWindowizabilityAdminSummary] =
+    useState<WindowizabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -8039,6 +8189,36 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [projectizabilityAdminAction, setProjectizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [transformizabilityAdminAction, setTransformizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [mapizabilityAdminAction, setMapizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [reduceizabilityAdminAction, setReduceizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [foldizabilityAdminAction, setFoldizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [scanizabilityAdminAction, setScanizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [chainingizabilityAdminAction, setChainingizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [pipeliningizabilityAdminAction, setPipeliningizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [batchingizabilityAdminAction, setBatchingizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [streamizabilityAdminAction, setStreamizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [windowizabilityAdminAction, setWindowizabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -13080,6 +13260,126 @@ function App() {
         }
       })
 
+    fetchTransformizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setTransformizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTransformizabilityRollout(null)
+        }
+      })
+
+    fetchMapizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setMapizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setMapizabilityRollout(null)
+        }
+      })
+
+    fetchReduceizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setReduceizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setReduceizabilityRollout(null)
+        }
+      })
+
+    fetchFoldizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setFoldizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setFoldizabilityRollout(null)
+        }
+      })
+
+    fetchScanizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setScanizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setScanizabilityRollout(null)
+        }
+      })
+
+    fetchChainingizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setChainingizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setChainingizabilityRollout(null)
+        }
+      })
+
+    fetchPipeliningizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setPipeliningizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setPipeliningizabilityRollout(null)
+        }
+      })
+
+    fetchBatchingizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setBatchingizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setBatchingizabilityRollout(null)
+        }
+      })
+
+    fetchStreamizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setStreamizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setStreamizabilityRollout(null)
+        }
+      })
+
+    fetchWindowizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setWindowizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setWindowizabilityRollout(null)
+        }
+      })
+
     fetchUsageCapabilities(apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
@@ -16636,6 +16936,76 @@ function App() {
         workspaceAuthHeaders,
       )
       setProjectizabilityAdminSummary(projectizabilityAdmin)
+
+      const transformizabilityAdmin = await fetchTransformizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTransformizabilityAdminSummary(transformizabilityAdmin)
+
+      const mapizabilityAdmin = await fetchMapizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMapizabilityAdminSummary(mapizabilityAdmin)
+
+      const reduceizabilityAdmin = await fetchReduceizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReduceizabilityAdminSummary(reduceizabilityAdmin)
+
+      const foldizabilityAdmin = await fetchFoldizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFoldizabilityAdminSummary(foldizabilityAdmin)
+
+      const scanizabilityAdmin = await fetchScanizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setScanizabilityAdminSummary(scanizabilityAdmin)
+
+      const chainingizabilityAdmin = await fetchChainingizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setChainingizabilityAdminSummary(chainingizabilityAdmin)
+
+      const pipeliningizabilityAdmin = await fetchPipeliningizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPipeliningizabilityAdminSummary(pipeliningizabilityAdmin)
+
+      const batchingizabilityAdmin = await fetchBatchingizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBatchingizabilityAdminSummary(batchingizabilityAdmin)
+
+      const streamizabilityAdmin = await fetchStreamizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setStreamizabilityAdminSummary(streamizabilityAdmin)
+
+      const windowizabilityAdmin = await fetchWindowizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setWindowizabilityAdminSummary(windowizabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -17868,6 +18238,296 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleWindowizabilityAdminAction(
+    action: 'refresh_windowizability_summary',
+  ) {
+    setWindowizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeWindowizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchWindowizabilityRollout(apiBaseUrl)
+      setWindowizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run windowizability admin action.',
+      )
+    } finally {
+      setWindowizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleStreamizabilityAdminAction(
+    action: 'refresh_streamizability_summary',
+  ) {
+    setStreamizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeStreamizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchStreamizabilityRollout(apiBaseUrl)
+      setStreamizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run streamizability admin action.',
+      )
+    } finally {
+      setStreamizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleBatchingizabilityAdminAction(
+    action: 'refresh_batchingizability_summary',
+  ) {
+    setBatchingizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeBatchingizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchBatchingizabilityRollout(apiBaseUrl)
+      setBatchingizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run batchingizability admin action.',
+      )
+    } finally {
+      setBatchingizabilityAdminAction('idle')
+    }
+  }
+
+  async function handlePipeliningizabilityAdminAction(
+    action: 'refresh_pipeliningizability_summary',
+  ) {
+    setPipeliningizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executePipeliningizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchPipeliningizabilityRollout(apiBaseUrl)
+      setPipeliningizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run pipeliningizability admin action.',
+      )
+    } finally {
+      setPipeliningizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleChainingizabilityAdminAction(
+    action: 'refresh_chainingizability_summary',
+  ) {
+    setChainingizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeChainingizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchChainingizabilityRollout(apiBaseUrl)
+      setChainingizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run chainingizability admin action.',
+      )
+    } finally {
+      setChainingizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleScanizabilityAdminAction(
+    action: 'refresh_scanizability_summary',
+  ) {
+    setScanizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeScanizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchScanizabilityRollout(apiBaseUrl)
+      setScanizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run scanizability admin action.',
+      )
+    } finally {
+      setScanizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleFoldizabilityAdminAction(
+    action: 'refresh_foldizability_summary',
+  ) {
+    setFoldizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeFoldizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchFoldizabilityRollout(apiBaseUrl)
+      setFoldizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run foldizability admin action.',
+      )
+    } finally {
+      setFoldizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleReduceizabilityAdminAction(
+    action: 'refresh_reduceizability_summary',
+  ) {
+    setReduceizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeReduceizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchReduceizabilityRollout(apiBaseUrl)
+      setReduceizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run reduceizability admin action.',
+      )
+    } finally {
+      setReduceizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleMapizabilityAdminAction(
+    action: 'refresh_mapizability_summary',
+  ) {
+    setMapizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeMapizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchMapizabilityRollout(apiBaseUrl)
+      setMapizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run mapizability admin action.',
+      )
+    } finally {
+      setMapizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleTransformizabilityAdminAction(
+    action: 'refresh_transformizability_summary',
+  ) {
+    setTransformizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeTransformizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchTransformizabilityRollout(apiBaseUrl)
+      setTransformizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run transformizability admin action.',
+      )
+    } finally {
+      setTransformizabilityAdminAction('idle')
     }
   }
 
@@ -41165,6 +41825,296 @@ function App() {
               ))}
             </div>
             <small>Checked at {groupizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {scanizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production scanizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${scanizabilityRollout.status}`}
+              >
+                {formatScanizabilityRolloutStatus(scanizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{scanizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {scanizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatScanizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {scanizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {foldizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production foldizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${foldizabilityRollout.status}`}
+              >
+                {formatFoldizabilityRolloutStatus(foldizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{foldizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {foldizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatFoldizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {foldizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {reduceizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production reduceizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${reduceizabilityRollout.status}`}
+              >
+                {formatReduceizabilityRolloutStatus(reduceizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{reduceizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {reduceizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatReduceizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {reduceizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {mapizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production mapizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${mapizabilityRollout.status}`}
+              >
+                {formatMapizabilityRolloutStatus(mapizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{mapizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {mapizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatMapizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {mapizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {transformizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production transformizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${transformizabilityRollout.status}`}
+              >
+                {formatTransformizabilityRolloutStatus(transformizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{transformizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {transformizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatTransformizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {transformizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {windowizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production windowizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${windowizabilityRollout.status}`}
+              >
+                {formatWindowizabilityRolloutStatus(windowizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{windowizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {windowizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatWindowizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {windowizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {streamizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production streamizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${streamizabilityRollout.status}`}
+              >
+                {formatStreamizabilityRolloutStatus(streamizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{streamizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {streamizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatStreamizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {streamizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {batchingizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production batchingizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${batchingizabilityRollout.status}`}
+              >
+                {formatBatchingizabilityRolloutStatus(batchingizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{batchingizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {batchingizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatBatchingizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {batchingizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {pipeliningizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production pipeliningizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${pipeliningizabilityRollout.status}`}
+              >
+                {formatPipeliningizabilityRolloutStatus(pipeliningizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{pipeliningizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {pipeliningizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatPipeliningizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {pipeliningizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {chainingizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production chainingizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${chainingizabilityRollout.status}`}
+              >
+                {formatChainingizabilityRolloutStatus(chainingizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{chainingizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {chainingizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatChainingizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {chainingizabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -68152,6 +69102,656 @@ function App() {
                 }
               >
                 {formatGroupizabilityAdminAction('refresh_groupizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {scanizabilityAdminSummary ? (
+          <div className="billing-admin workspace-scanizability-admin">
+            <div className="billing-admin__header">
+              <span>Scanizability admin</span>
+              <strong>{scanizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{scanizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Model health scanizability</span>
+                <strong>
+                  {scanizabilityAdminSummary.stats.scanizabilityPercent}%
+                </strong>
+                <small>
+                  {scanizabilityAdminSummary.stats.coveredDomains}/
+                  {scanizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Scanizability signals</span>
+                <strong>{scanizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {scanizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, model health events, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-scanizability-list">
+              {scanizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-scanizability-card workspace-scanizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatScanizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {scanizabilityAdminSummary.availableActions.includes(
+              'refresh_scanizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={scanizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleScanizabilityAdminAction(
+                    'refresh_scanizability_summary',
+                  )
+                }
+              >
+                {formatScanizabilityAdminAction('refresh_scanizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {foldizabilityAdminSummary ? (
+          <div className="billing-admin workspace-foldizability-admin">
+            <div className="billing-admin__header">
+              <span>Foldizability admin</span>
+              <strong>{foldizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{foldizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Provider credential foldizability</span>
+                <strong>
+                  {foldizabilityAdminSummary.stats.foldizabilityPercent}%
+                </strong>
+                <small>
+                  {foldizabilityAdminSummary.stats.coveredDomains}/
+                  {foldizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Foldizability signals</span>
+                <strong>{foldizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {foldizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, provider credentials, and model registry entries'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-foldizability-list">
+              {foldizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-foldizability-card workspace-foldizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatFoldizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {foldizabilityAdminSummary.availableActions.includes(
+              'refresh_foldizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={foldizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleFoldizabilityAdminAction(
+                    'refresh_foldizability_summary',
+                  )
+                }
+              >
+                {formatFoldizabilityAdminAction('refresh_foldizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {reduceizabilityAdminSummary ? (
+          <div className="billing-admin workspace-reduceizability-admin">
+            <div className="billing-admin__header">
+              <span>Reduceizability admin</span>
+              <strong>{reduceizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{reduceizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workspace limit reduceizability</span>
+                <strong>
+                  {reduceizabilityAdminSummary.stats.reduceizabilityPercent}%
+                </strong>
+                <small>
+                  {reduceizabilityAdminSummary.stats.coveredDomains}/
+                  {reduceizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Reduceizability signals</span>
+                <strong>{reduceizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {reduceizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace usage limits, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-reduceizability-list">
+              {reduceizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-reduceizability-card workspace-reduceizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatReduceizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {reduceizabilityAdminSummary.availableActions.includes(
+              'refresh_reduceizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={reduceizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleReduceizabilityAdminAction(
+                    'refresh_reduceizability_summary',
+                  )
+                }
+              >
+                {formatReduceizabilityAdminAction('refresh_reduceizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {mapizabilityAdminSummary ? (
+          <div className="billing-admin workspace-mapizability-admin">
+            <div className="billing-admin__header">
+              <span>Mapizability admin</span>
+              <strong>{mapizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{mapizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Meter usage mapizability</span>
+                <strong>
+                  {mapizabilityAdminSummary.stats.mapizabilityPercent}%
+                </strong>
+                <small>
+                  {mapizabilityAdminSummary.stats.coveredDomains}/
+                  {mapizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Mapizability signals</span>
+                <strong>{mapizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {mapizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, meter usage reports, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-mapizability-list">
+              {mapizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-mapizability-card workspace-mapizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatMapizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {mapizabilityAdminSummary.availableActions.includes(
+              'refresh_mapizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={mapizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleMapizabilityAdminAction(
+                    'refresh_mapizability_summary',
+                  )
+                }
+              >
+                {formatMapizabilityAdminAction('refresh_mapizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {transformizabilityAdminSummary ? (
+          <div className="billing-admin workspace-transformizability-admin">
+            <div className="billing-admin__header">
+              <span>Transformizability admin</span>
+              <strong>{transformizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{transformizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing webhook transformizability</span>
+                <strong>
+                  {transformizabilityAdminSummary.stats.transformizabilityPercent}%
+                </strong>
+                <small>
+                  {transformizabilityAdminSummary.stats.coveredDomains}/
+                  {transformizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Transformizability signals</span>
+                <strong>{transformizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {transformizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing webhook events, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-transformizability-list">
+              {transformizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-transformizability-card workspace-transformizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatTransformizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {transformizabilityAdminSummary.availableActions.includes(
+              'refresh_transformizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={transformizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleTransformizabilityAdminAction(
+                    'refresh_transformizability_summary',
+                  )
+                }
+              >
+                {formatTransformizabilityAdminAction('refresh_transformizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {windowizabilityAdminSummary ? (
+          <div className="billing-admin workspace-windowizability-admin">
+            <div className="billing-admin__header">
+              <span>Windowizability admin</span>
+              <strong>{windowizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{windowizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification windowizability</span>
+                <strong>
+                  {windowizabilityAdminSummary.stats.windowizabilityPercent}%
+                </strong>
+                <small>
+                  {windowizabilityAdminSummary.stats.coveredDomains}/
+                  {windowizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Windowizability signals</span>
+                <strong>{windowizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {windowizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-windowizability-list">
+              {windowizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-windowizability-card workspace-windowizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatWindowizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {windowizabilityAdminSummary.availableActions.includes(
+              'refresh_windowizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={windowizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleWindowizabilityAdminAction(
+                    'refresh_windowizability_summary',
+                  )
+                }
+              >
+                {formatWindowizabilityAdminAction('refresh_windowizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {streamizabilityAdminSummary ? (
+          <div className="billing-admin workspace-streamizability-admin">
+            <div className="billing-admin__header">
+              <span>Streamizability admin</span>
+              <strong>{streamizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{streamizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice streamizability</span>
+                <strong>
+                  {streamizabilityAdminSummary.stats.streamizabilityPercent}%
+                </strong>
+                <small>
+                  {streamizabilityAdminSummary.stats.coveredDomains}/
+                  {streamizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Streamizability signals</span>
+                <strong>{streamizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {streamizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-streamizability-list">
+              {streamizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-streamizability-card workspace-streamizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatStreamizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {streamizabilityAdminSummary.availableActions.includes(
+              'refresh_streamizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={streamizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleStreamizabilityAdminAction(
+                    'refresh_streamizability_summary',
+                  )
+                }
+              >
+                {formatStreamizabilityAdminAction('refresh_streamizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {batchingizabilityAdminSummary ? (
+          <div className="billing-admin workspace-batchingizability-admin">
+            <div className="billing-admin__header">
+              <span>Batchingizability admin</span>
+              <strong>{batchingizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{batchingizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership batchingizability</span>
+                <strong>
+                  {batchingizabilityAdminSummary.stats.batchingizabilityPercent}%
+                </strong>
+                <small>
+                  {batchingizabilityAdminSummary.stats.coveredDomains}/
+                  {batchingizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Batchingizability signals</span>
+                <strong>{batchingizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {batchingizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-batchingizability-list">
+              {batchingizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-batchingizability-card workspace-batchingizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatBatchingizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {batchingizabilityAdminSummary.availableActions.includes(
+              'refresh_batchingizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={batchingizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleBatchingizabilityAdminAction(
+                    'refresh_batchingizability_summary',
+                  )
+                }
+              >
+                {formatBatchingizabilityAdminAction('refresh_batchingizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {pipeliningizabilityAdminSummary ? (
+          <div className="billing-admin workspace-pipeliningizability-admin">
+            <div className="billing-admin__header">
+              <span>Pipeliningizability admin</span>
+              <strong>{pipeliningizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{pipeliningizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key pipeliningizability</span>
+                <strong>
+                  {pipeliningizabilityAdminSummary.stats.pipeliningizabilityPercent}%
+                </strong>
+                <small>
+                  {pipeliningizabilityAdminSummary.stats.coveredDomains}/
+                  {pipeliningizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Pipeliningizability signals</span>
+                <strong>{pipeliningizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {pipeliningizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-pipeliningizability-list">
+              {pipeliningizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-pipeliningizability-card workspace-pipeliningizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatPipeliningizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {pipeliningizabilityAdminSummary.availableActions.includes(
+              'refresh_pipeliningizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={pipeliningizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handlePipeliningizabilityAdminAction(
+                    'refresh_pipeliningizability_summary',
+                  )
+                }
+              >
+                {formatPipeliningizabilityAdminAction('refresh_pipeliningizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {chainingizabilityAdminSummary ? (
+          <div className="billing-admin workspace-chainingizability-admin">
+            <div className="billing-admin__header">
+              <span>Chainingizability admin</span>
+              <strong>{chainingizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{chainingizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan chainingizability</span>
+                <strong>
+                  {chainingizabilityAdminSummary.stats.chainingizabilityPercent}%
+                </strong>
+                <small>
+                  {chainingizabilityAdminSummary.stats.coveredDomains}/
+                  {chainingizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Chainingizability signals</span>
+                <strong>{chainingizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {chainingizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-chainingizability-list">
+              {chainingizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-chainingizability-card workspace-chainingizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatChainingizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {chainingizabilityAdminSummary.availableActions.includes(
+              'refresh_chainingizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={chainingizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleChainingizabilityAdminAction(
+                    'refresh_chainingizability_summary',
+                  )
+                }
+              >
+                {formatChainingizabilityAdminAction('refresh_chainingizability_summary')}
               </button>
             ) : null}
           </div>

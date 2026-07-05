@@ -11365,6 +11365,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-transformizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-transformizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-transformizability-card p,
+.workspace-transformizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-transformizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-transformizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-mapizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-mapizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-mapizability-card p,
+.workspace-mapizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-mapizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-mapizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-reduceizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-reduceizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-reduceizability-card p,
+.workspace-reduceizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-reduceizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-reduceizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-foldizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-foldizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-foldizability-card p,
+.workspace-foldizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-foldizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-foldizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-scanizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-scanizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-scanizability-card p,
+.workspace-scanizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-scanizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-scanizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-chainingizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-chainingizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-chainingizability-card p,
+.workspace-chainingizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-chainingizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-chainingizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-pipeliningizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-pipeliningizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-pipeliningizability-card p,
+.workspace-pipeliningizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-pipeliningizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-pipeliningizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-batchingizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-batchingizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-batchingizability-card p,
+.workspace-batchingizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-batchingizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-batchingizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-streamizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-streamizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-streamizability-card p,
+.workspace-streamizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-streamizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-streamizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-windowizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-windowizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-windowizability-card p,
+.workspace-windowizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-windowizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-windowizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

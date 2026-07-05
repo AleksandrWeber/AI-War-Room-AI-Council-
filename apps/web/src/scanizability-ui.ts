@@ -1,0 +1,119 @@
+import {
+  scanizabilityAdminActionResponseSchema,
+  scanizabilityAdminSummaryResponseSchema,
+  scanizabilityCapabilitiesResponseSchema,
+  scanizabilityRolloutResponseSchema,
+} from '@ai-war-room/schemas'
+
+export async function fetchScanizabilityRollout(apiBaseUrl: string) {
+  const response = await fetch(`${apiBaseUrl}/scanizability/readiness`)
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return scanizabilityRolloutResponseSchema.parse(await response.json())
+}
+
+export async function fetchScanizabilityAdminSummary(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/scanizability/workspace/${encodeURIComponent(workspaceId)}/admin`,
+    { headers },
+  )
+
+  if (response.status === 403) {
+    return null
+  }
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return scanizabilityAdminSummaryResponseSchema.parse(await response.json())
+}
+
+export async function executeScanizabilityAdminAction(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+  input: { action: 'refresh_scanizability_summary' },
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/scanizability/workspace/${encodeURIComponent(workspaceId)}/admin/actions`,
+    {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        workspaceId,
+        ...input,
+      }),
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return scanizabilityAdminActionResponseSchema.parse(await response.json())
+}
+
+export function formatScanizabilityRolloutStatus(status: 'ready' | 'not_ready') {
+  switch (status) {
+    case 'ready':
+      return 'Ready'
+    case 'not_ready':
+      return 'Not ready'
+  }
+}
+
+export function formatScanizabilityRolloutCheckStatus(
+  status: 'pass' | 'fail' | 'skip',
+) {
+  switch (status) {
+    case 'pass':
+      return 'Pass'
+    case 'fail':
+      return 'Fail'
+    case 'skip':
+      return 'Skip'
+  }
+}
+
+export function formatScanizabilityAdminAction(action: 'refresh_scanizability_summary') {
+  switch (action) {
+    case 'refresh_scanizability_summary':
+      return 'Refresh scanizability summary'
+  }
+}
+
+export function formatScanizabilityDomain(
+  domain: 'completed_runs' | 'failed_runs' | 'model_health_events' | 'billing_records',
+) {
+  switch (domain) {
+    case 'completed_runs':
+      return 'Completed runs'
+    case 'failed_runs':
+      return 'Failed runs'
+    case 'model_health_events':
+      return 'Model health events'
+    case 'billing_records':
+      return 'Billing records'
+  }
+}
+
+export async function fetchScanizabilityCapabilities(apiBaseUrl: string) {
+  const response = await fetch(`${apiBaseUrl}/scanizability/capabilities`)
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return scanizabilityCapabilitiesResponseSchema.parse(await response.json())
+}
