@@ -22,6 +22,7 @@ import { DurabilityModule } from './durability/durability.module.js'
 import { RecoverabilityModule } from './recoverability/recoverability.module.js'
 import { MaintainabilityModule } from './maintainability/maintainability.module.js'
 import { ScalabilityModule } from './scalability/scalability.module.js'
+import { TraceabilityModule } from './traceability/traceability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -63,6 +64,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     RecoverabilityModule,
     MaintainabilityModule,
     ScalabilityModule,
+    TraceabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

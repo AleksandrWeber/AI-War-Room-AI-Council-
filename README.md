@@ -783,6 +783,25 @@ Workspace scalability admin tools:
 - Only workspace owners and admins can access scalability admin endpoints.
 - The web billing panel shows scalability admin tools for authorized roles.
 
+Production traceability rollout readiness:
+
+- `GET /api/traceability/readiness` returns operator-facing production traceability checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, traceability signal table coverage, run lineage traceability, artifact lineage traceability, and lineage readiness signals.
+- The web billing panel shows traceability rollout status and per-check guidance.
+
+Workspace traceability admin tools:
+
+- `GET /api/traceability/workspace/:workspaceId/admin` returns owner/admin traceability summary with workspace run and artifact lineage domains.
+- `POST /api/traceability/workspace/:workspaceId/admin/actions` runs traceability admin actions such as refreshing the summary.
+- Only workspace owners and admins can access traceability admin endpoints.
+- The web billing panel shows traceability admin tools for authorized roles.
+
+Current `v5.51` behavior:
+
+- Production traceability rollout readiness validates traceability coverage and lineage readiness through `GET /api/traceability/readiness`.
+- Workspace owners and admins can inspect workspace traceability metrics from `GET /api/traceability/workspace/:workspaceId/admin`.
+- The web billing panel shows traceability rollout checks and workspace traceability admin tools.
+
 Current `v5.50` behavior:
 
 - Production scalability rollout readiness validates scalability coverage and growth readiness through `GET /api/scalability/readiness`.

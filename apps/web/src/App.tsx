@@ -74,6 +74,8 @@ import type {
   MaintainabilityAdminSummaryResponse,
   ScalabilityRolloutResponse,
   ScalabilityAdminSummaryResponse,
+  TraceabilityRolloutResponse,
+  TraceabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -365,6 +367,15 @@ import {
   formatScalabilityRolloutCheckStatus,
   formatScalabilityRolloutStatus,
 } from './scalability-ui'
+import {
+  executeTraceabilityAdminAction,
+  fetchTraceabilityAdminSummary,
+  fetchTraceabilityRollout,
+  formatTraceabilityAdminAction,
+  formatTraceabilityDomain,
+  formatTraceabilityRolloutCheckStatus,
+  formatTraceabilityRolloutStatus,
+} from './traceability-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -974,6 +985,8 @@ function App() {
     useState<MaintainabilityRolloutResponse | null>(null)
   const [scalabilityRollout, setScalabilityRollout] =
     useState<ScalabilityRolloutResponse | null>(null)
+  const [traceabilityRollout, setTraceabilityRollout] =
+    useState<TraceabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1111,6 +1124,8 @@ function App() {
     useState<MaintainabilityAdminSummaryResponse | null>(null)
   const [scalabilityAdminSummary, setScalabilityAdminSummary] =
     useState<ScalabilityAdminSummaryResponse | null>(null)
+  const [traceabilityAdminSummary, setTraceabilityAdminSummary] =
+    useState<TraceabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1199,6 +1214,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [scalabilityAdminAction, setScalabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [traceabilityAdminAction, setTraceabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1677,6 +1695,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setScalabilityRollout(null)
+        }
+      })
+
+    fetchTraceabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setTraceabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTraceabilityRollout(null)
         }
       })
 
@@ -2576,6 +2606,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setScalabilityAdminSummary(scalabilityAdmin)
+
+      const traceabilityAdmin = await fetchTraceabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTraceabilityAdminSummary(traceabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -3518,6 +3555,35 @@ function App() {
       )
     } finally {
       setScalabilityAdminAction('idle')
+    }
+  }
+
+  async function handleTraceabilityAdminAction(
+    action: 'refresh_traceability_summary',
+  ) {
+    setTraceabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeTraceabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchTraceabilityRollout(apiBaseUrl)
+      setTraceabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run traceability admin action.',
+      )
+    } finally {
+      setTraceabilityAdminAction('idle')
     }
   }
 
@@ -5065,6 +5131,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {scalabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {traceabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production traceability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${traceabilityRollout.status}`}
+              >
+                {formatTraceabilityRolloutStatus(traceabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{traceabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {traceabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatTraceabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {traceabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -7348,6 +7443,71 @@ function App() {
                 }
               >
                 {formatScalabilityAdminAction('refresh_scalability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {traceabilityAdminSummary ? (
+          <div className="billing-admin workspace-traceability-admin">
+            <div className="billing-admin__header">
+              <span>Traceability admin</span>
+              <strong>{traceabilityAdminSummary.role}</strong>
+            </div>
+            <p>{traceabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Artifact lineage</span>
+                <strong>
+                  {traceabilityAdminSummary.stats.traceabilityPercent}%
+                </strong>
+                <small>
+                  {traceabilityAdminSummary.stats.coveredDomains}/
+                  {traceabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Traceability signals</span>
+                <strong>{traceabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {traceabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, artifacts, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-traceability-list">
+              {traceabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-traceability-card workspace-traceability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatTraceabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {traceabilityAdminSummary.availableActions.includes(
+              'refresh_traceability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={traceabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleTraceabilityAdminAction(
+                    'refresh_traceability_summary',
+                  )
+                }
+              >
+                {formatTraceabilityAdminAction('refresh_traceability_summary')}
               </button>
             ) : null}
           </div>
