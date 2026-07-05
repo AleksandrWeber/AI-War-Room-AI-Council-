@@ -76,6 +76,8 @@ import type {
   ScalabilityAdminSummaryResponse,
   TraceabilityRolloutResponse,
   TraceabilityAdminSummaryResponse,
+  EfficiencyRolloutResponse,
+  EfficiencyAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -376,6 +378,15 @@ import {
   formatTraceabilityRolloutCheckStatus,
   formatTraceabilityRolloutStatus,
 } from './traceability-ui'
+import {
+  executeEfficiencyAdminAction,
+  fetchEfficiencyAdminSummary,
+  fetchEfficiencyRollout,
+  formatEfficiencyAdminAction,
+  formatEfficiencyDomain,
+  formatEfficiencyRolloutCheckStatus,
+  formatEfficiencyRolloutStatus,
+} from './efficiency-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -987,6 +998,8 @@ function App() {
     useState<ScalabilityRolloutResponse | null>(null)
   const [traceabilityRollout, setTraceabilityRollout] =
     useState<TraceabilityRolloutResponse | null>(null)
+  const [efficiencyRollout, setEfficiencyRollout] =
+    useState<EfficiencyRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1126,6 +1139,8 @@ function App() {
     useState<ScalabilityAdminSummaryResponse | null>(null)
   const [traceabilityAdminSummary, setTraceabilityAdminSummary] =
     useState<TraceabilityAdminSummaryResponse | null>(null)
+  const [efficiencyAdminSummary, setEfficiencyAdminSummary] =
+    useState<EfficiencyAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1217,6 +1232,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [traceabilityAdminAction, setTraceabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [efficiencyAdminAction, setEfficiencyAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1707,6 +1725,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setTraceabilityRollout(null)
+        }
+      })
+
+    fetchEfficiencyRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setEfficiencyRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setEfficiencyRollout(null)
         }
       })
 
@@ -2613,6 +2643,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setTraceabilityAdminSummary(traceabilityAdmin)
+
+      const efficiencyAdmin = await fetchEfficiencyAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEfficiencyAdminSummary(efficiencyAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -3584,6 +3621,35 @@ function App() {
       )
     } finally {
       setTraceabilityAdminAction('idle')
+    }
+  }
+
+  async function handleEfficiencyAdminAction(
+    action: 'refresh_efficiency_summary',
+  ) {
+    setEfficiencyAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeEfficiencyAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchEfficiencyRollout(apiBaseUrl)
+      setEfficiencyRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run efficiency admin action.',
+      )
+    } finally {
+      setEfficiencyAdminAction('idle')
     }
   }
 
@@ -5160,6 +5226,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {traceabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {efficiencyRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production efficiency rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${efficiencyRollout.status}`}
+              >
+                {formatEfficiencyRolloutStatus(efficiencyRollout.status)}
+              </strong>
+            </div>
+            <p>{efficiencyRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {efficiencyRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatEfficiencyRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {efficiencyRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -7508,6 +7603,71 @@ function App() {
                 }
               >
                 {formatTraceabilityAdminAction('refresh_traceability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {efficiencyAdminSummary ? (
+          <div className="billing-admin workspace-efficiency-admin">
+            <div className="billing-admin__header">
+              <span>Efficiency admin</span>
+              <strong>{efficiencyAdminSummary.role}</strong>
+            </div>
+            <p>{efficiencyAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Usage telemetry efficiency</span>
+                <strong>
+                  {efficiencyAdminSummary.stats.efficiencyPercent}%
+                </strong>
+                <small>
+                  {efficiencyAdminSummary.stats.coveredDomains}/
+                  {efficiencyAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Efficiency signals</span>
+                <strong>{efficiencyAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {efficiencyAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, usage events, and cost limits'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-efficiency-list">
+              {efficiencyAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-efficiency-card workspace-efficiency-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatEfficiencyDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {efficiencyAdminSummary.availableActions.includes(
+              'refresh_efficiency_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={efficiencyAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleEfficiencyAdminAction(
+                    'refresh_efficiency_summary',
+                  )
+                }
+              >
+                {formatEfficiencyAdminAction('refresh_efficiency_summary')}
               </button>
             ) : null}
           </div>
