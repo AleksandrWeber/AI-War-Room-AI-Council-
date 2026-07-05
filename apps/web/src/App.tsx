@@ -254,6 +254,26 @@ import type {
   MemorabilityAdminSummaryResponse,
   TeachabilityRolloutResponse,
   TeachabilityAdminSummaryResponse,
+  ReadabilityRolloutResponse,
+  ReadabilityAdminSummaryResponse,
+  ClarityRolloutResponse,
+  ClarityAdminSummaryResponse,
+  SimplicityRolloutResponse,
+  SimplicityAdminSummaryResponse,
+  NegotiabilityRolloutResponse,
+  NegotiabilityAdminSummaryResponse,
+  ComprehensibilityRolloutResponse,
+  ComprehensibilityAdminSummaryResponse,
+  IntelligibilityRolloutResponse,
+  IntelligibilityAdminSummaryResponse,
+  LegibilityRolloutResponse,
+  LegibilityAdminSummaryResponse,
+  ParsabilityRolloutResponse,
+  ParsabilityAdminSummaryResponse,
+  CoherenceRolloutResponse,
+  CoherenceAdminSummaryResponse,
+  FamiliarityRolloutResponse,
+  FamiliarityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -1356,6 +1376,96 @@ import {
   formatTeachabilityRolloutStatus,
 } from './teachability-ui'
 import {
+  executeReadabilityAdminAction,
+  fetchReadabilityAdminSummary,
+  fetchReadabilityRollout,
+  formatReadabilityAdminAction,
+  formatReadabilityDomain,
+  formatReadabilityRolloutCheckStatus,
+  formatReadabilityRolloutStatus,
+} from './readability-ui'
+import {
+  executeClarityAdminAction,
+  fetchClarityAdminSummary,
+  fetchClarityRollout,
+  formatClarityAdminAction,
+  formatClarityDomain,
+  formatClarityRolloutCheckStatus,
+  formatClarityRolloutStatus,
+} from './clarity-ui'
+import {
+  executeSimplicityAdminAction,
+  fetchSimplicityAdminSummary,
+  fetchSimplicityRollout,
+  formatSimplicityAdminAction,
+  formatSimplicityDomain,
+  formatSimplicityRolloutCheckStatus,
+  formatSimplicityRolloutStatus,
+} from './simplicity-ui'
+import {
+  executeNegotiabilityAdminAction,
+  fetchNegotiabilityAdminSummary,
+  fetchNegotiabilityRollout,
+  formatNegotiabilityAdminAction,
+  formatNegotiabilityDomain,
+  formatNegotiabilityRolloutCheckStatus,
+  formatNegotiabilityRolloutStatus,
+} from './negotiability-ui'
+import {
+  executeComprehensibilityAdminAction,
+  fetchComprehensibilityAdminSummary,
+  fetchComprehensibilityRollout,
+  formatComprehensibilityAdminAction,
+  formatComprehensibilityDomain,
+  formatComprehensibilityRolloutCheckStatus,
+  formatComprehensibilityRolloutStatus,
+} from './comprehensibility-ui'
+import {
+  executeIntelligibilityAdminAction,
+  fetchIntelligibilityAdminSummary,
+  fetchIntelligibilityRollout,
+  formatIntelligibilityAdminAction,
+  formatIntelligibilityDomain,
+  formatIntelligibilityRolloutCheckStatus,
+  formatIntelligibilityRolloutStatus,
+} from './intelligibility-ui'
+import {
+  executeLegibilityAdminAction,
+  fetchLegibilityAdminSummary,
+  fetchLegibilityRollout,
+  formatLegibilityAdminAction,
+  formatLegibilityDomain,
+  formatLegibilityRolloutCheckStatus,
+  formatLegibilityRolloutStatus,
+} from './legibility-ui'
+import {
+  executeParsabilityAdminAction,
+  fetchParsabilityAdminSummary,
+  fetchParsabilityRollout,
+  formatParsabilityAdminAction,
+  formatParsabilityDomain,
+  formatParsabilityRolloutCheckStatus,
+  formatParsabilityRolloutStatus,
+} from './parsability-ui'
+import {
+  executeCoherenceAdminAction,
+  fetchCoherenceAdminSummary,
+  fetchCoherenceRollout,
+  formatCoherenceAdminAction,
+  formatCoherenceDomain,
+  formatCoherenceRolloutCheckStatus,
+  formatCoherenceRolloutStatus,
+} from './coherence-ui'
+import {
+  executeFamiliarityAdminAction,
+  fetchFamiliarityAdminSummary,
+  fetchFamiliarityRollout,
+  formatFamiliarityAdminAction,
+  formatFamiliarityDomain,
+  formatFamiliarityRolloutCheckStatus,
+  formatFamiliarityRolloutStatus,
+} from './familiarity-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -2144,6 +2254,26 @@ function App() {
     useState<MemorabilityRolloutResponse | null>(null)
   const [teachabilityRollout, setTeachabilityRollout] =
     useState<TeachabilityRolloutResponse | null>(null)
+  const [readabilityRollout, setReadabilityRollout] =
+    useState<ReadabilityRolloutResponse | null>(null)
+  const [clarityRollout, setClarityRollout] =
+    useState<ClarityRolloutResponse | null>(null)
+  const [simplicityRollout, setSimplicityRollout] =
+    useState<SimplicityRolloutResponse | null>(null)
+  const [negotiabilityRollout, setNegotiabilityRollout] =
+    useState<NegotiabilityRolloutResponse | null>(null)
+  const [comprehensibilityRollout, setComprehensibilityRollout] =
+    useState<ComprehensibilityRolloutResponse | null>(null)
+  const [intelligibilityRollout, setIntelligibilityRollout] =
+    useState<IntelligibilityRolloutResponse | null>(null)
+  const [legibilityRollout, setLegibilityRollout] =
+    useState<LegibilityRolloutResponse | null>(null)
+  const [parsabilityRollout, setParsabilityRollout] =
+    useState<ParsabilityRolloutResponse | null>(null)
+  const [coherenceRollout, setCoherenceRollout] =
+    useState<CoherenceRolloutResponse | null>(null)
+  const [familiarityRollout, setFamiliarityRollout] =
+    useState<FamiliarityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -2461,6 +2591,26 @@ function App() {
     useState<MemorabilityAdminSummaryResponse | null>(null)
   const [teachabilityAdminSummary, setTeachabilityAdminSummary] =
     useState<TeachabilityAdminSummaryResponse | null>(null)
+  const [readabilityAdminSummary, setReadabilityAdminSummary] =
+    useState<ReadabilityAdminSummaryResponse | null>(null)
+  const [clarityAdminSummary, setClarityAdminSummary] =
+    useState<ClarityAdminSummaryResponse | null>(null)
+  const [simplicityAdminSummary, setSimplicityAdminSummary] =
+    useState<SimplicityAdminSummaryResponse | null>(null)
+  const [negotiabilityAdminSummary, setNegotiabilityAdminSummary] =
+    useState<NegotiabilityAdminSummaryResponse | null>(null)
+  const [comprehensibilityAdminSummary, setComprehensibilityAdminSummary] =
+    useState<ComprehensibilityAdminSummaryResponse | null>(null)
+  const [intelligibilityAdminSummary, setIntelligibilityAdminSummary] =
+    useState<IntelligibilityAdminSummaryResponse | null>(null)
+  const [legibilityAdminSummary, setLegibilityAdminSummary] =
+    useState<LegibilityAdminSummaryResponse | null>(null)
+  const [parsabilityAdminSummary, setParsabilityAdminSummary] =
+    useState<ParsabilityAdminSummaryResponse | null>(null)
+  const [coherenceAdminSummary, setCoherenceAdminSummary] =
+    useState<CoherenceAdminSummaryResponse | null>(null)
+  const [familiarityAdminSummary, setFamiliarityAdminSummary] =
+    useState<FamiliarityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -2819,6 +2969,36 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [teachabilityAdminAction, setTeachabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [readabilityAdminAction, setReadabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [clarityAdminAction, setClarityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [simplicityAdminAction, setSimplicityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [negotiabilityAdminAction, setNegotiabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [comprehensibilityAdminAction, setComprehensibilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [intelligibilityAdminAction, setIntelligibilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [legibilityAdminAction, setLegibilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [parsabilityAdminAction, setParsabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [coherenceAdminAction, setCoherenceAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [familiarityAdminAction, setFamiliarityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -4380,6 +4560,126 @@ function App() {
         }
       })
 
+    fetchReadabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setReadabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setReadabilityRollout(null)
+        }
+      })
+
+    fetchClarityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setClarityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setClarityRollout(null)
+        }
+      })
+
+    fetchSimplicityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setSimplicityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setSimplicityRollout(null)
+        }
+      })
+
+    fetchNegotiabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setNegotiabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setNegotiabilityRollout(null)
+        }
+      })
+
+    fetchComprehensibilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setComprehensibilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setComprehensibilityRollout(null)
+        }
+      })
+
+    fetchIntelligibilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setIntelligibilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setIntelligibilityRollout(null)
+        }
+      })
+
+    fetchLegibilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setLegibilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setLegibilityRollout(null)
+        }
+      })
+
+    fetchParsabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setParsabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setParsabilityRollout(null)
+        }
+      })
+
+    fetchCoherenceRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setCoherenceRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setCoherenceRollout(null)
+        }
+      })
+
+    fetchFamiliarityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setFamiliarityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setFamiliarityRollout(null)
+        }
+      })
+
     fetchUsageCapabilities(apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
@@ -5906,6 +6206,76 @@ function App() {
         workspaceAuthHeaders,
       )
       setTeachabilityAdminSummary(teachabilityAdmin)
+
+      const readabilityAdmin = await fetchReadabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReadabilityAdminSummary(readabilityAdmin)
+
+      const clarityAdmin = await fetchClarityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setClarityAdminSummary(clarityAdmin)
+
+      const simplicityAdmin = await fetchSimplicityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSimplicityAdminSummary(simplicityAdmin)
+
+      const negotiabilityAdmin = await fetchNegotiabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNegotiabilityAdminSummary(negotiabilityAdmin)
+
+      const comprehensibilityAdmin = await fetchComprehensibilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setComprehensibilityAdminSummary(comprehensibilityAdmin)
+
+      const intelligibilityAdmin = await fetchIntelligibilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIntelligibilityAdminSummary(intelligibilityAdmin)
+
+      const legibilityAdmin = await fetchLegibilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setLegibilityAdminSummary(legibilityAdmin)
+
+      const parsabilityAdmin = await fetchParsabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setParsabilityAdminSummary(parsabilityAdmin)
+
+      const coherenceAdmin = await fetchCoherenceAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCoherenceAdminSummary(coherenceAdmin)
+
+      const familiarityAdmin = await fetchFamiliarityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFamiliarityAdminSummary(familiarityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -7138,6 +7508,296 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleFamiliarityAdminAction(
+    action: 'refresh_familiarity_summary',
+  ) {
+    setFamiliarityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeFamiliarityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchFamiliarityRollout(apiBaseUrl)
+      setFamiliarityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run familiarity admin action.',
+      )
+    } finally {
+      setFamiliarityAdminAction('idle')
+    }
+  }
+
+  async function handleCoherenceAdminAction(
+    action: 'refresh_coherence_summary',
+  ) {
+    setCoherenceAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeCoherenceAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchCoherenceRollout(apiBaseUrl)
+      setCoherenceRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run coherence admin action.',
+      )
+    } finally {
+      setCoherenceAdminAction('idle')
+    }
+  }
+
+  async function handleParsabilityAdminAction(
+    action: 'refresh_parsability_summary',
+  ) {
+    setParsabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeParsabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchParsabilityRollout(apiBaseUrl)
+      setParsabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run parsability admin action.',
+      )
+    } finally {
+      setParsabilityAdminAction('idle')
+    }
+  }
+
+  async function handleLegibilityAdminAction(
+    action: 'refresh_legibility_summary',
+  ) {
+    setLegibilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeLegibilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchLegibilityRollout(apiBaseUrl)
+      setLegibilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run legibility admin action.',
+      )
+    } finally {
+      setLegibilityAdminAction('idle')
+    }
+  }
+
+  async function handleIntelligibilityAdminAction(
+    action: 'refresh_intelligibility_summary',
+  ) {
+    setIntelligibilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeIntelligibilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchIntelligibilityRollout(apiBaseUrl)
+      setIntelligibilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run intelligibility admin action.',
+      )
+    } finally {
+      setIntelligibilityAdminAction('idle')
+    }
+  }
+
+  async function handleComprehensibilityAdminAction(
+    action: 'refresh_comprehensibility_summary',
+  ) {
+    setComprehensibilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeComprehensibilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchComprehensibilityRollout(apiBaseUrl)
+      setComprehensibilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run comprehensibility admin action.',
+      )
+    } finally {
+      setComprehensibilityAdminAction('idle')
+    }
+  }
+
+  async function handleNegotiabilityAdminAction(
+    action: 'refresh_negotiability_summary',
+  ) {
+    setNegotiabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeNegotiabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchNegotiabilityRollout(apiBaseUrl)
+      setNegotiabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run negotiability admin action.',
+      )
+    } finally {
+      setNegotiabilityAdminAction('idle')
+    }
+  }
+
+  async function handleSimplicityAdminAction(
+    action: 'refresh_simplicity_summary',
+  ) {
+    setSimplicityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeSimplicityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchSimplicityRollout(apiBaseUrl)
+      setSimplicityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run simplicity admin action.',
+      )
+    } finally {
+      setSimplicityAdminAction('idle')
+    }
+  }
+
+  async function handleClarityAdminAction(
+    action: 'refresh_clarity_summary',
+  ) {
+    setClarityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeClarityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchClarityRollout(apiBaseUrl)
+      setClarityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run clarity admin action.',
+      )
+    } finally {
+      setClarityAdminAction('idle')
+    }
+  }
+
+  async function handleReadabilityAdminAction(
+    action: 'refresh_readability_summary',
+  ) {
+    setReadabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeReadabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchReadabilityRollout(apiBaseUrl)
+      setReadabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run readability admin action.',
+      )
+    } finally {
+      setReadabilityAdminAction('idle')
     }
   }
 
@@ -13615,6 +14275,296 @@ function App() {
               ))}
             </div>
             <small>Checked at {learnabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {comprehensibilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production comprehensibility rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${comprehensibilityRollout.status}`}
+              >
+                {formatComprehensibilityRolloutStatus(comprehensibilityRollout.status)}
+              </strong>
+            </div>
+            <p>{comprehensibilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {comprehensibilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatComprehensibilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {comprehensibilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {negotiabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production negotiability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${negotiabilityRollout.status}`}
+              >
+                {formatNegotiabilityRolloutStatus(negotiabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{negotiabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {negotiabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatNegotiabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {negotiabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {simplicityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production simplicity rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${simplicityRollout.status}`}
+              >
+                {formatSimplicityRolloutStatus(simplicityRollout.status)}
+              </strong>
+            </div>
+            <p>{simplicityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {simplicityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatSimplicityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {simplicityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {clarityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production clarity rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${clarityRollout.status}`}
+              >
+                {formatClarityRolloutStatus(clarityRollout.status)}
+              </strong>
+            </div>
+            <p>{clarityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {clarityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatClarityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {clarityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {readabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production readability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${readabilityRollout.status}`}
+              >
+                {formatReadabilityRolloutStatus(readabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{readabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {readabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatReadabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {readabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {familiarityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production familiarity rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${familiarityRollout.status}`}
+              >
+                {formatFamiliarityRolloutStatus(familiarityRollout.status)}
+              </strong>
+            </div>
+            <p>{familiarityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {familiarityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatFamiliarityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {familiarityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {coherenceRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production coherence rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${coherenceRollout.status}`}
+              >
+                {formatCoherenceRolloutStatus(coherenceRollout.status)}
+              </strong>
+            </div>
+            <p>{coherenceRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {coherenceRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatCoherenceRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {coherenceRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {parsabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production parsability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${parsabilityRollout.status}`}
+              >
+                {formatParsabilityRolloutStatus(parsabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{parsabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {parsabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatParsabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {parsabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {legibilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production legibility rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${legibilityRollout.status}`}
+              >
+                {formatLegibilityRolloutStatus(legibilityRollout.status)}
+              </strong>
+            </div>
+            <p>{legibilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {legibilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatLegibilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {legibilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {intelligibilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production intelligibility rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${intelligibilityRollout.status}`}
+              >
+                {formatIntelligibilityRolloutStatus(intelligibilityRollout.status)}
+              </strong>
+            </div>
+            <p>{intelligibilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {intelligibilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatIntelligibilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {intelligibilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -21752,6 +22702,656 @@ function App() {
                 }
               >
                 {formatLearnabilityAdminAction('refresh_learnability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {comprehensibilityAdminSummary ? (
+          <div className="billing-admin workspace-comprehensibility-admin">
+            <div className="billing-admin__header">
+              <span>Comprehensibility admin</span>
+              <strong>{comprehensibilityAdminSummary.role}</strong>
+            </div>
+            <p>{comprehensibilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Agent output comprehensibility</span>
+                <strong>
+                  {comprehensibilityAdminSummary.stats.comprehensibilityPercent}%
+                </strong>
+                <small>
+                  {comprehensibilityAdminSummary.stats.coveredDomains}/
+                  {comprehensibilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Comprehensibility signals</span>
+                <strong>{comprehensibilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {comprehensibilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, agent outputs, and moderator syntheses'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-comprehensibility-list">
+              {comprehensibilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-comprehensibility-card workspace-comprehensibility-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatComprehensibilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {comprehensibilityAdminSummary.availableActions.includes(
+              'refresh_comprehensibility_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={comprehensibilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleComprehensibilityAdminAction(
+                    'refresh_comprehensibility_summary',
+                  )
+                }
+              >
+                {formatComprehensibilityAdminAction('refresh_comprehensibility_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {negotiabilityAdminSummary ? (
+          <div className="billing-admin workspace-negotiability-admin">
+            <div className="billing-admin__header">
+              <span>Negotiability admin</span>
+              <strong>{negotiabilityAdminSummary.role}</strong>
+            </div>
+            <p>{negotiabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice negotiability</span>
+                <strong>
+                  {negotiabilityAdminSummary.stats.negotiabilityPercent}%
+                </strong>
+                <small>
+                  {negotiabilityAdminSummary.stats.coveredDomains}/
+                  {negotiabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Negotiability signals</span>
+                <strong>{negotiabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {negotiabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-negotiability-list">
+              {negotiabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-negotiability-card workspace-negotiability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatNegotiabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {negotiabilityAdminSummary.availableActions.includes(
+              'refresh_negotiability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={negotiabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleNegotiabilityAdminAction(
+                    'refresh_negotiability_summary',
+                  )
+                }
+              >
+                {formatNegotiabilityAdminAction('refresh_negotiability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {simplicityAdminSummary ? (
+          <div className="billing-admin workspace-simplicity-admin">
+            <div className="billing-admin__header">
+              <span>Simplicity admin</span>
+              <strong>{simplicityAdminSummary.role}</strong>
+            </div>
+            <p>{simplicityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workflow simplicity</span>
+                <strong>
+                  {simplicityAdminSummary.stats.simplicityPercent}%
+                </strong>
+                <small>
+                  {simplicityAdminSummary.stats.coveredDomains}/
+                  {simplicityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Simplicity signals</span>
+                <strong>{simplicityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {simplicityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, run workflows, and idempotency keys'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-simplicity-list">
+              {simplicityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-simplicity-card workspace-simplicity-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatSimplicityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {simplicityAdminSummary.availableActions.includes(
+              'refresh_simplicity_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={simplicityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleSimplicityAdminAction(
+                    'refresh_simplicity_summary',
+                  )
+                }
+              >
+                {formatSimplicityAdminAction('refresh_simplicity_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {clarityAdminSummary ? (
+          <div className="billing-admin workspace-clarity-admin">
+            <div className="billing-admin__header">
+              <span>Clarity admin</span>
+              <strong>{clarityAdminSummary.role}</strong>
+            </div>
+            <p>{clarityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Moderator synthesis clarity</span>
+                <strong>
+                  {clarityAdminSummary.stats.clarityPercent}%
+                </strong>
+                <small>
+                  {clarityAdminSummary.stats.coveredDomains}/
+                  {clarityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Clarity signals</span>
+                <strong>{clarityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {clarityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, moderator syntheses, and agent outputs'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-clarity-list">
+              {clarityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-clarity-card workspace-clarity-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatClarityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {clarityAdminSummary.availableActions.includes(
+              'refresh_clarity_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={clarityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleClarityAdminAction(
+                    'refresh_clarity_summary',
+                  )
+                }
+              >
+                {formatClarityAdminAction('refresh_clarity_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {readabilityAdminSummary ? (
+          <div className="billing-admin workspace-readability-admin">
+            <div className="billing-admin__header">
+              <span>Readability admin</span>
+              <strong>{readabilityAdminSummary.role}</strong>
+            </div>
+            <p>{readabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Artifact readability</span>
+                <strong>
+                  {readabilityAdminSummary.stats.readabilityPercent}%
+                </strong>
+                <small>
+                  {readabilityAdminSummary.stats.coveredDomains}/
+                  {readabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Readability signals</span>
+                <strong>{readabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {readabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, artifacts, and agent outputs'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-readability-list">
+              {readabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-readability-card workspace-readability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatReadabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {readabilityAdminSummary.availableActions.includes(
+              'refresh_readability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={readabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleReadabilityAdminAction(
+                    'refresh_readability_summary',
+                  )
+                }
+              >
+                {formatReadabilityAdminAction('refresh_readability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {familiarityAdminSummary ? (
+          <div className="billing-admin workspace-familiarity-admin">
+            <div className="billing-admin__header">
+              <span>Familiarity admin</span>
+              <strong>{familiarityAdminSummary.role}</strong>
+            </div>
+            <p>{familiarityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership familiarity</span>
+                <strong>
+                  {familiarityAdminSummary.stats.familiarityPercent}%
+                </strong>
+                <small>
+                  {familiarityAdminSummary.stats.coveredDomains}/
+                  {familiarityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Familiarity signals</span>
+                <strong>{familiarityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {familiarityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-familiarity-list">
+              {familiarityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-familiarity-card workspace-familiarity-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatFamiliarityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {familiarityAdminSummary.availableActions.includes(
+              'refresh_familiarity_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={familiarityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleFamiliarityAdminAction(
+                    'refresh_familiarity_summary',
+                  )
+                }
+              >
+                {formatFamiliarityAdminAction('refresh_familiarity_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {coherenceAdminSummary ? (
+          <div className="billing-admin workspace-coherence-admin">
+            <div className="billing-admin__header">
+              <span>Coherence admin</span>
+              <strong>{coherenceAdminSummary.role}</strong>
+            </div>
+            <p>{coherenceAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workflow coherence</span>
+                <strong>
+                  {coherenceAdminSummary.stats.coherencePercent}%
+                </strong>
+                <small>
+                  {coherenceAdminSummary.stats.coveredDomains}/
+                  {coherenceAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Coherence signals</span>
+                <strong>{coherenceAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {coherenceAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, run workflows, and agent outputs'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-coherence-list">
+              {coherenceAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-coherence-card workspace-coherence-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatCoherenceDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {coherenceAdminSummary.availableActions.includes(
+              'refresh_coherence_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={coherenceAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleCoherenceAdminAction(
+                    'refresh_coherence_summary',
+                  )
+                }
+              >
+                {formatCoherenceAdminAction('refresh_coherence_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {parsabilityAdminSummary ? (
+          <div className="billing-admin workspace-parsability-admin">
+            <div className="billing-admin__header">
+              <span>Parsability admin</span>
+              <strong>{parsabilityAdminSummary.role}</strong>
+            </div>
+            <p>{parsabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key parsability</span>
+                <strong>
+                  {parsabilityAdminSummary.stats.parsabilityPercent}%
+                </strong>
+                <small>
+                  {parsabilityAdminSummary.stats.coveredDomains}/
+                  {parsabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Parsability signals</span>
+                <strong>{parsabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {parsabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-parsability-list">
+              {parsabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-parsability-card workspace-parsability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatParsabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {parsabilityAdminSummary.availableActions.includes(
+              'refresh_parsability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={parsabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleParsabilityAdminAction(
+                    'refresh_parsability_summary',
+                  )
+                }
+              >
+                {formatParsabilityAdminAction('refresh_parsability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {legibilityAdminSummary ? (
+          <div className="billing-admin workspace-legibility-admin">
+            <div className="billing-admin__header">
+              <span>Legibility admin</span>
+              <strong>{legibilityAdminSummary.role}</strong>
+            </div>
+            <p>{legibilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Artifact legibility</span>
+                <strong>
+                  {legibilityAdminSummary.stats.legibilityPercent}%
+                </strong>
+                <small>
+                  {legibilityAdminSummary.stats.coveredDomains}/
+                  {legibilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Legibility signals</span>
+                <strong>{legibilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {legibilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, artifacts, and run workflows'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-legibility-list">
+              {legibilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-legibility-card workspace-legibility-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatLegibilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {legibilityAdminSummary.availableActions.includes(
+              'refresh_legibility_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={legibilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleLegibilityAdminAction(
+                    'refresh_legibility_summary',
+                  )
+                }
+              >
+                {formatLegibilityAdminAction('refresh_legibility_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {intelligibilityAdminSummary ? (
+          <div className="billing-admin workspace-intelligibility-admin">
+            <div className="billing-admin__header">
+              <span>Intelligibility admin</span>
+              <strong>{intelligibilityAdminSummary.role}</strong>
+            </div>
+            <p>{intelligibilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Moderator synthesis intelligibility</span>
+                <strong>
+                  {intelligibilityAdminSummary.stats.intelligibilityPercent}%
+                </strong>
+                <small>
+                  {intelligibilityAdminSummary.stats.coveredDomains}/
+                  {intelligibilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Intelligibility signals</span>
+                <strong>{intelligibilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {intelligibilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, moderator syntheses, and agent outputs'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-intelligibility-list">
+              {intelligibilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-intelligibility-card workspace-intelligibility-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatIntelligibilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {intelligibilityAdminSummary.availableActions.includes(
+              'refresh_intelligibility_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={intelligibilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleIntelligibilityAdminAction(
+                    'refresh_intelligibility_summary',
+                  )
+                }
+              >
+                {formatIntelligibilityAdminAction('refresh_intelligibility_summary')}
               </button>
             ) : null}
           </div>

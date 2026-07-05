@@ -112,6 +112,16 @@ import { DeliverabilityModule } from './deliverability/deliverability.module.js'
 import { UnderstandabilityModule } from './understandability/understandability.module.js'
 import { MemorabilityModule } from './memorability/memorability.module.js'
 import { TeachabilityModule } from './teachability/teachability.module.js'
+import { ReadabilityModule } from './readability/readability.module.js'
+import { ClarityModule } from './clarity/clarity.module.js'
+import { SimplicityModule } from './simplicity/simplicity.module.js'
+import { NegotiabilityModule } from './negotiability/negotiability.module.js'
+import { ComprehensibilityModule } from './comprehensibility/comprehensibility.module.js'
+import { IntelligibilityModule } from './intelligibility/intelligibility.module.js'
+import { LegibilityModule } from './legibility/legibility.module.js'
+import { ParsabilityModule } from './parsability/parsability.module.js'
+import { CoherenceModule } from './coherence/coherence.module.js'
+import { FamiliarityModule } from './familiarity/familiarity.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -243,6 +253,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     UnderstandabilityModule,
     MemorabilityModule,
     TeachabilityModule,
+    ReadabilityModule,
+    ClarityModule,
+    SimplicityModule,
+    NegotiabilityModule,
+    ComprehensibilityModule,
+    IntelligibilityModule,
+    LegibilityModule,
+    ParsabilityModule,
+    CoherenceModule,
+    FamiliarityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

@@ -8316,3 +8316,689 @@ describe('teachability rollout integration', () => {
       .expect(403)
   })
 })
+describe('readability rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports readability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/readability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsReadabilityRollout: true,
+      supportsReadabilityAdminTools: true,
+      supportsArtifactReadabilitySignals: true,
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/readability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns readability admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/readability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        readabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects readability admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/readability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('clarity rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports clarity capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/clarity/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsClarityRollout: true,
+      supportsClarityAdminTools: true,
+      supportsSynthesisClaritySignals: true,
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/clarity/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns clarity admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/clarity/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        clarityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects clarity admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/clarity/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('simplicity rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports simplicity capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/simplicity/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsSimplicityRollout: true,
+      supportsSimplicityAdminTools: true,
+      supportsWorkflowSimplicitySignals: true,
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/simplicity/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns simplicity admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/simplicity/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        simplicityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects simplicity admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/simplicity/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('negotiability rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports negotiability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/negotiability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsNegotiabilityRollout: true,
+      supportsNegotiabilityAdminTools: true,
+      supportsBillingInvoiceNegotiabilitySignals: true,
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/negotiability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns negotiability admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/negotiability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        negotiabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects negotiability admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/negotiability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('comprehensibility rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports comprehensibility capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/comprehensibility/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsComprehensibilityRollout: true,
+      supportsComprehensibilityAdminTools: true,
+      supportsAgentOutputComprehensibilitySignals: true,
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/comprehensibility/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns comprehensibility admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/comprehensibility/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        comprehensibilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects comprehensibility admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/comprehensibility/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+describe('intelligibility rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports intelligibility capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/intelligibility/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsIntelligibilityRollout: true,
+      supportsIntelligibilityAdminTools: true,
+      supportsSynthesisIntelligibilitySignals: true,
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/intelligibility/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns intelligibility admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/intelligibility/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        intelligibilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects intelligibility admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/intelligibility/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('legibility rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports legibility capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/legibility/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsLegibilityRollout: true,
+      supportsLegibilityAdminTools: true,
+      supportsArtifactLegibilitySignals: true,
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/legibility/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns legibility admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/legibility/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        legibilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects legibility admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/legibility/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('parsability rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports parsability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/parsability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsParsabilityRollout: true,
+      supportsParsabilityAdminTools: true,
+      supportsIdempotencyKeyParsabilitySignals: true,
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/parsability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns parsability admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/parsability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        parsabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects parsability admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/parsability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('coherence rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports coherence capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/coherence/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsCoherenceRollout: true,
+      supportsCoherenceAdminTools: true,
+      supportsWorkflowCoherenceSignals: true,
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/coherence/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns coherence admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/coherence/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        coherencePercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects coherence admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/coherence/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('familiarity rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports familiarity capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/familiarity/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsFamiliarityRollout: true,
+      supportsFamiliarityAdminTools: true,
+      supportsMembershipFamiliaritySignals: true,
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/familiarity/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns familiarity admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/familiarity/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        familiarityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects familiarity admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/familiarity/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})

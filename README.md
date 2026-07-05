@@ -796,6 +796,66 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.150` behavior:
+
+- Production familiarity rollout readiness validates familiarity coverage and readiness through `GET /api/familiarity/readiness`.
+- Workspace owners and admins can inspect workspace familiarity metrics from `GET /api/familiarity/workspace/:workspaceId/admin`.
+- The web billing panel shows familiarity rollout checks and workspace familiarity admin tools.
+
+Current `v5.149` behavior:
+
+- Production coherence rollout readiness validates coherence coverage and readiness through `GET /api/coherence/readiness`.
+- Workspace owners and admins can inspect workspace coherence metrics from `GET /api/coherence/workspace/:workspaceId/admin`.
+- The web billing panel shows coherence rollout checks and workspace coherence admin tools.
+
+Current `v5.148` behavior:
+
+- Production parsability rollout readiness validates parsability coverage and readiness through `GET /api/parsability/readiness`.
+- Workspace owners and admins can inspect workspace parsability metrics from `GET /api/parsability/workspace/:workspaceId/admin`.
+- The web billing panel shows parsability rollout checks and workspace parsability admin tools.
+
+Current `v5.147` behavior:
+
+- Production legibility rollout readiness validates legibility coverage and readiness through `GET /api/legibility/readiness`.
+- Workspace owners and admins can inspect workspace legibility metrics from `GET /api/legibility/workspace/:workspaceId/admin`.
+- The web billing panel shows legibility rollout checks and workspace legibility admin tools.
+
+Current `v5.146` behavior:
+
+- Production intelligibility rollout readiness validates intelligibility coverage and readiness through `GET /api/intelligibility/readiness`.
+- Workspace owners and admins can inspect workspace intelligibility metrics from `GET /api/intelligibility/workspace/:workspaceId/admin`.
+- The web billing panel shows intelligibility rollout checks and workspace intelligibility admin tools.
+
+Current `v5.145` behavior:
+
+- Production comprehensibility rollout readiness validates comprehensibility coverage and readiness through `GET /api/comprehensibility/readiness`.
+- Workspace owners and admins can inspect workspace comprehensibility metrics from `GET /api/comprehensibility/workspace/:workspaceId/admin`.
+- The web billing panel shows comprehensibility rollout checks and workspace comprehensibility admin tools.
+
+Current `v5.144` behavior:
+
+- Production negotiability rollout readiness validates negotiability coverage and readiness through `GET /api/negotiability/readiness`.
+- Workspace owners and admins can inspect workspace negotiability metrics from `GET /api/negotiability/workspace/:workspaceId/admin`.
+- The web billing panel shows negotiability rollout checks and workspace negotiability admin tools.
+
+Current `v5.143` behavior:
+
+- Production simplicity rollout readiness validates simplicity coverage and readiness through `GET /api/simplicity/readiness`.
+- Workspace owners and admins can inspect workspace simplicity metrics from `GET /api/simplicity/workspace/:workspaceId/admin`.
+- The web billing panel shows simplicity rollout checks and workspace simplicity admin tools.
+
+Current `v5.142` behavior:
+
+- Production clarity rollout readiness validates clarity coverage and readiness through `GET /api/clarity/readiness`.
+- Workspace owners and admins can inspect workspace clarity metrics from `GET /api/clarity/workspace/:workspaceId/admin`.
+- The web billing panel shows clarity rollout checks and workspace clarity admin tools.
+
+Current `v5.141` behavior:
+
+- Production readability rollout readiness validates readability coverage and readiness through `GET /api/readability/readiness`.
+- Workspace owners and admins can inspect workspace readability metrics from `GET /api/readability/workspace/:workspaceId/admin`.
+- The web billing panel shows readability rollout checks and workspace readability admin tools.
+
 Current `v5.140` behavior:
 
 - Production teachability rollout readiness validates teachability coverage and readiness through `GET /api/teachability/readiness`.
