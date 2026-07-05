@@ -88,6 +88,8 @@ import type {
   GovernanceAdminSummaryResponse,
   OversightRolloutResponse,
   OversightAdminSummaryResponse,
+  AssuranceRolloutResponse,
+  AssuranceAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -442,6 +444,15 @@ import {
   formatOversightRolloutCheckStatus,
   formatOversightRolloutStatus,
 } from './oversight-ui'
+import {
+  executeAssuranceAdminAction,
+  fetchAssuranceAdminSummary,
+  fetchAssuranceRollout,
+  formatAssuranceAdminAction,
+  formatAssuranceDomain,
+  formatAssuranceRolloutCheckStatus,
+  formatAssuranceRolloutStatus,
+} from './assurance-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -1065,6 +1076,8 @@ function App() {
     useState<GovernanceRolloutResponse | null>(null)
   const [oversightRollout, setOversightRollout] =
     useState<OversightRolloutResponse | null>(null)
+  const [assuranceRollout, setAssuranceRollout] =
+    useState<AssuranceRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1216,6 +1229,8 @@ function App() {
     useState<GovernanceAdminSummaryResponse | null>(null)
   const [oversightAdminSummary, setOversightAdminSummary] =
     useState<OversightAdminSummaryResponse | null>(null)
+  const [assuranceAdminSummary, setAssuranceAdminSummary] =
+    useState<AssuranceAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1325,6 +1340,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [oversightAdminAction, setOversightAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [assuranceAdminAction, setAssuranceAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1887,6 +1905,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setOversightRollout(null)
+        }
+      })
+
+    fetchAssuranceRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAssuranceRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAssuranceRollout(null)
         }
       })
 
@@ -2835,6 +2865,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setOversightAdminSummary(oversightAdmin)
+
+      const assuranceAdmin = await fetchAssuranceAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAssuranceAdminSummary(assuranceAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -3980,6 +4017,35 @@ function App() {
       )
     } finally {
       setOversightAdminAction('idle')
+    }
+  }
+
+  async function handleAssuranceAdminAction(
+    action: 'refresh_assurance_summary',
+  ) {
+    setAssuranceAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAssuranceAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAssuranceRollout(apiBaseUrl)
+      setAssuranceRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run assurance admin action.',
+      )
+    } finally {
+      setAssuranceAdminAction('idle')
     }
   }
 
@@ -5730,6 +5796,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {oversightRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {assuranceRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production assurance rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${assuranceRollout.status}`}
+              >
+                {formatAssuranceRolloutStatus(assuranceRollout.status)}
+              </strong>
+            </div>
+            <p>{assuranceRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {assuranceRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAssuranceRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {assuranceRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -8468,6 +8563,71 @@ function App() {
                 }
               >
                 {formatOversightAdminAction('refresh_oversight_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {assuranceAdminSummary ? (
+          <div className="billing-admin workspace-assurance-admin">
+            <div className="billing-admin__header">
+              <span>Assurance admin</span>
+              <strong>{assuranceAdminSummary.role}</strong>
+            </div>
+            <p>{assuranceAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield quality assurance</span>
+                <strong>
+                  {assuranceAdminSummary.stats.assurancePercent}%
+                </strong>
+                <small>
+                  {assuranceAdminSummary.stats.coveredDomains}/
+                  {assuranceAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Assurance signals</span>
+                <strong>{assuranceAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {assuranceAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield reviews, and artifacts'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-assurance-list">
+              {assuranceAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-assurance-card workspace-assurance-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAssuranceDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {assuranceAdminSummary.availableActions.includes(
+              'refresh_assurance_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={assuranceAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAssuranceAdminAction(
+                    'refresh_assurance_summary',
+                  )
+                }
+              >
+                {formatAssuranceAdminAction('refresh_assurance_summary')}
               </button>
             ) : null}
           </div>
