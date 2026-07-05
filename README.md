@@ -796,6 +796,36 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.135` behavior:
+
+- Production profitability rollout readiness validates profitability coverage and readiness through `GET /api/profitability/readiness`.
+- Workspace owners and admins can inspect workspace profitability metrics from `GET /api/profitability/workspace/:workspaceId/admin`.
+- The web billing panel shows profitability rollout checks and workspace profitability admin tools.
+
+Current `v5.134` behavior:
+
+- Production suitability rollout readiness validates suitability coverage and readiness through `GET /api/suitability/readiness`.
+- Workspace owners and admins can inspect workspace suitability metrics from `GET /api/suitability/workspace/:workspaceId/admin`.
+- The web billing panel shows suitability rollout checks and workspace suitability admin tools.
+
+Current `v5.133` behavior:
+
+- Production marketability rollout readiness validates marketability coverage and readiness through `GET /api/marketability/readiness`.
+- Workspace owners and admins can inspect workspace marketability metrics from `GET /api/marketability/workspace/:workspaceId/admin`.
+- The web billing panel shows marketability rollout checks and workspace marketability admin tools.
+
+Current `v5.132` behavior:
+
+- Production desirability rollout readiness validates desirability coverage and readiness through `GET /api/desirability/readiness`.
+- Workspace owners and admins can inspect workspace desirability metrics from `GET /api/desirability/workspace/:workspaceId/admin`.
+- The web billing panel shows desirability rollout checks and workspace desirability admin tools.
+
+Current `v5.131` behavior:
+
+- Production affordability rollout readiness validates affordability coverage and readiness through `GET /api/affordability/readiness`.
+- Workspace owners and admins can inspect workspace affordability metrics from `GET /api/affordability/workspace/:workspaceId/admin`.
+- The web billing panel shows affordability rollout checks and workspace affordability admin tools.
+
 Current `v5.130` behavior:
 
 - Production acceptability rollout readiness validates acceptability coverage and readiness through `GET /api/acceptability/readiness`.

@@ -3565,6 +3565,136 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-affordability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-affordability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-affordability-card p,
+.workspace-affordability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-affordability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-affordability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-desirability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-desirability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-desirability-card p,
+.workspace-desirability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-desirability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-desirability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-marketability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-marketability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-marketability-card p,
+.workspace-marketability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-marketability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-marketability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-suitability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-suitability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-suitability-card p,
+.workspace-suitability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-suitability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-suitability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-profitability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-profitability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-profitability-card p,
+.workspace-profitability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-profitability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-profitability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

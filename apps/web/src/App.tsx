@@ -234,6 +234,16 @@ import type {
   AdoptabilityAdminSummaryResponse,
   AcceptabilityRolloutResponse,
   AcceptabilityAdminSummaryResponse,
+  AffordabilityRolloutResponse,
+  AffordabilityAdminSummaryResponse,
+  DesirabilityRolloutResponse,
+  DesirabilityAdminSummaryResponse,
+  MarketabilityRolloutResponse,
+  MarketabilityAdminSummaryResponse,
+  SuitabilityRolloutResponse,
+  SuitabilityAdminSummaryResponse,
+  ProfitabilityRolloutResponse,
+  ProfitabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -1246,6 +1256,51 @@ import {
   formatAcceptabilityRolloutStatus,
 } from './acceptability-ui'
 import {
+  executeAffordabilityAdminAction,
+  fetchAffordabilityAdminSummary,
+  fetchAffordabilityRollout,
+  formatAffordabilityAdminAction,
+  formatAffordabilityDomain,
+  formatAffordabilityRolloutCheckStatus,
+  formatAffordabilityRolloutStatus,
+} from './affordability-ui'
+import {
+  executeDesirabilityAdminAction,
+  fetchDesirabilityAdminSummary,
+  fetchDesirabilityRollout,
+  formatDesirabilityAdminAction,
+  formatDesirabilityDomain,
+  formatDesirabilityRolloutCheckStatus,
+  formatDesirabilityRolloutStatus,
+} from './desirability-ui'
+import {
+  executeMarketabilityAdminAction,
+  fetchMarketabilityAdminSummary,
+  fetchMarketabilityRollout,
+  formatMarketabilityAdminAction,
+  formatMarketabilityDomain,
+  formatMarketabilityRolloutCheckStatus,
+  formatMarketabilityRolloutStatus,
+} from './marketability-ui'
+import {
+  executeSuitabilityAdminAction,
+  fetchSuitabilityAdminSummary,
+  fetchSuitabilityRollout,
+  formatSuitabilityAdminAction,
+  formatSuitabilityDomain,
+  formatSuitabilityRolloutCheckStatus,
+  formatSuitabilityRolloutStatus,
+} from './suitability-ui'
+import {
+  executeProfitabilityAdminAction,
+  fetchProfitabilityAdminSummary,
+  fetchProfitabilityRollout,
+  formatProfitabilityAdminAction,
+  formatProfitabilityDomain,
+  formatProfitabilityRolloutCheckStatus,
+  formatProfitabilityRolloutStatus,
+} from './profitability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -2014,6 +2069,16 @@ function App() {
     useState<AdoptabilityRolloutResponse | null>(null)
   const [acceptabilityRollout, setAcceptabilityRollout] =
     useState<AcceptabilityRolloutResponse | null>(null)
+  const [affordabilityRollout, setAffordabilityRollout] =
+    useState<AffordabilityRolloutResponse | null>(null)
+  const [desirabilityRollout, setDesirabilityRollout] =
+    useState<DesirabilityRolloutResponse | null>(null)
+  const [marketabilityRollout, setMarketabilityRollout] =
+    useState<MarketabilityRolloutResponse | null>(null)
+  const [suitabilityRollout, setSuitabilityRollout] =
+    useState<SuitabilityRolloutResponse | null>(null)
+  const [profitabilityRollout, setProfitabilityRollout] =
+    useState<ProfitabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -2311,6 +2376,16 @@ function App() {
     useState<AdoptabilityAdminSummaryResponse | null>(null)
   const [acceptabilityAdminSummary, setAcceptabilityAdminSummary] =
     useState<AcceptabilityAdminSummaryResponse | null>(null)
+  const [affordabilityAdminSummary, setAffordabilityAdminSummary] =
+    useState<AffordabilityAdminSummaryResponse | null>(null)
+  const [desirabilityAdminSummary, setDesirabilityAdminSummary] =
+    useState<DesirabilityAdminSummaryResponse | null>(null)
+  const [marketabilityAdminSummary, setMarketabilityAdminSummary] =
+    useState<MarketabilityAdminSummaryResponse | null>(null)
+  const [suitabilityAdminSummary, setSuitabilityAdminSummary] =
+    useState<SuitabilityAdminSummaryResponse | null>(null)
+  const [profitabilityAdminSummary, setProfitabilityAdminSummary] =
+    useState<ProfitabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -2639,6 +2714,21 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [acceptabilityAdminAction, setAcceptabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [affordabilityAdminAction, setAffordabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [desirabilityAdminAction, setDesirabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [marketabilityAdminAction, setMarketabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [suitabilityAdminAction, setSuitabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [profitabilityAdminAction, setProfitabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -4077,6 +4167,66 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setAcceptabilityRollout(null)
+        }
+      })
+
+    fetchAffordabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAffordabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAffordabilityRollout(null)
+        }
+      })
+
+    fetchDesirabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setDesirabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDesirabilityRollout(null)
+        }
+      })
+
+    fetchMarketabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setMarketabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setMarketabilityRollout(null)
+        }
+      })
+
+    fetchSuitabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setSuitabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setSuitabilityRollout(null)
+        }
+      })
+
+    fetchProfitabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setProfitabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setProfitabilityRollout(null)
         }
       })
 
@@ -5536,6 +5686,41 @@ function App() {
         workspaceAuthHeaders,
       )
       setAcceptabilityAdminSummary(acceptabilityAdmin)
+
+      const affordabilityAdmin = await fetchAffordabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAffordabilityAdminSummary(affordabilityAdmin)
+
+      const desirabilityAdmin = await fetchDesirabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDesirabilityAdminSummary(desirabilityAdmin)
+
+      const marketabilityAdmin = await fetchMarketabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMarketabilityAdminSummary(marketabilityAdmin)
+
+      const suitabilityAdmin = await fetchSuitabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSuitabilityAdminSummary(suitabilityAdmin)
+
+      const profitabilityAdmin = await fetchProfitabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProfitabilityAdminSummary(profitabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -6768,6 +6953,151 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleProfitabilityAdminAction(
+    action: 'refresh_profitability_summary',
+  ) {
+    setProfitabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeProfitabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchProfitabilityRollout(apiBaseUrl)
+      setProfitabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run profitability admin action.',
+      )
+    } finally {
+      setProfitabilityAdminAction('idle')
+    }
+  }
+
+  async function handleSuitabilityAdminAction(
+    action: 'refresh_suitability_summary',
+  ) {
+    setSuitabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeSuitabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchSuitabilityRollout(apiBaseUrl)
+      setSuitabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run suitability admin action.',
+      )
+    } finally {
+      setSuitabilityAdminAction('idle')
+    }
+  }
+
+  async function handleMarketabilityAdminAction(
+    action: 'refresh_marketability_summary',
+  ) {
+    setMarketabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeMarketabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchMarketabilityRollout(apiBaseUrl)
+      setMarketabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run marketability admin action.',
+      )
+    } finally {
+      setMarketabilityAdminAction('idle')
+    }
+  }
+
+  async function handleDesirabilityAdminAction(
+    action: 'refresh_desirability_summary',
+  ) {
+    setDesirabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeDesirabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchDesirabilityRollout(apiBaseUrl)
+      setDesirabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run desirability admin action.',
+      )
+    } finally {
+      setDesirabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAffordabilityAdminAction(
+    action: 'refresh_affordability_summary',
+  ) {
+    setAffordabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAffordabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAffordabilityRollout(apiBaseUrl)
+      setAffordabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run affordability admin action.',
+      )
+    } finally {
+      setAffordabilityAdminAction('idle')
     }
   }
 
@@ -12665,6 +12995,151 @@ function App() {
               ))}
             </div>
             <small>Checked at {viabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {profitabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production profitability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${profitabilityRollout.status}`}
+              >
+                {formatProfitabilityRolloutStatus(profitabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{profitabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {profitabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatProfitabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {profitabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {suitabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production suitability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${suitabilityRollout.status}`}
+              >
+                {formatSuitabilityRolloutStatus(suitabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{suitabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {suitabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatSuitabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {suitabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {marketabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production marketability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${marketabilityRollout.status}`}
+              >
+                {formatMarketabilityRolloutStatus(marketabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{marketabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {marketabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatMarketabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {marketabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {desirabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production desirability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${desirabilityRollout.status}`}
+              >
+                {formatDesirabilityRolloutStatus(desirabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{desirabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {desirabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatDesirabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {desirabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {affordabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production affordability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${affordabilityRollout.status}`}
+              >
+                {formatAffordabilityRolloutStatus(affordabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{affordabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {affordabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAffordabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {affordabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -20152,6 +20627,331 @@ function App() {
                 }
               >
                 {formatViabilityAdminAction('refresh_viability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {profitabilityAdminSummary ? (
+          <div className="billing-admin workspace-profitability-admin">
+            <div className="billing-admin__header">
+              <span>Profitability admin</span>
+              <strong>{profitabilityAdminSummary.role}</strong>
+            </div>
+            <p>{profitabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing record profitability</span>
+                <strong>
+                  {profitabilityAdminSummary.stats.profitabilityPercent}%
+                </strong>
+                <small>
+                  {profitabilityAdminSummary.stats.coveredDomains}/
+                  {profitabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Profitability signals</span>
+                <strong>{profitabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {profitabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing records, and billing invoices'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-profitability-list">
+              {profitabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-profitability-card workspace-profitability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatProfitabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {profitabilityAdminSummary.availableActions.includes(
+              'refresh_profitability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={profitabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleProfitabilityAdminAction(
+                    'refresh_profitability_summary',
+                  )
+                }
+              >
+                {formatProfitabilityAdminAction('refresh_profitability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {suitabilityAdminSummary ? (
+          <div className="billing-admin workspace-suitability-admin">
+            <div className="billing-admin__header">
+              <span>Suitability admin</span>
+              <strong>{suitabilityAdminSummary.role}</strong>
+            </div>
+            <p>{suitabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Agent output suitability</span>
+                <strong>
+                  {suitabilityAdminSummary.stats.suitabilityPercent}%
+                </strong>
+                <small>
+                  {suitabilityAdminSummary.stats.coveredDomains}/
+                  {suitabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Suitability signals</span>
+                <strong>{suitabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {suitabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, agent outputs, and artifacts'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-suitability-list">
+              {suitabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-suitability-card workspace-suitability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatSuitabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {suitabilityAdminSummary.availableActions.includes(
+              'refresh_suitability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={suitabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleSuitabilityAdminAction(
+                    'refresh_suitability_summary',
+                  )
+                }
+              >
+                {formatSuitabilityAdminAction('refresh_suitability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {marketabilityAdminSummary ? (
+          <div className="billing-admin workspace-marketability-admin">
+            <div className="billing-admin__header">
+              <span>Marketability admin</span>
+              <strong>{marketabilityAdminSummary.role}</strong>
+            </div>
+            <p>{marketabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership marketability</span>
+                <strong>
+                  {marketabilityAdminSummary.stats.marketabilityPercent}%
+                </strong>
+                <small>
+                  {marketabilityAdminSummary.stats.coveredDomains}/
+                  {marketabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Marketability signals</span>
+                <strong>{marketabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {marketabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and meter usage reports'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-marketability-list">
+              {marketabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-marketability-card workspace-marketability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatMarketabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {marketabilityAdminSummary.availableActions.includes(
+              'refresh_marketability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={marketabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleMarketabilityAdminAction(
+                    'refresh_marketability_summary',
+                  )
+                }
+              >
+                {formatMarketabilityAdminAction('refresh_marketability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {desirabilityAdminSummary ? (
+          <div className="billing-admin workspace-desirability-admin">
+            <div className="billing-admin__header">
+              <span>Desirability admin</span>
+              <strong>{desirabilityAdminSummary.role}</strong>
+            </div>
+            <p>{desirabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Usage event desirability</span>
+                <strong>
+                  {desirabilityAdminSummary.stats.desirabilityPercent}%
+                </strong>
+                <small>
+                  {desirabilityAdminSummary.stats.coveredDomains}/
+                  {desirabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Desirability signals</span>
+                <strong>{desirabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {desirabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, usage events, and billing notifications'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-desirability-list">
+              {desirabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-desirability-card workspace-desirability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatDesirabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {desirabilityAdminSummary.availableActions.includes(
+              'refresh_desirability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={desirabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleDesirabilityAdminAction(
+                    'refresh_desirability_summary',
+                  )
+                }
+              >
+                {formatDesirabilityAdminAction('refresh_desirability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {affordabilityAdminSummary ? (
+          <div className="billing-admin workspace-affordability-admin">
+            <div className="billing-admin__header">
+              <span>Affordability admin</span>
+              <strong>{affordabilityAdminSummary.role}</strong>
+            </div>
+            <p>{affordabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice affordability</span>
+                <strong>
+                  {affordabilityAdminSummary.stats.affordabilityPercent}%
+                </strong>
+                <small>
+                  {affordabilityAdminSummary.stats.coveredDomains}/
+                  {affordabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Affordability signals</span>
+                <strong>{affordabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {affordabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-affordability-list">
+              {affordabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-affordability-card workspace-affordability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAffordabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {affordabilityAdminSummary.availableActions.includes(
+              'refresh_affordability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={affordabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAffordabilityAdminAction(
+                    'refresh_affordability_summary',
+                  )
+                }
+              >
+                {formatAffordabilityAdminAction('refresh_affordability_summary')}
               </button>
             ) : null}
           </div>

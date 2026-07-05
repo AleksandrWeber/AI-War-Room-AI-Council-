@@ -102,6 +102,11 @@ import { FeasibilityModule } from './feasibility/feasibility.module.js'
 import { ConformanceModule } from './conformance/conformance.module.js'
 import { AdoptabilityModule } from './adoptability/adoptability.module.js'
 import { AcceptabilityModule } from './acceptability/acceptability.module.js'
+import { AffordabilityModule } from './affordability/affordability.module.js'
+import { DesirabilityModule } from './desirability/desirability.module.js'
+import { MarketabilityModule } from './marketability/marketability.module.js'
+import { SuitabilityModule } from './suitability/suitability.module.js'
+import { ProfitabilityModule } from './profitability/profitability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -223,6 +228,11 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     ConformanceModule,
     AdoptabilityModule,
     AcceptabilityModule,
+    AffordabilityModule,
+    DesirabilityModule,
+    MarketabilityModule,
+    SuitabilityModule,
+    ProfitabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,
