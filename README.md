@@ -796,6 +796,12 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.54` behavior:
+
+- Production utilization rollout readiness validates utilization coverage and capacity readiness through `GET /api/utilization/readiness`.
+- Workspace owners and admins can inspect workspace utilization metrics from `GET /api/utilization/workspace/:workspaceId/admin`.
+- The web billing panel shows utilization rollout checks and workspace utilization admin tools.
+
 Current `v5.53` behavior:
 
 - Production optimization rollout readiness validates optimization coverage and performance readiness through `GET /api/optimization/readiness`.

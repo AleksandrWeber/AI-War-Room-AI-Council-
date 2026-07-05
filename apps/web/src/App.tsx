@@ -80,6 +80,8 @@ import type {
   EfficiencyAdminSummaryResponse,
   OptimizationRolloutResponse,
   OptimizationAdminSummaryResponse,
+  UtilizationRolloutResponse,
+  UtilizationAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -398,6 +400,15 @@ import {
   formatOptimizationRolloutCheckStatus,
   formatOptimizationRolloutStatus,
 } from './optimization-ui'
+import {
+  executeUtilizationAdminAction,
+  fetchUtilizationAdminSummary,
+  fetchUtilizationRollout,
+  formatUtilizationAdminAction,
+  formatUtilizationDomain,
+  formatUtilizationRolloutCheckStatus,
+  formatUtilizationRolloutStatus,
+} from './utilization-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -1013,6 +1024,8 @@ function App() {
     useState<EfficiencyRolloutResponse | null>(null)
   const [optimizationRollout, setOptimizationRollout] =
     useState<OptimizationRolloutResponse | null>(null)
+  const [utilizationRollout, setUtilizationRollout] =
+    useState<UtilizationRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1156,6 +1169,8 @@ function App() {
     useState<EfficiencyAdminSummaryResponse | null>(null)
   const [optimizationAdminSummary, setOptimizationAdminSummary] =
     useState<OptimizationAdminSummaryResponse | null>(null)
+  const [utilizationAdminSummary, setUtilizationAdminSummary] =
+    useState<UtilizationAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1253,6 +1268,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [optimizationAdminAction, setOptimizationAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [utilizationAdminAction, setUtilizationAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1767,6 +1785,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setOptimizationRollout(null)
+        }
+      })
+
+    fetchUtilizationRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setUtilizationRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setUtilizationRollout(null)
         }
       })
 
@@ -2687,6 +2717,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setOptimizationAdminSummary(optimizationAdmin)
+
+      const utilizationAdmin = await fetchUtilizationAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setUtilizationAdminSummary(utilizationAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -3716,6 +3753,35 @@ function App() {
       )
     } finally {
       setOptimizationAdminAction('idle')
+    }
+  }
+
+  async function handleUtilizationAdminAction(
+    action: 'refresh_utilization_summary',
+  ) {
+    setUtilizationAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeUtilizationAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchUtilizationRollout(apiBaseUrl)
+      setUtilizationRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run utilization admin action.',
+      )
+    } finally {
+      setUtilizationAdminAction('idle')
     }
   }
 
@@ -5350,6 +5416,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {optimizationRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {utilizationRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production utilization rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${utilizationRollout.status}`}
+              >
+                {formatUtilizationRolloutStatus(utilizationRollout.status)}
+              </strong>
+            </div>
+            <p>{utilizationRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {utilizationRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatUtilizationRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {utilizationRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -7828,6 +7923,71 @@ function App() {
                 }
               >
                 {formatOptimizationAdminAction('refresh_optimization_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {utilizationAdminSummary ? (
+          <div className="billing-admin workspace-utilization-admin">
+            <div className="billing-admin__header">
+              <span>Utilization admin</span>
+              <strong>{utilizationAdminSummary.role}</strong>
+            </div>
+            <p>{utilizationAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workspace utilization</span>
+                <strong>
+                  {utilizationAdminSummary.stats.utilizationPercent}%
+                </strong>
+                <small>
+                  {utilizationAdminSummary.stats.coveredDomains}/
+                  {utilizationAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Utilization signals</span>
+                <strong>{utilizationAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {utilizationAdminSummary.stats.postgresConnectivity
+                    ? 'Run load, usage events, and memberships'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-utilization-list">
+              {utilizationAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-utilization-card workspace-utilization-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatUtilizationDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {utilizationAdminSummary.availableActions.includes(
+              'refresh_utilization_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={utilizationAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleUtilizationAdminAction(
+                    'refresh_utilization_summary',
+                  )
+                }
+              >
+                {formatUtilizationAdminAction('refresh_utilization_summary')}
               </button>
             ) : null}
           </div>
