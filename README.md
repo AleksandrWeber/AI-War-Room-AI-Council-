@@ -444,6 +444,25 @@ Workspace provider key admin tools:
 - Only workspace owners and admins can access provider key admin endpoints.
 - The web billing panel shows provider key admin tools for authorized roles.
 
+Observability rollout readiness:
+
+- `GET /api/observability/readiness` returns operator-facing production observability checklist results (`ready` or `not_ready`).
+- Checks cover structured logging, tracing spans, recent event buffer capacity, and pipeline event coverage.
+- The web billing panel shows observability rollout status and per-check guidance.
+
+Workspace observability admin tools:
+
+- `GET /api/observability/workspace/:workspaceId/admin` returns owner/admin workspace observability summary.
+- `POST /api/observability/workspace/:workspaceId/admin/actions` runs observability admin actions such as refreshing event summaries or clearing the local event buffer.
+- Only workspace owners and admins can access observability admin endpoints.
+- The web billing panel shows observability admin tools for authorized roles.
+
+Current `v5.25` behavior:
+
+- Observability rollout readiness validates structured logging and pipeline event coverage through `GET /api/observability/readiness`.
+- Workspace owners and admins can inspect recent pipeline observability events from `GET /api/observability/workspace/:workspaceId/admin`.
+- The web billing panel shows observability rollout checks and workspace observability admin tools.
+
 Current `v5.24` behavior:
 
 - Provider credentials rollout readiness validates encryption and persistence through `GET /api/provider-credentials/readiness`.

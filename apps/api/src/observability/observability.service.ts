@@ -3,6 +3,28 @@ import { SpanStatusCode, trace, type Attributes } from '@opentelemetry/api'
 
 type ObservabilityLevel = 'info' | 'warn' | 'error'
 
+export const RECENT_EVENT_BUFFER_CAPACITY = 200
+
+export const supportedPipelineObservabilityEvents = [
+  'pipeline_phase_completed',
+  'pipeline_quota_check_completed',
+  'pipeline_cost_signal',
+  'shield_scan_completed',
+  'shield_scan_classified',
+  'shield_abuse_signal',
+  'llm_call_completed',
+  'llm_provider_failure',
+  'llm_validation_failure',
+  'llm_fallback_used',
+  'model_router_selection',
+  'model_router_model_degraded',
+  'model_router_model_recovered',
+  'research_context_retrieved',
+  'temporal_workflow_start_completed',
+  'temporal_workflow_status_checked',
+  'temporal_runtime_health_checked',
+] as const
+
 export type ObservabilityEvent = {
   eventName: string
   level: ObservabilityLevel
@@ -29,7 +51,10 @@ export class ObservabilityService {
     }
 
     this.recentEvents.push(event)
-    this.recentEvents.splice(0, Math.max(0, this.recentEvents.length - 200))
+    this.recentEvents.splice(
+      0,
+      Math.max(0, this.recentEvents.length - RECENT_EVENT_BUFFER_CAPACITY),
+    )
     this.write(event)
 
     return event
@@ -92,6 +117,20 @@ export class ObservabilityService {
 
   getRecentEvents() {
     return [...this.recentEvents]
+  }
+
+  getRecentEventsForWorkspace(workspaceId: string) {
+    return this.recentEvents.filter(
+      (event) => event.attributes.workspaceId === workspaceId,
+    )
+  }
+
+  getRecentEventBufferCapacity() {
+    return RECENT_EVENT_BUFFER_CAPACITY
+  }
+
+  getSupportedPipelineEvents() {
+    return [...supportedPipelineObservabilityEvents]
   }
 
   clearRecentEvents() {

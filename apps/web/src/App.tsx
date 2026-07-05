@@ -22,6 +22,8 @@ import type {
   ShieldReviewAdminSummaryResponse,
   ProviderCredentialsRolloutResponse,
   ProviderKeyAdminSummaryResponse,
+  ObservabilityRolloutResponse,
+  ObservabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -78,6 +80,15 @@ import {
   formatProviderKeyAdminAction,
   formatProviderKeyTestStatus,
 } from './provider-credentials-ui'
+import {
+  executeObservabilityAdminAction,
+  fetchObservabilityAdminSummary,
+  fetchObservabilityRollout,
+  formatObservabilityAdminAction,
+  formatObservabilityEventLevel,
+  formatObservabilityRolloutCheckStatus,
+  formatObservabilityRolloutStatus,
+} from './observability-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -636,6 +647,8 @@ function App() {
   )
   const [providerCredentialsRollout, setProviderCredentialsRollout] =
     useState<ProviderCredentialsRolloutResponse | null>(null)
+  const [observabilityRollout, setObservabilityRollout] =
+    useState<ObservabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -721,6 +734,8 @@ function App() {
     useState<ShieldReviewAdminSummaryResponse | null>(null)
   const [providerKeyAdminSummary, setProviderKeyAdminSummary] =
     useState<ProviderKeyAdminSummaryResponse | null>(null)
+  const [observabilityAdminSummary, setObservabilityAdminSummary] =
+    useState<ObservabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -731,6 +746,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [providerKeyAdminAction, setProviderKeyAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [observabilityAdminAction, setObservabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -897,6 +915,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setProviderCredentialsRollout(null)
+        }
+      })
+
+    fetchObservabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setObservabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setObservabilityRollout(null)
         }
       })
 
@@ -1614,6 +1644,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setProviderKeyAdminSummary(providerKeyAdmin)
+
+      const observabilityAdmin = await fetchObservabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setObservabilityAdminSummary(observabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -1822,6 +1859,33 @@ function App() {
       )
     } finally {
       setProviderKeyAdminAction('idle')
+    }
+  }
+
+  async function handleObservabilityAdminAction(
+    action: 'refresh_event_summary' | 'clear_observability_buffer',
+  ) {
+    setObservabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeObservabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run observability admin action.',
+      )
+    } finally {
+      setObservabilityAdminAction('idle')
     }
   }
 
@@ -2605,6 +2669,35 @@ function App() {
           </div>
         ) : null}
 
+        {observabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Observability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${observabilityRollout.status}`}
+              >
+                {formatObservabilityRolloutStatus(observabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{observabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {observabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatObservabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {observabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
         {billingCapabilities?.supportsBillingRollout && billingRollout ? (
           <div className="billing-rollout">
             <div className="billing-rollout__header">
@@ -3195,6 +3288,72 @@ function App() {
                     onClick={() => void handleProviderKeyAdminAction(action)}
                   >
                     {formatProviderKeyAdminAction(action)}
+                  </button>
+                ))}
+              </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {observabilityAdminSummary ? (
+          <div className="billing-admin workspace-observability-admin">
+            <div className="billing-admin__header">
+              <span>Observability admin</span>
+              <strong>{observabilityAdminSummary.role}</strong>
+            </div>
+            <p>{observabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Recent events</span>
+                <strong>{observabilityAdminSummary.stats.totalEvents}</strong>
+                <small>
+                  {observabilityAdminSummary.stats.pipelinePhaseEvents} pipeline
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Errors / warnings</span>
+                <strong>{observabilityAdminSummary.stats.errorEvents}</strong>
+                <small>{observabilityAdminSummary.stats.warnEvents} warnings</small>
+              </article>
+            </div>
+            <div className="workspace-observability-event-list">
+              {observabilityAdminSummary.events.length ? (
+                observabilityAdminSummary.events.map((event) => (
+                  <article
+                    className={`workspace-observability-event-card workspace-observability-event-card--${event.level}`}
+                    key={`${event.eventName}-${event.timestamp}`}
+                  >
+                    <div>
+                      <strong>{event.eventName}</strong>
+                      <p>{formatObservabilityEventLevel(event.level)}</p>
+                      <small>
+                        {event.timestamp.slice(0, 19).replace('T', ' ')}
+                        {event.runId ? ` · ${event.runId}` : ''}
+                      </small>
+                    </div>
+                  </article>
+                ))
+              ) : (
+                <p className="clear-copy">
+                  No recent observability events recorded for this workspace yet.
+                </p>
+              )}
+            </div>
+            {observabilityAdminSummary.availableActions.length ? (
+              <div className="billing-admin__actions">
+                {observabilityAdminSummary.availableActions.map((action) => (
+                  <button
+                    key={action}
+                    className={
+                      action === 'clear_observability_buffer'
+                        ? 'danger-button'
+                        : 'secondary-button'
+                    }
+                    type="button"
+                    disabled={observabilityAdminAction !== 'idle'}
+                    onClick={() => void handleObservabilityAdminAction(action)}
+                  >
+                    {formatObservabilityAdminAction(action)}
                   </button>
                 ))}
               </div>

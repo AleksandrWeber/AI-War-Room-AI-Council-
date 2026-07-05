@@ -6,6 +6,7 @@ import { BillingModule } from './billing/billing.module.js'
 import { HealthModule } from './health/health.module.js'
 import { LlmModule } from './llm/llm.module.js'
 import { ModelRouterModule } from './model-router/model-router.module.js'
+import { ObservabilityModule } from './observability/observability.module.js'
 import { ProviderCredentialsModule } from './provider-credentials/provider-credentials.module.js'
 import { RunsModule } from './runs/runs.module.js'
 import { ShieldModule } from './shield/shield.module.js'
@@ -24,6 +25,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     WorkspacesModule,
     VersionModule,
     ModelRouterModule,
+    ObservabilityModule,
     ProviderCredentialsModule,
     LlmModule,
     ShieldModule,

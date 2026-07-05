@@ -855,6 +855,35 @@
   border-color: var(--border);
 }
 
+.workspace-observability-event-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.workspace-observability-event-card {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+}
+
+.workspace-observability-event-card p,
+.workspace-observability-event-card small {
+  margin: 0;
+  color: var(--muted);
+}
+
+.workspace-observability-event-card--error {
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
+}
+
+.workspace-observability-event-card--warn {
+  border-color: color-mix(in srgb, #d4a017 45%, var(--border));
+}
+
+.workspace-observability-event-card--info {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;
