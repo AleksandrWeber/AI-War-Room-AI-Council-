@@ -272,6 +272,16 @@ import { ReplicabilizabilityModule } from './replicabilizability/replicabilizabi
 import { LoadbalancizabilityModule } from './loadbalancizability/loadbalancizability.module.js'
 import { AutoscalingizabilityModule } from './autoscalingizability/autoscalingizability.module.js'
 import { DeployabilizabilityModule } from './deployabilizability/deployabilizability.module.js'
+import { ConfigurabilizabilityModule } from './configurabilizability/configurabilizability.module.js'
+import { OperabilizabilityModule } from './operabilizability/operabilizability.module.js'
+import { MaintainabilizabilityModule } from './maintainabilizability/maintainabilizability.module.js'
+import { DiagnosabilizabilityModule } from './diagnosabilizability/diagnosabilizability.module.js'
+import { TroubleshootizabilityModule } from './troubleshootizability/troubleshootizability.module.js'
+import { RollbackabilizabilityModule } from './rollbackabilizability/rollbackabilizability.module.js'
+import { CanaryizabilityModule } from './canaryizability/canaryizability.module.js'
+import { BluegreenizabilityModule } from './bluegreenizability/bluegreenizability.module.js'
+import { ProgressiveizabilityModule } from './progressiveizability/progressiveizability.module.js'
+import { FeatureflagizabilityModule } from './featureflagizability/featureflagizability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -563,6 +573,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     LoadbalancizabilityModule,
     AutoscalingizabilityModule,
     DeployabilizabilityModule,
+    ConfigurabilizabilityModule,
+    OperabilizabilityModule,
+    MaintainabilizabilityModule,
+    DiagnosabilizabilityModule,
+    TroubleshootizabilityModule,
+    RollbackabilizabilityModule,
+    CanaryizabilityModule,
+    BluegreenizabilityModule,
+    ProgressiveizabilityModule,
+    FeatureflagizabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

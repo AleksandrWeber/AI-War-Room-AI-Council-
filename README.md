@@ -1216,6 +1216,36 @@ Current `v5.286` behavior:
 - Workspace owners and admins can inspect workspace recoverizability metrics from `GET /api/recoverizability/workspace/:workspaceId/admin`.
 - The web billing panel shows recoverizability rollout checks and workspace recoverizability admin tools.
 
+Current `v5.305` behavior:
+
+- Production troubleshootizability rollout readiness validates troubleshootizability coverage and readiness through `GET /api/troubleshootizability/readiness`.
+- Workspace owners and admins can inspect workspace troubleshootizability metrics from `GET /api/troubleshootizability/workspace/:workspaceId/admin`.
+- The web billing panel shows troubleshootizability rollout checks and workspace troubleshootizability admin tools.
+
+Current `v5.304` behavior:
+
+- Production diagnosabilizability rollout readiness validates diagnosabilizability coverage and readiness through `GET /api/diagnosabilizability/readiness`.
+- Workspace owners and admins can inspect workspace diagnosabilizability metrics from `GET /api/diagnosabilizability/workspace/:workspaceId/admin`.
+- The web billing panel shows diagnosabilizability rollout checks and workspace diagnosabilizability admin tools.
+
+Current `v5.303` behavior:
+
+- Production maintainabilizability rollout readiness validates maintainabilizability coverage and readiness through `GET /api/maintainabilizability/readiness`.
+- Workspace owners and admins can inspect workspace maintainabilizability metrics from `GET /api/maintainabilizability/workspace/:workspaceId/admin`.
+- The web billing panel shows maintainabilizability rollout checks and workspace maintainabilizability admin tools.
+
+Current `v5.302` behavior:
+
+- Production operabilizability rollout readiness validates operabilizability coverage and readiness through `GET /api/operabilizability/readiness`.
+- Workspace owners and admins can inspect workspace operabilizability metrics from `GET /api/operabilizability/workspace/:workspaceId/admin`.
+- The web billing panel shows operabilizability rollout checks and workspace operabilizability admin tools.
+
+Current `v5.301` behavior:
+
+- Production configurabilizability rollout readiness validates configurabilizability coverage and readiness through `GET /api/configurabilizability/readiness`.
+- Workspace owners and admins can inspect workspace configurabilizability metrics from `GET /api/configurabilizability/workspace/:workspaceId/admin`.
+- The web billing panel shows configurabilizability rollout checks and workspace configurabilizability admin tools.
+
 Current `v5.300` behavior:
 
 - Production deployabilizability rollout readiness validates deployabilizability coverage and readiness through `GET /api/deployabilizability/readiness`.
@@ -1245,6 +1275,36 @@ Current `v5.296` behavior:
 - Production restorabilizability rollout readiness validates restorabilizability coverage and readiness through `GET /api/restorabilizability/readiness`.
 - Workspace owners and admins can inspect workspace restorabilizability metrics from `GET /api/restorabilizability/workspace/:workspaceId/admin`.
 - The web billing panel shows restorabilizability rollout checks and workspace restorabilizability admin tools.
+
+Current `v5.310` behavior:
+
+- Production featureflagizability rollout readiness validates featureflagizability coverage and readiness through `GET /api/featureflagizability/readiness`.
+- Workspace owners and admins can inspect workspace featureflagizability metrics from `GET /api/featureflagizability/workspace/:workspaceId/admin`.
+- The web billing panel shows featureflagizability rollout checks and workspace featureflagizability admin tools.
+
+Current `v5.309` behavior:
+
+- Production progressiveizability rollout readiness validates progressiveizability coverage and readiness through `GET /api/progressiveizability/readiness`.
+- Workspace owners and admins can inspect workspace progressiveizability metrics from `GET /api/progressiveizability/workspace/:workspaceId/admin`.
+- The web billing panel shows progressiveizability rollout checks and workspace progressiveizability admin tools.
+
+Current `v5.308` behavior:
+
+- Production bluegreenizability rollout readiness validates bluegreenizability coverage and readiness through `GET /api/bluegreenizability/readiness`.
+- Workspace owners and admins can inspect workspace bluegreenizability metrics from `GET /api/bluegreenizability/workspace/:workspaceId/admin`.
+- The web billing panel shows bluegreenizability rollout checks and workspace bluegreenizability admin tools.
+
+Current `v5.307` behavior:
+
+- Production canaryizability rollout readiness validates canaryizability coverage and readiness through `GET /api/canaryizability/readiness`.
+- Workspace owners and admins can inspect workspace canaryizability metrics from `GET /api/canaryizability/workspace/:workspaceId/admin`.
+- The web billing panel shows canaryizability rollout checks and workspace canaryizability admin tools.
+
+Current `v5.306` behavior:
+
+- Production rollbackabilizability rollout readiness validates rollbackabilizability coverage and readiness through `GET /api/rollbackabilizability/readiness`.
+- Workspace owners and admins can inspect workspace rollbackabilizability metrics from `GET /api/rollbackabilizability/workspace/:workspaceId/admin`.
+- The web billing panel shows rollbackabilizability rollout checks and workspace rollbackabilizability admin tools.
 
 Current `v5.225` behavior:
 
