@@ -11625,6 +11625,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-orchestrationizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-orchestrationizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-orchestrationizability-card p,
+.workspace-orchestrationizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-orchestrationizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-orchestrationizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-schedulingizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-schedulingizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-schedulingizability-card p,
+.workspace-schedulingizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-schedulingizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-schedulingizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-triggeringizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-triggeringizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-triggeringizability-card p,
+.workspace-triggeringizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-triggeringizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-triggeringizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-routingizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-routingizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-routingizability-card p,
+.workspace-routingizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-routingizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-routingizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-balancingizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-balancingizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-balancingizability-card p,
+.workspace-balancingizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-balancingizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-balancingizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-nodelizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-nodelizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-nodelizability-card p,
+.workspace-nodelizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-nodelizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-nodelizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-coordinationizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-coordinationizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-coordinationizability-card p,
+.workspace-coordinationizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-coordinationizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-coordinationizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-partitioningizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-partitioningizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-partitioningizability-card p,
+.workspace-partitioningizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-partitioningizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-partitioningizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-clusteringizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-clusteringizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-clusteringizability-card p,
+.workspace-clusteringizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-clusteringizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-clusteringizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-meshingizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-meshingizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-meshingizability-card p,
+.workspace-meshingizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-meshingizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-meshingizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

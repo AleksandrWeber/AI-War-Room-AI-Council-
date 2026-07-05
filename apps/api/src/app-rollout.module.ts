@@ -263,6 +263,16 @@ import { PipeliningizabilityModule } from './pipeliningizability/pipeliningizabi
 import { BatchingizabilityModule } from './batchingizability/batchingizability.module.js'
 import { StreamizabilityModule } from './streamizability/streamizability.module.js'
 import { WindowizabilityModule } from './windowizability/windowizability.module.js'
+import { OrchestrationizabilityModule } from './orchestrationizability/orchestrationizability.module.js'
+import { SchedulingizabilityModule } from './schedulingizability/schedulingizability.module.js'
+import { TriggeringizabilityModule } from './triggeringizability/triggeringizability.module.js'
+import { RoutingizabilityModule } from './routingizability/routingizability.module.js'
+import { BalancingizabilityModule } from './balancingizability/balancingizability.module.js'
+import { NodelizabilityModule } from './nodelizability/nodelizability.module.js'
+import { CoordinationizabilityModule } from './coordinationizability/coordinationizability.module.js'
+import { PartitioningizabilityModule } from './partitioningizability/partitioningizability.module.js'
+import { ClusteringizabilityModule } from './clusteringizability/clusteringizability.module.js'
+import { MeshingizabilityModule } from './meshingizability/meshingizability.module.js'
 
 @Module({
   imports: [
@@ -530,6 +540,16 @@ import { WindowizabilityModule } from './windowizability/windowizability.module.
     BatchingizabilityModule,
     StreamizabilityModule,
     WindowizabilityModule,
+    OrchestrationizabilityModule,
+    SchedulingizabilityModule,
+    TriggeringizabilityModule,
+    RoutingizabilityModule,
+    BalancingizabilityModule,
+    NodelizabilityModule,
+    CoordinationizabilityModule,
+    PartitioningizabilityModule,
+    ClusteringizabilityModule,
+    MeshingizabilityModule,
   ],
   exports: [
     CustomizabilityModule,
