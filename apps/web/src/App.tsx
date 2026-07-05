@@ -34,6 +34,8 @@ import type {
   IdempotencyAdminSummaryResponse,
   UsageLimitsRolloutResponse,
   QuotaAdminSummaryResponse,
+  DeploymentRolloutResponse,
+  DeploymentAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -144,6 +146,16 @@ import {
   formatUsageLimitsRolloutStatus,
   formatUsagePhase,
 } from './usage-limits-ui'
+import {
+  executeDeploymentAdminAction,
+  fetchDeploymentAdminSummary,
+  fetchDeploymentRollout,
+  formatDeploymentAdminAction,
+  formatDeploymentRolloutCheckStatus,
+  formatDeploymentRolloutStatus,
+  formatDependencyName,
+  formatDependencyStatus,
+} from './deployment-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -714,6 +726,8 @@ function App() {
     useState<IdempotencyRolloutResponse | null>(null)
   const [usageLimitsRollout, setUsageLimitsRollout] =
     useState<UsageLimitsRolloutResponse | null>(null)
+  const [deploymentRollout, setDeploymentRollout] =
+    useState<DeploymentRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -811,6 +825,8 @@ function App() {
     useState<IdempotencyAdminSummaryResponse | null>(null)
   const [quotaAdminSummary, setQuotaAdminSummary] =
     useState<QuotaAdminSummaryResponse | null>(null)
+  const [deploymentAdminSummary, setDeploymentAdminSummary] =
+    useState<DeploymentAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -841,6 +857,9 @@ function App() {
   const [quotaAdminAction, setQuotaAdminAction] = useState<'idle' | 'running'>(
     'idle',
   )
+  const [deploymentAdminAction, setDeploymentAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
   const [memberAdminAction, setMemberAdminAction] = useState<
     'idle' | 'running'
@@ -1077,6 +1096,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setUsageLimitsRollout(null)
+        }
+      })
+
+    fetchDeploymentRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setDeploymentRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDeploymentRollout(null)
         }
       })
 
@@ -1836,6 +1867,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setQuotaAdminSummary(quotaAdmin)
+
+      const deploymentAdmin = await fetchDeploymentAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDeploymentAdminSummary(deploymentAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -2216,6 +2254,33 @@ function App() {
       )
     } finally {
       setQuotaAdminAction('idle')
+    }
+  }
+
+  async function handleDeploymentAdminAction(action: 'refresh_deployment_summary') {
+    setDeploymentAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeDeploymentAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchDeploymentRollout(apiBaseUrl)
+      setDeploymentRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run deployment admin action.',
+      )
+    } finally {
+      setDeploymentAdminAction('idle')
     }
   }
 
@@ -3189,6 +3254,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {usageLimitsRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {deploymentRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Deployment health rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${deploymentRollout.status}`}
+              >
+                {formatDeploymentRolloutStatus(deploymentRollout.status)}
+              </strong>
+            </div>
+            <p>{deploymentRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {deploymentRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatDeploymentRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {deploymentRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -4223,6 +4317,62 @@ function App() {
                 onClick={() => void handleQuotaAdminAction('refresh_quota_summary')}
               >
                 {formatQuotaAdminAction('refresh_quota_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {deploymentAdminSummary ? (
+          <div className="billing-admin workspace-deployment-admin">
+            <div className="billing-admin__header">
+              <span>Deployment admin</span>
+              <strong>{deploymentAdminSummary.role}</strong>
+            </div>
+            <p>{deploymentAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Readiness</span>
+                <strong>{deploymentAdminSummary.readinessStatus}</strong>
+                <small>
+                  {deploymentAdminSummary.stats.healthyDependencyCount}/
+                  {deploymentAdminSummary.stats.totalDependencies} dependencies
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>API version</span>
+                <strong>{deploymentAdminSummary.stats.apiVersion}</strong>
+                <small>{deploymentAdminSummary.nodeEnv} · {deploymentAdminSummary.webOrigin}</small>
+              </article>
+            </div>
+            <div className="workspace-deployment-list">
+              {deploymentAdminSummary.dependencies.map((dependency) => (
+                <article
+                  className={`workspace-deployment-card workspace-deployment-card--${dependency.status}`}
+                  key={dependency.name}
+                >
+                  <div>
+                    <strong>{formatDependencyName(dependency.name)}</strong>
+                    <p>{formatDependencyStatus(dependency.status)}</p>
+                    {dependency.detail ? <small>{dependency.detail}</small> : null}
+                  </div>
+                </article>
+              ))}
+            </div>
+            <p className="clear-copy">
+              Checked at {deploymentAdminSummary.checkedAt.slice(0, 19).replace('T', ' ')}
+            </p>
+            {deploymentAdminSummary.availableActions.includes(
+              'refresh_deployment_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={deploymentAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleDeploymentAdminAction('refresh_deployment_summary')
+                }
+              >
+                {formatDeploymentAdminAction('refresh_deployment_summary')}
               </button>
             ) : null}
           </div>

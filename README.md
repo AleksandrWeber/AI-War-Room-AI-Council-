@@ -523,6 +523,25 @@ Workspace quota admin tools:
 - Only workspace owners and admins can access quota admin endpoints.
 - The web billing panel shows quota admin tools for authorized roles.
 
+Deployment health rollout readiness:
+
+- `GET /api/deployment/readiness` returns operator-facing production deployment checklist results (`ready` or `not_ready`).
+- Checks cover API health, readiness probes, dependency health, and production web origin configuration.
+- The web billing panel shows deployment health rollout status and per-check guidance.
+
+Workspace deployment admin tools:
+
+- `GET /api/deployment/workspace/:workspaceId/admin` returns owner/admin deployment health summary.
+- `POST /api/deployment/workspace/:workspaceId/admin/actions` runs deployment admin actions such as refreshing the summary.
+- Only workspace owners and admins can access deployment admin endpoints.
+- The web billing panel shows deployment admin tools for authorized roles.
+
+Current `v5.31` behavior:
+
+- Deployment health rollout readiness validates API readiness and dependency health through `GET /api/deployment/readiness`.
+- Workspace owners and admins can inspect deployment health from `GET /api/deployment/workspace/:workspaceId/admin`.
+- The web billing panel shows deployment health rollout checks and workspace deployment admin tools.
+
 Current `v5.30` behavior:
 
 - Usage limits rollout readiness validates quota enforcement through `GET /api/usage/limits/readiness`.

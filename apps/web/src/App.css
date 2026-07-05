@@ -993,6 +993,31 @@
   color: var(--muted);
 }
 
+.workspace-deployment-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.workspace-deployment-card {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+}
+
+.workspace-deployment-card p,
+.workspace-deployment-card small {
+  margin: 0;
+  color: var(--muted);
+}
+
+.workspace-deployment-card--up {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-deployment-card--down {
+  border-color: color-mix(in srgb, var(--danger) 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

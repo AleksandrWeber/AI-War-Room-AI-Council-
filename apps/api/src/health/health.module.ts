@@ -8,5 +8,6 @@ import { ReadinessService } from './readiness.service.js'
   imports: [PersistenceModule],
   controllers: [HealthController],
   providers: [HealthService, ReadinessService],
+  exports: [HealthService, ReadinessService],
 })
 export class HealthModule {}

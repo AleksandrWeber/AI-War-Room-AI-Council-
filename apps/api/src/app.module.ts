@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config'
 import { validateEnv } from './config/env.js'
 import { AuthModule } from './auth/auth.module.js'
 import { BillingModule } from './billing/billing.module.js'
+import { DeploymentModule } from './deployment/deployment.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
 import { IdempotencyModule } from './idempotency/idempotency.module.js'
@@ -24,6 +25,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     HealthModule,
     AuthModule,
     BillingModule,
+    DeploymentModule,
     EvaluationModule,
     IdempotencyModule,
     WorkspacesModule,
