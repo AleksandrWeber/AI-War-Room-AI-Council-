@@ -292,6 +292,16 @@ import { VersionizabilityModule } from './versionizability/versionizability.modu
 import { MigratizabilityModule } from './migratizability/migratizability.module.js'
 import { UpgradizabilityModule } from './upgradizability/upgradizability.module.js'
 import { PatchizabilityModule } from './patchizability/patchizability.module.js'
+import { IntegrabilizabilityModule } from './integrabilizability/integrabilizability.module.js'
+import { ComposabilizabilityModule } from './composabilizability/composabilizability.module.js'
+import { ModularizabilityModule } from './modularizability/modularizability.module.js'
+import { ExtensibilizabilityModule } from './extensibilizability/extensibilizability.module.js'
+import { PluggabilizabilityModule } from './pluggabilizability/pluggabilizability.module.js'
+import { CompatibilizabilityModule } from './compatibilizability/compatibilizability.module.js'
+import { InteroperabilizabilityModule } from './interoperabilizability/interoperabilizability.module.js'
+import { ConnectabilizabilityModule } from './connectabilizability/connectabilizability.module.js'
+import { InterfabilizabilityModule } from './interfabilizability/interfabilizability.module.js'
+import { ProtocolizabilityModule } from './protocolizability/protocolizability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -603,6 +613,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     MigratizabilityModule,
     UpgradizabilityModule,
     PatchizabilityModule,
+    IntegrabilizabilityModule,
+    ComposabilizabilityModule,
+    ModularizabilityModule,
+    ExtensibilizabilityModule,
+    PluggabilizabilityModule,
+    CompatibilizabilityModule,
+    InteroperabilizabilityModule,
+    ConnectabilizabilityModule,
+    InterfabilizabilityModule,
+    ProtocolizabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

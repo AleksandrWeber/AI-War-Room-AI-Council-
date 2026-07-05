@@ -8505,6 +8505,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-integrabilizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-integrabilizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-integrabilizability-card p,
+.workspace-integrabilizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-integrabilizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-integrabilizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-composabilizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-composabilizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-composabilizability-card p,
+.workspace-composabilizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-composabilizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-composabilizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-modularizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-modularizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-modularizability-card p,
+.workspace-modularizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-modularizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-modularizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-extensibilizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-extensibilizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-extensibilizability-card p,
+.workspace-extensibilizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-extensibilizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-extensibilizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-pluggabilizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-pluggabilizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-pluggabilizability-card p,
+.workspace-pluggabilizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-pluggabilizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-pluggabilizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-compatibilizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-compatibilizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-compatibilizability-card p,
+.workspace-compatibilizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-compatibilizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-compatibilizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-interoperabilizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-interoperabilizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-interoperabilizability-card p,
+.workspace-interoperabilizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-interoperabilizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-interoperabilizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-connectabilizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-connectabilizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-connectabilizability-card p,
+.workspace-connectabilizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-connectabilizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-connectabilizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-interfabilizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-interfabilizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-interfabilizability-card p,
+.workspace-interfabilizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-interfabilizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-interfabilizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-protocolizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-protocolizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-protocolizability-card p,
+.workspace-protocolizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-protocolizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-protocolizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;
