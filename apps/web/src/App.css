@@ -10325,6 +10325,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-replicationizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-replicationizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-replicationizability-card p,
+.workspace-replicationizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-replicationizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-replicationizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-mirroringizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-mirroringizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-mirroringizability-card p,
+.workspace-mirroringizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-mirroringizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-mirroringizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-cloningizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-cloningizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-cloningizability-card p,
+.workspace-cloningizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-cloningizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-cloningizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-propagationizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-propagationizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-propagationizability-card p,
+.workspace-propagationizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-propagationizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-propagationizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-materializationizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-materializationizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-materializationizability-card p,
+.workspace-materializationizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-materializationizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-materializationizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-hydrationizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-hydrationizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-hydrationizability-card p,
+.workspace-hydrationizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-hydrationizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-hydrationizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-invalidationizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-invalidationizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-invalidationizability-card p,
+.workspace-invalidationizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-invalidationizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-invalidationizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-evictionizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-evictionizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-evictionizability-card p,
+.workspace-evictionizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-evictionizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-evictionizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-ttlizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-ttlizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-ttlizability-card p,
+.workspace-ttlizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-ttlizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-ttlizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-expirationizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-expirationizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-expirationizability-card p,
+.workspace-expirationizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-expirationizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-expirationizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

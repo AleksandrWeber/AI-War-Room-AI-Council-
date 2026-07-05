@@ -754,6 +754,26 @@ import type {
   AppendizabilityAdminSummaryResponse,
   WalizabilityRolloutResponse,
   WalizabilityAdminSummaryResponse,
+  ReplicationizabilityRolloutResponse,
+  ReplicationizabilityAdminSummaryResponse,
+  MirroringizabilityRolloutResponse,
+  MirroringizabilityAdminSummaryResponse,
+  CloningizabilityRolloutResponse,
+  CloningizabilityAdminSummaryResponse,
+  PropagationizabilityRolloutResponse,
+  PropagationizabilityAdminSummaryResponse,
+  MaterializationizabilityRolloutResponse,
+  MaterializationizabilityAdminSummaryResponse,
+  HydrationizabilityRolloutResponse,
+  HydrationizabilityAdminSummaryResponse,
+  InvalidationizabilityRolloutResponse,
+  InvalidationizabilityAdminSummaryResponse,
+  EvictionizabilityRolloutResponse,
+  EvictionizabilityAdminSummaryResponse,
+  TtlizabilityRolloutResponse,
+  TtlizabilityAdminSummaryResponse,
+  ExpirationizabilityRolloutResponse,
+  ExpirationizabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -4106,6 +4126,96 @@ import {
   formatWalizabilityRolloutStatus,
 } from './walizability-ui'
 import {
+  executeReplicationizabilityAdminAction,
+  fetchReplicationizabilityAdminSummary,
+  fetchReplicationizabilityRollout,
+  formatReplicationizabilityAdminAction,
+  formatReplicationizabilityDomain,
+  formatReplicationizabilityRolloutCheckStatus,
+  formatReplicationizabilityRolloutStatus,
+} from './replicationizability-ui'
+import {
+  executeMirroringizabilityAdminAction,
+  fetchMirroringizabilityAdminSummary,
+  fetchMirroringizabilityRollout,
+  formatMirroringizabilityAdminAction,
+  formatMirroringizabilityDomain,
+  formatMirroringizabilityRolloutCheckStatus,
+  formatMirroringizabilityRolloutStatus,
+} from './mirroringizability-ui'
+import {
+  executeCloningizabilityAdminAction,
+  fetchCloningizabilityAdminSummary,
+  fetchCloningizabilityRollout,
+  formatCloningizabilityAdminAction,
+  formatCloningizabilityDomain,
+  formatCloningizabilityRolloutCheckStatus,
+  formatCloningizabilityRolloutStatus,
+} from './cloningizability-ui'
+import {
+  executePropagationizabilityAdminAction,
+  fetchPropagationizabilityAdminSummary,
+  fetchPropagationizabilityRollout,
+  formatPropagationizabilityAdminAction,
+  formatPropagationizabilityDomain,
+  formatPropagationizabilityRolloutCheckStatus,
+  formatPropagationizabilityRolloutStatus,
+} from './propagationizability-ui'
+import {
+  executeMaterializationizabilityAdminAction,
+  fetchMaterializationizabilityAdminSummary,
+  fetchMaterializationizabilityRollout,
+  formatMaterializationizabilityAdminAction,
+  formatMaterializationizabilityDomain,
+  formatMaterializationizabilityRolloutCheckStatus,
+  formatMaterializationizabilityRolloutStatus,
+} from './materializationizability-ui'
+import {
+  executeHydrationizabilityAdminAction,
+  fetchHydrationizabilityAdminSummary,
+  fetchHydrationizabilityRollout,
+  formatHydrationizabilityAdminAction,
+  formatHydrationizabilityDomain,
+  formatHydrationizabilityRolloutCheckStatus,
+  formatHydrationizabilityRolloutStatus,
+} from './hydrationizability-ui'
+import {
+  executeInvalidationizabilityAdminAction,
+  fetchInvalidationizabilityAdminSummary,
+  fetchInvalidationizabilityRollout,
+  formatInvalidationizabilityAdminAction,
+  formatInvalidationizabilityDomain,
+  formatInvalidationizabilityRolloutCheckStatus,
+  formatInvalidationizabilityRolloutStatus,
+} from './invalidationizability-ui'
+import {
+  executeEvictionizabilityAdminAction,
+  fetchEvictionizabilityAdminSummary,
+  fetchEvictionizabilityRollout,
+  formatEvictionizabilityAdminAction,
+  formatEvictionizabilityDomain,
+  formatEvictionizabilityRolloutCheckStatus,
+  formatEvictionizabilityRolloutStatus,
+} from './evictionizability-ui'
+import {
+  executeTtlizabilityAdminAction,
+  fetchTtlizabilityAdminSummary,
+  fetchTtlizabilityRollout,
+  formatTtlizabilityAdminAction,
+  formatTtlizabilityDomain,
+  formatTtlizabilityRolloutCheckStatus,
+  formatTtlizabilityRolloutStatus,
+} from './ttlizability-ui'
+import {
+  executeExpirationizabilityAdminAction,
+  fetchExpirationizabilityAdminSummary,
+  fetchExpirationizabilityRollout,
+  formatExpirationizabilityAdminAction,
+  formatExpirationizabilityDomain,
+  formatExpirationizabilityRolloutCheckStatus,
+  formatExpirationizabilityRolloutStatus,
+} from './expirationizability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -5394,6 +5504,26 @@ function App() {
     useState<AppendizabilityRolloutResponse | null>(null)
   const [walizabilityRollout, setWalizabilityRollout] =
     useState<WalizabilityRolloutResponse | null>(null)
+  const [replicationizabilityRollout, setReplicationizabilityRollout] =
+    useState<ReplicationizabilityRolloutResponse | null>(null)
+  const [mirroringizabilityRollout, setMirroringizabilityRollout] =
+    useState<MirroringizabilityRolloutResponse | null>(null)
+  const [cloningizabilityRollout, setCloningizabilityRollout] =
+    useState<CloningizabilityRolloutResponse | null>(null)
+  const [propagationizabilityRollout, setPropagationizabilityRollout] =
+    useState<PropagationizabilityRolloutResponse | null>(null)
+  const [materializationizabilityRollout, setMaterializationizabilityRollout] =
+    useState<MaterializationizabilityRolloutResponse | null>(null)
+  const [hydrationizabilityRollout, setHydrationizabilityRollout] =
+    useState<HydrationizabilityRolloutResponse | null>(null)
+  const [invalidationizabilityRollout, setInvalidationizabilityRollout] =
+    useState<InvalidationizabilityRolloutResponse | null>(null)
+  const [evictionizabilityRollout, setEvictionizabilityRollout] =
+    useState<EvictionizabilityRolloutResponse | null>(null)
+  const [ttlizabilityRollout, setTtlizabilityRollout] =
+    useState<TtlizabilityRolloutResponse | null>(null)
+  const [expirationizabilityRollout, setExpirationizabilityRollout] =
+    useState<ExpirationizabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -6211,6 +6341,26 @@ function App() {
     useState<AppendizabilityAdminSummaryResponse | null>(null)
   const [walizabilityAdminSummary, setWalizabilityAdminSummary] =
     useState<WalizabilityAdminSummaryResponse | null>(null)
+  const [replicationizabilityAdminSummary, setReplicationizabilityAdminSummary] =
+    useState<ReplicationizabilityAdminSummaryResponse | null>(null)
+  const [mirroringizabilityAdminSummary, setMirroringizabilityAdminSummary] =
+    useState<MirroringizabilityAdminSummaryResponse | null>(null)
+  const [cloningizabilityAdminSummary, setCloningizabilityAdminSummary] =
+    useState<CloningizabilityAdminSummaryResponse | null>(null)
+  const [propagationizabilityAdminSummary, setPropagationizabilityAdminSummary] =
+    useState<PropagationizabilityAdminSummaryResponse | null>(null)
+  const [materializationizabilityAdminSummary, setMaterializationizabilityAdminSummary] =
+    useState<MaterializationizabilityAdminSummaryResponse | null>(null)
+  const [hydrationizabilityAdminSummary, setHydrationizabilityAdminSummary] =
+    useState<HydrationizabilityAdminSummaryResponse | null>(null)
+  const [invalidationizabilityAdminSummary, setInvalidationizabilityAdminSummary] =
+    useState<InvalidationizabilityAdminSummaryResponse | null>(null)
+  const [evictionizabilityAdminSummary, setEvictionizabilityAdminSummary] =
+    useState<EvictionizabilityAdminSummaryResponse | null>(null)
+  const [ttlizabilityAdminSummary, setTtlizabilityAdminSummary] =
+    useState<TtlizabilityAdminSummaryResponse | null>(null)
+  const [expirationizabilityAdminSummary, setExpirationizabilityAdminSummary] =
+    useState<ExpirationizabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -7319,6 +7469,36 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [walizabilityAdminAction, setWalizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [replicationizabilityAdminAction, setReplicationizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [mirroringizabilityAdminAction, setMirroringizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [cloningizabilityAdminAction, setCloningizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [propagationizabilityAdminAction, setPropagationizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [materializationizabilityAdminAction, setMaterializationizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [hydrationizabilityAdminAction, setHydrationizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [invalidationizabilityAdminAction, setInvalidationizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [evictionizabilityAdminAction, setEvictionizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [ttlizabilityAdminAction, setTtlizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [expirationizabilityAdminAction, setExpirationizabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -11880,6 +12060,126 @@ function App() {
         }
       })
 
+    fetchReplicationizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setReplicationizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setReplicationizabilityRollout(null)
+        }
+      })
+
+    fetchMirroringizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setMirroringizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setMirroringizabilityRollout(null)
+        }
+      })
+
+    fetchCloningizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setCloningizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setCloningizabilityRollout(null)
+        }
+      })
+
+    fetchPropagationizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setPropagationizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setPropagationizabilityRollout(null)
+        }
+      })
+
+    fetchMaterializationizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setMaterializationizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setMaterializationizabilityRollout(null)
+        }
+      })
+
+    fetchHydrationizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setHydrationizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setHydrationizabilityRollout(null)
+        }
+      })
+
+    fetchInvalidationizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setInvalidationizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setInvalidationizabilityRollout(null)
+        }
+      })
+
+    fetchEvictionizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setEvictionizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setEvictionizabilityRollout(null)
+        }
+      })
+
+    fetchTtlizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setTtlizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTtlizabilityRollout(null)
+        }
+      })
+
+    fetchExpirationizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setExpirationizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setExpirationizabilityRollout(null)
+        }
+      })
+
     fetchUsageCapabilities(apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
@@ -15156,6 +15456,76 @@ function App() {
         workspaceAuthHeaders,
       )
       setWalizabilityAdminSummary(walizabilityAdmin)
+
+      const replicationizabilityAdmin = await fetchReplicationizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReplicationizabilityAdminSummary(replicationizabilityAdmin)
+
+      const mirroringizabilityAdmin = await fetchMirroringizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMirroringizabilityAdminSummary(mirroringizabilityAdmin)
+
+      const cloningizabilityAdmin = await fetchCloningizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCloningizabilityAdminSummary(cloningizabilityAdmin)
+
+      const propagationizabilityAdmin = await fetchPropagationizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPropagationizabilityAdminSummary(propagationizabilityAdmin)
+
+      const materializationizabilityAdmin = await fetchMaterializationizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMaterializationizabilityAdminSummary(materializationizabilityAdmin)
+
+      const hydrationizabilityAdmin = await fetchHydrationizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setHydrationizabilityAdminSummary(hydrationizabilityAdmin)
+
+      const invalidationizabilityAdmin = await fetchInvalidationizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setInvalidationizabilityAdminSummary(invalidationizabilityAdmin)
+
+      const evictionizabilityAdmin = await fetchEvictionizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEvictionizabilityAdminSummary(evictionizabilityAdmin)
+
+      const ttlizabilityAdmin = await fetchTtlizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTtlizabilityAdminSummary(ttlizabilityAdmin)
+
+      const expirationizabilityAdmin = await fetchExpirationizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setExpirationizabilityAdminSummary(expirationizabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -16388,6 +16758,296 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleExpirationizabilityAdminAction(
+    action: 'refresh_expirationizability_summary',
+  ) {
+    setExpirationizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeExpirationizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchExpirationizabilityRollout(apiBaseUrl)
+      setExpirationizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run expirationizability admin action.',
+      )
+    } finally {
+      setExpirationizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleTtlizabilityAdminAction(
+    action: 'refresh_ttlizability_summary',
+  ) {
+    setTtlizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeTtlizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchTtlizabilityRollout(apiBaseUrl)
+      setTtlizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run ttlizability admin action.',
+      )
+    } finally {
+      setTtlizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleEvictionizabilityAdminAction(
+    action: 'refresh_evictionizability_summary',
+  ) {
+    setEvictionizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeEvictionizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchEvictionizabilityRollout(apiBaseUrl)
+      setEvictionizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run evictionizability admin action.',
+      )
+    } finally {
+      setEvictionizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleInvalidationizabilityAdminAction(
+    action: 'refresh_invalidationizability_summary',
+  ) {
+    setInvalidationizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeInvalidationizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchInvalidationizabilityRollout(apiBaseUrl)
+      setInvalidationizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run invalidationizability admin action.',
+      )
+    } finally {
+      setInvalidationizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleHydrationizabilityAdminAction(
+    action: 'refresh_hydrationizability_summary',
+  ) {
+    setHydrationizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeHydrationizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchHydrationizabilityRollout(apiBaseUrl)
+      setHydrationizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run hydrationizability admin action.',
+      )
+    } finally {
+      setHydrationizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleMaterializationizabilityAdminAction(
+    action: 'refresh_materializationizability_summary',
+  ) {
+    setMaterializationizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeMaterializationizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchMaterializationizabilityRollout(apiBaseUrl)
+      setMaterializationizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run materializationizability admin action.',
+      )
+    } finally {
+      setMaterializationizabilityAdminAction('idle')
+    }
+  }
+
+  async function handlePropagationizabilityAdminAction(
+    action: 'refresh_propagationizability_summary',
+  ) {
+    setPropagationizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executePropagationizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchPropagationizabilityRollout(apiBaseUrl)
+      setPropagationizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run propagationizability admin action.',
+      )
+    } finally {
+      setPropagationizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleCloningizabilityAdminAction(
+    action: 'refresh_cloningizability_summary',
+  ) {
+    setCloningizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeCloningizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchCloningizabilityRollout(apiBaseUrl)
+      setCloningizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run cloningizability admin action.',
+      )
+    } finally {
+      setCloningizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleMirroringizabilityAdminAction(
+    action: 'refresh_mirroringizability_summary',
+  ) {
+    setMirroringizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeMirroringizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchMirroringizabilityRollout(apiBaseUrl)
+      setMirroringizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run mirroringizability admin action.',
+      )
+    } finally {
+      setMirroringizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleReplicationizabilityAdminAction(
+    action: 'refresh_replicationizability_summary',
+  ) {
+    setReplicationizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeReplicationizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchReplicationizabilityRollout(apiBaseUrl)
+      setReplicationizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run replicationizability admin action.',
+      )
+    } finally {
+      setReplicationizabilityAdminAction('idle')
     }
   }
 
@@ -37365,6 +38025,296 @@ function App() {
               ))}
             </div>
             <small>Checked at {quorumizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {materializationizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production materializationizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${materializationizabilityRollout.status}`}
+              >
+                {formatMaterializationizabilityRolloutStatus(materializationizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{materializationizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {materializationizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatMaterializationizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {materializationizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {propagationizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production propagationizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${propagationizabilityRollout.status}`}
+              >
+                {formatPropagationizabilityRolloutStatus(propagationizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{propagationizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {propagationizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatPropagationizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {propagationizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {cloningizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production cloningizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${cloningizabilityRollout.status}`}
+              >
+                {formatCloningizabilityRolloutStatus(cloningizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{cloningizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {cloningizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatCloningizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {cloningizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {mirroringizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production mirroringizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${mirroringizabilityRollout.status}`}
+              >
+                {formatMirroringizabilityRolloutStatus(mirroringizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{mirroringizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {mirroringizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatMirroringizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {mirroringizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {replicationizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production replicationizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${replicationizabilityRollout.status}`}
+              >
+                {formatReplicationizabilityRolloutStatus(replicationizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{replicationizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {replicationizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatReplicationizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {replicationizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {expirationizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production expirationizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${expirationizabilityRollout.status}`}
+              >
+                {formatExpirationizabilityRolloutStatus(expirationizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{expirationizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {expirationizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatExpirationizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {expirationizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {ttlizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production ttlizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${ttlizabilityRollout.status}`}
+              >
+                {formatTtlizabilityRolloutStatus(ttlizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{ttlizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {ttlizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatTtlizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {ttlizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {evictionizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production evictionizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${evictionizabilityRollout.status}`}
+              >
+                {formatEvictionizabilityRolloutStatus(evictionizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{evictionizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {evictionizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatEvictionizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {evictionizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {invalidationizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production invalidationizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${invalidationizabilityRollout.status}`}
+              >
+                {formatInvalidationizabilityRolloutStatus(invalidationizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{invalidationizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {invalidationizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatInvalidationizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {invalidationizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {hydrationizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production hydrationizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${hydrationizabilityRollout.status}`}
+              >
+                {formatHydrationizabilityRolloutStatus(hydrationizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{hydrationizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {hydrationizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatHydrationizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {hydrationizabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -61752,6 +62702,656 @@ function App() {
                 }
               >
                 {formatQuorumizabilityAdminAction('refresh_quorumizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {materializationizabilityAdminSummary ? (
+          <div className="billing-admin workspace-materializationizability-admin">
+            <div className="billing-admin__header">
+              <span>Materializationizability admin</span>
+              <strong>{materializationizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{materializationizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Model health materializationizability</span>
+                <strong>
+                  {materializationizabilityAdminSummary.stats.materializationizabilityPercent}%
+                </strong>
+                <small>
+                  {materializationizabilityAdminSummary.stats.coveredDomains}/
+                  {materializationizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Materializationizability signals</span>
+                <strong>{materializationizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {materializationizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, model health events, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-materializationizability-list">
+              {materializationizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-materializationizability-card workspace-materializationizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatMaterializationizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {materializationizabilityAdminSummary.availableActions.includes(
+              'refresh_materializationizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={materializationizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleMaterializationizabilityAdminAction(
+                    'refresh_materializationizability_summary',
+                  )
+                }
+              >
+                {formatMaterializationizabilityAdminAction('refresh_materializationizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {propagationizabilityAdminSummary ? (
+          <div className="billing-admin workspace-propagationizability-admin">
+            <div className="billing-admin__header">
+              <span>Propagationizability admin</span>
+              <strong>{propagationizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{propagationizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Provider credential propagationizability</span>
+                <strong>
+                  {propagationizabilityAdminSummary.stats.propagationizabilityPercent}%
+                </strong>
+                <small>
+                  {propagationizabilityAdminSummary.stats.coveredDomains}/
+                  {propagationizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Propagationizability signals</span>
+                <strong>{propagationizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {propagationizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, provider credentials, and model registry entries'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-propagationizability-list">
+              {propagationizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-propagationizability-card workspace-propagationizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatPropagationizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {propagationizabilityAdminSummary.availableActions.includes(
+              'refresh_propagationizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={propagationizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handlePropagationizabilityAdminAction(
+                    'refresh_propagationizability_summary',
+                  )
+                }
+              >
+                {formatPropagationizabilityAdminAction('refresh_propagationizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {cloningizabilityAdminSummary ? (
+          <div className="billing-admin workspace-cloningizability-admin">
+            <div className="billing-admin__header">
+              <span>Cloningizability admin</span>
+              <strong>{cloningizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{cloningizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workspace limit cloningizability</span>
+                <strong>
+                  {cloningizabilityAdminSummary.stats.cloningizabilityPercent}%
+                </strong>
+                <small>
+                  {cloningizabilityAdminSummary.stats.coveredDomains}/
+                  {cloningizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Cloningizability signals</span>
+                <strong>{cloningizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {cloningizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace usage limits, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-cloningizability-list">
+              {cloningizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-cloningizability-card workspace-cloningizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatCloningizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {cloningizabilityAdminSummary.availableActions.includes(
+              'refresh_cloningizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={cloningizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleCloningizabilityAdminAction(
+                    'refresh_cloningizability_summary',
+                  )
+                }
+              >
+                {formatCloningizabilityAdminAction('refresh_cloningizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {mirroringizabilityAdminSummary ? (
+          <div className="billing-admin workspace-mirroringizability-admin">
+            <div className="billing-admin__header">
+              <span>Mirroringizability admin</span>
+              <strong>{mirroringizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{mirroringizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Meter usage mirroringizability</span>
+                <strong>
+                  {mirroringizabilityAdminSummary.stats.mirroringizabilityPercent}%
+                </strong>
+                <small>
+                  {mirroringizabilityAdminSummary.stats.coveredDomains}/
+                  {mirroringizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Mirroringizability signals</span>
+                <strong>{mirroringizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {mirroringizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, meter usage reports, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-mirroringizability-list">
+              {mirroringizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-mirroringizability-card workspace-mirroringizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatMirroringizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {mirroringizabilityAdminSummary.availableActions.includes(
+              'refresh_mirroringizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={mirroringizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleMirroringizabilityAdminAction(
+                    'refresh_mirroringizability_summary',
+                  )
+                }
+              >
+                {formatMirroringizabilityAdminAction('refresh_mirroringizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {replicationizabilityAdminSummary ? (
+          <div className="billing-admin workspace-replicationizability-admin">
+            <div className="billing-admin__header">
+              <span>Replicationizability admin</span>
+              <strong>{replicationizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{replicationizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing webhook replicationizability</span>
+                <strong>
+                  {replicationizabilityAdminSummary.stats.replicationizabilityPercent}%
+                </strong>
+                <small>
+                  {replicationizabilityAdminSummary.stats.coveredDomains}/
+                  {replicationizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Replicationizability signals</span>
+                <strong>{replicationizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {replicationizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing webhook events, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-replicationizability-list">
+              {replicationizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-replicationizability-card workspace-replicationizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatReplicationizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {replicationizabilityAdminSummary.availableActions.includes(
+              'refresh_replicationizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={replicationizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleReplicationizabilityAdminAction(
+                    'refresh_replicationizability_summary',
+                  )
+                }
+              >
+                {formatReplicationizabilityAdminAction('refresh_replicationizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {expirationizabilityAdminSummary ? (
+          <div className="billing-admin workspace-expirationizability-admin">
+            <div className="billing-admin__header">
+              <span>Expirationizability admin</span>
+              <strong>{expirationizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{expirationizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification expirationizability</span>
+                <strong>
+                  {expirationizabilityAdminSummary.stats.expirationizabilityPercent}%
+                </strong>
+                <small>
+                  {expirationizabilityAdminSummary.stats.coveredDomains}/
+                  {expirationizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Expirationizability signals</span>
+                <strong>{expirationizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {expirationizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-expirationizability-list">
+              {expirationizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-expirationizability-card workspace-expirationizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatExpirationizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {expirationizabilityAdminSummary.availableActions.includes(
+              'refresh_expirationizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={expirationizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleExpirationizabilityAdminAction(
+                    'refresh_expirationizability_summary',
+                  )
+                }
+              >
+                {formatExpirationizabilityAdminAction('refresh_expirationizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {ttlizabilityAdminSummary ? (
+          <div className="billing-admin workspace-ttlizability-admin">
+            <div className="billing-admin__header">
+              <span>Ttlizability admin</span>
+              <strong>{ttlizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{ttlizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice ttlizability</span>
+                <strong>
+                  {ttlizabilityAdminSummary.stats.ttlizabilityPercent}%
+                </strong>
+                <small>
+                  {ttlizabilityAdminSummary.stats.coveredDomains}/
+                  {ttlizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Ttlizability signals</span>
+                <strong>{ttlizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {ttlizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-ttlizability-list">
+              {ttlizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-ttlizability-card workspace-ttlizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatTtlizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {ttlizabilityAdminSummary.availableActions.includes(
+              'refresh_ttlizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={ttlizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleTtlizabilityAdminAction(
+                    'refresh_ttlizability_summary',
+                  )
+                }
+              >
+                {formatTtlizabilityAdminAction('refresh_ttlizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {evictionizabilityAdminSummary ? (
+          <div className="billing-admin workspace-evictionizability-admin">
+            <div className="billing-admin__header">
+              <span>Evictionizability admin</span>
+              <strong>{evictionizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{evictionizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership evictionizability</span>
+                <strong>
+                  {evictionizabilityAdminSummary.stats.evictionizabilityPercent}%
+                </strong>
+                <small>
+                  {evictionizabilityAdminSummary.stats.coveredDomains}/
+                  {evictionizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Evictionizability signals</span>
+                <strong>{evictionizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {evictionizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-evictionizability-list">
+              {evictionizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-evictionizability-card workspace-evictionizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatEvictionizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {evictionizabilityAdminSummary.availableActions.includes(
+              'refresh_evictionizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={evictionizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleEvictionizabilityAdminAction(
+                    'refresh_evictionizability_summary',
+                  )
+                }
+              >
+                {formatEvictionizabilityAdminAction('refresh_evictionizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {invalidationizabilityAdminSummary ? (
+          <div className="billing-admin workspace-invalidationizability-admin">
+            <div className="billing-admin__header">
+              <span>Invalidationizability admin</span>
+              <strong>{invalidationizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{invalidationizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key invalidationizability</span>
+                <strong>
+                  {invalidationizabilityAdminSummary.stats.invalidationizabilityPercent}%
+                </strong>
+                <small>
+                  {invalidationizabilityAdminSummary.stats.coveredDomains}/
+                  {invalidationizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Invalidationizability signals</span>
+                <strong>{invalidationizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {invalidationizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-invalidationizability-list">
+              {invalidationizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-invalidationizability-card workspace-invalidationizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatInvalidationizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {invalidationizabilityAdminSummary.availableActions.includes(
+              'refresh_invalidationizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={invalidationizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleInvalidationizabilityAdminAction(
+                    'refresh_invalidationizability_summary',
+                  )
+                }
+              >
+                {formatInvalidationizabilityAdminAction('refresh_invalidationizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {hydrationizabilityAdminSummary ? (
+          <div className="billing-admin workspace-hydrationizability-admin">
+            <div className="billing-admin__header">
+              <span>Hydrationizability admin</span>
+              <strong>{hydrationizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{hydrationizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan hydrationizability</span>
+                <strong>
+                  {hydrationizabilityAdminSummary.stats.hydrationizabilityPercent}%
+                </strong>
+                <small>
+                  {hydrationizabilityAdminSummary.stats.coveredDomains}/
+                  {hydrationizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Hydrationizability signals</span>
+                <strong>{hydrationizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {hydrationizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-hydrationizability-list">
+              {hydrationizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-hydrationizability-card workspace-hydrationizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatHydrationizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {hydrationizabilityAdminSummary.availableActions.includes(
+              'refresh_hydrationizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={hydrationizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleHydrationizabilityAdminAction(
+                    'refresh_hydrationizability_summary',
+                  )
+                }
+              >
+                {formatHydrationizabilityAdminAction('refresh_hydrationizability_summary')}
               </button>
             ) : null}
           </div>

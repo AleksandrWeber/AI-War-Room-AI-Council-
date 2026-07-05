@@ -213,6 +213,16 @@ import { SnapshotizabilityModule } from './snapshotizability/snapshotizability.m
 import { JournalizabilityModule } from './journalizability/journalizability.module.js'
 import { AppendizabilityModule } from './appendizability/appendizability.module.js'
 import { WalizabilityModule } from './walizability/walizability.module.js'
+import { ReplicationizabilityModule } from './replicationizability/replicationizability.module.js'
+import { MirroringizabilityModule } from './mirroringizability/mirroringizability.module.js'
+import { CloningizabilityModule } from './cloningizability/cloningizability.module.js'
+import { PropagationizabilityModule } from './propagationizability/propagationizability.module.js'
+import { MaterializationizabilityModule } from './materializationizability/materializationizability.module.js'
+import { HydrationizabilityModule } from './hydrationizability/hydrationizability.module.js'
+import { InvalidationizabilityModule } from './invalidationizability/invalidationizability.module.js'
+import { EvictionizabilityModule } from './evictionizability/evictionizability.module.js'
+import { TtlizabilityModule } from './ttlizability/ttlizability.module.js'
+import { ExpirationizabilityModule } from './expirationizability/expirationizability.module.js'
 
 @Module({
   imports: [
@@ -430,6 +440,16 @@ import { WalizabilityModule } from './walizability/walizability.module.js'
     JournalizabilityModule,
     AppendizabilityModule,
     WalizabilityModule,
+    ReplicationizabilityModule,
+    MirroringizabilityModule,
+    CloningizabilityModule,
+    PropagationizabilityModule,
+    MaterializationizabilityModule,
+    HydrationizabilityModule,
+    InvalidationizabilityModule,
+    EvictionizabilityModule,
+    TtlizabilityModule,
+    ExpirationizabilityModule,
   ],
   exports: [
     CustomizabilityModule,
