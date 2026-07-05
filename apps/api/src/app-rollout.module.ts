@@ -183,6 +183,16 @@ import { SynchronizabilityModule } from './synchronizability/synchronizability.m
 import { AsynchronizabilityModule } from './asynchronizability/asynchronizability.module.js'
 import { BroadcastizabilityModule } from './broadcastizability/broadcastizability.module.js'
 import { MulticastizabilityModule } from './multicastizability/multicastizability.module.js'
+import { UnicastizabilityModule } from './unicastizability/unicastizability.module.js'
+import { FanoutizabilityModule } from './fanoutizability/fanoutizability.module.js'
+import { BackpressureizabilityModule } from './backpressureizability/backpressureizability.module.js'
+import { ThrottleizabilityModule } from './throttleizability/throttleizability.module.js'
+import { DebouncizabilityModule } from './debouncizability/debouncizability.module.js'
+import { BufferizabilityModule } from './bufferizability/bufferizability.module.js'
+import { BatchizabilityModule } from './batchizability/batchizability.module.js'
+import { RetryizabilityModule } from './retryizability/retryizability.module.js'
+import { CircuitizabilityModule } from './circuitizability/circuitizability.module.js'
+import { TimeoutizabilityModule } from './timeoutizability/timeoutizability.module.js'
 
 @Module({
   imports: [
@@ -370,6 +380,16 @@ import { MulticastizabilityModule } from './multicastizability/multicastizabilit
     AsynchronizabilityModule,
     BroadcastizabilityModule,
     MulticastizabilityModule,
+    UnicastizabilityModule,
+    FanoutizabilityModule,
+    BackpressureizabilityModule,
+    ThrottleizabilityModule,
+    DebouncizabilityModule,
+    BufferizabilityModule,
+    BatchizabilityModule,
+    RetryizabilityModule,
+    CircuitizabilityModule,
+    TimeoutizabilityModule,
   ],
   exports: [
     CustomizabilityModule,
