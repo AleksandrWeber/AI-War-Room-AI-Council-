@@ -1393,6 +1393,31 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-durability-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.workspace-durability-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+}
+
+.workspace-durability-card p,
+.workspace-durability-card small {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+}
+
+.workspace-durability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-durability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

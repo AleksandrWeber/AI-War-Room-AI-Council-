@@ -66,6 +66,8 @@ import type {
   ConsistencyAdminSummaryResponse,
   IntegrityRolloutResponse,
   IntegrityAdminSummaryResponse,
+  DurabilityRolloutResponse,
+  DurabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -321,6 +323,15 @@ import {
   formatIntegrityRolloutCheckStatus,
   formatIntegrityRolloutStatus,
 } from './integrity-ui'
+import {
+  executeDurabilityAdminAction,
+  fetchDurabilityAdminSummary,
+  fetchDurabilityRollout,
+  formatDurabilityAdminAction,
+  formatDurabilityDomain,
+  formatDurabilityRolloutCheckStatus,
+  formatDurabilityRolloutStatus,
+} from './durability-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -922,6 +933,8 @@ function App() {
     useState<ConsistencyRolloutResponse | null>(null)
   const [integrityRollout, setIntegrityRollout] =
     useState<IntegrityRolloutResponse | null>(null)
+  const [durabilityRollout, setDurabilityRollout] =
+    useState<DurabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1051,6 +1064,8 @@ function App() {
     useState<ConsistencyAdminSummaryResponse | null>(null)
   const [integrityAdminSummary, setIntegrityAdminSummary] =
     useState<IntegrityAdminSummaryResponse | null>(null)
+  const [durabilityAdminSummary, setDurabilityAdminSummary] =
+    useState<DurabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1127,6 +1142,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [integrityAdminAction, setIntegrityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [durabilityAdminAction, setDurabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1557,6 +1575,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setIntegrityRollout(null)
+        }
+      })
+
+    fetchDurabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setDurabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDurabilityRollout(null)
         }
       })
 
@@ -2428,6 +2458,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setIntegrityAdminSummary(integrityAdmin)
+
+      const durabilityAdmin = await fetchDurabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDurabilityAdminSummary(durabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -3254,6 +3291,35 @@ function App() {
       )
     } finally {
       setIntegrityAdminAction('idle')
+    }
+  }
+
+  async function handleDurabilityAdminAction(
+    action: 'refresh_durability_summary',
+  ) {
+    setDurabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeDurabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchDurabilityRollout(apiBaseUrl)
+      setDurabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run durability admin action.',
+      )
+    } finally {
+      setDurabilityAdminAction('idle')
     }
   }
 
@@ -4685,6 +4751,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {integrityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {durabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production durability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${durabilityRollout.status}`}
+              >
+                {formatDurabilityRolloutStatus(durabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{durabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {durabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatDurabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {durabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -6708,6 +6803,69 @@ function App() {
                 }
               >
                 {formatIntegrityAdminAction('refresh_integrity_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {durabilityAdminSummary ? (
+          <div className="billing-admin workspace-durability-admin">
+            <div className="billing-admin__header">
+              <span>Durability admin</span>
+              <strong>{durabilityAdminSummary.role}</strong>
+            </div>
+            <p>{durabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Artifact durability</span>
+                <strong>
+                  {durabilityAdminSummary.stats.durabilityPercent}%
+                </strong>
+                <small>
+                  {durabilityAdminSummary.stats.coveredDomains}/
+                  {durabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Durability signals</span>
+                <strong>{durabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {durabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Artifacts, usage events, and idempotency signals'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-durability-list">
+              {durabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-durability-card workspace-durability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatDurabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {durabilityAdminSummary.availableActions.includes(
+              'refresh_durability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={durabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleDurabilityAdminAction('refresh_durability_summary')
+                }
+              >
+                {formatDurabilityAdminAction('refresh_durability_summary')}
               </button>
             ) : null}
           </div>

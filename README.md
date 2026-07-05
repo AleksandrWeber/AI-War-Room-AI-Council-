@@ -731,6 +731,25 @@ Workspace integrity admin tools:
 - Only workspace owners and admins can access integrity admin endpoints.
 - The web billing panel shows integrity admin tools for authorized roles.
 
+Production durability rollout readiness:
+
+- `GET /api/durability/readiness` returns operator-facing production durability checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, durability signal table coverage, artifact persistence durability, Redis persistence durability, and persistence readiness signals.
+- The web billing panel shows durability rollout status and per-check guidance.
+
+Workspace durability admin tools:
+
+- `GET /api/durability/workspace/:workspaceId/admin` returns owner/admin durability summary with workspace artifact and usage event domains.
+- `POST /api/durability/workspace/:workspaceId/admin/actions` runs durability admin actions such as refreshing the summary.
+- Only workspace owners and admins can access durability admin endpoints.
+- The web billing panel shows durability admin tools for authorized roles.
+
+Current `v5.47` behavior:
+
+- Production durability rollout readiness validates durability coverage and persistence readiness through `GET /api/durability/readiness`.
+- Workspace owners and admins can inspect workspace durability metrics from `GET /api/durability/workspace/:workspaceId/admin`.
+- The web billing panel shows durability rollout checks and workspace durability admin tools.
+
 Current `v5.46` behavior:
 
 - Production integrity rollout readiness validates integrity coverage and verification readiness through `GET /api/integrity/readiness`.
