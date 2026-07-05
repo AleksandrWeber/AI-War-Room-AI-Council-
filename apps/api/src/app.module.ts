@@ -222,6 +222,16 @@ import { GeneralizabilityModule } from './generalizability/generalizability.modu
 import { StandardizabilityModule } from './standardizability/standardizability.module.js'
 import { FormalizabilityModule } from './formalizability/formalizability.module.js'
 import { CanonicalizabilityModule } from './canonicalizability/canonicalizability.module.js'
+import { AbstractizabilityModule } from './abstractizability/abstractizability.module.js'
+import { ConcretizabilityModule } from './concretizability/concretizability.module.js'
+import { DefinizabilityModule } from './definizability/definizability.module.js'
+import { InferencizabilityModule } from './inferencizability/inferencizability.module.js'
+import { DeducizabilityModule } from './deducizability/deducizability.module.js'
+import { ProbabilizabilityModule } from './probabilizability/probabilizability.module.js'
+import { StochasticizabilityModule } from './stochasticizability/stochasticizability.module.js'
+import { DeterminizabilityModule } from './determinizability/determinizability.module.js'
+import { PredictizabilityModule } from './predictizability/predictizability.module.js'
+import { ExtrapolizabilityModule } from './extrapolizability/extrapolizability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -463,6 +473,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     StandardizabilityModule,
     FormalizabilityModule,
     CanonicalizabilityModule,
+    AbstractizabilityModule,
+    ConcretizabilityModule,
+    DefinizabilityModule,
+    InferencizabilityModule,
+    DeducizabilityModule,
+    ProbabilizabilityModule,
+    StochasticizabilityModule,
+    DeterminizabilityModule,
+    PredictizabilityModule,
+    ExtrapolizabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

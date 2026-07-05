@@ -1,5 +1,5 @@
 
-describe('contextualizability rollout integration', () => {
+describe('probabilizability rollout integration', () => {
   let app: NestFastifyApplication | undefined
 
   beforeAll(async () => {
@@ -21,27 +21,27 @@ describe('contextualizability rollout integration', () => {
     await app?.close()
   })
 
-  it('reports contextualizability capabilities and rollout readiness', async () => {
+  it('reports probabilizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app!.getHttpServer())
-      .get('/api/contextualizability/capabilities')
+      .get('/api/probabilizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsContextualizabilityRollout: true,
-      supportsContextualizabilityAdminTools: true,
-      supportsBillingWebhookContextualizabilitySignals: true,
+      supportsProbabilizabilityRollout: true,
+      supportsProbabilizabilityAdminTools: true,
+      supportsBillingWebhookProbabilizabilitySignals: true,
     })
 
     const rollout = await request(app!.getHttpServer())
-      .get('/api/contextualizability/readiness')
+      .get('/api/probabilizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns contextualizability admin summary for owners', async () => {
+  it('returns probabilizability admin summary for owners', async () => {
     const response = await request(app!.getHttpServer())
-      .get('/api/contextualizability/workspace/workspace_1/admin')
+      .get('/api/probabilizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -51,14 +51,14 @@ describe('contextualizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        contextualizabilityPercent: expect.any(Number),
+        probabilizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects contextualizability admin tools for members', async () => {
+  it('rejects probabilizability admin tools for members', async () => {
     await request(app!.getHttpServer())
-      .get('/api/contextualizability/workspace/workspace_1/admin')
+      .get('/api/probabilizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -68,7 +68,7 @@ describe('contextualizability rollout integration', () => {
 })
 
 
-describe('generalizability rollout integration', () => {
+describe('stochasticizability rollout integration', () => {
   let app: NestFastifyApplication | undefined
 
   beforeAll(async () => {
@@ -90,27 +90,27 @@ describe('generalizability rollout integration', () => {
     await app?.close()
   })
 
-  it('reports generalizability capabilities and rollout readiness', async () => {
+  it('reports stochasticizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app!.getHttpServer())
-      .get('/api/generalizability/capabilities')
+      .get('/api/stochasticizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsGeneralizabilityRollout: true,
-      supportsGeneralizabilityAdminTools: true,
-      supportsMeterUsageGeneralizabilitySignals: true,
+      supportsStochasticizabilityRollout: true,
+      supportsStochasticizabilityAdminTools: true,
+      supportsMeterUsageStochasticizabilitySignals: true,
     })
 
     const rollout = await request(app!.getHttpServer())
-      .get('/api/generalizability/readiness')
+      .get('/api/stochasticizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns generalizability admin summary for owners', async () => {
+  it('returns stochasticizability admin summary for owners', async () => {
     const response = await request(app!.getHttpServer())
-      .get('/api/generalizability/workspace/workspace_1/admin')
+      .get('/api/stochasticizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -120,14 +120,14 @@ describe('generalizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        generalizabilityPercent: expect.any(Number),
+        stochasticizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects generalizability admin tools for members', async () => {
+  it('rejects stochasticizability admin tools for members', async () => {
     await request(app!.getHttpServer())
-      .get('/api/generalizability/workspace/workspace_1/admin')
+      .get('/api/stochasticizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -137,7 +137,7 @@ describe('generalizability rollout integration', () => {
 })
 
 
-describe('standardizability rollout integration', () => {
+describe('determinizability rollout integration', () => {
   let app: NestFastifyApplication | undefined
 
   beforeAll(async () => {
@@ -159,27 +159,27 @@ describe('standardizability rollout integration', () => {
     await app?.close()
   })
 
-  it('reports standardizability capabilities and rollout readiness', async () => {
+  it('reports determinizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app!.getHttpServer())
-      .get('/api/standardizability/capabilities')
+      .get('/api/determinizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsStandardizabilityRollout: true,
-      supportsStandardizabilityAdminTools: true,
-      supportsWorkspaceLimitStandardizabilitySignals: true,
+      supportsDeterminizabilityRollout: true,
+      supportsDeterminizabilityAdminTools: true,
+      supportsWorkspaceLimitDeterminizabilitySignals: true,
     })
 
     const rollout = await request(app!.getHttpServer())
-      .get('/api/standardizability/readiness')
+      .get('/api/determinizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns standardizability admin summary for owners', async () => {
+  it('returns determinizability admin summary for owners', async () => {
     const response = await request(app!.getHttpServer())
-      .get('/api/standardizability/workspace/workspace_1/admin')
+      .get('/api/determinizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -189,14 +189,14 @@ describe('standardizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        standardizabilityPercent: expect.any(Number),
+        determinizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects standardizability admin tools for members', async () => {
+  it('rejects determinizability admin tools for members', async () => {
     await request(app!.getHttpServer())
-      .get('/api/standardizability/workspace/workspace_1/admin')
+      .get('/api/determinizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -206,7 +206,7 @@ describe('standardizability rollout integration', () => {
 })
 
 
-describe('formalizability rollout integration', () => {
+describe('predictizability rollout integration', () => {
   let app: NestFastifyApplication | undefined
 
   beforeAll(async () => {
@@ -228,27 +228,27 @@ describe('formalizability rollout integration', () => {
     await app?.close()
   })
 
-  it('reports formalizability capabilities and rollout readiness', async () => {
+  it('reports predictizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app!.getHttpServer())
-      .get('/api/formalizability/capabilities')
+      .get('/api/predictizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsFormalizabilityRollout: true,
-      supportsFormalizabilityAdminTools: true,
-      supportsProviderCredentialFormalizabilitySignals: true,
+      supportsPredictizabilityRollout: true,
+      supportsPredictizabilityAdminTools: true,
+      supportsProviderCredentialPredictizabilitySignals: true,
     })
 
     const rollout = await request(app!.getHttpServer())
-      .get('/api/formalizability/readiness')
+      .get('/api/predictizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns formalizability admin summary for owners', async () => {
+  it('returns predictizability admin summary for owners', async () => {
     const response = await request(app!.getHttpServer())
-      .get('/api/formalizability/workspace/workspace_1/admin')
+      .get('/api/predictizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -258,14 +258,14 @@ describe('formalizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        formalizabilityPercent: expect.any(Number),
+        predictizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects formalizability admin tools for members', async () => {
+  it('rejects predictizability admin tools for members', async () => {
     await request(app!.getHttpServer())
-      .get('/api/formalizability/workspace/workspace_1/admin')
+      .get('/api/predictizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -275,7 +275,7 @@ describe('formalizability rollout integration', () => {
 })
 
 
-describe('canonicalizability rollout integration', () => {
+describe('extrapolizability rollout integration', () => {
   let app: NestFastifyApplication | undefined
 
   beforeAll(async () => {
@@ -297,27 +297,27 @@ describe('canonicalizability rollout integration', () => {
     await app?.close()
   })
 
-  it('reports canonicalizability capabilities and rollout readiness', async () => {
+  it('reports extrapolizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app!.getHttpServer())
-      .get('/api/canonicalizability/capabilities')
+      .get('/api/extrapolizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsCanonicalizabilityRollout: true,
-      supportsCanonicalizabilityAdminTools: true,
-      supportsModelHealthCanonicalizabilitySignals: true,
+      supportsExtrapolizabilityRollout: true,
+      supportsExtrapolizabilityAdminTools: true,
+      supportsModelHealthExtrapolizabilitySignals: true,
     })
 
     const rollout = await request(app!.getHttpServer())
-      .get('/api/canonicalizability/readiness')
+      .get('/api/extrapolizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns canonicalizability admin summary for owners', async () => {
+  it('returns extrapolizability admin summary for owners', async () => {
     const response = await request(app!.getHttpServer())
-      .get('/api/canonicalizability/workspace/workspace_1/admin')
+      .get('/api/extrapolizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -327,14 +327,14 @@ describe('canonicalizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        canonicalizabilityPercent: expect.any(Number),
+        extrapolizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects canonicalizability admin tools for members', async () => {
+  it('rejects extrapolizability admin tools for members', async () => {
     await request(app!.getHttpServer())
-      .get('/api/canonicalizability/workspace/workspace_1/admin')
+      .get('/api/extrapolizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',

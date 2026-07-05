@@ -6685,6 +6685,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-abstractizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-abstractizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-abstractizability-card p,
+.workspace-abstractizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-abstractizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-abstractizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-concretizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-concretizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-concretizability-card p,
+.workspace-concretizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-concretizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-concretizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-definizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-definizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-definizability-card p,
+.workspace-definizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-definizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-definizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-inferencizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-inferencizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-inferencizability-card p,
+.workspace-inferencizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-inferencizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-inferencizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-deducizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-deducizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-deducizability-card p,
+.workspace-deducizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-deducizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-deducizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-probabilizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-probabilizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-probabilizability-card p,
+.workspace-probabilizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-probabilizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-probabilizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-stochasticizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-stochasticizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-stochasticizability-card p,
+.workspace-stochasticizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-stochasticizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-stochasticizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-determinizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-determinizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-determinizability-card p,
+.workspace-determinizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-determinizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-determinizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-predictizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-predictizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-predictizability-card p,
+.workspace-predictizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-predictizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-predictizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-extrapolizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-extrapolizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-extrapolizability-card p,
+.workspace-extrapolizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-extrapolizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-extrapolizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

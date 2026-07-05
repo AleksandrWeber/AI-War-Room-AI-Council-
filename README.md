@@ -916,6 +916,36 @@ Current `v5.236` behavior:
 - Workspace owners and admins can inspect workspace consolidatizability metrics from `GET /api/consolidatizability/workspace/:workspaceId/admin`.
 - The web billing panel shows consolidatizability rollout checks and workspace consolidatizability admin tools.
 
+Current `v5.255` behavior:
+
+- Production deducizability rollout readiness validates deducizability coverage and readiness through `GET /api/deducizability/readiness`.
+- Workspace owners and admins can inspect workspace deducizability metrics from `GET /api/deducizability/workspace/:workspaceId/admin`.
+- The web billing panel shows deducizability rollout checks and workspace deducizability admin tools.
+
+Current `v5.254` behavior:
+
+- Production inferencizability rollout readiness validates inferencizability coverage and readiness through `GET /api/inferencizability/readiness`.
+- Workspace owners and admins can inspect workspace inferencizability metrics from `GET /api/inferencizability/workspace/:workspaceId/admin`.
+- The web billing panel shows inferencizability rollout checks and workspace inferencizability admin tools.
+
+Current `v5.253` behavior:
+
+- Production definizability rollout readiness validates definizability coverage and readiness through `GET /api/definizability/readiness`.
+- Workspace owners and admins can inspect workspace definizability metrics from `GET /api/definizability/workspace/:workspaceId/admin`.
+- The web billing panel shows definizability rollout checks and workspace definizability admin tools.
+
+Current `v5.252` behavior:
+
+- Production concretizability rollout readiness validates concretizability coverage and readiness through `GET /api/concretizability/readiness`.
+- Workspace owners and admins can inspect workspace concretizability metrics from `GET /api/concretizability/workspace/:workspaceId/admin`.
+- The web billing panel shows concretizability rollout checks and workspace concretizability admin tools.
+
+Current `v5.251` behavior:
+
+- Production abstractizability rollout readiness validates abstractizability coverage and readiness through `GET /api/abstractizability/readiness`.
+- Workspace owners and admins can inspect workspace abstractizability metrics from `GET /api/abstractizability/workspace/:workspaceId/admin`.
+- The web billing panel shows abstractizability rollout checks and workspace abstractizability admin tools.
+
 Current `v5.250` behavior:
 
 - Production canonicalizability rollout readiness validates canonicalizability coverage and readiness through `GET /api/canonicalizability/readiness`.
@@ -945,6 +975,36 @@ Current `v5.246` behavior:
 - Production contextualizability rollout readiness validates contextualizability coverage and readiness through `GET /api/contextualizability/readiness`.
 - Workspace owners and admins can inspect workspace contextualizability metrics from `GET /api/contextualizability/workspace/:workspaceId/admin`.
 - The web billing panel shows contextualizability rollout checks and workspace contextualizability admin tools.
+
+Current `v5.260` behavior:
+
+- Production extrapolizability rollout readiness validates extrapolizability coverage and readiness through `GET /api/extrapolizability/readiness`.
+- Workspace owners and admins can inspect workspace extrapolizability metrics from `GET /api/extrapolizability/workspace/:workspaceId/admin`.
+- The web billing panel shows extrapolizability rollout checks and workspace extrapolizability admin tools.
+
+Current `v5.259` behavior:
+
+- Production predictizability rollout readiness validates predictizability coverage and readiness through `GET /api/predictizability/readiness`.
+- Workspace owners and admins can inspect workspace predictizability metrics from `GET /api/predictizability/workspace/:workspaceId/admin`.
+- The web billing panel shows predictizability rollout checks and workspace predictizability admin tools.
+
+Current `v5.258` behavior:
+
+- Production determinizability rollout readiness validates determinizability coverage and readiness through `GET /api/determinizability/readiness`.
+- Workspace owners and admins can inspect workspace determinizability metrics from `GET /api/determinizability/workspace/:workspaceId/admin`.
+- The web billing panel shows determinizability rollout checks and workspace determinizability admin tools.
+
+Current `v5.257` behavior:
+
+- Production stochasticizability rollout readiness validates stochasticizability coverage and readiness through `GET /api/stochasticizability/readiness`.
+- Workspace owners and admins can inspect workspace stochasticizability metrics from `GET /api/stochasticizability/workspace/:workspaceId/admin`.
+- The web billing panel shows stochasticizability rollout checks and workspace stochasticizability admin tools.
+
+Current `v5.256` behavior:
+
+- Production probabilizability rollout readiness validates probabilizability coverage and readiness through `GET /api/probabilizability/readiness`.
+- Workspace owners and admins can inspect workspace probabilizability metrics from `GET /api/probabilizability/workspace/:workspaceId/admin`.
+- The web billing panel shows probabilizability rollout checks and workspace probabilizability admin tools.
 
 Current `v5.225` behavior:
 
