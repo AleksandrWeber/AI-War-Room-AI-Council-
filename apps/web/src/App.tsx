@@ -58,6 +58,8 @@ import type {
   ResilienceAdminSummaryResponse,
   AvailabilityRolloutResponse,
   AvailabilityAdminSummaryResponse,
+  ReliabilityRolloutResponse,
+  ReliabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -277,6 +279,15 @@ import {
   formatAvailabilityRolloutCheckStatus,
   formatAvailabilityRolloutStatus,
 } from './availability-ui'
+import {
+  executeReliabilityAdminAction,
+  fetchReliabilityAdminSummary,
+  fetchReliabilityRollout,
+  formatReliabilityAdminAction,
+  formatReliabilityDomain,
+  formatReliabilityRolloutCheckStatus,
+  formatReliabilityRolloutStatus,
+} from './reliability-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -870,6 +881,8 @@ function App() {
     useState<ResilienceRolloutResponse | null>(null)
   const [availabilityRollout, setAvailabilityRollout] =
     useState<AvailabilityRolloutResponse | null>(null)
+  const [reliabilityRollout, setReliabilityRollout] =
+    useState<ReliabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -991,6 +1004,8 @@ function App() {
     useState<ResilienceAdminSummaryResponse | null>(null)
   const [availabilityAdminSummary, setAvailabilityAdminSummary] =
     useState<AvailabilityAdminSummaryResponse | null>(null)
+  const [reliabilityAdminSummary, setReliabilityAdminSummary] =
+    useState<ReliabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1055,6 +1070,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [availabilityAdminAction, setAvailabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [reliabilityAdminAction, setReliabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1437,6 +1455,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setAvailabilityRollout(null)
+        }
+      })
+
+    fetchReliabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setReliabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setReliabilityRollout(null)
         }
       })
 
@@ -2280,6 +2310,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setAvailabilityAdminSummary(availabilityAdmin)
+
+      const reliabilityAdmin = await fetchReliabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReliabilityAdminSummary(reliabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -2990,6 +3027,35 @@ function App() {
       )
     } finally {
       setAvailabilityAdminAction('idle')
+    }
+  }
+
+  async function handleReliabilityAdminAction(
+    action: 'refresh_reliability_summary',
+  ) {
+    setReliabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeReliabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchReliabilityRollout(apiBaseUrl)
+      setReliabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run reliability admin action.',
+      )
+    } finally {
+      setReliabilityAdminAction('idle')
     }
   }
 
@@ -4305,6 +4371,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {availabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {reliabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production reliability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${reliabilityRollout.status}`}
+              >
+                {formatReliabilityRolloutStatus(reliabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{reliabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {reliabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatReliabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {reliabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -6080,6 +6175,67 @@ function App() {
                 }
               >
                 {formatAvailabilityAdminAction('refresh_availability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {reliabilityAdminSummary ? (
+          <div className="billing-admin workspace-reliability-admin">
+            <div className="billing-admin__header">
+              <span>Reliability admin</span>
+              <strong>{reliabilityAdminSummary.role}</strong>
+            </div>
+            <p>{reliabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Run reliability</span>
+                <strong>{reliabilityAdminSummary.stats.reliabilityPercent}%</strong>
+                <small>
+                  {reliabilityAdminSummary.stats.coveredDomains}/
+                  {reliabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Reliability signals</span>
+                <strong>{reliabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {reliabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency, and model health signals'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-reliability-list">
+              {reliabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-reliability-card workspace-reliability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatReliabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {reliabilityAdminSummary.availableActions.includes(
+              'refresh_reliability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={reliabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleReliabilityAdminAction('refresh_reliability_summary')
+                }
+              >
+                {formatReliabilityAdminAction('refresh_reliability_summary')}
               </button>
             ) : null}
           </div>

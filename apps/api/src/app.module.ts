@@ -14,6 +14,7 @@ import { CapacityModule } from './capacity/capacity.module.js'
 import { PerformanceModule } from './performance/performance.module.js'
 import { ResilienceModule } from './resilience/resilience.module.js'
 import { AvailabilityModule } from './availability/availability.module.js'
+import { ReliabilityModule } from './reliability/reliability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -47,6 +48,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     PerformanceModule,
     ResilienceModule,
     AvailabilityModule,
+    ReliabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

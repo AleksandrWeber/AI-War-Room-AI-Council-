@@ -679,6 +679,25 @@ Workspace availability admin tools:
 - Only workspace owners and admins can access availability admin endpoints.
 - The web billing panel shows availability admin tools for authorized roles.
 
+Production reliability rollout readiness:
+
+- `GET /api/reliability/readiness` returns operator-facing production reliability checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, reliability signal table coverage, model health reliability signals, idempotency fault tolerance, and fault tolerance readiness signals.
+- The web billing panel shows reliability rollout status and per-check guidance.
+
+Workspace reliability admin tools:
+
+- `GET /api/reliability/workspace/:workspaceId/admin` returns owner/admin reliability summary with workspace fault tolerance domains.
+- `POST /api/reliability/workspace/:workspaceId/admin/actions` runs reliability admin actions such as refreshing the summary.
+- Only workspace owners and admins can access reliability admin endpoints.
+- The web billing panel shows reliability admin tools for authorized roles.
+
+Current `v5.43` behavior:
+
+- Production reliability rollout readiness validates reliability coverage and fault tolerance readiness through `GET /api/reliability/readiness`.
+- Workspace owners and admins can inspect workspace reliability metrics from `GET /api/reliability/workspace/:workspaceId/admin`.
+- The web billing panel shows reliability rollout checks and workspace reliability admin tools.
+
 Current `v5.42` behavior:
 
 - Production availability rollout readiness validates availability coverage and uptime readiness through `GET /api/availability/readiness`.
