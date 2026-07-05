@@ -302,6 +302,16 @@ import { InteroperabilizabilityModule } from './interoperabilizability/interoper
 import { ConnectabilizabilityModule } from './connectabilizability/connectabilizability.module.js'
 import { InterfabilizabilityModule } from './interfabilizability/interfabilizability.module.js'
 import { ProtocolizabilityModule } from './protocolizability/protocolizability.module.js'
+import { EncapsulizabilityModule } from './encapsulizability/encapsulizability.module.js'
+import { IsolatizabilityModule } from './isolatizability/isolatizability.module.js'
+import { SandboxizabilityModule } from './sandboxizability/sandboxizability.module.js'
+import { ContainerizabilityModule } from './containerizability/containerizability.module.js'
+import { BoundarizabilityModule } from './boundarizability/boundarizability.module.js'
+import { VirtualizabilityModule } from './virtualizability/virtualizability.module.js'
+import { DistributizabilityModule } from './distributizability/distributizability.module.js'
+import { FederatizabilityModule } from './federatizability/federatizability.module.js'
+import { DecentralizabilityModule } from './decentralizability/decentralizability.module.js'
+import { MeshabilizabilityModule } from './meshabilizability/meshabilizability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -623,6 +633,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     ConnectabilizabilityModule,
     InterfabilizabilityModule,
     ProtocolizabilityModule,
+    EncapsulizabilityModule,
+    IsolatizabilityModule,
+    SandboxizabilityModule,
+    ContainerizabilityModule,
+    BoundarizabilityModule,
+    VirtualizabilityModule,
+    DistributizabilityModule,
+    FederatizabilityModule,
+    DecentralizabilityModule,
+    MeshabilizabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,
