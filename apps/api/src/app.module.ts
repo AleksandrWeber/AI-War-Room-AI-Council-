@@ -232,6 +232,16 @@ import { StochasticizabilityModule } from './stochasticizability/stochasticizabi
 import { DeterminizabilityModule } from './determinizability/determinizability.module.js'
 import { PredictizabilityModule } from './predictizability/predictizability.module.js'
 import { ExtrapolizabilityModule } from './extrapolizability/extrapolizability.module.js'
+import { InductizabilityModule } from './inductizability/inductizability.module.js'
+import { AbductizabilityModule } from './abductizability/abductizability.module.js'
+import { RetrodictizabilityModule } from './retrodictizability/retrodictizability.module.js'
+import { CorroborizabilityModule } from './corroborizability/corroborizability.module.js'
+import { FalsifiizabilityModule } from './falsifiizability/falsifiizability.module.js'
+import { InterpolizabilityModule } from './interpolizability/interpolizability.module.js'
+import { RegressizabilityModule } from './regressizability/regressizability.module.js'
+import { HeuristizabilityModule } from './heuristizability/heuristizability.module.js'
+import { SimulatizabilityModule } from './simulatizability/simulatizability.module.js'
+import { OptimizabilityModule } from './optimizability/optimizability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -483,6 +493,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     DeterminizabilityModule,
     PredictizabilityModule,
     ExtrapolizabilityModule,
+    InductizabilityModule,
+    AbductizabilityModule,
+    RetrodictizabilityModule,
+    CorroborizabilityModule,
+    FalsifiizabilityModule,
+    InterpolizabilityModule,
+    RegressizabilityModule,
+    HeuristizabilityModule,
+    SimulatizabilityModule,
+    OptimizabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

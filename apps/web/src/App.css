@@ -6945,6 +6945,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-inductizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-inductizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-inductizability-card p,
+.workspace-inductizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-inductizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-inductizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-abductizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-abductizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-abductizability-card p,
+.workspace-abductizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-abductizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-abductizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-retrodictizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-retrodictizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-retrodictizability-card p,
+.workspace-retrodictizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-retrodictizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-retrodictizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-corroborizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-corroborizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-corroborizability-card p,
+.workspace-corroborizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-corroborizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-corroborizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-falsifiizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-falsifiizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-falsifiizability-card p,
+.workspace-falsifiizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-falsifiizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-falsifiizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-interpolizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-interpolizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-interpolizability-card p,
+.workspace-interpolizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-interpolizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-interpolizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-regressizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-regressizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-regressizability-card p,
+.workspace-regressizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-regressizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-regressizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-heuristizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-heuristizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-heuristizability-card p,
+.workspace-heuristizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-heuristizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-heuristizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-simulatizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-simulatizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-simulatizability-card p,
+.workspace-simulatizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-simulatizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-simulatizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-optimizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-optimizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-optimizability-card p,
+.workspace-optimizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-optimizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-optimizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;
