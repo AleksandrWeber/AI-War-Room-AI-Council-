@@ -394,6 +394,26 @@ import type {
   HistorizabilityAdminSummaryResponse,
   CategorizabilityRolloutResponse,
   CategorizabilityAdminSummaryResponse,
+  TaxonomizabilityRolloutResponse,
+  TaxonomizabilityAdminSummaryResponse,
+  ClassifiabilityRolloutResponse,
+  ClassifiabilityAdminSummaryResponse,
+  TypologizabilityRolloutResponse,
+  TypologizabilityAdminSummaryResponse,
+  StratifiabilityRolloutResponse,
+  StratifiabilityAdminSummaryResponse,
+  OrdinarizabilityRolloutResponse,
+  OrdinarizabilityAdminSummaryResponse,
+  SystematizabilityRolloutResponse,
+  SystematizabilityAdminSummaryResponse,
+  HierarchizabilityRolloutResponse,
+  HierarchizabilityAdminSummaryResponse,
+  SegmentizabilityRolloutResponse,
+  SegmentizabilityAdminSummaryResponse,
+  ClusterizabilityRolloutResponse,
+  ClusterizabilityAdminSummaryResponse,
+  NomenclatizabilityRolloutResponse,
+  NomenclatizabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -2126,6 +2146,96 @@ import {
   formatCategorizabilityRolloutStatus,
 } from './categorizability-ui'
 import {
+  executeTaxonomizabilityAdminAction,
+  fetchTaxonomizabilityAdminSummary,
+  fetchTaxonomizabilityRollout,
+  formatTaxonomizabilityAdminAction,
+  formatTaxonomizabilityDomain,
+  formatTaxonomizabilityRolloutCheckStatus,
+  formatTaxonomizabilityRolloutStatus,
+} from './taxonomizability-ui'
+import {
+  executeClassifiabilityAdminAction,
+  fetchClassifiabilityAdminSummary,
+  fetchClassifiabilityRollout,
+  formatClassifiabilityAdminAction,
+  formatClassifiabilityDomain,
+  formatClassifiabilityRolloutCheckStatus,
+  formatClassifiabilityRolloutStatus,
+} from './classifiability-ui'
+import {
+  executeTypologizabilityAdminAction,
+  fetchTypologizabilityAdminSummary,
+  fetchTypologizabilityRollout,
+  formatTypologizabilityAdminAction,
+  formatTypologizabilityDomain,
+  formatTypologizabilityRolloutCheckStatus,
+  formatTypologizabilityRolloutStatus,
+} from './typologizability-ui'
+import {
+  executeStratifiabilityAdminAction,
+  fetchStratifiabilityAdminSummary,
+  fetchStratifiabilityRollout,
+  formatStratifiabilityAdminAction,
+  formatStratifiabilityDomain,
+  formatStratifiabilityRolloutCheckStatus,
+  formatStratifiabilityRolloutStatus,
+} from './stratifiability-ui'
+import {
+  executeOrdinarizabilityAdminAction,
+  fetchOrdinarizabilityAdminSummary,
+  fetchOrdinarizabilityRollout,
+  formatOrdinarizabilityAdminAction,
+  formatOrdinarizabilityDomain,
+  formatOrdinarizabilityRolloutCheckStatus,
+  formatOrdinarizabilityRolloutStatus,
+} from './ordinarizability-ui'
+import {
+  executeSystematizabilityAdminAction,
+  fetchSystematizabilityAdminSummary,
+  fetchSystematizabilityRollout,
+  formatSystematizabilityAdminAction,
+  formatSystematizabilityDomain,
+  formatSystematizabilityRolloutCheckStatus,
+  formatSystematizabilityRolloutStatus,
+} from './systematizability-ui'
+import {
+  executeHierarchizabilityAdminAction,
+  fetchHierarchizabilityAdminSummary,
+  fetchHierarchizabilityRollout,
+  formatHierarchizabilityAdminAction,
+  formatHierarchizabilityDomain,
+  formatHierarchizabilityRolloutCheckStatus,
+  formatHierarchizabilityRolloutStatus,
+} from './hierarchizability-ui'
+import {
+  executeSegmentizabilityAdminAction,
+  fetchSegmentizabilityAdminSummary,
+  fetchSegmentizabilityRollout,
+  formatSegmentizabilityAdminAction,
+  formatSegmentizabilityDomain,
+  formatSegmentizabilityRolloutCheckStatus,
+  formatSegmentizabilityRolloutStatus,
+} from './segmentizability-ui'
+import {
+  executeClusterizabilityAdminAction,
+  fetchClusterizabilityAdminSummary,
+  fetchClusterizabilityRollout,
+  formatClusterizabilityAdminAction,
+  formatClusterizabilityDomain,
+  formatClusterizabilityRolloutCheckStatus,
+  formatClusterizabilityRolloutStatus,
+} from './clusterizability-ui'
+import {
+  executeNomenclatizabilityAdminAction,
+  fetchNomenclatizabilityAdminSummary,
+  fetchNomenclatizabilityRollout,
+  formatNomenclatizabilityAdminAction,
+  formatNomenclatizabilityDomain,
+  formatNomenclatizabilityRolloutCheckStatus,
+  formatNomenclatizabilityRolloutStatus,
+} from './nomenclatizability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -3054,6 +3164,26 @@ function App() {
     useState<HistorizabilityRolloutResponse | null>(null)
   const [categorizabilityRollout, setCategorizabilityRollout] =
     useState<CategorizabilityRolloutResponse | null>(null)
+  const [taxonomizabilityRollout, setTaxonomizabilityRollout] =
+    useState<TaxonomizabilityRolloutResponse | null>(null)
+  const [classifiabilityRollout, setClassifiabilityRollout] =
+    useState<ClassifiabilityRolloutResponse | null>(null)
+  const [typologizabilityRollout, setTypologizabilityRollout] =
+    useState<TypologizabilityRolloutResponse | null>(null)
+  const [stratifiabilityRollout, setStratifiabilityRollout] =
+    useState<StratifiabilityRolloutResponse | null>(null)
+  const [ordinarizabilityRollout, setOrdinarizabilityRollout] =
+    useState<OrdinarizabilityRolloutResponse | null>(null)
+  const [systematizabilityRollout, setSystematizabilityRollout] =
+    useState<SystematizabilityRolloutResponse | null>(null)
+  const [hierarchizabilityRollout, setHierarchizabilityRollout] =
+    useState<HierarchizabilityRolloutResponse | null>(null)
+  const [segmentizabilityRollout, setSegmentizabilityRollout] =
+    useState<SegmentizabilityRolloutResponse | null>(null)
+  const [clusterizabilityRollout, setClusterizabilityRollout] =
+    useState<ClusterizabilityRolloutResponse | null>(null)
+  const [nomenclatizabilityRollout, setNomenclatizabilityRollout] =
+    useState<NomenclatizabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -3511,6 +3641,26 @@ function App() {
     useState<HistorizabilityAdminSummaryResponse | null>(null)
   const [categorizabilityAdminSummary, setCategorizabilityAdminSummary] =
     useState<CategorizabilityAdminSummaryResponse | null>(null)
+  const [taxonomizabilityAdminSummary, setTaxonomizabilityAdminSummary] =
+    useState<TaxonomizabilityAdminSummaryResponse | null>(null)
+  const [classifiabilityAdminSummary, setClassifiabilityAdminSummary] =
+    useState<ClassifiabilityAdminSummaryResponse | null>(null)
+  const [typologizabilityAdminSummary, setTypologizabilityAdminSummary] =
+    useState<TypologizabilityAdminSummaryResponse | null>(null)
+  const [stratifiabilityAdminSummary, setStratifiabilityAdminSummary] =
+    useState<StratifiabilityAdminSummaryResponse | null>(null)
+  const [ordinarizabilityAdminSummary, setOrdinarizabilityAdminSummary] =
+    useState<OrdinarizabilityAdminSummaryResponse | null>(null)
+  const [systematizabilityAdminSummary, setSystematizabilityAdminSummary] =
+    useState<SystematizabilityAdminSummaryResponse | null>(null)
+  const [hierarchizabilityAdminSummary, setHierarchizabilityAdminSummary] =
+    useState<HierarchizabilityAdminSummaryResponse | null>(null)
+  const [segmentizabilityAdminSummary, setSegmentizabilityAdminSummary] =
+    useState<SegmentizabilityAdminSummaryResponse | null>(null)
+  const [clusterizabilityAdminSummary, setClusterizabilityAdminSummary] =
+    useState<ClusterizabilityAdminSummaryResponse | null>(null)
+  const [nomenclatizabilityAdminSummary, setNomenclatizabilityAdminSummary] =
+    useState<NomenclatizabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -4079,6 +4229,36 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [categorizabilityAdminAction, setCategorizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [taxonomizabilityAdminAction, setTaxonomizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [classifiabilityAdminAction, setClassifiabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [typologizabilityAdminAction, setTypologizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [stratifiabilityAdminAction, setStratifiabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [ordinarizabilityAdminAction, setOrdinarizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [systematizabilityAdminAction, setSystematizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [hierarchizabilityAdminAction, setHierarchizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [segmentizabilityAdminAction, setSegmentizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [clusterizabilityAdminAction, setClusterizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [nomenclatizabilityAdminAction, setNomenclatizabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -6480,6 +6660,126 @@ function App() {
         }
       })
 
+    fetchTaxonomizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setTaxonomizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTaxonomizabilityRollout(null)
+        }
+      })
+
+    fetchClassifiabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setClassifiabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setClassifiabilityRollout(null)
+        }
+      })
+
+    fetchTypologizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setTypologizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTypologizabilityRollout(null)
+        }
+      })
+
+    fetchStratifiabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setStratifiabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setStratifiabilityRollout(null)
+        }
+      })
+
+    fetchOrdinarizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setOrdinarizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setOrdinarizabilityRollout(null)
+        }
+      })
+
+    fetchSystematizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setSystematizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setSystematizabilityRollout(null)
+        }
+      })
+
+    fetchHierarchizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setHierarchizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setHierarchizabilityRollout(null)
+        }
+      })
+
+    fetchSegmentizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setSegmentizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setSegmentizabilityRollout(null)
+        }
+      })
+
+    fetchClusterizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setClusterizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setClusterizabilityRollout(null)
+        }
+      })
+
+    fetchNomenclatizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setNomenclatizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setNomenclatizabilityRollout(null)
+        }
+      })
+
     fetchUsageCapabilities(apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
@@ -8496,6 +8796,76 @@ function App() {
         workspaceAuthHeaders,
       )
       setCategorizabilityAdminSummary(categorizabilityAdmin)
+
+      const taxonomizabilityAdmin = await fetchTaxonomizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTaxonomizabilityAdminSummary(taxonomizabilityAdmin)
+
+      const classifiabilityAdmin = await fetchClassifiabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setClassifiabilityAdminSummary(classifiabilityAdmin)
+
+      const typologizabilityAdmin = await fetchTypologizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTypologizabilityAdminSummary(typologizabilityAdmin)
+
+      const stratifiabilityAdmin = await fetchStratifiabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setStratifiabilityAdminSummary(stratifiabilityAdmin)
+
+      const ordinarizabilityAdmin = await fetchOrdinarizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setOrdinarizabilityAdminSummary(ordinarizabilityAdmin)
+
+      const systematizabilityAdmin = await fetchSystematizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSystematizabilityAdminSummary(systematizabilityAdmin)
+
+      const hierarchizabilityAdmin = await fetchHierarchizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setHierarchizabilityAdminSummary(hierarchizabilityAdmin)
+
+      const segmentizabilityAdmin = await fetchSegmentizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSegmentizabilityAdminSummary(segmentizabilityAdmin)
+
+      const clusterizabilityAdmin = await fetchClusterizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setClusterizabilityAdminSummary(clusterizabilityAdmin)
+
+      const nomenclatizabilityAdmin = await fetchNomenclatizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNomenclatizabilityAdminSummary(nomenclatizabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -9728,6 +10098,296 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleNomenclatizabilityAdminAction(
+    action: 'refresh_nomenclatizability_summary',
+  ) {
+    setNomenclatizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeNomenclatizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchNomenclatizabilityRollout(apiBaseUrl)
+      setNomenclatizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run nomenclatizability admin action.',
+      )
+    } finally {
+      setNomenclatizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleClusterizabilityAdminAction(
+    action: 'refresh_clusterizability_summary',
+  ) {
+    setClusterizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeClusterizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchClusterizabilityRollout(apiBaseUrl)
+      setClusterizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run clusterizability admin action.',
+      )
+    } finally {
+      setClusterizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleSegmentizabilityAdminAction(
+    action: 'refresh_segmentizability_summary',
+  ) {
+    setSegmentizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeSegmentizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchSegmentizabilityRollout(apiBaseUrl)
+      setSegmentizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run segmentizability admin action.',
+      )
+    } finally {
+      setSegmentizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleHierarchizabilityAdminAction(
+    action: 'refresh_hierarchizability_summary',
+  ) {
+    setHierarchizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeHierarchizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchHierarchizabilityRollout(apiBaseUrl)
+      setHierarchizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run hierarchizability admin action.',
+      )
+    } finally {
+      setHierarchizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleSystematizabilityAdminAction(
+    action: 'refresh_systematizability_summary',
+  ) {
+    setSystematizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeSystematizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchSystematizabilityRollout(apiBaseUrl)
+      setSystematizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run systematizability admin action.',
+      )
+    } finally {
+      setSystematizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleOrdinarizabilityAdminAction(
+    action: 'refresh_ordinarizability_summary',
+  ) {
+    setOrdinarizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeOrdinarizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchOrdinarizabilityRollout(apiBaseUrl)
+      setOrdinarizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run ordinarizability admin action.',
+      )
+    } finally {
+      setOrdinarizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleStratifiabilityAdminAction(
+    action: 'refresh_stratifiability_summary',
+  ) {
+    setStratifiabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeStratifiabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchStratifiabilityRollout(apiBaseUrl)
+      setStratifiabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run stratifiability admin action.',
+      )
+    } finally {
+      setStratifiabilityAdminAction('idle')
+    }
+  }
+
+  async function handleTypologizabilityAdminAction(
+    action: 'refresh_typologizability_summary',
+  ) {
+    setTypologizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeTypologizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchTypologizabilityRollout(apiBaseUrl)
+      setTypologizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run typologizability admin action.',
+      )
+    } finally {
+      setTypologizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleClassifiabilityAdminAction(
+    action: 'refresh_classifiability_summary',
+  ) {
+    setClassifiabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeClassifiabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchClassifiabilityRollout(apiBaseUrl)
+      setClassifiabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run classifiability admin action.',
+      )
+    } finally {
+      setClassifiabilityAdminAction('idle')
+    }
+  }
+
+  async function handleTaxonomizabilityAdminAction(
+    action: 'refresh_taxonomizability_summary',
+  ) {
+    setTaxonomizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeTaxonomizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchTaxonomizabilityRollout(apiBaseUrl)
+      setTaxonomizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run taxonomizability admin action.',
+      )
+    } finally {
+      setTaxonomizabilityAdminAction('idle')
     }
   }
 
@@ -20265,6 +20925,296 @@ function App() {
               ))}
             </div>
             <small>Checked at {teleologizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {ordinarizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production ordinarizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${ordinarizabilityRollout.status}`}
+              >
+                {formatOrdinarizabilityRolloutStatus(ordinarizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{ordinarizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {ordinarizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatOrdinarizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {ordinarizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {stratifiabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production stratifiability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${stratifiabilityRollout.status}`}
+              >
+                {formatStratifiabilityRolloutStatus(stratifiabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{stratifiabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {stratifiabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatStratifiabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {stratifiabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {typologizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production typologizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${typologizabilityRollout.status}`}
+              >
+                {formatTypologizabilityRolloutStatus(typologizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{typologizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {typologizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatTypologizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {typologizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {classifiabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production classifiability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${classifiabilityRollout.status}`}
+              >
+                {formatClassifiabilityRolloutStatus(classifiabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{classifiabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {classifiabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatClassifiabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {classifiabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {taxonomizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production taxonomizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${taxonomizabilityRollout.status}`}
+              >
+                {formatTaxonomizabilityRolloutStatus(taxonomizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{taxonomizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {taxonomizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatTaxonomizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {taxonomizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {nomenclatizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production nomenclatizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${nomenclatizabilityRollout.status}`}
+              >
+                {formatNomenclatizabilityRolloutStatus(nomenclatizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{nomenclatizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {nomenclatizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatNomenclatizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {nomenclatizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {clusterizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production clusterizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${clusterizabilityRollout.status}`}
+              >
+                {formatClusterizabilityRolloutStatus(clusterizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{clusterizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {clusterizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatClusterizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {clusterizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {segmentizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production segmentizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${segmentizabilityRollout.status}`}
+              >
+                {formatSegmentizabilityRolloutStatus(segmentizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{segmentizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {segmentizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatSegmentizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {segmentizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {hierarchizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production hierarchizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${hierarchizabilityRollout.status}`}
+              >
+                {formatHierarchizabilityRolloutStatus(hierarchizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{hierarchizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {hierarchizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatHierarchizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {hierarchizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {systematizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production systematizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${systematizabilityRollout.status}`}
+              >
+                {formatSystematizabilityRolloutStatus(systematizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{systematizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {systematizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatSystematizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {systematizabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -32952,6 +33902,656 @@ function App() {
                 }
               >
                 {formatTeleologizabilityAdminAction('refresh_teleologizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {ordinarizabilityAdminSummary ? (
+          <div className="billing-admin workspace-ordinarizability-admin">
+            <div className="billing-admin__header">
+              <span>Ordinarizability admin</span>
+              <strong>{ordinarizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{ordinarizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification ordinarizability</span>
+                <strong>
+                  {ordinarizabilityAdminSummary.stats.ordinarizabilityPercent}%
+                </strong>
+                <small>
+                  {ordinarizabilityAdminSummary.stats.coveredDomains}/
+                  {ordinarizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Ordinarizability signals</span>
+                <strong>{ordinarizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {ordinarizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-ordinarizability-list">
+              {ordinarizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-ordinarizability-card workspace-ordinarizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatOrdinarizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {ordinarizabilityAdminSummary.availableActions.includes(
+              'refresh_ordinarizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={ordinarizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleOrdinarizabilityAdminAction(
+                    'refresh_ordinarizability_summary',
+                  )
+                }
+              >
+                {formatOrdinarizabilityAdminAction('refresh_ordinarizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {stratifiabilityAdminSummary ? (
+          <div className="billing-admin workspace-stratifiability-admin">
+            <div className="billing-admin__header">
+              <span>Stratifiability admin</span>
+              <strong>{stratifiabilityAdminSummary.role}</strong>
+            </div>
+            <p>{stratifiabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice stratifiability</span>
+                <strong>
+                  {stratifiabilityAdminSummary.stats.stratifiabilityPercent}%
+                </strong>
+                <small>
+                  {stratifiabilityAdminSummary.stats.coveredDomains}/
+                  {stratifiabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Stratifiability signals</span>
+                <strong>{stratifiabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {stratifiabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-stratifiability-list">
+              {stratifiabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-stratifiability-card workspace-stratifiability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatStratifiabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {stratifiabilityAdminSummary.availableActions.includes(
+              'refresh_stratifiability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={stratifiabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleStratifiabilityAdminAction(
+                    'refresh_stratifiability_summary',
+                  )
+                }
+              >
+                {formatStratifiabilityAdminAction('refresh_stratifiability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {typologizabilityAdminSummary ? (
+          <div className="billing-admin workspace-typologizability-admin">
+            <div className="billing-admin__header">
+              <span>Typologizability admin</span>
+              <strong>{typologizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{typologizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership typologizability</span>
+                <strong>
+                  {typologizabilityAdminSummary.stats.typologizabilityPercent}%
+                </strong>
+                <small>
+                  {typologizabilityAdminSummary.stats.coveredDomains}/
+                  {typologizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Typologizability signals</span>
+                <strong>{typologizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {typologizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-typologizability-list">
+              {typologizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-typologizability-card workspace-typologizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatTypologizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {typologizabilityAdminSummary.availableActions.includes(
+              'refresh_typologizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={typologizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleTypologizabilityAdminAction(
+                    'refresh_typologizability_summary',
+                  )
+                }
+              >
+                {formatTypologizabilityAdminAction('refresh_typologizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {classifiabilityAdminSummary ? (
+          <div className="billing-admin workspace-classifiability-admin">
+            <div className="billing-admin__header">
+              <span>Classifiability admin</span>
+              <strong>{classifiabilityAdminSummary.role}</strong>
+            </div>
+            <p>{classifiabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key classifiability</span>
+                <strong>
+                  {classifiabilityAdminSummary.stats.classifiabilityPercent}%
+                </strong>
+                <small>
+                  {classifiabilityAdminSummary.stats.coveredDomains}/
+                  {classifiabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Classifiability signals</span>
+                <strong>{classifiabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {classifiabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-classifiability-list">
+              {classifiabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-classifiability-card workspace-classifiability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatClassifiabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {classifiabilityAdminSummary.availableActions.includes(
+              'refresh_classifiability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={classifiabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleClassifiabilityAdminAction(
+                    'refresh_classifiability_summary',
+                  )
+                }
+              >
+                {formatClassifiabilityAdminAction('refresh_classifiability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {taxonomizabilityAdminSummary ? (
+          <div className="billing-admin workspace-taxonomizability-admin">
+            <div className="billing-admin__header">
+              <span>Taxonomizability admin</span>
+              <strong>{taxonomizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{taxonomizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan taxonomizability</span>
+                <strong>
+                  {taxonomizabilityAdminSummary.stats.taxonomizabilityPercent}%
+                </strong>
+                <small>
+                  {taxonomizabilityAdminSummary.stats.coveredDomains}/
+                  {taxonomizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Taxonomizability signals</span>
+                <strong>{taxonomizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {taxonomizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-taxonomizability-list">
+              {taxonomizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-taxonomizability-card workspace-taxonomizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatTaxonomizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {taxonomizabilityAdminSummary.availableActions.includes(
+              'refresh_taxonomizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={taxonomizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleTaxonomizabilityAdminAction(
+                    'refresh_taxonomizability_summary',
+                  )
+                }
+              >
+                {formatTaxonomizabilityAdminAction('refresh_taxonomizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {nomenclatizabilityAdminSummary ? (
+          <div className="billing-admin workspace-nomenclatizability-admin">
+            <div className="billing-admin__header">
+              <span>Nomenclatizability admin</span>
+              <strong>{nomenclatizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{nomenclatizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Model health nomenclatizability</span>
+                <strong>
+                  {nomenclatizabilityAdminSummary.stats.nomenclatizabilityPercent}%
+                </strong>
+                <small>
+                  {nomenclatizabilityAdminSummary.stats.coveredDomains}/
+                  {nomenclatizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Nomenclatizability signals</span>
+                <strong>{nomenclatizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {nomenclatizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, model health events, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-nomenclatizability-list">
+              {nomenclatizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-nomenclatizability-card workspace-nomenclatizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatNomenclatizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {nomenclatizabilityAdminSummary.availableActions.includes(
+              'refresh_nomenclatizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={nomenclatizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleNomenclatizabilityAdminAction(
+                    'refresh_nomenclatizability_summary',
+                  )
+                }
+              >
+                {formatNomenclatizabilityAdminAction('refresh_nomenclatizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {clusterizabilityAdminSummary ? (
+          <div className="billing-admin workspace-clusterizability-admin">
+            <div className="billing-admin__header">
+              <span>Clusterizability admin</span>
+              <strong>{clusterizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{clusterizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Provider credential clusterizability</span>
+                <strong>
+                  {clusterizabilityAdminSummary.stats.clusterizabilityPercent}%
+                </strong>
+                <small>
+                  {clusterizabilityAdminSummary.stats.coveredDomains}/
+                  {clusterizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Clusterizability signals</span>
+                <strong>{clusterizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {clusterizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, provider credentials, and model registry entries'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-clusterizability-list">
+              {clusterizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-clusterizability-card workspace-clusterizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatClusterizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {clusterizabilityAdminSummary.availableActions.includes(
+              'refresh_clusterizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={clusterizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleClusterizabilityAdminAction(
+                    'refresh_clusterizability_summary',
+                  )
+                }
+              >
+                {formatClusterizabilityAdminAction('refresh_clusterizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {segmentizabilityAdminSummary ? (
+          <div className="billing-admin workspace-segmentizability-admin">
+            <div className="billing-admin__header">
+              <span>Segmentizability admin</span>
+              <strong>{segmentizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{segmentizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workspace limit segmentizability</span>
+                <strong>
+                  {segmentizabilityAdminSummary.stats.segmentizabilityPercent}%
+                </strong>
+                <small>
+                  {segmentizabilityAdminSummary.stats.coveredDomains}/
+                  {segmentizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Segmentizability signals</span>
+                <strong>{segmentizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {segmentizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace usage limits, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-segmentizability-list">
+              {segmentizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-segmentizability-card workspace-segmentizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatSegmentizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {segmentizabilityAdminSummary.availableActions.includes(
+              'refresh_segmentizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={segmentizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleSegmentizabilityAdminAction(
+                    'refresh_segmentizability_summary',
+                  )
+                }
+              >
+                {formatSegmentizabilityAdminAction('refresh_segmentizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {hierarchizabilityAdminSummary ? (
+          <div className="billing-admin workspace-hierarchizability-admin">
+            <div className="billing-admin__header">
+              <span>Hierarchizability admin</span>
+              <strong>{hierarchizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{hierarchizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Meter usage hierarchizability</span>
+                <strong>
+                  {hierarchizabilityAdminSummary.stats.hierarchizabilityPercent}%
+                </strong>
+                <small>
+                  {hierarchizabilityAdminSummary.stats.coveredDomains}/
+                  {hierarchizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Hierarchizability signals</span>
+                <strong>{hierarchizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {hierarchizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, meter usage reports, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-hierarchizability-list">
+              {hierarchizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-hierarchizability-card workspace-hierarchizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatHierarchizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {hierarchizabilityAdminSummary.availableActions.includes(
+              'refresh_hierarchizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={hierarchizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleHierarchizabilityAdminAction(
+                    'refresh_hierarchizability_summary',
+                  )
+                }
+              >
+                {formatHierarchizabilityAdminAction('refresh_hierarchizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {systematizabilityAdminSummary ? (
+          <div className="billing-admin workspace-systematizability-admin">
+            <div className="billing-admin__header">
+              <span>Systematizability admin</span>
+              <strong>{systematizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{systematizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing webhook systematizability</span>
+                <strong>
+                  {systematizabilityAdminSummary.stats.systematizabilityPercent}%
+                </strong>
+                <small>
+                  {systematizabilityAdminSummary.stats.coveredDomains}/
+                  {systematizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Systematizability signals</span>
+                <strong>{systematizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {systematizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing webhook events, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-systematizability-list">
+              {systematizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-systematizability-card workspace-systematizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatSystematizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {systematizabilityAdminSummary.availableActions.includes(
+              'refresh_systematizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={systematizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleSystematizabilityAdminAction(
+                    'refresh_systematizability_summary',
+                  )
+                }
+              >
+                {formatSystematizabilityAdminAction('refresh_systematizability_summary')}
               </button>
             ) : null}
           </div>

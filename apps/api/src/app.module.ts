@@ -182,6 +182,16 @@ import { GnoseizabilityModule } from './gnoseizability/gnoseizability.module.js'
 import { MethodizabilityModule } from './methodizability/methodizability.module.js'
 import { HistorizabilityModule } from './historizability/historizability.module.js'
 import { CategorizabilityModule } from './categorizability/categorizability.module.js'
+import { TaxonomizabilityModule } from './taxonomizability/taxonomizability.module.js'
+import { ClassifiabilityModule } from './classifiability/classifiability.module.js'
+import { TypologizabilityModule } from './typologizability/typologizability.module.js'
+import { StratifiabilityModule } from './stratifiability/stratifiability.module.js'
+import { OrdinarizabilityModule } from './ordinarizability/ordinarizability.module.js'
+import { SystematizabilityModule } from './systematizability/systematizability.module.js'
+import { HierarchizabilityModule } from './hierarchizability/hierarchizability.module.js'
+import { SegmentizabilityModule } from './segmentizability/segmentizability.module.js'
+import { ClusterizabilityModule } from './clusterizability/clusterizability.module.js'
+import { NomenclatizabilityModule } from './nomenclatizability/nomenclatizability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -383,6 +393,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     MethodizabilityModule,
     HistorizabilityModule,
     CategorizabilityModule,
+    TaxonomizabilityModule,
+    ClassifiabilityModule,
+    TypologizabilityModule,
+    StratifiabilityModule,
+    OrdinarizabilityModule,
+    SystematizabilityModule,
+    HierarchizabilityModule,
+    SegmentizabilityModule,
+    ClusterizabilityModule,
+    NomenclatizabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

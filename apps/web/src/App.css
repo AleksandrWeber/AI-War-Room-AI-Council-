@@ -5645,6 +5645,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-taxonomizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-taxonomizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-taxonomizability-card p,
+.workspace-taxonomizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-taxonomizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-taxonomizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-classifiability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-classifiability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-classifiability-card p,
+.workspace-classifiability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-classifiability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-classifiability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-typologizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-typologizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-typologizability-card p,
+.workspace-typologizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-typologizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-typologizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-stratifiability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-stratifiability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-stratifiability-card p,
+.workspace-stratifiability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-stratifiability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-stratifiability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-ordinarizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-ordinarizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-ordinarizability-card p,
+.workspace-ordinarizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-ordinarizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-ordinarizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-systematizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-systematizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-systematizability-card p,
+.workspace-systematizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-systematizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-systematizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-hierarchizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-hierarchizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-hierarchizability-card p,
+.workspace-hierarchizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-hierarchizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-hierarchizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-segmentizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-segmentizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-segmentizability-card p,
+.workspace-segmentizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-segmentizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-segmentizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-clusterizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-clusterizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-clusterizability-card p,
+.workspace-clusterizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-clusterizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-clusterizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-nomenclatizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-nomenclatizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-nomenclatizability-card p,
+.workspace-nomenclatizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-nomenclatizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-nomenclatizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;
