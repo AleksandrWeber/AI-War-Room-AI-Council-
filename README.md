@@ -653,6 +653,25 @@ Workspace performance admin tools:
 - Only workspace owners and admins can access performance admin endpoints.
 - The web billing panel shows performance admin tools for authorized roles.
 
+Production resilience rollout readiness:
+
+- `GET /api/resilience/readiness` returns operator-facing production resilience checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, resilience signal table coverage, Redis recovery signals, migration recovery prerequisites, and recovery readiness signals.
+- The web billing panel shows resilience rollout status and per-check guidance.
+
+Workspace resilience admin tools:
+
+- `GET /api/resilience/workspace/:workspaceId/admin` returns owner/admin resilience summary with workspace recovery signal domains.
+- `POST /api/resilience/workspace/:workspaceId/admin/actions` runs resilience admin actions such as refreshing the summary.
+- Only workspace owners and admins can access resilience admin endpoints.
+- The web billing panel shows resilience admin tools for authorized roles.
+
+Current `v5.41` behavior:
+
+- Production resilience rollout readiness validates resilience coverage and recovery readiness through `GET /api/resilience/readiness`.
+- Workspace owners and admins can inspect workspace resilience metrics from `GET /api/resilience/workspace/:workspaceId/admin`.
+- The web billing panel shows resilience rollout checks and workspace resilience admin tools.
+
 Current `v5.40` behavior:
 
 - Production performance rollout readiness validates performance coverage and latency readiness through `GET /api/performance/readiness`.

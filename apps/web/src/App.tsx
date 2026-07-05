@@ -54,6 +54,8 @@ import type {
   CapacityAdminSummaryResponse,
   PerformanceRolloutResponse,
   PerformanceAdminSummaryResponse,
+  ResilienceRolloutResponse,
+  ResilienceAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -255,6 +257,15 @@ import {
   formatPerformanceRolloutCheckStatus,
   formatPerformanceRolloutStatus,
 } from './performance-ui'
+import {
+  executeResilienceAdminAction,
+  fetchResilienceAdminSummary,
+  fetchResilienceRollout,
+  formatResilienceAdminAction,
+  formatResilienceDomain,
+  formatResilienceRolloutCheckStatus,
+  formatResilienceRolloutStatus,
+} from './resilience-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -844,6 +855,8 @@ function App() {
     useState<CapacityRolloutResponse | null>(null)
   const [performanceRollout, setPerformanceRollout] =
     useState<PerformanceRolloutResponse | null>(null)
+  const [resilienceRollout, setResilienceRollout] =
+    useState<ResilienceRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -961,6 +974,8 @@ function App() {
     useState<CapacityAdminSummaryResponse | null>(null)
   const [performanceAdminSummary, setPerformanceAdminSummary] =
     useState<PerformanceAdminSummaryResponse | null>(null)
+  const [resilienceAdminSummary, setResilienceAdminSummary] =
+    useState<ResilienceAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1019,6 +1034,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [performanceAdminAction, setPerformanceAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [resilienceAdminAction, setResilienceAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1377,6 +1395,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setPerformanceRollout(null)
+        }
+      })
+
+    fetchResilienceRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setResilienceRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setResilienceRollout(null)
         }
       })
 
@@ -2206,6 +2236,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setPerformanceAdminSummary(performanceAdmin)
+
+      const resilienceAdmin = await fetchResilienceAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setResilienceAdminSummary(resilienceAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -2858,6 +2895,35 @@ function App() {
       )
     } finally {
       setPerformanceAdminAction('idle')
+    }
+  }
+
+  async function handleResilienceAdminAction(
+    action: 'refresh_resilience_summary',
+  ) {
+    setResilienceAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeResilienceAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchResilienceRollout(apiBaseUrl)
+      setResilienceRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run resilience admin action.',
+      )
+    } finally {
+      setResilienceAdminAction('idle')
     }
   }
 
@@ -4115,6 +4181,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {performanceRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {resilienceRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production resilience rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${resilienceRollout.status}`}
+              >
+                {formatResilienceRolloutStatus(resilienceRollout.status)}
+              </strong>
+            </div>
+            <p>{resilienceRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {resilienceRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatResilienceRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {resilienceRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -5766,6 +5861,69 @@ function App() {
                 }
               >
                 {formatPerformanceAdminAction('refresh_performance_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {resilienceAdminSummary ? (
+          <div className="billing-admin workspace-resilience-admin">
+            <div className="billing-admin__header">
+              <span>Resilience admin</span>
+              <strong>{resilienceAdminSummary.role}</strong>
+            </div>
+            <p>{resilienceAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Recovery readiness</span>
+                <strong>
+                  {resilienceAdminSummary.stats.recoveryReadinessPercent}%
+                </strong>
+                <small>
+                  {resilienceAdminSummary.stats.coveredDomains}/
+                  {resilienceAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Resilience signals</span>
+                <strong>{resilienceAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {resilienceAdminSummary.stats.postgresConnectivity
+                    ? 'Run workflow and migration recovery signals'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-resilience-list">
+              {resilienceAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-resilience-card workspace-resilience-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatResilienceDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {resilienceAdminSummary.availableActions.includes(
+              'refresh_resilience_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={resilienceAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleResilienceAdminAction('refresh_resilience_summary')
+                }
+              >
+                {formatResilienceAdminAction('refresh_resilience_summary')}
               </button>
             ) : null}
           </div>
