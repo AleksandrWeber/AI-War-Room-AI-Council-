@@ -10,6 +10,6 @@ import { MigrationStatusService } from './migration-status.service.js'
   imports: [PersistenceModule, forwardRef(() => AuthModule), WorkspacesModule],
   controllers: [MigrationController],
   providers: [MigrationStatusService, MigrationAdminService],
-  exports: [MigrationAdminService],
+  exports: [MigrationAdminService, MigrationStatusService],
 })
 export class MigrationsModule {}

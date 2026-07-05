@@ -549,6 +549,25 @@ Workspace migration admin tools:
 - Only workspace owners and admins can access migration admin endpoints.
 - The web billing panel shows migration admin tools for authorized roles.
 
+Production backup rollout readiness:
+
+- `GET /api/backup/readiness` returns operator-facing production backup checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, Redis persistence, critical table coverage, migration prerequisites, and restore readiness signals.
+- The web billing panel shows backup rollout status and per-check guidance.
+
+Workspace backup admin tools:
+
+- `GET /api/backup/workspace/:workspaceId/admin` returns owner/admin backup summary with recoverable workspace data domains.
+- `POST /api/backup/workspace/:workspaceId/admin/actions` runs backup admin actions such as refreshing the summary.
+- Only workspace owners and admins can access backup admin endpoints.
+- The web billing panel shows backup admin tools for authorized roles.
+
+Current `v5.33` behavior:
+
+- Production backup rollout readiness validates backup coverage and restore readiness through `GET /api/backup/readiness`.
+- Workspace owners and admins can inspect recoverable workspace data from `GET /api/backup/workspace/:workspaceId/admin`.
+- The web billing panel shows backup rollout checks and workspace backup admin tools.
+
 Current `v5.32` behavior:
 
 - Database migration rollout readiness validates schema migration coverage through `GET /api/migrations/readiness`.

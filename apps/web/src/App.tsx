@@ -38,6 +38,8 @@ import type {
   DeploymentAdminSummaryResponse,
   MigrationRolloutResponse,
   MigrationAdminSummaryResponse,
+  BackupRolloutResponse,
+  BackupAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -167,6 +169,15 @@ import {
   formatMigrationRolloutStatus,
   formatMigrationStatus,
 } from './migrations-ui'
+import {
+  executeBackupAdminAction,
+  fetchBackupAdminSummary,
+  fetchBackupRollout,
+  formatBackupAdminAction,
+  formatBackupDomain,
+  formatBackupRolloutCheckStatus,
+  formatBackupRolloutStatus,
+} from './backup-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -741,6 +752,8 @@ function App() {
     useState<DeploymentRolloutResponse | null>(null)
   const [migrationRollout, setMigrationRollout] =
     useState<MigrationRolloutResponse | null>(null)
+  const [backupRollout, setBackupRollout] =
+    useState<BackupRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -842,6 +855,8 @@ function App() {
     useState<DeploymentAdminSummaryResponse | null>(null)
   const [migrationAdminSummary, setMigrationAdminSummary] =
     useState<MigrationAdminSummaryResponse | null>(null)
+  const [backupAdminSummary, setBackupAdminSummary] =
+    useState<BackupAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -876,6 +891,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [migrationAdminAction, setMigrationAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [backupAdminAction, setBackupAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1138,6 +1156,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setMigrationRollout(null)
+        }
+      })
+
+    fetchBackupRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setBackupRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setBackupRollout(null)
         }
       })
 
@@ -1911,6 +1941,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setMigrationAdminSummary(migrationAdmin)
+
+      const backupAdmin = await fetchBackupAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBackupAdminSummary(backupAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -2345,6 +2382,33 @@ function App() {
       )
     } finally {
       setMigrationAdminAction('idle')
+    }
+  }
+
+  async function handleBackupAdminAction(action: 'refresh_backup_summary') {
+    setBackupAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeBackupAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchBackupRollout(apiBaseUrl)
+      setBackupRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run backup admin action.',
+      )
+    } finally {
+      setBackupAdminAction('idle')
     }
   }
 
@@ -3376,6 +3440,33 @@ function App() {
               ))}
             </div>
             <small>Checked at {migrationRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {backupRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production backup rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${backupRollout.status}`}
+              >
+                {formatBackupRolloutStatus(backupRollout.status)}
+              </strong>
+            </div>
+            <p>{backupRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {backupRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>{formatBackupRolloutCheckStatus(check.status)}</span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {backupRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -4531,6 +4622,71 @@ function App() {
                 }
               >
                 {formatMigrationAdminAction('refresh_migration_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {backupAdminSummary ? (
+          <div className="billing-admin workspace-backup-admin">
+            <div className="billing-admin__header">
+              <span>Backup admin</span>
+              <strong>{backupAdminSummary.role}</strong>
+            </div>
+            <p>{backupAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Recoverable records</span>
+                <strong>{backupAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {backupAdminSummary.stats.recoverableDomains}/
+                  {backupAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Persistence</span>
+                <strong>
+                  {backupAdminSummary.stats.postgresConnectivity
+                    ? 'PostgreSQL'
+                    : 'Unavailable'}
+                </strong>
+                <small>
+                  {backupAdminSummary.stats.redisBackedPersistence
+                    ? 'Redis AOF enabled'
+                    : 'Redis optional'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-backup-list">
+              {backupAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-backup-card workspace-backup-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatBackupDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {backupAdminSummary.availableActions.includes(
+              'refresh_backup_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={backupAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleBackupAdminAction('refresh_backup_summary')
+                }
+              >
+                {formatBackupAdminAction('refresh_backup_summary')}
               </button>
             ) : null}
           </div>
