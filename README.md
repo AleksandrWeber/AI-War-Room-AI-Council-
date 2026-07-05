@@ -692,6 +692,25 @@ Workspace reliability admin tools:
 - Only workspace owners and admins can access reliability admin endpoints.
 - The web billing panel shows reliability admin tools for authorized roles.
 
+Production stability rollout readiness:
+
+- `GET /api/stability/readiness` returns operator-facing production stability checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, stability signal table coverage, schema migration stability, artifact persistence stability, and drift readiness signals.
+- The web billing panel shows stability rollout status and per-check guidance.
+
+Workspace stability admin tools:
+
+- `GET /api/stability/workspace/:workspaceId/admin` returns owner/admin stability summary with workspace run outcome and artifact domains.
+- `POST /api/stability/workspace/:workspaceId/admin/actions` runs stability admin actions such as refreshing the summary.
+- Only workspace owners and admins can access stability admin endpoints.
+- The web billing panel shows stability admin tools for authorized roles.
+
+Current `v5.44` behavior:
+
+- Production stability rollout readiness validates stability coverage and drift readiness through `GET /api/stability/readiness`.
+- Workspace owners and admins can inspect workspace stability metrics from `GET /api/stability/workspace/:workspaceId/admin`.
+- The web billing panel shows stability rollout checks and workspace stability admin tools.
+
 Current `v5.43` behavior:
 
 - Production reliability rollout readiness validates reliability coverage and fault tolerance readiness through `GET /api/reliability/readiness`.

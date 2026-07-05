@@ -60,6 +60,8 @@ import type {
   AvailabilityAdminSummaryResponse,
   ReliabilityRolloutResponse,
   ReliabilityAdminSummaryResponse,
+  StabilityRolloutResponse,
+  StabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -288,6 +290,15 @@ import {
   formatReliabilityRolloutCheckStatus,
   formatReliabilityRolloutStatus,
 } from './reliability-ui'
+import {
+  executeStabilityAdminAction,
+  fetchStabilityAdminSummary,
+  fetchStabilityRollout,
+  formatStabilityAdminAction,
+  formatStabilityDomain,
+  formatStabilityRolloutCheckStatus,
+  formatStabilityRolloutStatus,
+} from './stability-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -883,6 +894,8 @@ function App() {
     useState<AvailabilityRolloutResponse | null>(null)
   const [reliabilityRollout, setReliabilityRollout] =
     useState<ReliabilityRolloutResponse | null>(null)
+  const [stabilityRollout, setStabilityRollout] =
+    useState<StabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1006,6 +1019,8 @@ function App() {
     useState<AvailabilityAdminSummaryResponse | null>(null)
   const [reliabilityAdminSummary, setReliabilityAdminSummary] =
     useState<ReliabilityAdminSummaryResponse | null>(null)
+  const [stabilityAdminSummary, setStabilityAdminSummary] =
+    useState<StabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1073,6 +1088,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [reliabilityAdminAction, setReliabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [stabilityAdminAction, setStabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1467,6 +1485,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setReliabilityRollout(null)
+        }
+      })
+
+    fetchStabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setStabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setStabilityRollout(null)
         }
       })
 
@@ -2317,6 +2347,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setReliabilityAdminSummary(reliabilityAdmin)
+
+      const stabilityAdmin = await fetchStabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setStabilityAdminSummary(stabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -3056,6 +3093,35 @@ function App() {
       )
     } finally {
       setReliabilityAdminAction('idle')
+    }
+  }
+
+  async function handleStabilityAdminAction(
+    action: 'refresh_stability_summary',
+  ) {
+    setStabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeStabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchStabilityRollout(apiBaseUrl)
+      setStabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run stability admin action.',
+      )
+    } finally {
+      setStabilityAdminAction('idle')
     }
   }
 
@@ -4400,6 +4466,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {reliabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {stabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production stability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${stabilityRollout.status}`}
+              >
+                {formatStabilityRolloutStatus(stabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{stabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {stabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatStabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {stabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -6236,6 +6331,67 @@ function App() {
                 }
               >
                 {formatReliabilityAdminAction('refresh_reliability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {stabilityAdminSummary ? (
+          <div className="billing-admin workspace-stability-admin">
+            <div className="billing-admin__header">
+              <span>Stability admin</span>
+              <strong>{stabilityAdminSummary.role}</strong>
+            </div>
+            <p>{stabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Run stability</span>
+                <strong>{stabilityAdminSummary.stats.stabilityPercent}%</strong>
+                <small>
+                  {stabilityAdminSummary.stats.coveredDomains}/
+                  {stabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Stability signals</span>
+                <strong>{stabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {stabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, artifacts, and migration signals'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-stability-list">
+              {stabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-stability-card workspace-stability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatStabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {stabilityAdminSummary.availableActions.includes(
+              'refresh_stability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={stabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleStabilityAdminAction('refresh_stability_summary')
+                }
+              >
+                {formatStabilityAdminAction('refresh_stability_summary')}
               </button>
             ) : null}
           </div>
