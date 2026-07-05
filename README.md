@@ -796,6 +796,36 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.125` behavior:
+
+- Production survivability rollout readiness validates survivability coverage and readiness through `GET /api/survivability/readiness`.
+- Workspace owners and admins can inspect workspace survivability metrics from `GET /api/survivability/workspace/:workspaceId/admin`.
+- The web billing panel shows survivability rollout checks and workspace survivability admin tools.
+
+Current `v5.124` behavior:
+
+- Production appropriateness rollout readiness validates appropriateness coverage and readiness through `GET /api/appropriateness/readiness`.
+- Workspace owners and admins can inspect workspace appropriateness metrics from `GET /api/appropriateness/workspace/:workspaceId/admin`.
+- The web billing panel shows appropriateness rollout checks and workspace appropriateness admin tools.
+
+Current `v5.123` behavior:
+
+- Production effectiveness rollout readiness validates effectiveness coverage and readiness through `GET /api/effectiveness/readiness`.
+- Workspace owners and admins can inspect workspace effectiveness metrics from `GET /api/effectiveness/workspace/:workspaceId/admin`.
+- The web billing panel shows effectiveness rollout checks and workspace effectiveness admin tools.
+
+Current `v5.122` behavior:
+
+- Production accessibility rollout readiness validates accessibility coverage and readiness through `GET /api/accessibility/readiness`.
+- Workspace owners and admins can inspect workspace accessibility metrics from `GET /api/accessibility/workspace/:workspaceId/admin`.
+- The web billing panel shows accessibility rollout checks and workspace accessibility admin tools.
+
+Current `v5.121` behavior:
+
+- Production usability rollout readiness validates usability coverage and readiness through `GET /api/usability/readiness`.
+- Workspace owners and admins can inspect workspace usability metrics from `GET /api/usability/workspace/:workspaceId/admin`.
+- The web billing panel shows usability rollout checks and workspace usability admin tools.
+
 Current `v5.120` behavior:
 
 - Production trustworthiness rollout readiness validates trustworthiness coverage and readiness through `GET /api/trustworthiness/readiness`.

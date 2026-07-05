@@ -214,6 +214,16 @@ import type {
   ComposabilityAdminSummaryResponse,
   TrustworthinessRolloutResponse,
   TrustworthinessAdminSummaryResponse,
+  UsabilityRolloutResponse,
+  UsabilityAdminSummaryResponse,
+  AccessibilityRolloutResponse,
+  AccessibilityAdminSummaryResponse,
+  EffectivenessRolloutResponse,
+  EffectivenessAdminSummaryResponse,
+  AppropriatenessRolloutResponse,
+  AppropriatenessAdminSummaryResponse,
+  SurvivabilityRolloutResponse,
+  SurvivabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -1136,6 +1146,51 @@ import {
   formatTrustworthinessRolloutStatus,
 } from './trustworthiness-ui'
 import {
+  executeUsabilityAdminAction,
+  fetchUsabilityAdminSummary,
+  fetchUsabilityRollout,
+  formatUsabilityAdminAction,
+  formatUsabilityDomain,
+  formatUsabilityRolloutCheckStatus,
+  formatUsabilityRolloutStatus,
+} from './usability-ui'
+import {
+  executeAccessibilityAdminAction,
+  fetchAccessibilityAdminSummary,
+  fetchAccessibilityRollout,
+  formatAccessibilityAdminAction,
+  formatAccessibilityDomain,
+  formatAccessibilityRolloutCheckStatus,
+  formatAccessibilityRolloutStatus,
+} from './accessibility-ui'
+import {
+  executeEffectivenessAdminAction,
+  fetchEffectivenessAdminSummary,
+  fetchEffectivenessRollout,
+  formatEffectivenessAdminAction,
+  formatEffectivenessDomain,
+  formatEffectivenessRolloutCheckStatus,
+  formatEffectivenessRolloutStatus,
+} from './effectiveness-ui'
+import {
+  executeAppropriatenessAdminAction,
+  fetchAppropriatenessAdminSummary,
+  fetchAppropriatenessRollout,
+  formatAppropriatenessAdminAction,
+  formatAppropriatenessDomain,
+  formatAppropriatenessRolloutCheckStatus,
+  formatAppropriatenessRolloutStatus,
+} from './appropriateness-ui'
+import {
+  executeSurvivabilityAdminAction,
+  fetchSurvivabilityAdminSummary,
+  fetchSurvivabilityRollout,
+  formatSurvivabilityAdminAction,
+  formatSurvivabilityDomain,
+  formatSurvivabilityRolloutCheckStatus,
+  formatSurvivabilityRolloutStatus,
+} from './survivability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -1884,6 +1939,16 @@ function App() {
     useState<ComposabilityRolloutResponse | null>(null)
   const [trustworthinessRollout, setTrustworthinessRollout] =
     useState<TrustworthinessRolloutResponse | null>(null)
+  const [usabilityRollout, setUsabilityRollout] =
+    useState<UsabilityRolloutResponse | null>(null)
+  const [accessibilityRollout, setAccessibilityRollout] =
+    useState<AccessibilityRolloutResponse | null>(null)
+  const [effectivenessRollout, setEffectivenessRollout] =
+    useState<EffectivenessRolloutResponse | null>(null)
+  const [appropriatenessRollout, setAppropriatenessRollout] =
+    useState<AppropriatenessRolloutResponse | null>(null)
+  const [survivabilityRollout, setSurvivabilityRollout] =
+    useState<SurvivabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -2161,6 +2226,16 @@ function App() {
     useState<ComposabilityAdminSummaryResponse | null>(null)
   const [trustworthinessAdminSummary, setTrustworthinessAdminSummary] =
     useState<TrustworthinessAdminSummaryResponse | null>(null)
+  const [usabilityAdminSummary, setUsabilityAdminSummary] =
+    useState<UsabilityAdminSummaryResponse | null>(null)
+  const [accessibilityAdminSummary, setAccessibilityAdminSummary] =
+    useState<AccessibilityAdminSummaryResponse | null>(null)
+  const [effectivenessAdminSummary, setEffectivenessAdminSummary] =
+    useState<EffectivenessAdminSummaryResponse | null>(null)
+  const [appropriatenessAdminSummary, setAppropriatenessAdminSummary] =
+    useState<AppropriatenessAdminSummaryResponse | null>(null)
+  const [survivabilityAdminSummary, setSurvivabilityAdminSummary] =
+    useState<SurvivabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -2459,6 +2534,21 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [trustworthinessAdminAction, setTrustworthinessAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [usabilityAdminAction, setUsabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [accessibilityAdminAction, setAccessibilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [effectivenessAdminAction, setEffectivenessAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [appropriatenessAdminAction, setAppropriatenessAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [survivabilityAdminAction, setSurvivabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -3777,6 +3867,66 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setTrustworthinessRollout(null)
+        }
+      })
+
+    fetchUsabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setUsabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setUsabilityRollout(null)
+        }
+      })
+
+    fetchAccessibilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAccessibilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAccessibilityRollout(null)
+        }
+      })
+
+    fetchEffectivenessRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setEffectivenessRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setEffectivenessRollout(null)
+        }
+      })
+
+    fetchAppropriatenessRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAppropriatenessRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAppropriatenessRollout(null)
+        }
+      })
+
+    fetchSurvivabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setSurvivabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setSurvivabilityRollout(null)
         }
       })
 
@@ -5166,6 +5316,41 @@ function App() {
         workspaceAuthHeaders,
       )
       setTrustworthinessAdminSummary(trustworthinessAdmin)
+
+      const usabilityAdmin = await fetchUsabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setUsabilityAdminSummary(usabilityAdmin)
+
+      const accessibilityAdmin = await fetchAccessibilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAccessibilityAdminSummary(accessibilityAdmin)
+
+      const effectivenessAdmin = await fetchEffectivenessAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEffectivenessAdminSummary(effectivenessAdmin)
+
+      const appropriatenessAdmin = await fetchAppropriatenessAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAppropriatenessAdminSummary(appropriatenessAdmin)
+
+      const survivabilityAdmin = await fetchSurvivabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSurvivabilityAdminSummary(survivabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -6398,6 +6583,151 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleSurvivabilityAdminAction(
+    action: 'refresh_survivability_summary',
+  ) {
+    setSurvivabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeSurvivabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchSurvivabilityRollout(apiBaseUrl)
+      setSurvivabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run survivability admin action.',
+      )
+    } finally {
+      setSurvivabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAppropriatenessAdminAction(
+    action: 'refresh_appropriateness_summary',
+  ) {
+    setAppropriatenessAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAppropriatenessAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAppropriatenessRollout(apiBaseUrl)
+      setAppropriatenessRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run appropriateness admin action.',
+      )
+    } finally {
+      setAppropriatenessAdminAction('idle')
+    }
+  }
+
+  async function handleEffectivenessAdminAction(
+    action: 'refresh_effectiveness_summary',
+  ) {
+    setEffectivenessAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeEffectivenessAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchEffectivenessRollout(apiBaseUrl)
+      setEffectivenessRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run effectiveness admin action.',
+      )
+    } finally {
+      setEffectivenessAdminAction('idle')
+    }
+  }
+
+  async function handleAccessibilityAdminAction(
+    action: 'refresh_accessibility_summary',
+  ) {
+    setAccessibilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAccessibilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAccessibilityRollout(apiBaseUrl)
+      setAccessibilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run accessibility admin action.',
+      )
+    } finally {
+      setAccessibilityAdminAction('idle')
+    }
+  }
+
+  async function handleUsabilityAdminAction(
+    action: 'refresh_usability_summary',
+  ) {
+    setUsabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeUsabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchUsabilityRollout(apiBaseUrl)
+      setUsabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run usability admin action.',
+      )
+    } finally {
+      setUsabilityAdminAction('idle')
     }
   }
 
@@ -11715,6 +12045,151 @@ function App() {
               ))}
             </div>
             <small>Checked at {repeatabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {survivabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production survivability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${survivabilityRollout.status}`}
+              >
+                {formatSurvivabilityRolloutStatus(survivabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{survivabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {survivabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatSurvivabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {survivabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {appropriatenessRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production appropriateness rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${appropriatenessRollout.status}`}
+              >
+                {formatAppropriatenessRolloutStatus(appropriatenessRollout.status)}
+              </strong>
+            </div>
+            <p>{appropriatenessRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {appropriatenessRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAppropriatenessRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {appropriatenessRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {effectivenessRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production effectiveness rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${effectivenessRollout.status}`}
+              >
+                {formatEffectivenessRolloutStatus(effectivenessRollout.status)}
+              </strong>
+            </div>
+            <p>{effectivenessRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {effectivenessRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatEffectivenessRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {effectivenessRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {accessibilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production accessibility rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${accessibilityRollout.status}`}
+              >
+                {formatAccessibilityRolloutStatus(accessibilityRollout.status)}
+              </strong>
+            </div>
+            <p>{accessibilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {accessibilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAccessibilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {accessibilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {usabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production usability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${usabilityRollout.status}`}
+              >
+                {formatUsabilityRolloutStatus(usabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{usabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {usabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatUsabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {usabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -18552,6 +19027,331 @@ function App() {
                 }
               >
                 {formatRepeatabilityAdminAction('refresh_repeatability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {survivabilityAdminSummary ? (
+          <div className="billing-admin workspace-survivability-admin">
+            <div className="billing-admin__header">
+              <span>Survivability admin</span>
+              <strong>{survivabilityAdminSummary.role}</strong>
+            </div>
+            <p>{survivabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing record survivability</span>
+                <strong>
+                  {survivabilityAdminSummary.stats.survivabilityPercent}%
+                </strong>
+                <small>
+                  {survivabilityAdminSummary.stats.coveredDomains}/
+                  {survivabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Survivability signals</span>
+                <strong>{survivabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {survivabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing records, and meter usage reports'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-survivability-list">
+              {survivabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-survivability-card workspace-survivability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatSurvivabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {survivabilityAdminSummary.availableActions.includes(
+              'refresh_survivability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={survivabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleSurvivabilityAdminAction(
+                    'refresh_survivability_summary',
+                  )
+                }
+              >
+                {formatSurvivabilityAdminAction('refresh_survivability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {appropriatenessAdminSummary ? (
+          <div className="billing-admin workspace-appropriateness-admin">
+            <div className="billing-admin__header">
+              <span>Appropriateness admin</span>
+              <strong>{appropriatenessAdminSummary.role}</strong>
+            </div>
+            <p>{appropriatenessAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice appropriateness</span>
+                <strong>
+                  {appropriatenessAdminSummary.stats.appropriatenessPercent}%
+                </strong>
+                <small>
+                  {appropriatenessAdminSummary.stats.coveredDomains}/
+                  {appropriatenessAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Appropriateness signals</span>
+                <strong>{appropriatenessAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {appropriatenessAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-appropriateness-list">
+              {appropriatenessAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-appropriateness-card workspace-appropriateness-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAppropriatenessDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {appropriatenessAdminSummary.availableActions.includes(
+              'refresh_appropriateness_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={appropriatenessAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAppropriatenessAdminAction(
+                    'refresh_appropriateness_summary',
+                  )
+                }
+              >
+                {formatAppropriatenessAdminAction('refresh_appropriateness_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {effectivenessAdminSummary ? (
+          <div className="billing-admin workspace-effectiveness-admin">
+            <div className="billing-admin__header">
+              <span>Effectiveness admin</span>
+              <strong>{effectivenessAdminSummary.role}</strong>
+            </div>
+            <p>{effectivenessAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Agent output effectiveness</span>
+                <strong>
+                  {effectivenessAdminSummary.stats.effectivenessPercent}%
+                </strong>
+                <small>
+                  {effectivenessAdminSummary.stats.coveredDomains}/
+                  {effectivenessAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Effectiveness signals</span>
+                <strong>{effectivenessAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {effectivenessAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, agent outputs, and moderator syntheses'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-effectiveness-list">
+              {effectivenessAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-effectiveness-card workspace-effectiveness-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatEffectivenessDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {effectivenessAdminSummary.availableActions.includes(
+              'refresh_effectiveness_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={effectivenessAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleEffectivenessAdminAction(
+                    'refresh_effectiveness_summary',
+                  )
+                }
+              >
+                {formatEffectivenessAdminAction('refresh_effectiveness_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {accessibilityAdminSummary ? (
+          <div className="billing-admin workspace-accessibility-admin">
+            <div className="billing-admin__header">
+              <span>Accessibility admin</span>
+              <strong>{accessibilityAdminSummary.role}</strong>
+            </div>
+            <p>{accessibilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key accessibility</span>
+                <strong>
+                  {accessibilityAdminSummary.stats.accessibilityPercent}%
+                </strong>
+                <small>
+                  {accessibilityAdminSummary.stats.coveredDomains}/
+                  {accessibilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Accessibility signals</span>
+                <strong>{accessibilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {accessibilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-accessibility-list">
+              {accessibilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-accessibility-card workspace-accessibility-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAccessibilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {accessibilityAdminSummary.availableActions.includes(
+              'refresh_accessibility_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={accessibilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAccessibilityAdminAction(
+                    'refresh_accessibility_summary',
+                  )
+                }
+              >
+                {formatAccessibilityAdminAction('refresh_accessibility_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {usabilityAdminSummary ? (
+          <div className="billing-admin workspace-usability-admin">
+            <div className="billing-admin__header">
+              <span>Usability admin</span>
+              <strong>{usabilityAdminSummary.role}</strong>
+            </div>
+            <p>{usabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership usability</span>
+                <strong>
+                  {usabilityAdminSummary.stats.usabilityPercent}%
+                </strong>
+                <small>
+                  {usabilityAdminSummary.stats.coveredDomains}/
+                  {usabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Usability signals</span>
+                <strong>{usabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {usabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-usability-list">
+              {usabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-usability-card workspace-usability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatUsabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {usabilityAdminSummary.availableActions.includes(
+              'refresh_usability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={usabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleUsabilityAdminAction(
+                    'refresh_usability_summary',
+                  )
+                }
+              >
+                {formatUsabilityAdminAction('refresh_usability_summary')}
               </button>
             ) : null}
           </div>

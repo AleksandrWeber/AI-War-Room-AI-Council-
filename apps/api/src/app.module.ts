@@ -92,6 +92,11 @@ import { ResponsivenessModule } from './responsiveness/responsiveness.module.js'
 import { DependabilityModule } from './dependability/dependability.module.js'
 import { ComposabilityModule } from './composability/composability.module.js'
 import { TrustworthinessModule } from './trustworthiness/trustworthiness.module.js'
+import { UsabilityModule } from './usability/usability.module.js'
+import { AccessibilityModule } from './accessibility/accessibility.module.js'
+import { EffectivenessModule } from './effectiveness/effectiveness.module.js'
+import { AppropriatenessModule } from './appropriateness/appropriateness.module.js'
+import { SurvivabilityModule } from './survivability/survivability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -203,6 +208,11 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     DependabilityModule,
     ComposabilityModule,
     TrustworthinessModule,
+    UsabilityModule,
+    AccessibilityModule,
+    EffectivenessModule,
+    AppropriatenessModule,
+    SurvivabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

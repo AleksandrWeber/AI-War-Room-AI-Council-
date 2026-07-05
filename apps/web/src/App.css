@@ -3305,6 +3305,136 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-usability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-usability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-usability-card p,
+.workspace-usability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-usability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-usability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-accessibility-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-accessibility-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-accessibility-card p,
+.workspace-accessibility-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-accessibility-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-accessibility-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-effectiveness-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-effectiveness-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-effectiveness-card p,
+.workspace-effectiveness-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-effectiveness-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-effectiveness-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-appropriateness-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-appropriateness-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-appropriateness-card p,
+.workspace-appropriateness-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-appropriateness-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-appropriateness-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-survivability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-survivability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-survivability-card p,
+.workspace-survivability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-survivability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-survivability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;
