@@ -1456,7 +1456,19 @@ Current `v5.326` behavior:
 - Workspace owners and admins can inspect workspace compatibilizability metrics from `GET /api/compatibilizability/workspace/:workspaceId/admin`.
 - The web billing panel shows compatibilizability rollout checks and workspace compatibilizability admin tools.
 
-Current `v5.350` behavior:
+Current `v5.360` behavior:
+
+- Production multicastizability rollout readiness validates multicastizability coverage and readiness through `GET /api/multicastizability/readiness`.
+- Workspace owners and admins can inspect workspace multicastizability metrics from `GET /api/multicastizability/workspace/:workspaceId/admin`.
+- The web billing panel shows multicastizability rollout checks and workspace multicastizability admin tools.
+
+Current `v5.330` behavior:
+
+- Production dispatchizability rollout readiness validates dispatchizability coverage and readiness through `GET /api/dispatchizability/readiness`.
+- Workspace owners and admins can inspect workspace dispatchizability metrics from `GET /api/dispatchizability/workspace/:workspaceId/admin`.
+- The web billing panel shows dispatchizability rollout checks and workspace dispatchizability admin tools.
+
+Current `v5.225` behavior:
 
 - Production notifizability rollout readiness validates notifizability coverage and readiness through `GET /api/notifizability/readiness`.
 - Workspace owners and admins can inspect workspace notifizability metrics from `GET /api/notifizability/workspace/:workspaceId/admin`.

@@ -173,6 +173,16 @@ import { QueueizabilityModule } from './queueizability/queueizability.module.js'
 import { EventizabilityModule } from './eventizability/eventizability.module.js'
 import { ChannelizabilityModule } from './channelizability/channelizability.module.js'
 import { NotifizabilityModule } from './notifizability/notifizability.module.js'
+import { SubscribizabilityModule } from './subscribizability/subscribizability.module.js'
+import { PublishizabilityModule } from './publishizability/publishizability.module.js'
+import { ConsumizabilityModule } from './consumizability/consumizability.module.js'
+import { DeliverizabilityModule } from './deliverizability/deliverizability.module.js'
+import { DispatchizabilityModule } from './dispatchizability/dispatchizability.module.js'
+import { HandoffizabilityModule } from './handoffizability/handoffizability.module.js'
+import { SynchronizabilityModule } from './synchronizability/synchronizability.module.js'
+import { AsynchronizabilityModule } from './asynchronizability/asynchronizability.module.js'
+import { BroadcastizabilityModule } from './broadcastizability/broadcastizability.module.js'
+import { MulticastizabilityModule } from './multicastizability/multicastizability.module.js'
 
 @Module({
   imports: [
@@ -350,6 +360,16 @@ import { NotifizabilityModule } from './notifizability/notifizability.module.js'
     EventizabilityModule,
     ChannelizabilityModule,
     NotifizabilityModule,
+    SubscribizabilityModule,
+    PublishizabilityModule,
+    ConsumizabilityModule,
+    DeliverizabilityModule,
+    DispatchizabilityModule,
+    HandoffizabilityModule,
+    SynchronizabilityModule,
+    AsynchronizabilityModule,
+    BroadcastizabilityModule,
+    MulticastizabilityModule,
   ],
   exports: [
     CustomizabilityModule,
