@@ -601,6 +601,25 @@ Workspace incident admin tools:
 - Only workspace owners and admins can access incident admin endpoints.
 - The web billing panel shows incident admin tools for authorized roles.
 
+Production release rollout readiness:
+
+- `GET /api/releases/readiness` returns operator-facing production release checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, release artifact table coverage, API version metadata, migration prerequisites, and rollout readiness signals.
+- The web billing panel shows release rollout status and per-check guidance.
+
+Workspace release admin tools:
+
+- `GET /api/releases/workspace/:workspaceId/admin` returns owner/admin release summary with workspace release artifact domains.
+- `POST /api/releases/workspace/:workspaceId/admin/actions` runs release admin actions such as refreshing the summary.
+- Only workspace owners and admins can access release admin endpoints.
+- The web billing panel shows release admin tools for authorized roles.
+
+Current `v5.37` behavior:
+
+- Production release rollout readiness validates release coverage and rollout readiness through `GET /api/releases/readiness`.
+- Workspace owners and admins can inspect workspace release metrics from `GET /api/releases/workspace/:workspaceId/admin`.
+- The web billing panel shows release rollout checks and workspace release admin tools.
+
 Current `v5.36` behavior:
 
 - Production incident response rollout readiness validates incident coverage and escalation readiness through `GET /api/incidents/readiness`.

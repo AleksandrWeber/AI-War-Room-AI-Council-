@@ -46,6 +46,8 @@ import type {
   ComplianceAdminSummaryResponse,
   IncidentResponseRolloutResponse,
   IncidentAdminSummaryResponse,
+  ReleaseRolloutResponse,
+  ReleaseAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -211,6 +213,15 @@ import {
   formatIncidentResponseRolloutCheckStatus,
   formatIncidentResponseRolloutStatus,
 } from './incident-response-ui'
+import {
+  executeReleaseAdminAction,
+  fetchReleaseAdminSummary,
+  fetchReleaseRollout,
+  formatReleaseAdminAction,
+  formatReleaseDomain,
+  formatReleaseRolloutCheckStatus,
+  formatReleaseRolloutStatus,
+} from './release-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -793,6 +804,8 @@ function App() {
     useState<ComplianceRolloutResponse | null>(null)
   const [incidentResponseRollout, setIncidentResponseRollout] =
     useState<IncidentResponseRolloutResponse | null>(null)
+  const [releaseRollout, setReleaseRollout] =
+    useState<ReleaseRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -902,6 +915,8 @@ function App() {
     useState<ComplianceAdminSummaryResponse | null>(null)
   const [incidentAdminSummary, setIncidentAdminSummary] =
     useState<IncidentAdminSummaryResponse | null>(null)
+  const [releaseAdminSummary, setReleaseAdminSummary] =
+    useState<ReleaseAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -948,6 +963,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [incidentAdminAction, setIncidentAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [releaseAdminAction, setReleaseAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1258,6 +1276,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setIncidentResponseRollout(null)
+        }
+      })
+
+    fetchReleaseRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setReleaseRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setReleaseRollout(null)
         }
       })
 
@@ -2059,6 +2089,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setIncidentAdminSummary(incidentAdmin)
+
+      const releaseAdmin = await fetchReleaseAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReleaseAdminSummary(releaseAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -2601,6 +2638,33 @@ function App() {
       )
     } finally {
       setIncidentAdminAction('idle')
+    }
+  }
+
+  async function handleReleaseAdminAction(action: 'refresh_release_summary') {
+    setReleaseAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeReleaseAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchReleaseRollout(apiBaseUrl)
+      setReleaseRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run release admin action.',
+      )
+    } finally {
+      setReleaseAdminAction('idle')
     }
   }
 
@@ -3748,6 +3812,33 @@ function App() {
               ))}
             </div>
             <small>Checked at {incidentResponseRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {releaseRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production release rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${releaseRollout.status}`}
+              >
+                {formatReleaseRolloutStatus(releaseRollout.status)}
+              </strong>
+            </div>
+            <p>{releaseRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {releaseRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>{formatReleaseRolloutCheckStatus(check.status)}</span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {releaseRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -5157,6 +5248,67 @@ function App() {
                 }
               >
                 {formatIncidentAdminAction('refresh_incident_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {releaseAdminSummary ? (
+          <div className="billing-admin workspace-release-admin">
+            <div className="billing-admin__header">
+              <span>Release admin</span>
+              <strong>{releaseAdminSummary.role}</strong>
+            </div>
+            <p>{releaseAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Release records</span>
+                <strong>{releaseAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {releaseAdminSummary.stats.coveredDomains}/
+                  {releaseAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>API version</span>
+                <strong>{releaseAdminSummary.stats.apiVersion}</strong>
+                <small>
+                  {releaseAdminSummary.stats.postgresConnectivity
+                    ? 'Release artifact tables'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-release-list">
+              {releaseAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-release-card workspace-release-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatReleaseDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {releaseAdminSummary.availableActions.includes(
+              'refresh_release_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={releaseAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleReleaseAdminAction('refresh_release_summary')
+                }
+              >
+                {formatReleaseAdminAction('refresh_release_summary')}
               </button>
             ) : null}
           </div>
