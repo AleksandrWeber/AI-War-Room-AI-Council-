@@ -50,6 +50,8 @@ import type {
   ReleaseAdminSummaryResponse,
   SloRolloutResponse,
   SloAdminSummaryResponse,
+  CapacityRolloutResponse,
+  CapacityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -233,6 +235,15 @@ import {
   formatSloRolloutCheckStatus,
   formatSloRolloutStatus,
 } from './slo-ui'
+import {
+  executeCapacityAdminAction,
+  fetchCapacityAdminSummary,
+  fetchCapacityRollout,
+  formatCapacityAdminAction,
+  formatCapacityDomain,
+  formatCapacityRolloutCheckStatus,
+  formatCapacityRolloutStatus,
+} from './capacity-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -818,6 +829,8 @@ function App() {
   const [releaseRollout, setReleaseRollout] =
     useState<ReleaseRolloutResponse | null>(null)
   const [sloRollout, setSloRollout] = useState<SloRolloutResponse | null>(null)
+  const [capacityRollout, setCapacityRollout] =
+    useState<CapacityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -931,6 +944,8 @@ function App() {
     useState<ReleaseAdminSummaryResponse | null>(null)
   const [sloAdminSummary, setSloAdminSummary] =
     useState<SloAdminSummaryResponse | null>(null)
+  const [capacityAdminSummary, setCapacityAdminSummary] =
+    useState<CapacityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -985,6 +1000,9 @@ function App() {
   const [sloAdminAction, setSloAdminAction] = useState<'idle' | 'running'>(
     'idle',
   )
+  const [capacityAdminAction, setCapacityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
   const [memberAdminAction, setMemberAdminAction] = useState<
     'idle' | 'running'
@@ -1317,6 +1335,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setSloRollout(null)
+        }
+      })
+
+    fetchCapacityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setCapacityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setCapacityRollout(null)
         }
       })
 
@@ -2132,6 +2162,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setSloAdminSummary(sloAdmin)
+
+      const capacityAdmin = await fetchCapacityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCapacityAdminSummary(capacityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -2728,6 +2765,33 @@ function App() {
       )
     } finally {
       setSloAdminAction('idle')
+    }
+  }
+
+  async function handleCapacityAdminAction(action: 'refresh_capacity_summary') {
+    setCapacityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeCapacityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchCapacityRollout(apiBaseUrl)
+      setCapacityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run capacity admin action.',
+      )
+    } finally {
+      setCapacityAdminAction('idle')
     }
   }
 
@@ -3929,6 +3993,33 @@ function App() {
               ))}
             </div>
             <small>Checked at {sloRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {capacityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production capacity rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${capacityRollout.status}`}
+              >
+                {formatCapacityRolloutStatus(capacityRollout.status)}
+              </strong>
+            </div>
+            <p>{capacityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {capacityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>{formatCapacityRolloutCheckStatus(check.status)}</span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {capacityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -5458,6 +5549,67 @@ function App() {
                 }
               >
                 {formatSloAdminAction('refresh_slo_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {capacityAdminSummary ? (
+          <div className="billing-admin workspace-capacity-admin">
+            <div className="billing-admin__header">
+              <span>Capacity admin</span>
+              <strong>{capacityAdminSummary.role}</strong>
+            </div>
+            <p>{capacityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Concurrent load</span>
+                <strong>{capacityAdminSummary.stats.loadUtilizationPercent}%</strong>
+                <small>
+                  {capacityAdminSummary.stats.coveredDomains}/
+                  {capacityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Capacity signals</span>
+                <strong>{capacityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {capacityAdminSummary.stats.postgresConnectivity
+                    ? 'Run load and usage limit signals'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-capacity-list">
+              {capacityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-capacity-card workspace-capacity-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatCapacityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {capacityAdminSummary.availableActions.includes(
+              'refresh_capacity_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={capacityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleCapacityAdminAction('refresh_capacity_summary')
+                }
+              >
+                {formatCapacityAdminAction('refresh_capacity_summary')}
               </button>
             ) : null}
           </div>

@@ -10,6 +10,7 @@ import { ComplianceModule } from './compliance/compliance.module.js'
 import { IncidentsModule } from './incidents/incidents.module.js'
 import { ReleasesModule } from './releases/releases.module.js'
 import { SloModule } from './slo/slo.module.js'
+import { CapacityModule } from './capacity/capacity.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -39,6 +40,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     IncidentsModule,
     ReleasesModule,
     SloModule,
+    CapacityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

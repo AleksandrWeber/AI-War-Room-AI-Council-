@@ -627,6 +627,25 @@ Workspace SLO admin tools:
 - Only workspace owners and admins can access SLO admin endpoints.
 - The web billing panel shows SLO admin tools for authorized roles.
 
+Production capacity rollout readiness:
+
+- `GET /api/capacity/readiness` returns operator-facing production capacity checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, capacity signal table coverage, Redis capacity signals, usage limits capacity enforcement, and scaling readiness signals.
+- The web billing panel shows capacity rollout status and per-check guidance.
+
+Workspace capacity admin tools:
+
+- `GET /api/capacity/workspace/:workspaceId/admin` returns owner/admin capacity summary with workspace capacity signal domains.
+- `POST /api/capacity/workspace/:workspaceId/admin/actions` runs capacity admin actions such as refreshing the summary.
+- Only workspace owners and admins can access capacity admin endpoints.
+- The web billing panel shows capacity admin tools for authorized roles.
+
+Current `v5.39` behavior:
+
+- Production capacity rollout readiness validates capacity coverage and scaling readiness through `GET /api/capacity/readiness`.
+- Workspace owners and admins can inspect workspace capacity metrics from `GET /api/capacity/workspace/:workspaceId/admin`.
+- The web billing panel shows capacity rollout checks and workspace capacity admin tools.
+
 Current `v5.38` behavior:
 
 - Production SLO rollout readiness validates SLO coverage and target readiness through `GET /api/slo/readiness`.
