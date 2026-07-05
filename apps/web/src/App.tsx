@@ -454,6 +454,26 @@ import type {
   SerializabilityAdminSummaryResponse,
   NormalizabilityRolloutResponse,
   NormalizabilityAdminSummaryResponse,
+  GlossarizabilityRolloutResponse,
+  GlossarizabilityAdminSummaryResponse,
+  ThesaurusizabilityRolloutResponse,
+  ThesaurusizabilityAdminSummaryResponse,
+  TerminologizabilityRolloutResponse,
+  TerminologizabilityAdminSummaryResponse,
+  VocabularizabilityRolloutResponse,
+  VocabularizabilityAdminSummaryResponse,
+  FootnotizabilityRolloutResponse,
+  FootnotizabilityAdminSummaryResponse,
+  ContextualizabilityRolloutResponse,
+  ContextualizabilityAdminSummaryResponse,
+  GeneralizabilityRolloutResponse,
+  GeneralizabilityAdminSummaryResponse,
+  StandardizabilityRolloutResponse,
+  StandardizabilityAdminSummaryResponse,
+  FormalizabilityRolloutResponse,
+  FormalizabilityAdminSummaryResponse,
+  CanonicalizabilityRolloutResponse,
+  CanonicalizabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -2456,6 +2476,96 @@ import {
   formatNormalizabilityRolloutStatus,
 } from './normalizability-ui'
 import {
+  executeGlossarizabilityAdminAction,
+  fetchGlossarizabilityAdminSummary,
+  fetchGlossarizabilityRollout,
+  formatGlossarizabilityAdminAction,
+  formatGlossarizabilityDomain,
+  formatGlossarizabilityRolloutCheckStatus,
+  formatGlossarizabilityRolloutStatus,
+} from './glossarizability-ui'
+import {
+  executeThesaurusizabilityAdminAction,
+  fetchThesaurusizabilityAdminSummary,
+  fetchThesaurusizabilityRollout,
+  formatThesaurusizabilityAdminAction,
+  formatThesaurusizabilityDomain,
+  formatThesaurusizabilityRolloutCheckStatus,
+  formatThesaurusizabilityRolloutStatus,
+} from './thesaurusizability-ui'
+import {
+  executeTerminologizabilityAdminAction,
+  fetchTerminologizabilityAdminSummary,
+  fetchTerminologizabilityRollout,
+  formatTerminologizabilityAdminAction,
+  formatTerminologizabilityDomain,
+  formatTerminologizabilityRolloutCheckStatus,
+  formatTerminologizabilityRolloutStatus,
+} from './terminologizability-ui'
+import {
+  executeVocabularizabilityAdminAction,
+  fetchVocabularizabilityAdminSummary,
+  fetchVocabularizabilityRollout,
+  formatVocabularizabilityAdminAction,
+  formatVocabularizabilityDomain,
+  formatVocabularizabilityRolloutCheckStatus,
+  formatVocabularizabilityRolloutStatus,
+} from './vocabularizability-ui'
+import {
+  executeFootnotizabilityAdminAction,
+  fetchFootnotizabilityAdminSummary,
+  fetchFootnotizabilityRollout,
+  formatFootnotizabilityAdminAction,
+  formatFootnotizabilityDomain,
+  formatFootnotizabilityRolloutCheckStatus,
+  formatFootnotizabilityRolloutStatus,
+} from './footnotizability-ui'
+import {
+  executeContextualizabilityAdminAction,
+  fetchContextualizabilityAdminSummary,
+  fetchContextualizabilityRollout,
+  formatContextualizabilityAdminAction,
+  formatContextualizabilityDomain,
+  formatContextualizabilityRolloutCheckStatus,
+  formatContextualizabilityRolloutStatus,
+} from './contextualizability-ui'
+import {
+  executeGeneralizabilityAdminAction,
+  fetchGeneralizabilityAdminSummary,
+  fetchGeneralizabilityRollout,
+  formatGeneralizabilityAdminAction,
+  formatGeneralizabilityDomain,
+  formatGeneralizabilityRolloutCheckStatus,
+  formatGeneralizabilityRolloutStatus,
+} from './generalizability-ui'
+import {
+  executeStandardizabilityAdminAction,
+  fetchStandardizabilityAdminSummary,
+  fetchStandardizabilityRollout,
+  formatStandardizabilityAdminAction,
+  formatStandardizabilityDomain,
+  formatStandardizabilityRolloutCheckStatus,
+  formatStandardizabilityRolloutStatus,
+} from './standardizability-ui'
+import {
+  executeFormalizabilityAdminAction,
+  fetchFormalizabilityAdminSummary,
+  fetchFormalizabilityRollout,
+  formatFormalizabilityAdminAction,
+  formatFormalizabilityDomain,
+  formatFormalizabilityRolloutCheckStatus,
+  formatFormalizabilityRolloutStatus,
+} from './formalizability-ui'
+import {
+  executeCanonicalizabilityAdminAction,
+  fetchCanonicalizabilityAdminSummary,
+  fetchCanonicalizabilityRollout,
+  formatCanonicalizabilityAdminAction,
+  formatCanonicalizabilityDomain,
+  formatCanonicalizabilityRolloutCheckStatus,
+  formatCanonicalizabilityRolloutStatus,
+} from './canonicalizability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -3444,6 +3554,26 @@ function App() {
     useState<SerializabilityRolloutResponse | null>(null)
   const [normalizabilityRollout, setNormalizabilityRollout] =
     useState<NormalizabilityRolloutResponse | null>(null)
+  const [glossarizabilityRollout, setGlossarizabilityRollout] =
+    useState<GlossarizabilityRolloutResponse | null>(null)
+  const [thesaurusizabilityRollout, setThesaurusizabilityRollout] =
+    useState<ThesaurusizabilityRolloutResponse | null>(null)
+  const [terminologizabilityRollout, setTerminologizabilityRollout] =
+    useState<TerminologizabilityRolloutResponse | null>(null)
+  const [vocabularizabilityRollout, setVocabularizabilityRollout] =
+    useState<VocabularizabilityRolloutResponse | null>(null)
+  const [footnotizabilityRollout, setFootnotizabilityRollout] =
+    useState<FootnotizabilityRolloutResponse | null>(null)
+  const [contextualizabilityRollout, setContextualizabilityRollout] =
+    useState<ContextualizabilityRolloutResponse | null>(null)
+  const [generalizabilityRollout, setGeneralizabilityRollout] =
+    useState<GeneralizabilityRolloutResponse | null>(null)
+  const [standardizabilityRollout, setStandardizabilityRollout] =
+    useState<StandardizabilityRolloutResponse | null>(null)
+  const [formalizabilityRollout, setFormalizabilityRollout] =
+    useState<FormalizabilityRolloutResponse | null>(null)
+  const [canonicalizabilityRollout, setCanonicalizabilityRollout] =
+    useState<CanonicalizabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -3961,6 +4091,26 @@ function App() {
     useState<SerializabilityAdminSummaryResponse | null>(null)
   const [normalizabilityAdminSummary, setNormalizabilityAdminSummary] =
     useState<NormalizabilityAdminSummaryResponse | null>(null)
+  const [glossarizabilityAdminSummary, setGlossarizabilityAdminSummary] =
+    useState<GlossarizabilityAdminSummaryResponse | null>(null)
+  const [thesaurusizabilityAdminSummary, setThesaurusizabilityAdminSummary] =
+    useState<ThesaurusizabilityAdminSummaryResponse | null>(null)
+  const [terminologizabilityAdminSummary, setTerminologizabilityAdminSummary] =
+    useState<TerminologizabilityAdminSummaryResponse | null>(null)
+  const [vocabularizabilityAdminSummary, setVocabularizabilityAdminSummary] =
+    useState<VocabularizabilityAdminSummaryResponse | null>(null)
+  const [footnotizabilityAdminSummary, setFootnotizabilityAdminSummary] =
+    useState<FootnotizabilityAdminSummaryResponse | null>(null)
+  const [contextualizabilityAdminSummary, setContextualizabilityAdminSummary] =
+    useState<ContextualizabilityAdminSummaryResponse | null>(null)
+  const [generalizabilityAdminSummary, setGeneralizabilityAdminSummary] =
+    useState<GeneralizabilityAdminSummaryResponse | null>(null)
+  const [standardizabilityAdminSummary, setStandardizabilityAdminSummary] =
+    useState<StandardizabilityAdminSummaryResponse | null>(null)
+  const [formalizabilityAdminSummary, setFormalizabilityAdminSummary] =
+    useState<FormalizabilityAdminSummaryResponse | null>(null)
+  const [canonicalizabilityAdminSummary, setCanonicalizabilityAdminSummary] =
+    useState<CanonicalizabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -4619,6 +4769,36 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [normalizabilityAdminAction, setNormalizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [glossarizabilityAdminAction, setGlossarizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [thesaurusizabilityAdminAction, setThesaurusizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [terminologizabilityAdminAction, setTerminologizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [vocabularizabilityAdminAction, setVocabularizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [footnotizabilityAdminAction, setFootnotizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [contextualizabilityAdminAction, setContextualizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [generalizabilityAdminAction, setGeneralizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [standardizabilityAdminAction, setStandardizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [formalizabilityAdminAction, setFormalizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [canonicalizabilityAdminAction, setCanonicalizabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -7380,6 +7560,126 @@ function App() {
         }
       })
 
+    fetchGlossarizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setGlossarizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setGlossarizabilityRollout(null)
+        }
+      })
+
+    fetchThesaurusizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setThesaurusizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setThesaurusizabilityRollout(null)
+        }
+      })
+
+    fetchTerminologizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setTerminologizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTerminologizabilityRollout(null)
+        }
+      })
+
+    fetchVocabularizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setVocabularizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setVocabularizabilityRollout(null)
+        }
+      })
+
+    fetchFootnotizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setFootnotizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setFootnotizabilityRollout(null)
+        }
+      })
+
+    fetchContextualizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setContextualizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setContextualizabilityRollout(null)
+        }
+      })
+
+    fetchGeneralizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setGeneralizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setGeneralizabilityRollout(null)
+        }
+      })
+
+    fetchStandardizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setStandardizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setStandardizabilityRollout(null)
+        }
+      })
+
+    fetchFormalizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setFormalizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setFormalizabilityRollout(null)
+        }
+      })
+
+    fetchCanonicalizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setCanonicalizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setCanonicalizabilityRollout(null)
+        }
+      })
+
     fetchUsageCapabilities(apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
@@ -9606,6 +9906,76 @@ function App() {
         workspaceAuthHeaders,
       )
       setNormalizabilityAdminSummary(normalizabilityAdmin)
+
+      const glossarizabilityAdmin = await fetchGlossarizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setGlossarizabilityAdminSummary(glossarizabilityAdmin)
+
+      const thesaurusizabilityAdmin = await fetchThesaurusizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setThesaurusizabilityAdminSummary(thesaurusizabilityAdmin)
+
+      const terminologizabilityAdmin = await fetchTerminologizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTerminologizabilityAdminSummary(terminologizabilityAdmin)
+
+      const vocabularizabilityAdmin = await fetchVocabularizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setVocabularizabilityAdminSummary(vocabularizabilityAdmin)
+
+      const footnotizabilityAdmin = await fetchFootnotizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFootnotizabilityAdminSummary(footnotizabilityAdmin)
+
+      const contextualizabilityAdmin = await fetchContextualizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setContextualizabilityAdminSummary(contextualizabilityAdmin)
+
+      const generalizabilityAdmin = await fetchGeneralizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setGeneralizabilityAdminSummary(generalizabilityAdmin)
+
+      const standardizabilityAdmin = await fetchStandardizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setStandardizabilityAdminSummary(standardizabilityAdmin)
+
+      const formalizabilityAdmin = await fetchFormalizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFormalizabilityAdminSummary(formalizabilityAdmin)
+
+      const canonicalizabilityAdmin = await fetchCanonicalizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCanonicalizabilityAdminSummary(canonicalizabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -10838,6 +11208,296 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleCanonicalizabilityAdminAction(
+    action: 'refresh_canonicalizability_summary',
+  ) {
+    setCanonicalizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeCanonicalizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchCanonicalizabilityRollout(apiBaseUrl)
+      setCanonicalizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run canonicalizability admin action.',
+      )
+    } finally {
+      setCanonicalizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleFormalizabilityAdminAction(
+    action: 'refresh_formalizability_summary',
+  ) {
+    setFormalizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeFormalizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchFormalizabilityRollout(apiBaseUrl)
+      setFormalizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run formalizability admin action.',
+      )
+    } finally {
+      setFormalizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleStandardizabilityAdminAction(
+    action: 'refresh_standardizability_summary',
+  ) {
+    setStandardizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeStandardizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchStandardizabilityRollout(apiBaseUrl)
+      setStandardizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run standardizability admin action.',
+      )
+    } finally {
+      setStandardizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleGeneralizabilityAdminAction(
+    action: 'refresh_generalizability_summary',
+  ) {
+    setGeneralizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeGeneralizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchGeneralizabilityRollout(apiBaseUrl)
+      setGeneralizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run generalizability admin action.',
+      )
+    } finally {
+      setGeneralizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleContextualizabilityAdminAction(
+    action: 'refresh_contextualizability_summary',
+  ) {
+    setContextualizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeContextualizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchContextualizabilityRollout(apiBaseUrl)
+      setContextualizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run contextualizability admin action.',
+      )
+    } finally {
+      setContextualizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleFootnotizabilityAdminAction(
+    action: 'refresh_footnotizability_summary',
+  ) {
+    setFootnotizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeFootnotizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchFootnotizabilityRollout(apiBaseUrl)
+      setFootnotizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run footnotizability admin action.',
+      )
+    } finally {
+      setFootnotizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleVocabularizabilityAdminAction(
+    action: 'refresh_vocabularizability_summary',
+  ) {
+    setVocabularizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeVocabularizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchVocabularizabilityRollout(apiBaseUrl)
+      setVocabularizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run vocabularizability admin action.',
+      )
+    } finally {
+      setVocabularizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleTerminologizabilityAdminAction(
+    action: 'refresh_terminologizability_summary',
+  ) {
+    setTerminologizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeTerminologizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchTerminologizabilityRollout(apiBaseUrl)
+      setTerminologizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run terminologizability admin action.',
+      )
+    } finally {
+      setTerminologizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleThesaurusizabilityAdminAction(
+    action: 'refresh_thesaurusizability_summary',
+  ) {
+    setThesaurusizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeThesaurusizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchThesaurusizabilityRollout(apiBaseUrl)
+      setThesaurusizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run thesaurusizability admin action.',
+      )
+    } finally {
+      setThesaurusizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleGlossarizabilityAdminAction(
+    action: 'refresh_glossarizability_summary',
+  ) {
+    setGlossarizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeGlossarizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchGlossarizabilityRollout(apiBaseUrl)
+      setGlossarizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run glossarizability admin action.',
+      )
+    } finally {
+      setGlossarizabilityAdminAction('idle')
     }
   }
 
@@ -23115,6 +23775,296 @@ function App() {
               ))}
             </div>
             <small>Checked at {consolidatizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {footnotizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production footnotizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${footnotizabilityRollout.status}`}
+              >
+                {formatFootnotizabilityRolloutStatus(footnotizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{footnotizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {footnotizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatFootnotizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {footnotizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {vocabularizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production vocabularizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${vocabularizabilityRollout.status}`}
+              >
+                {formatVocabularizabilityRolloutStatus(vocabularizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{vocabularizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {vocabularizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatVocabularizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {vocabularizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {terminologizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production terminologizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${terminologizabilityRollout.status}`}
+              >
+                {formatTerminologizabilityRolloutStatus(terminologizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{terminologizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {terminologizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatTerminologizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {terminologizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {thesaurusizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production thesaurusizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${thesaurusizabilityRollout.status}`}
+              >
+                {formatThesaurusizabilityRolloutStatus(thesaurusizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{thesaurusizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {thesaurusizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatThesaurusizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {thesaurusizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {glossarizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production glossarizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${glossarizabilityRollout.status}`}
+              >
+                {formatGlossarizabilityRolloutStatus(glossarizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{glossarizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {glossarizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatGlossarizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {glossarizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {canonicalizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production canonicalizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${canonicalizabilityRollout.status}`}
+              >
+                {formatCanonicalizabilityRolloutStatus(canonicalizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{canonicalizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {canonicalizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatCanonicalizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {canonicalizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {formalizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production formalizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${formalizabilityRollout.status}`}
+              >
+                {formatFormalizabilityRolloutStatus(formalizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{formalizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {formalizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatFormalizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {formalizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {standardizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production standardizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${standardizabilityRollout.status}`}
+              >
+                {formatStandardizabilityRolloutStatus(standardizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{standardizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {standardizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatStandardizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {standardizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {generalizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production generalizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${generalizabilityRollout.status}`}
+              >
+                {formatGeneralizabilityRolloutStatus(generalizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{generalizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {generalizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatGeneralizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {generalizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {contextualizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production contextualizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${contextualizabilityRollout.status}`}
+              >
+                {formatContextualizabilityRolloutStatus(contextualizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{contextualizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {contextualizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatContextualizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {contextualizabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -37752,6 +38702,656 @@ function App() {
                 }
               >
                 {formatConsolidatizabilityAdminAction('refresh_consolidatizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {footnotizabilityAdminSummary ? (
+          <div className="billing-admin workspace-footnotizability-admin">
+            <div className="billing-admin__header">
+              <span>Footnotizability admin</span>
+              <strong>{footnotizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{footnotizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification footnotizability</span>
+                <strong>
+                  {footnotizabilityAdminSummary.stats.footnotizabilityPercent}%
+                </strong>
+                <small>
+                  {footnotizabilityAdminSummary.stats.coveredDomains}/
+                  {footnotizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Footnotizability signals</span>
+                <strong>{footnotizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {footnotizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-footnotizability-list">
+              {footnotizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-footnotizability-card workspace-footnotizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatFootnotizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {footnotizabilityAdminSummary.availableActions.includes(
+              'refresh_footnotizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={footnotizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleFootnotizabilityAdminAction(
+                    'refresh_footnotizability_summary',
+                  )
+                }
+              >
+                {formatFootnotizabilityAdminAction('refresh_footnotizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {vocabularizabilityAdminSummary ? (
+          <div className="billing-admin workspace-vocabularizability-admin">
+            <div className="billing-admin__header">
+              <span>Vocabularizability admin</span>
+              <strong>{vocabularizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{vocabularizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice vocabularizability</span>
+                <strong>
+                  {vocabularizabilityAdminSummary.stats.vocabularizabilityPercent}%
+                </strong>
+                <small>
+                  {vocabularizabilityAdminSummary.stats.coveredDomains}/
+                  {vocabularizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Vocabularizability signals</span>
+                <strong>{vocabularizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {vocabularizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-vocabularizability-list">
+              {vocabularizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-vocabularizability-card workspace-vocabularizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatVocabularizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {vocabularizabilityAdminSummary.availableActions.includes(
+              'refresh_vocabularizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={vocabularizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleVocabularizabilityAdminAction(
+                    'refresh_vocabularizability_summary',
+                  )
+                }
+              >
+                {formatVocabularizabilityAdminAction('refresh_vocabularizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {terminologizabilityAdminSummary ? (
+          <div className="billing-admin workspace-terminologizability-admin">
+            <div className="billing-admin__header">
+              <span>Terminologizability admin</span>
+              <strong>{terminologizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{terminologizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership terminologizability</span>
+                <strong>
+                  {terminologizabilityAdminSummary.stats.terminologizabilityPercent}%
+                </strong>
+                <small>
+                  {terminologizabilityAdminSummary.stats.coveredDomains}/
+                  {terminologizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Terminologizability signals</span>
+                <strong>{terminologizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {terminologizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-terminologizability-list">
+              {terminologizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-terminologizability-card workspace-terminologizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatTerminologizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {terminologizabilityAdminSummary.availableActions.includes(
+              'refresh_terminologizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={terminologizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleTerminologizabilityAdminAction(
+                    'refresh_terminologizability_summary',
+                  )
+                }
+              >
+                {formatTerminologizabilityAdminAction('refresh_terminologizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {thesaurusizabilityAdminSummary ? (
+          <div className="billing-admin workspace-thesaurusizability-admin">
+            <div className="billing-admin__header">
+              <span>Thesaurusizability admin</span>
+              <strong>{thesaurusizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{thesaurusizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key thesaurusizability</span>
+                <strong>
+                  {thesaurusizabilityAdminSummary.stats.thesaurusizabilityPercent}%
+                </strong>
+                <small>
+                  {thesaurusizabilityAdminSummary.stats.coveredDomains}/
+                  {thesaurusizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Thesaurusizability signals</span>
+                <strong>{thesaurusizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {thesaurusizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-thesaurusizability-list">
+              {thesaurusizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-thesaurusizability-card workspace-thesaurusizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatThesaurusizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {thesaurusizabilityAdminSummary.availableActions.includes(
+              'refresh_thesaurusizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={thesaurusizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleThesaurusizabilityAdminAction(
+                    'refresh_thesaurusizability_summary',
+                  )
+                }
+              >
+                {formatThesaurusizabilityAdminAction('refresh_thesaurusizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {glossarizabilityAdminSummary ? (
+          <div className="billing-admin workspace-glossarizability-admin">
+            <div className="billing-admin__header">
+              <span>Glossarizability admin</span>
+              <strong>{glossarizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{glossarizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan glossarizability</span>
+                <strong>
+                  {glossarizabilityAdminSummary.stats.glossarizabilityPercent}%
+                </strong>
+                <small>
+                  {glossarizabilityAdminSummary.stats.coveredDomains}/
+                  {glossarizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Glossarizability signals</span>
+                <strong>{glossarizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {glossarizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-glossarizability-list">
+              {glossarizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-glossarizability-card workspace-glossarizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatGlossarizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {glossarizabilityAdminSummary.availableActions.includes(
+              'refresh_glossarizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={glossarizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleGlossarizabilityAdminAction(
+                    'refresh_glossarizability_summary',
+                  )
+                }
+              >
+                {formatGlossarizabilityAdminAction('refresh_glossarizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {canonicalizabilityAdminSummary ? (
+          <div className="billing-admin workspace-canonicalizability-admin">
+            <div className="billing-admin__header">
+              <span>Canonicalizability admin</span>
+              <strong>{canonicalizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{canonicalizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Model health canonicalizability</span>
+                <strong>
+                  {canonicalizabilityAdminSummary.stats.canonicalizabilityPercent}%
+                </strong>
+                <small>
+                  {canonicalizabilityAdminSummary.stats.coveredDomains}/
+                  {canonicalizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Canonicalizability signals</span>
+                <strong>{canonicalizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {canonicalizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, model health events, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-canonicalizability-list">
+              {canonicalizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-canonicalizability-card workspace-canonicalizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatCanonicalizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {canonicalizabilityAdminSummary.availableActions.includes(
+              'refresh_canonicalizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={canonicalizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleCanonicalizabilityAdminAction(
+                    'refresh_canonicalizability_summary',
+                  )
+                }
+              >
+                {formatCanonicalizabilityAdminAction('refresh_canonicalizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {formalizabilityAdminSummary ? (
+          <div className="billing-admin workspace-formalizability-admin">
+            <div className="billing-admin__header">
+              <span>Formalizability admin</span>
+              <strong>{formalizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{formalizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Provider credential formalizability</span>
+                <strong>
+                  {formalizabilityAdminSummary.stats.formalizabilityPercent}%
+                </strong>
+                <small>
+                  {formalizabilityAdminSummary.stats.coveredDomains}/
+                  {formalizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Formalizability signals</span>
+                <strong>{formalizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {formalizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, provider credentials, and model registry entries'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-formalizability-list">
+              {formalizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-formalizability-card workspace-formalizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatFormalizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {formalizabilityAdminSummary.availableActions.includes(
+              'refresh_formalizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={formalizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleFormalizabilityAdminAction(
+                    'refresh_formalizability_summary',
+                  )
+                }
+              >
+                {formatFormalizabilityAdminAction('refresh_formalizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {standardizabilityAdminSummary ? (
+          <div className="billing-admin workspace-standardizability-admin">
+            <div className="billing-admin__header">
+              <span>Standardizability admin</span>
+              <strong>{standardizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{standardizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workspace limit standardizability</span>
+                <strong>
+                  {standardizabilityAdminSummary.stats.standardizabilityPercent}%
+                </strong>
+                <small>
+                  {standardizabilityAdminSummary.stats.coveredDomains}/
+                  {standardizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Standardizability signals</span>
+                <strong>{standardizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {standardizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace usage limits, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-standardizability-list">
+              {standardizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-standardizability-card workspace-standardizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatStandardizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {standardizabilityAdminSummary.availableActions.includes(
+              'refresh_standardizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={standardizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleStandardizabilityAdminAction(
+                    'refresh_standardizability_summary',
+                  )
+                }
+              >
+                {formatStandardizabilityAdminAction('refresh_standardizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {generalizabilityAdminSummary ? (
+          <div className="billing-admin workspace-generalizability-admin">
+            <div className="billing-admin__header">
+              <span>Generalizability admin</span>
+              <strong>{generalizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{generalizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Meter usage generalizability</span>
+                <strong>
+                  {generalizabilityAdminSummary.stats.generalizabilityPercent}%
+                </strong>
+                <small>
+                  {generalizabilityAdminSummary.stats.coveredDomains}/
+                  {generalizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Generalizability signals</span>
+                <strong>{generalizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {generalizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, meter usage reports, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-generalizability-list">
+              {generalizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-generalizability-card workspace-generalizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatGeneralizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {generalizabilityAdminSummary.availableActions.includes(
+              'refresh_generalizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={generalizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleGeneralizabilityAdminAction(
+                    'refresh_generalizability_summary',
+                  )
+                }
+              >
+                {formatGeneralizabilityAdminAction('refresh_generalizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {contextualizabilityAdminSummary ? (
+          <div className="billing-admin workspace-contextualizability-admin">
+            <div className="billing-admin__header">
+              <span>Contextualizability admin</span>
+              <strong>{contextualizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{contextualizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing webhook contextualizability</span>
+                <strong>
+                  {contextualizabilityAdminSummary.stats.contextualizabilityPercent}%
+                </strong>
+                <small>
+                  {contextualizabilityAdminSummary.stats.coveredDomains}/
+                  {contextualizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Contextualizability signals</span>
+                <strong>{contextualizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {contextualizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing webhook events, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-contextualizability-list">
+              {contextualizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-contextualizability-card workspace-contextualizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatContextualizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {contextualizabilityAdminSummary.availableActions.includes(
+              'refresh_contextualizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={contextualizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleContextualizabilityAdminAction(
+                    'refresh_contextualizability_summary',
+                  )
+                }
+              >
+                {formatContextualizabilityAdminAction('refresh_contextualizability_summary')}
               </button>
             ) : null}
           </div>

@@ -212,6 +212,16 @@ import { HarmonizabilityModule } from './harmonizability/harmonizability.module.
 import { ParametrizabilityModule } from './parametrizability/parametrizability.module.js'
 import { SerializabilityModule } from './serializability/serializability.module.js'
 import { NormalizabilityModule } from './normalizability/normalizability.module.js'
+import { GlossarizabilityModule } from './glossarizability/glossarizability.module.js'
+import { ThesaurusizabilityModule } from './thesaurusizability/thesaurusizability.module.js'
+import { TerminologizabilityModule } from './terminologizability/terminologizability.module.js'
+import { VocabularizabilityModule } from './vocabularizability/vocabularizability.module.js'
+import { FootnotizabilityModule } from './footnotizability/footnotizability.module.js'
+import { ContextualizabilityModule } from './contextualizability/contextualizability.module.js'
+import { GeneralizabilityModule } from './generalizability/generalizability.module.js'
+import { StandardizabilityModule } from './standardizability/standardizability.module.js'
+import { FormalizabilityModule } from './formalizability/formalizability.module.js'
+import { CanonicalizabilityModule } from './canonicalizability/canonicalizability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -443,6 +453,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     ParametrizabilityModule,
     SerializabilityModule,
     NormalizabilityModule,
+    GlossarizabilityModule,
+    ThesaurusizabilityModule,
+    TerminologizabilityModule,
+    VocabularizabilityModule,
+    FootnotizabilityModule,
+    ContextualizabilityModule,
+    GeneralizabilityModule,
+    StandardizabilityModule,
+    FormalizabilityModule,
+    CanonicalizabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

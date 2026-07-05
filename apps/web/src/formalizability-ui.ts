@@ -1,0 +1,119 @@
+import {
+  formalizabilityAdminActionResponseSchema,
+  formalizabilityAdminSummaryResponseSchema,
+  formalizabilityCapabilitiesResponseSchema,
+  formalizabilityRolloutResponseSchema,
+} from '@ai-war-room/schemas'
+
+export async function fetchFormalizabilityRollout(apiBaseUrl: string) {
+  const response = await fetch(`${apiBaseUrl}/formalizability/readiness`)
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return formalizabilityRolloutResponseSchema.parse(await response.json())
+}
+
+export async function fetchFormalizabilityAdminSummary(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/formalizability/workspace/${encodeURIComponent(workspaceId)}/admin`,
+    { headers },
+  )
+
+  if (response.status === 403) {
+    return null
+  }
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return formalizabilityAdminSummaryResponseSchema.parse(await response.json())
+}
+
+export async function executeFormalizabilityAdminAction(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+  input: { action: 'refresh_formalizability_summary' },
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/formalizability/workspace/${encodeURIComponent(workspaceId)}/admin/actions`,
+    {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        workspaceId,
+        ...input,
+      }),
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return formalizabilityAdminActionResponseSchema.parse(await response.json())
+}
+
+export function formatFormalizabilityRolloutStatus(status: 'ready' | 'not_ready') {
+  switch (status) {
+    case 'ready':
+      return 'Ready'
+    case 'not_ready':
+      return 'Not ready'
+  }
+}
+
+export function formatFormalizabilityRolloutCheckStatus(
+  status: 'pass' | 'fail' | 'skip',
+) {
+  switch (status) {
+    case 'pass':
+      return 'Pass'
+    case 'fail':
+      return 'Fail'
+    case 'skip':
+      return 'Skip'
+  }
+}
+
+export function formatFormalizabilityAdminAction(action: 'refresh_formalizability_summary') {
+  switch (action) {
+    case 'refresh_formalizability_summary':
+      return 'Refresh formalizability summary'
+  }
+}
+
+export function formatFormalizabilityDomain(
+  domain: 'completed_runs' | 'failed_runs' | 'workspace_provider_credentials' | 'model_registry_entries',
+) {
+  switch (domain) {
+    case 'completed_runs':
+      return 'Completed runs'
+    case 'failed_runs':
+      return 'Failed runs'
+    case 'workspace_provider_credentials':
+      return 'Provider credentials'
+    case 'model_registry_entries':
+      return 'Model registry entries'
+  }
+}
+
+export async function fetchFormalizabilityCapabilities(apiBaseUrl: string) {
+  const response = await fetch(`${apiBaseUrl}/formalizability/capabilities`)
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return formalizabilityCapabilitiesResponseSchema.parse(await response.json())
+}

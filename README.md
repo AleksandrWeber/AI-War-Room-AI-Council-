@@ -856,6 +856,36 @@ Current `v5.226` behavior:
 - Workspace owners and admins can inspect workspace archivizability metrics from `GET /api/archivizability/workspace/:workspaceId/admin`.
 - The web billing panel shows archivizability rollout checks and workspace archivizability admin tools.
 
+Current `v5.245` behavior:
+
+- Production footnotizability rollout readiness validates footnotizability coverage and readiness through `GET /api/footnotizability/readiness`.
+- Workspace owners and admins can inspect workspace footnotizability metrics from `GET /api/footnotizability/workspace/:workspaceId/admin`.
+- The web billing panel shows footnotizability rollout checks and workspace footnotizability admin tools.
+
+Current `v5.244` behavior:
+
+- Production vocabularizability rollout readiness validates vocabularizability coverage and readiness through `GET /api/vocabularizability/readiness`.
+- Workspace owners and admins can inspect workspace vocabularizability metrics from `GET /api/vocabularizability/workspace/:workspaceId/admin`.
+- The web billing panel shows vocabularizability rollout checks and workspace vocabularizability admin tools.
+
+Current `v5.243` behavior:
+
+- Production terminologizability rollout readiness validates terminologizability coverage and readiness through `GET /api/terminologizability/readiness`.
+- Workspace owners and admins can inspect workspace terminologizability metrics from `GET /api/terminologizability/workspace/:workspaceId/admin`.
+- The web billing panel shows terminologizability rollout checks and workspace terminologizability admin tools.
+
+Current `v5.242` behavior:
+
+- Production thesaurusizability rollout readiness validates thesaurusizability coverage and readiness through `GET /api/thesaurusizability/readiness`.
+- Workspace owners and admins can inspect workspace thesaurusizability metrics from `GET /api/thesaurusizability/workspace/:workspaceId/admin`.
+- The web billing panel shows thesaurusizability rollout checks and workspace thesaurusizability admin tools.
+
+Current `v5.241` behavior:
+
+- Production glossarizability rollout readiness validates glossarizability coverage and readiness through `GET /api/glossarizability/readiness`.
+- Workspace owners and admins can inspect workspace glossarizability metrics from `GET /api/glossarizability/workspace/:workspaceId/admin`.
+- The web billing panel shows glossarizability rollout checks and workspace glossarizability admin tools.
+
 Current `v5.240` behavior:
 
 - Production normalizability rollout readiness validates normalizability coverage and readiness through `GET /api/normalizability/readiness`.
@@ -885,6 +915,36 @@ Current `v5.236` behavior:
 - Production consolidatizability rollout readiness validates consolidatizability coverage and readiness through `GET /api/consolidatizability/readiness`.
 - Workspace owners and admins can inspect workspace consolidatizability metrics from `GET /api/consolidatizability/workspace/:workspaceId/admin`.
 - The web billing panel shows consolidatizability rollout checks and workspace consolidatizability admin tools.
+
+Current `v5.250` behavior:
+
+- Production canonicalizability rollout readiness validates canonicalizability coverage and readiness through `GET /api/canonicalizability/readiness`.
+- Workspace owners and admins can inspect workspace canonicalizability metrics from `GET /api/canonicalizability/workspace/:workspaceId/admin`.
+- The web billing panel shows canonicalizability rollout checks and workspace canonicalizability admin tools.
+
+Current `v5.249` behavior:
+
+- Production formalizability rollout readiness validates formalizability coverage and readiness through `GET /api/formalizability/readiness`.
+- Workspace owners and admins can inspect workspace formalizability metrics from `GET /api/formalizability/workspace/:workspaceId/admin`.
+- The web billing panel shows formalizability rollout checks and workspace formalizability admin tools.
+
+Current `v5.248` behavior:
+
+- Production standardizability rollout readiness validates standardizability coverage and readiness through `GET /api/standardizability/readiness`.
+- Workspace owners and admins can inspect workspace standardizability metrics from `GET /api/standardizability/workspace/:workspaceId/admin`.
+- The web billing panel shows standardizability rollout checks and workspace standardizability admin tools.
+
+Current `v5.247` behavior:
+
+- Production generalizability rollout readiness validates generalizability coverage and readiness through `GET /api/generalizability/readiness`.
+- Workspace owners and admins can inspect workspace generalizability metrics from `GET /api/generalizability/workspace/:workspaceId/admin`.
+- The web billing panel shows generalizability rollout checks and workspace generalizability admin tools.
+
+Current `v5.246` behavior:
+
+- Production contextualizability rollout readiness validates contextualizability coverage and readiness through `GET /api/contextualizability/readiness`.
+- Workspace owners and admins can inspect workspace contextualizability metrics from `GET /api/contextualizability/workspace/:workspaceId/admin`.
+- The web billing panel shows contextualizability rollout checks and workspace contextualizability admin tools.
 
 Current `v5.225` behavior:
 
