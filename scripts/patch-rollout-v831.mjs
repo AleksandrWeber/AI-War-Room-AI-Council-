@@ -26,8 +26,8 @@ if (!index.includes('encapsulizability-rollout')) {
   writeFileSync(indexPath, index)
 }
 
-// app.module.ts
-const appModulePath = join(root, 'apps/api/src/app.module.ts')
+// app-rollout.module.ts
+const appModulePath = join(root, 'apps/api/src/app-rollout.module.ts')
 let appModule = readFileSync(appModulePath, 'utf8')
 if (!appModule.includes('EncapsulizabilityModule')) {
   const importBlock = milestones
@@ -51,7 +51,7 @@ if (!appModule.includes('EncapsulizabilityModule')) {
 // integration tests
 const testPath = join(
   root,
-  'apps/api/src/workspaces/workspace-admin.integration.test.ts',
+  'apps/api/src/workspaces/workspace-admin-rollout.integration.test.ts',
 )
 let tests = readFileSync(testPath, 'utf8')
 const generatedTests = readFileSync(
