@@ -796,6 +796,36 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.85` behavior:
+
+- Production assignability rollout readiness validates assignability coverage and readiness through `GET /api/assignability/readiness`.
+- Workspace owners and admins can inspect workspace assignability metrics from `GET /api/assignability/workspace/:workspaceId/admin`.
+- The web billing panel shows assignability rollout checks and workspace assignability admin tools.
+
+Current `v5.84` behavior:
+
+- Production distinguishability rollout readiness validates distinguishability coverage and readiness through `GET /api/distinguishability/readiness`.
+- Workspace owners and admins can inspect workspace distinguishability metrics from `GET /api/distinguishability/workspace/:workspaceId/admin`.
+- The web billing panel shows distinguishability rollout checks and workspace distinguishability admin tools.
+
+Current `v5.83` behavior:
+
+- Production comparability rollout readiness validates comparability coverage and readiness through `GET /api/comparability/readiness`.
+- Workspace owners and admins can inspect workspace comparability metrics from `GET /api/comparability/workspace/:workspaceId/admin`.
+- The web billing panel shows comparability rollout checks and workspace comparability admin tools.
+
+Current `v5.82` behavior:
+
+- Production identifiability rollout readiness validates identifiability coverage and readiness through `GET /api/identifiability/readiness`.
+- Workspace owners and admins can inspect workspace identifiability metrics from `GET /api/identifiability/workspace/:workspaceId/admin`.
+- The web billing panel shows identifiability rollout checks and workspace identifiability admin tools.
+
+Current `v5.81` behavior:
+
+- Production attributability rollout readiness validates attributability coverage and readiness through `GET /api/attributability/readiness`.
+- Workspace owners and admins can inspect workspace attributability metrics from `GET /api/attributability/workspace/:workspaceId/admin`.
+- The web billing panel shows attributability rollout checks and workspace attributability admin tools.
+
 Current `v5.80` behavior:
 
 - Production warrantability rollout readiness validates warrantability coverage and readiness through `GET /api/warrantability/readiness`.

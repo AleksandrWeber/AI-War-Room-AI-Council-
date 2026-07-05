@@ -134,6 +134,16 @@ import type {
   SubstantiabilityAdminSummaryResponse,
   WarrantabilityRolloutResponse,
   WarrantabilityAdminSummaryResponse,
+  AttributabilityRolloutResponse,
+  AttributabilityAdminSummaryResponse,
+  IdentifiabilityRolloutResponse,
+  IdentifiabilityAdminSummaryResponse,
+  ComparabilityRolloutResponse,
+  ComparabilityAdminSummaryResponse,
+  DistinguishabilityRolloutResponse,
+  DistinguishabilityAdminSummaryResponse,
+  AssignabilityRolloutResponse,
+  AssignabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -695,6 +705,51 @@ import {
   formatWarrantabilityRolloutCheckStatus,
   formatWarrantabilityRolloutStatus,
 } from './warrantability-ui'
+import {
+  executeAttributabilityAdminAction,
+  fetchAttributabilityAdminSummary,
+  fetchAttributabilityRollout,
+  formatAttributabilityAdminAction,
+  formatAttributabilityDomain,
+  formatAttributabilityRolloutCheckStatus,
+  formatAttributabilityRolloutStatus,
+} from './attributability-ui'
+import {
+  executeIdentifiabilityAdminAction,
+  fetchIdentifiabilityAdminSummary,
+  fetchIdentifiabilityRollout,
+  formatIdentifiabilityAdminAction,
+  formatIdentifiabilityDomain,
+  formatIdentifiabilityRolloutCheckStatus,
+  formatIdentifiabilityRolloutStatus,
+} from './identifiability-ui'
+import {
+  executeComparabilityAdminAction,
+  fetchComparabilityAdminSummary,
+  fetchComparabilityRollout,
+  formatComparabilityAdminAction,
+  formatComparabilityDomain,
+  formatComparabilityRolloutCheckStatus,
+  formatComparabilityRolloutStatus,
+} from './comparability-ui'
+import {
+  executeDistinguishabilityAdminAction,
+  fetchDistinguishabilityAdminSummary,
+  fetchDistinguishabilityRollout,
+  formatDistinguishabilityAdminAction,
+  formatDistinguishabilityDomain,
+  formatDistinguishabilityRolloutCheckStatus,
+  formatDistinguishabilityRolloutStatus,
+} from './distinguishability-ui'
+import {
+  executeAssignabilityAdminAction,
+  fetchAssignabilityAdminSummary,
+  fetchAssignabilityRollout,
+  formatAssignabilityAdminAction,
+  formatAssignabilityDomain,
+  formatAssignabilityRolloutCheckStatus,
+  formatAssignabilityRolloutStatus,
+} from './assignability-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -1364,6 +1419,16 @@ function App() {
     useState<SubstantiabilityRolloutResponse | null>(null)
   const [warrantabilityRollout, setWarrantabilityRollout] =
     useState<WarrantabilityRolloutResponse | null>(null)
+  const [attributabilityRollout, setAttributabilityRollout] =
+    useState<AttributabilityRolloutResponse | null>(null)
+  const [identifiabilityRollout, setIdentifiabilityRollout] =
+    useState<IdentifiabilityRolloutResponse | null>(null)
+  const [comparabilityRollout, setComparabilityRollout] =
+    useState<ComparabilityRolloutResponse | null>(null)
+  const [distinguishabilityRollout, setDistinguishabilityRollout] =
+    useState<DistinguishabilityRolloutResponse | null>(null)
+  const [assignabilityRollout, setAssignabilityRollout] =
+    useState<AssignabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1561,6 +1626,16 @@ function App() {
     useState<SubstantiabilityAdminSummaryResponse | null>(null)
   const [warrantabilityAdminSummary, setWarrantabilityAdminSummary] =
     useState<WarrantabilityAdminSummaryResponse | null>(null)
+  const [attributabilityAdminSummary, setAttributabilityAdminSummary] =
+    useState<AttributabilityAdminSummaryResponse | null>(null)
+  const [identifiabilityAdminSummary, setIdentifiabilityAdminSummary] =
+    useState<IdentifiabilityAdminSummaryResponse | null>(null)
+  const [comparabilityAdminSummary, setComparabilityAdminSummary] =
+    useState<ComparabilityAdminSummaryResponse | null>(null)
+  const [distinguishabilityAdminSummary, setDistinguishabilityAdminSummary] =
+    useState<DistinguishabilityAdminSummaryResponse | null>(null)
+  const [assignabilityAdminSummary, setAssignabilityAdminSummary] =
+    useState<AssignabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1739,6 +1814,21 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [warrantabilityAdminAction, setWarrantabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [attributabilityAdminAction, setAttributabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [identifiabilityAdminAction, setIdentifiabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [comparabilityAdminAction, setComparabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [distinguishabilityAdminAction, setDistinguishabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [assignabilityAdminAction, setAssignabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -2577,6 +2667,66 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setWarrantabilityRollout(null)
+        }
+      })
+
+    fetchAttributabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAttributabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAttributabilityRollout(null)
+        }
+      })
+
+    fetchIdentifiabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setIdentifiabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setIdentifiabilityRollout(null)
+        }
+      })
+
+    fetchComparabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setComparabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setComparabilityRollout(null)
+        }
+      })
+
+    fetchDistinguishabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setDistinguishabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDistinguishabilityRollout(null)
+        }
+      })
+
+    fetchAssignabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAssignabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAssignabilityRollout(null)
         }
       })
 
@@ -3686,6 +3836,41 @@ function App() {
         workspaceAuthHeaders,
       )
       setWarrantabilityAdminSummary(warrantabilityAdmin)
+
+      const attributabilityAdmin = await fetchAttributabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAttributabilityAdminSummary(attributabilityAdmin)
+
+      const identifiabilityAdmin = await fetchIdentifiabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIdentifiabilityAdminSummary(identifiabilityAdmin)
+
+      const comparabilityAdmin = await fetchComparabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setComparabilityAdminSummary(comparabilityAdmin)
+
+      const distinguishabilityAdmin = await fetchDistinguishabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDistinguishabilityAdminSummary(distinguishabilityAdmin)
+
+      const assignabilityAdmin = await fetchAssignabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAssignabilityAdminSummary(assignabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -4918,6 +5103,151 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleAssignabilityAdminAction(
+    action: 'refresh_assignability_summary',
+  ) {
+    setAssignabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAssignabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAssignabilityRollout(apiBaseUrl)
+      setAssignabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run assignability admin action.',
+      )
+    } finally {
+      setAssignabilityAdminAction('idle')
+    }
+  }
+
+  async function handleDistinguishabilityAdminAction(
+    action: 'refresh_distinguishability_summary',
+  ) {
+    setDistinguishabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeDistinguishabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchDistinguishabilityRollout(apiBaseUrl)
+      setDistinguishabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run distinguishability admin action.',
+      )
+    } finally {
+      setDistinguishabilityAdminAction('idle')
+    }
+  }
+
+  async function handleComparabilityAdminAction(
+    action: 'refresh_comparability_summary',
+  ) {
+    setComparabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeComparabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchComparabilityRollout(apiBaseUrl)
+      setComparabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run comparability admin action.',
+      )
+    } finally {
+      setComparabilityAdminAction('idle')
+    }
+  }
+
+  async function handleIdentifiabilityAdminAction(
+    action: 'refresh_identifiability_summary',
+  ) {
+    setIdentifiabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeIdentifiabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchIdentifiabilityRollout(apiBaseUrl)
+      setIdentifiabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run identifiability admin action.',
+      )
+    } finally {
+      setIdentifiabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAttributabilityAdminAction(
+    action: 'refresh_attributability_summary',
+  ) {
+    setAttributabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAttributabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAttributabilityRollout(apiBaseUrl)
+      setAttributabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run attributability admin action.',
+      )
+    } finally {
+      setAttributabilityAdminAction('idle')
     }
   }
 
@@ -7915,6 +8245,151 @@ function App() {
               ))}
             </div>
             <small>Checked at {assessabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {assignabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production assignability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${assignabilityRollout.status}`}
+              >
+                {formatAssignabilityRolloutStatus(assignabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{assignabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {assignabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAssignabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {assignabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {distinguishabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production distinguishability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${distinguishabilityRollout.status}`}
+              >
+                {formatDistinguishabilityRolloutStatus(distinguishabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{distinguishabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {distinguishabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatDistinguishabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {distinguishabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {comparabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production comparability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${comparabilityRollout.status}`}
+              >
+                {formatComparabilityRolloutStatus(comparabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{comparabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {comparabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatComparabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {comparabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {identifiabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production identifiability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${identifiabilityRollout.status}`}
+              >
+                {formatIdentifiabilityRolloutStatus(identifiabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{identifiabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {identifiabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatIdentifiabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {identifiabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {attributabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production attributability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${attributabilityRollout.status}`}
+              >
+                {formatAttributabilityRolloutStatus(attributabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{attributabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {attributabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAttributabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {attributabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -12152,6 +12627,331 @@ function App() {
                 }
               >
                 {formatAssessabilityAdminAction('refresh_assessability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {assignabilityAdminSummary ? (
+          <div className="billing-admin workspace-assignability-admin">
+            <div className="billing-admin__header">
+              <span>Assignability admin</span>
+              <strong>{assignabilityAdminSummary.role}</strong>
+            </div>
+            <p>{assignabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workspace membership assignability</span>
+                <strong>
+                  {assignabilityAdminSummary.stats.assignabilityPercent}%
+                </strong>
+                <small>
+                  {assignabilityAdminSummary.stats.coveredDomains}/
+                  {assignabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Assignability signals</span>
+                <strong>{assignabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {assignabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and billing notifications'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-assignability-list">
+              {assignabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-assignability-card workspace-assignability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAssignabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {assignabilityAdminSummary.availableActions.includes(
+              'refresh_assignability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={assignabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAssignabilityAdminAction(
+                    'refresh_assignability_summary',
+                  )
+                }
+              >
+                {formatAssignabilityAdminAction('refresh_assignability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {distinguishabilityAdminSummary ? (
+          <div className="billing-admin workspace-distinguishability-admin">
+            <div className="billing-admin__header">
+              <span>Distinguishability admin</span>
+              <strong>{distinguishabilityAdminSummary.role}</strong>
+            </div>
+            <p>{distinguishabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Moderator synthesis distinguishability</span>
+                <strong>
+                  {distinguishabilityAdminSummary.stats.distinguishabilityPercent}%
+                </strong>
+                <small>
+                  {distinguishabilityAdminSummary.stats.coveredDomains}/
+                  {distinguishabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Distinguishability signals</span>
+                <strong>{distinguishabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {distinguishabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, moderator syntheses, and run workflows'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-distinguishability-list">
+              {distinguishabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-distinguishability-card workspace-distinguishability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatDistinguishabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {distinguishabilityAdminSummary.availableActions.includes(
+              'refresh_distinguishability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={distinguishabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleDistinguishabilityAdminAction(
+                    'refresh_distinguishability_summary',
+                  )
+                }
+              >
+                {formatDistinguishabilityAdminAction('refresh_distinguishability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {comparabilityAdminSummary ? (
+          <div className="billing-admin workspace-comparability-admin">
+            <div className="billing-admin__header">
+              <span>Comparability admin</span>
+              <strong>{comparabilityAdminSummary.role}</strong>
+            </div>
+            <p>{comparabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice comparability</span>
+                <strong>
+                  {comparabilityAdminSummary.stats.comparabilityPercent}%
+                </strong>
+                <small>
+                  {comparabilityAdminSummary.stats.coveredDomains}/
+                  {comparabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Comparability signals</span>
+                <strong>{comparabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {comparabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and meter usage reports'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-comparability-list">
+              {comparabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-comparability-card workspace-comparability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatComparabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {comparabilityAdminSummary.availableActions.includes(
+              'refresh_comparability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={comparabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleComparabilityAdminAction(
+                    'refresh_comparability_summary',
+                  )
+                }
+              >
+                {formatComparabilityAdminAction('refresh_comparability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {identifiabilityAdminSummary ? (
+          <div className="billing-admin workspace-identifiability-admin">
+            <div className="billing-admin__header">
+              <span>Identifiability admin</span>
+              <strong>{identifiabilityAdminSummary.role}</strong>
+            </div>
+            <p>{identifiabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key identifiability</span>
+                <strong>
+                  {identifiabilityAdminSummary.stats.identifiabilityPercent}%
+                </strong>
+                <small>
+                  {identifiabilityAdminSummary.stats.coveredDomains}/
+                  {identifiabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Identifiability signals</span>
+                <strong>{identifiabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {identifiabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-identifiability-list">
+              {identifiabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-identifiability-card workspace-identifiability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatIdentifiabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {identifiabilityAdminSummary.availableActions.includes(
+              'refresh_identifiability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={identifiabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleIdentifiabilityAdminAction(
+                    'refresh_identifiability_summary',
+                  )
+                }
+              >
+                {formatIdentifiabilityAdminAction('refresh_identifiability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {attributabilityAdminSummary ? (
+          <div className="billing-admin workspace-attributability-admin">
+            <div className="billing-admin__header">
+              <span>Attributability admin</span>
+              <strong>{attributabilityAdminSummary.role}</strong>
+            </div>
+            <p>{attributabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Agent output attributability</span>
+                <strong>
+                  {attributabilityAdminSummary.stats.attributabilityPercent}%
+                </strong>
+                <small>
+                  {attributabilityAdminSummary.stats.coveredDomains}/
+                  {attributabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Attributability signals</span>
+                <strong>{attributabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {attributabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, agent outputs, and artifacts'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-attributability-list">
+              {attributabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-attributability-card workspace-attributability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAttributabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {attributabilityAdminSummary.availableActions.includes(
+              'refresh_attributability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={attributabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAttributabilityAdminAction(
+                    'refresh_attributability_summary',
+                  )
+                }
+              >
+                {formatAttributabilityAdminAction('refresh_attributability_summary')}
               </button>
             ) : null}
           </div>

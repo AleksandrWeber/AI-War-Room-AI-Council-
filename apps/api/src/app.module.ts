@@ -52,6 +52,11 @@ import { MeasurabilityModule } from './measurability/measurability.module.js'
 import { CertifiabilityModule } from './certifiability/certifiability.module.js'
 import { SubstantiabilityModule } from './substantiability/substantiability.module.js'
 import { WarrantabilityModule } from './warrantability/warrantability.module.js'
+import { AttributabilityModule } from './attributability/attributability.module.js'
+import { IdentifiabilityModule } from './identifiability/identifiability.module.js'
+import { ComparabilityModule } from './comparability/comparability.module.js'
+import { DistinguishabilityModule } from './distinguishability/distinguishability.module.js'
+import { AssignabilityModule } from './assignability/assignability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -123,6 +128,11 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     CertifiabilityModule,
     SubstantiabilityModule,
     WarrantabilityModule,
+    AttributabilityModule,
+    IdentifiabilityModule,
+    ComparabilityModule,
+    DistinguishabilityModule,
+    AssignabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

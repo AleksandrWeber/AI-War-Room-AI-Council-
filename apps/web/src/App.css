@@ -2265,6 +2265,136 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-attributability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-attributability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-attributability-card p,
+.workspace-attributability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-attributability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-attributability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-identifiability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-identifiability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-identifiability-card p,
+.workspace-identifiability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-identifiability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-identifiability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-comparability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-comparability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-comparability-card p,
+.workspace-comparability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-comparability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-comparability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-distinguishability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-distinguishability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-distinguishability-card p,
+.workspace-distinguishability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-distinguishability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-distinguishability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-assignability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-assignability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-assignability-card p,
+.workspace-assignability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-assignability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-assignability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

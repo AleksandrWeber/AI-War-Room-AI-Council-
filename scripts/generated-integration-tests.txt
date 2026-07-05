@@ -1,5 +1,5 @@
 
-describe('assessability rollout integration', () => {
+describe('attributability rollout integration', () => {
   let app: NestFastifyApplication | undefined
 
   beforeAll(async () => {
@@ -21,27 +21,27 @@ describe('assessability rollout integration', () => {
     await app?.close()
   })
 
-  it('reports assessability capabilities and rollout readiness', async () => {
+  it('reports attributability capabilities and rollout readiness', async () => {
     const capabilities = await request(app!.getHttpServer())
-      .get('/api/assessability/capabilities')
+      .get('/api/attributability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsAssessabilityRollout: true,
-      supportsAssessabilityAdminTools: true,
-      supportsModelHealthAssessabilitySignals: true,
+      supportsAttributabilityRollout: true,
+      supportsAttributabilityAdminTools: true,
+      supportsAgentOutputAttributabilitySignals: true,
     })
 
     const rollout = await request(app!.getHttpServer())
-      .get('/api/assessability/readiness')
+      .get('/api/attributability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns assessability admin summary for owners', async () => {
+  it('returns attributability admin summary for owners', async () => {
     const response = await request(app!.getHttpServer())
-      .get('/api/assessability/workspace/workspace_1/admin')
+      .get('/api/attributability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -51,14 +51,14 @@ describe('assessability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        assessabilityPercent: expect.any(Number),
+        attributabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects assessability admin tools for members', async () => {
+  it('rejects attributability admin tools for members', async () => {
     await request(app!.getHttpServer())
-      .get('/api/assessability/workspace/workspace_1/admin')
+      .get('/api/attributability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -68,7 +68,7 @@ describe('assessability rollout integration', () => {
 })
 
 
-describe('measurability rollout integration', () => {
+describe('identifiability rollout integration', () => {
   let app: NestFastifyApplication | undefined
 
   beforeAll(async () => {
@@ -90,27 +90,27 @@ describe('measurability rollout integration', () => {
     await app?.close()
   })
 
-  it('reports measurability capabilities and rollout readiness', async () => {
+  it('reports identifiability capabilities and rollout readiness', async () => {
     const capabilities = await request(app!.getHttpServer())
-      .get('/api/measurability/capabilities')
+      .get('/api/identifiability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsMeasurabilityRollout: true,
-      supportsMeasurabilityAdminTools: true,
-      supportsMeterUsageMeasurabilitySignals: true,
+      supportsIdentifiabilityRollout: true,
+      supportsIdentifiabilityAdminTools: true,
+      supportsIdempotencyKeyIdentifiabilitySignals: true,
     })
 
     const rollout = await request(app!.getHttpServer())
-      .get('/api/measurability/readiness')
+      .get('/api/identifiability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns measurability admin summary for owners', async () => {
+  it('returns identifiability admin summary for owners', async () => {
     const response = await request(app!.getHttpServer())
-      .get('/api/measurability/workspace/workspace_1/admin')
+      .get('/api/identifiability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -120,14 +120,14 @@ describe('measurability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        measurabilityPercent: expect.any(Number),
+        identifiabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects measurability admin tools for members', async () => {
+  it('rejects identifiability admin tools for members', async () => {
     await request(app!.getHttpServer())
-      .get('/api/measurability/workspace/workspace_1/admin')
+      .get('/api/identifiability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -137,7 +137,7 @@ describe('measurability rollout integration', () => {
 })
 
 
-describe('certifiability rollout integration', () => {
+describe('comparability rollout integration', () => {
   let app: NestFastifyApplication | undefined
 
   beforeAll(async () => {
@@ -159,27 +159,27 @@ describe('certifiability rollout integration', () => {
     await app?.close()
   })
 
-  it('reports certifiability capabilities and rollout readiness', async () => {
+  it('reports comparability capabilities and rollout readiness', async () => {
     const capabilities = await request(app!.getHttpServer())
-      .get('/api/certifiability/capabilities')
+      .get('/api/comparability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsCertifiabilityRollout: true,
-      supportsCertifiabilityAdminTools: true,
-      supportsProviderCredentialCertifiabilitySignals: true,
+      supportsComparabilityRollout: true,
+      supportsComparabilityAdminTools: true,
+      supportsBillingInvoiceComparabilitySignals: true,
     })
 
     const rollout = await request(app!.getHttpServer())
-      .get('/api/certifiability/readiness')
+      .get('/api/comparability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns certifiability admin summary for owners', async () => {
+  it('returns comparability admin summary for owners', async () => {
     const response = await request(app!.getHttpServer())
-      .get('/api/certifiability/workspace/workspace_1/admin')
+      .get('/api/comparability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -189,14 +189,14 @@ describe('certifiability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        certifiabilityPercent: expect.any(Number),
+        comparabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects certifiability admin tools for members', async () => {
+  it('rejects comparability admin tools for members', async () => {
     await request(app!.getHttpServer())
-      .get('/api/certifiability/workspace/workspace_1/admin')
+      .get('/api/comparability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -206,7 +206,7 @@ describe('certifiability rollout integration', () => {
 })
 
 
-describe('substantiability rollout integration', () => {
+describe('distinguishability rollout integration', () => {
   let app: NestFastifyApplication | undefined
 
   beforeAll(async () => {
@@ -228,27 +228,27 @@ describe('substantiability rollout integration', () => {
     await app?.close()
   })
 
-  it('reports substantiability capabilities and rollout readiness', async () => {
+  it('reports distinguishability capabilities and rollout readiness', async () => {
     const capabilities = await request(app!.getHttpServer())
-      .get('/api/substantiability/capabilities')
+      .get('/api/distinguishability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsSubstantiabilityRollout: true,
-      supportsSubstantiabilityAdminTools: true,
-      supportsBillingRecordSubstantiabilitySignals: true,
+      supportsDistinguishabilityRollout: true,
+      supportsDistinguishabilityAdminTools: true,
+      supportsSynthesisDistinguishabilitySignals: true,
     })
 
     const rollout = await request(app!.getHttpServer())
-      .get('/api/substantiability/readiness')
+      .get('/api/distinguishability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns substantiability admin summary for owners', async () => {
+  it('returns distinguishability admin summary for owners', async () => {
     const response = await request(app!.getHttpServer())
-      .get('/api/substantiability/workspace/workspace_1/admin')
+      .get('/api/distinguishability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -258,14 +258,14 @@ describe('substantiability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        substantiabilityPercent: expect.any(Number),
+        distinguishabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects substantiability admin tools for members', async () => {
+  it('rejects distinguishability admin tools for members', async () => {
     await request(app!.getHttpServer())
-      .get('/api/substantiability/workspace/workspace_1/admin')
+      .get('/api/distinguishability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -275,7 +275,7 @@ describe('substantiability rollout integration', () => {
 })
 
 
-describe('warrantability rollout integration', () => {
+describe('assignability rollout integration', () => {
   let app: NestFastifyApplication | undefined
 
   beforeAll(async () => {
@@ -297,27 +297,27 @@ describe('warrantability rollout integration', () => {
     await app?.close()
   })
 
-  it('reports warrantability capabilities and rollout readiness', async () => {
+  it('reports assignability capabilities and rollout readiness', async () => {
     const capabilities = await request(app!.getHttpServer())
-      .get('/api/warrantability/capabilities')
+      .get('/api/assignability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsWarrantabilityRollout: true,
-      supportsWarrantabilityAdminTools: true,
-      supportsShieldScanWarrantabilitySignals: true,
+      supportsAssignabilityRollout: true,
+      supportsAssignabilityAdminTools: true,
+      supportsWorkspaceMembershipAssignabilitySignals: true,
     })
 
     const rollout = await request(app!.getHttpServer())
-      .get('/api/warrantability/readiness')
+      .get('/api/assignability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns warrantability admin summary for owners', async () => {
+  it('returns assignability admin summary for owners', async () => {
     const response = await request(app!.getHttpServer())
-      .get('/api/warrantability/workspace/workspace_1/admin')
+      .get('/api/assignability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -327,14 +327,14 @@ describe('warrantability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        warrantabilityPercent: expect.any(Number),
+        assignabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects warrantability admin tools for members', async () => {
+  it('rejects assignability admin tools for members', async () => {
     await request(app!.getHttpServer())
-      .get('/api/warrantability/workspace/workspace_1/admin')
+      .get('/api/assignability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
