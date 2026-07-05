@@ -2,7 +2,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { milestones } from './milestones-v836-v840.mjs'
+import { milestones } from './milestones-v846-v850.mjs'
 
 const root = join(import.meta.dirname, '..')
 
@@ -858,29 +858,8 @@ export async function fetch${m.Name}Capabilities(apiBaseUrl: string) {
 function integrationTest(m) {
   return `
 describe('${m.name} rollout integration', () => {
-  let app: NestFastifyApplication | undefined
-
-  beforeAll(async () => {
-    const { AppModule } = await import('../app.module.js')
-
-    const moduleRef: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile()
-
-    app = moduleRef.createNestApplication<NestFastifyApplication>(
-      new FastifyAdapter(),
-    )
-    app.setGlobalPrefix('api')
-    await app.init()
-    await app.getHttpAdapter().getInstance().ready()
-  })
-
-  afterAll(async () => {
-    await app?.close()
-  })
-
   it('reports ${m.name} capabilities and rollout readiness', async () => {
-    const capabilities = await request(app!.getHttpServer())
+    const capabilities = await request(app.getHttpServer())
       .get('/api/${m.name}/capabilities')
       .expect(200)
 
@@ -890,7 +869,7 @@ describe('${m.name} rollout integration', () => {
       ${m.cap1}: true,
     })
 
-    const rollout = await request(app!.getHttpServer())
+    const rollout = await request(app.getHttpServer())
       .get('/api/${m.name}/readiness')
       .expect(200)
 
@@ -898,7 +877,7 @@ describe('${m.name} rollout integration', () => {
   })
 
   it('returns ${m.name} admin summary for owners', async () => {
-    const response = await request(app!.getHttpServer())
+    const response = await request(app.getHttpServer())
       .get('/api/${m.name}/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
@@ -915,7 +894,7 @@ describe('${m.name} rollout integration', () => {
   })
 
   it('rejects ${m.name} admin tools for members', async () => {
-    await request(app!.getHttpServer())
+    await request(app.getHttpServer())
       .get('/api/${m.name}/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',

@@ -654,6 +654,26 @@ import type {
   DecentralizabilityAdminSummaryResponse,
   MeshabilizabilityRolloutResponse,
   MeshabilizabilityAdminSummaryResponse,
+  TopologizabilityRolloutResponse,
+  TopologizabilityAdminSummaryResponse,
+  NetworkizabilityRolloutResponse,
+  NetworkizabilityAdminSummaryResponse,
+  GatewayizabilityRolloutResponse,
+  GatewayizabilityAdminSummaryResponse,
+  BrokerizabilityRolloutResponse,
+  BrokerizabilityAdminSummaryResponse,
+  RelayizabilityRolloutResponse,
+  RelayizabilityAdminSummaryResponse,
+  RoutizabilityRolloutResponse,
+  RoutizabilityAdminSummaryResponse,
+  QueueizabilityRolloutResponse,
+  QueueizabilityAdminSummaryResponse,
+  EventizabilityRolloutResponse,
+  EventizabilityAdminSummaryResponse,
+  ChannelizabilityRolloutResponse,
+  ChannelizabilityAdminSummaryResponse,
+  NotifizabilityRolloutResponse,
+  NotifizabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -3556,6 +3576,96 @@ import {
   formatMeshabilizabilityRolloutStatus,
 } from './meshabilizability-ui'
 import {
+  executeTopologizabilityAdminAction,
+  fetchTopologizabilityAdminSummary,
+  fetchTopologizabilityRollout,
+  formatTopologizabilityAdminAction,
+  formatTopologizabilityDomain,
+  formatTopologizabilityRolloutCheckStatus,
+  formatTopologizabilityRolloutStatus,
+} from './topologizability-ui'
+import {
+  executeNetworkizabilityAdminAction,
+  fetchNetworkizabilityAdminSummary,
+  fetchNetworkizabilityRollout,
+  formatNetworkizabilityAdminAction,
+  formatNetworkizabilityDomain,
+  formatNetworkizabilityRolloutCheckStatus,
+  formatNetworkizabilityRolloutStatus,
+} from './networkizability-ui'
+import {
+  executeGatewayizabilityAdminAction,
+  fetchGatewayizabilityAdminSummary,
+  fetchGatewayizabilityRollout,
+  formatGatewayizabilityAdminAction,
+  formatGatewayizabilityDomain,
+  formatGatewayizabilityRolloutCheckStatus,
+  formatGatewayizabilityRolloutStatus,
+} from './gatewayizability-ui'
+import {
+  executeBrokerizabilityAdminAction,
+  fetchBrokerizabilityAdminSummary,
+  fetchBrokerizabilityRollout,
+  formatBrokerizabilityAdminAction,
+  formatBrokerizabilityDomain,
+  formatBrokerizabilityRolloutCheckStatus,
+  formatBrokerizabilityRolloutStatus,
+} from './brokerizability-ui'
+import {
+  executeRelayizabilityAdminAction,
+  fetchRelayizabilityAdminSummary,
+  fetchRelayizabilityRollout,
+  formatRelayizabilityAdminAction,
+  formatRelayizabilityDomain,
+  formatRelayizabilityRolloutCheckStatus,
+  formatRelayizabilityRolloutStatus,
+} from './relayizability-ui'
+import {
+  executeRoutizabilityAdminAction,
+  fetchRoutizabilityAdminSummary,
+  fetchRoutizabilityRollout,
+  formatRoutizabilityAdminAction,
+  formatRoutizabilityDomain,
+  formatRoutizabilityRolloutCheckStatus,
+  formatRoutizabilityRolloutStatus,
+} from './routizability-ui'
+import {
+  executeQueueizabilityAdminAction,
+  fetchQueueizabilityAdminSummary,
+  fetchQueueizabilityRollout,
+  formatQueueizabilityAdminAction,
+  formatQueueizabilityDomain,
+  formatQueueizabilityRolloutCheckStatus,
+  formatQueueizabilityRolloutStatus,
+} from './queueizability-ui'
+import {
+  executeEventizabilityAdminAction,
+  fetchEventizabilityAdminSummary,
+  fetchEventizabilityRollout,
+  formatEventizabilityAdminAction,
+  formatEventizabilityDomain,
+  formatEventizabilityRolloutCheckStatus,
+  formatEventizabilityRolloutStatus,
+} from './eventizability-ui'
+import {
+  executeChannelizabilityAdminAction,
+  fetchChannelizabilityAdminSummary,
+  fetchChannelizabilityRollout,
+  formatChannelizabilityAdminAction,
+  formatChannelizabilityDomain,
+  formatChannelizabilityRolloutCheckStatus,
+  formatChannelizabilityRolloutStatus,
+} from './channelizability-ui'
+import {
+  executeNotifizabilityAdminAction,
+  fetchNotifizabilityAdminSummary,
+  fetchNotifizabilityRollout,
+  formatNotifizabilityAdminAction,
+  formatNotifizabilityDomain,
+  formatNotifizabilityRolloutCheckStatus,
+  formatNotifizabilityRolloutStatus,
+} from './notifizability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -4744,6 +4854,26 @@ function App() {
     useState<DecentralizabilityRolloutResponse | null>(null)
   const [meshabilizabilityRollout, setMeshabilizabilityRollout] =
     useState<MeshabilizabilityRolloutResponse | null>(null)
+  const [topologizabilityRollout, setTopologizabilityRollout] =
+    useState<TopologizabilityRolloutResponse | null>(null)
+  const [networkizabilityRollout, setNetworkizabilityRollout] =
+    useState<NetworkizabilityRolloutResponse | null>(null)
+  const [gatewayizabilityRollout, setGatewayizabilityRollout] =
+    useState<GatewayizabilityRolloutResponse | null>(null)
+  const [brokerizabilityRollout, setBrokerizabilityRollout] =
+    useState<BrokerizabilityRolloutResponse | null>(null)
+  const [relayizabilityRollout, setRelayizabilityRollout] =
+    useState<RelayizabilityRolloutResponse | null>(null)
+  const [routizabilityRollout, setRoutizabilityRollout] =
+    useState<RoutizabilityRolloutResponse | null>(null)
+  const [queueizabilityRollout, setQueueizabilityRollout] =
+    useState<QueueizabilityRolloutResponse | null>(null)
+  const [eventizabilityRollout, setEventizabilityRollout] =
+    useState<EventizabilityRolloutResponse | null>(null)
+  const [channelizabilityRollout, setChannelizabilityRollout] =
+    useState<ChannelizabilityRolloutResponse | null>(null)
+  const [notifizabilityRollout, setNotifizabilityRollout] =
+    useState<NotifizabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -5461,6 +5591,26 @@ function App() {
     useState<DecentralizabilityAdminSummaryResponse | null>(null)
   const [meshabilizabilityAdminSummary, setMeshabilizabilityAdminSummary] =
     useState<MeshabilizabilityAdminSummaryResponse | null>(null)
+  const [topologizabilityAdminSummary, setTopologizabilityAdminSummary] =
+    useState<TopologizabilityAdminSummaryResponse | null>(null)
+  const [networkizabilityAdminSummary, setNetworkizabilityAdminSummary] =
+    useState<NetworkizabilityAdminSummaryResponse | null>(null)
+  const [gatewayizabilityAdminSummary, setGatewayizabilityAdminSummary] =
+    useState<GatewayizabilityAdminSummaryResponse | null>(null)
+  const [brokerizabilityAdminSummary, setBrokerizabilityAdminSummary] =
+    useState<BrokerizabilityAdminSummaryResponse | null>(null)
+  const [relayizabilityAdminSummary, setRelayizabilityAdminSummary] =
+    useState<RelayizabilityAdminSummaryResponse | null>(null)
+  const [routizabilityAdminSummary, setRoutizabilityAdminSummary] =
+    useState<RoutizabilityAdminSummaryResponse | null>(null)
+  const [queueizabilityAdminSummary, setQueueizabilityAdminSummary] =
+    useState<QueueizabilityAdminSummaryResponse | null>(null)
+  const [eventizabilityAdminSummary, setEventizabilityAdminSummary] =
+    useState<EventizabilityAdminSummaryResponse | null>(null)
+  const [channelizabilityAdminSummary, setChannelizabilityAdminSummary] =
+    useState<ChannelizabilityAdminSummaryResponse | null>(null)
+  const [notifizabilityAdminSummary, setNotifizabilityAdminSummary] =
+    useState<NotifizabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -6419,6 +6569,36 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [meshabilizabilityAdminAction, setMeshabilizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [topologizabilityAdminAction, setTopologizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [networkizabilityAdminAction, setNetworkizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [gatewayizabilityAdminAction, setGatewayizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [brokerizabilityAdminAction, setBrokerizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [relayizabilityAdminAction, setRelayizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [routizabilityAdminAction, setRoutizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [queueizabilityAdminAction, setQueueizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [eventizabilityAdminAction, setEventizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [channelizabilityAdminAction, setChannelizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [notifizabilityAdminAction, setNotifizabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -10380,6 +10560,126 @@ function App() {
         }
       })
 
+    fetchTopologizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setTopologizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTopologizabilityRollout(null)
+        }
+      })
+
+    fetchNetworkizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setNetworkizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setNetworkizabilityRollout(null)
+        }
+      })
+
+    fetchGatewayizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setGatewayizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setGatewayizabilityRollout(null)
+        }
+      })
+
+    fetchBrokerizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setBrokerizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setBrokerizabilityRollout(null)
+        }
+      })
+
+    fetchRelayizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setRelayizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setRelayizabilityRollout(null)
+        }
+      })
+
+    fetchRoutizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setRoutizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setRoutizabilityRollout(null)
+        }
+      })
+
+    fetchQueueizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setQueueizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setQueueizabilityRollout(null)
+        }
+      })
+
+    fetchEventizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setEventizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setEventizabilityRollout(null)
+        }
+      })
+
+    fetchChannelizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setChannelizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setChannelizabilityRollout(null)
+        }
+      })
+
+    fetchNotifizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setNotifizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setNotifizabilityRollout(null)
+        }
+      })
+
     fetchUsageCapabilities(apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
@@ -13306,6 +13606,76 @@ function App() {
         workspaceAuthHeaders,
       )
       setMeshabilizabilityAdminSummary(meshabilizabilityAdmin)
+
+      const topologizabilityAdmin = await fetchTopologizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTopologizabilityAdminSummary(topologizabilityAdmin)
+
+      const networkizabilityAdmin = await fetchNetworkizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNetworkizabilityAdminSummary(networkizabilityAdmin)
+
+      const gatewayizabilityAdmin = await fetchGatewayizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setGatewayizabilityAdminSummary(gatewayizabilityAdmin)
+
+      const brokerizabilityAdmin = await fetchBrokerizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBrokerizabilityAdminSummary(brokerizabilityAdmin)
+
+      const relayizabilityAdmin = await fetchRelayizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRelayizabilityAdminSummary(relayizabilityAdmin)
+
+      const routizabilityAdmin = await fetchRoutizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRoutizabilityAdminSummary(routizabilityAdmin)
+
+      const queueizabilityAdmin = await fetchQueueizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setQueueizabilityAdminSummary(queueizabilityAdmin)
+
+      const eventizabilityAdmin = await fetchEventizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEventizabilityAdminSummary(eventizabilityAdmin)
+
+      const channelizabilityAdmin = await fetchChannelizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setChannelizabilityAdminSummary(channelizabilityAdmin)
+
+      const notifizabilityAdmin = await fetchNotifizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNotifizabilityAdminSummary(notifizabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -14538,6 +14908,296 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleNotifizabilityAdminAction(
+    action: 'refresh_notifizability_summary',
+  ) {
+    setNotifizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeNotifizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchNotifizabilityRollout(apiBaseUrl)
+      setNotifizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run notifizability admin action.',
+      )
+    } finally {
+      setNotifizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleChannelizabilityAdminAction(
+    action: 'refresh_channelizability_summary',
+  ) {
+    setChannelizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeChannelizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchChannelizabilityRollout(apiBaseUrl)
+      setChannelizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run channelizability admin action.',
+      )
+    } finally {
+      setChannelizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleEventizabilityAdminAction(
+    action: 'refresh_eventizability_summary',
+  ) {
+    setEventizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeEventizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchEventizabilityRollout(apiBaseUrl)
+      setEventizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run eventizability admin action.',
+      )
+    } finally {
+      setEventizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleQueueizabilityAdminAction(
+    action: 'refresh_queueizability_summary',
+  ) {
+    setQueueizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeQueueizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchQueueizabilityRollout(apiBaseUrl)
+      setQueueizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run queueizability admin action.',
+      )
+    } finally {
+      setQueueizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleRoutizabilityAdminAction(
+    action: 'refresh_routizability_summary',
+  ) {
+    setRoutizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeRoutizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchRoutizabilityRollout(apiBaseUrl)
+      setRoutizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run routizability admin action.',
+      )
+    } finally {
+      setRoutizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleRelayizabilityAdminAction(
+    action: 'refresh_relayizability_summary',
+  ) {
+    setRelayizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeRelayizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchRelayizabilityRollout(apiBaseUrl)
+      setRelayizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run relayizability admin action.',
+      )
+    } finally {
+      setRelayizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleBrokerizabilityAdminAction(
+    action: 'refresh_brokerizability_summary',
+  ) {
+    setBrokerizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeBrokerizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchBrokerizabilityRollout(apiBaseUrl)
+      setBrokerizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run brokerizability admin action.',
+      )
+    } finally {
+      setBrokerizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleGatewayizabilityAdminAction(
+    action: 'refresh_gatewayizability_summary',
+  ) {
+    setGatewayizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeGatewayizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchGatewayizabilityRollout(apiBaseUrl)
+      setGatewayizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run gatewayizability admin action.',
+      )
+    } finally {
+      setGatewayizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleNetworkizabilityAdminAction(
+    action: 'refresh_networkizability_summary',
+  ) {
+    setNetworkizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeNetworkizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchNetworkizabilityRollout(apiBaseUrl)
+      setNetworkizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run networkizability admin action.',
+      )
+    } finally {
+      setNetworkizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleTopologizabilityAdminAction(
+    action: 'refresh_topologizability_summary',
+  ) {
+    setTopologizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeTopologizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchTopologizabilityRollout(apiBaseUrl)
+      setTopologizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run topologizability admin action.',
+      )
+    } finally {
+      setTopologizabilityAdminAction('idle')
     }
   }
 
@@ -32615,6 +33275,296 @@ function App() {
               ))}
             </div>
             <small>Checked at {virtualizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {relayizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production relayizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${relayizabilityRollout.status}`}
+              >
+                {formatRelayizabilityRolloutStatus(relayizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{relayizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {relayizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatRelayizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {relayizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {brokerizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production brokerizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${brokerizabilityRollout.status}`}
+              >
+                {formatBrokerizabilityRolloutStatus(brokerizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{brokerizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {brokerizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatBrokerizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {brokerizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {gatewayizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production gatewayizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${gatewayizabilityRollout.status}`}
+              >
+                {formatGatewayizabilityRolloutStatus(gatewayizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{gatewayizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {gatewayizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatGatewayizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {gatewayizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {networkizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production networkizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${networkizabilityRollout.status}`}
+              >
+                {formatNetworkizabilityRolloutStatus(networkizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{networkizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {networkizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatNetworkizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {networkizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {topologizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production topologizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${topologizabilityRollout.status}`}
+              >
+                {formatTopologizabilityRolloutStatus(topologizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{topologizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {topologizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatTopologizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {topologizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {notifizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production notifizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${notifizabilityRollout.status}`}
+              >
+                {formatNotifizabilityRolloutStatus(notifizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{notifizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {notifizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatNotifizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {notifizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {channelizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production channelizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${channelizabilityRollout.status}`}
+              >
+                {formatChannelizabilityRolloutStatus(channelizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{channelizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {channelizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatChannelizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {channelizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {eventizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production eventizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${eventizabilityRollout.status}`}
+              >
+                {formatEventizabilityRolloutStatus(eventizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{eventizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {eventizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatEventizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {eventizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {queueizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production queueizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${queueizabilityRollout.status}`}
+              >
+                {formatQueueizabilityRolloutStatus(queueizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{queueizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {queueizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatQueueizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {queueizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {routizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production routizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${routizabilityRollout.status}`}
+              >
+                {formatRoutizabilityRolloutStatus(routizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{routizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {routizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatRoutizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {routizabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -53752,6 +54702,656 @@ function App() {
                 }
               >
                 {formatVirtualizabilityAdminAction('refresh_virtualizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {relayizabilityAdminSummary ? (
+          <div className="billing-admin workspace-relayizability-admin">
+            <div className="billing-admin__header">
+              <span>Relayizability admin</span>
+              <strong>{relayizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{relayizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Model health relayizability</span>
+                <strong>
+                  {relayizabilityAdminSummary.stats.relayizabilityPercent}%
+                </strong>
+                <small>
+                  {relayizabilityAdminSummary.stats.coveredDomains}/
+                  {relayizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Relayizability signals</span>
+                <strong>{relayizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {relayizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, model health events, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-relayizability-list">
+              {relayizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-relayizability-card workspace-relayizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatRelayizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {relayizabilityAdminSummary.availableActions.includes(
+              'refresh_relayizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={relayizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleRelayizabilityAdminAction(
+                    'refresh_relayizability_summary',
+                  )
+                }
+              >
+                {formatRelayizabilityAdminAction('refresh_relayizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {brokerizabilityAdminSummary ? (
+          <div className="billing-admin workspace-brokerizability-admin">
+            <div className="billing-admin__header">
+              <span>Brokerizability admin</span>
+              <strong>{brokerizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{brokerizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Provider credential brokerizability</span>
+                <strong>
+                  {brokerizabilityAdminSummary.stats.brokerizabilityPercent}%
+                </strong>
+                <small>
+                  {brokerizabilityAdminSummary.stats.coveredDomains}/
+                  {brokerizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Brokerizability signals</span>
+                <strong>{brokerizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {brokerizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, provider credentials, and model registry entries'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-brokerizability-list">
+              {brokerizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-brokerizability-card workspace-brokerizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatBrokerizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {brokerizabilityAdminSummary.availableActions.includes(
+              'refresh_brokerizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={brokerizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleBrokerizabilityAdminAction(
+                    'refresh_brokerizability_summary',
+                  )
+                }
+              >
+                {formatBrokerizabilityAdminAction('refresh_brokerizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {gatewayizabilityAdminSummary ? (
+          <div className="billing-admin workspace-gatewayizability-admin">
+            <div className="billing-admin__header">
+              <span>Gatewayizability admin</span>
+              <strong>{gatewayizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{gatewayizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workspace limit gatewayizability</span>
+                <strong>
+                  {gatewayizabilityAdminSummary.stats.gatewayizabilityPercent}%
+                </strong>
+                <small>
+                  {gatewayizabilityAdminSummary.stats.coveredDomains}/
+                  {gatewayizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Gatewayizability signals</span>
+                <strong>{gatewayizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {gatewayizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace usage limits, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-gatewayizability-list">
+              {gatewayizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-gatewayizability-card workspace-gatewayizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatGatewayizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {gatewayizabilityAdminSummary.availableActions.includes(
+              'refresh_gatewayizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={gatewayizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleGatewayizabilityAdminAction(
+                    'refresh_gatewayizability_summary',
+                  )
+                }
+              >
+                {formatGatewayizabilityAdminAction('refresh_gatewayizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {networkizabilityAdminSummary ? (
+          <div className="billing-admin workspace-networkizability-admin">
+            <div className="billing-admin__header">
+              <span>Networkizability admin</span>
+              <strong>{networkizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{networkizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Meter usage networkizability</span>
+                <strong>
+                  {networkizabilityAdminSummary.stats.networkizabilityPercent}%
+                </strong>
+                <small>
+                  {networkizabilityAdminSummary.stats.coveredDomains}/
+                  {networkizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Networkizability signals</span>
+                <strong>{networkizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {networkizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, meter usage reports, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-networkizability-list">
+              {networkizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-networkizability-card workspace-networkizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatNetworkizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {networkizabilityAdminSummary.availableActions.includes(
+              'refresh_networkizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={networkizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleNetworkizabilityAdminAction(
+                    'refresh_networkizability_summary',
+                  )
+                }
+              >
+                {formatNetworkizabilityAdminAction('refresh_networkizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {topologizabilityAdminSummary ? (
+          <div className="billing-admin workspace-topologizability-admin">
+            <div className="billing-admin__header">
+              <span>Topologizability admin</span>
+              <strong>{topologizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{topologizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing webhook topologizability</span>
+                <strong>
+                  {topologizabilityAdminSummary.stats.topologizabilityPercent}%
+                </strong>
+                <small>
+                  {topologizabilityAdminSummary.stats.coveredDomains}/
+                  {topologizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Topologizability signals</span>
+                <strong>{topologizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {topologizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing webhook events, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-topologizability-list">
+              {topologizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-topologizability-card workspace-topologizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatTopologizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {topologizabilityAdminSummary.availableActions.includes(
+              'refresh_topologizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={topologizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleTopologizabilityAdminAction(
+                    'refresh_topologizability_summary',
+                  )
+                }
+              >
+                {formatTopologizabilityAdminAction('refresh_topologizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {notifizabilityAdminSummary ? (
+          <div className="billing-admin workspace-notifizability-admin">
+            <div className="billing-admin__header">
+              <span>Notifizability admin</span>
+              <strong>{notifizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{notifizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification notifizability</span>
+                <strong>
+                  {notifizabilityAdminSummary.stats.notifizabilityPercent}%
+                </strong>
+                <small>
+                  {notifizabilityAdminSummary.stats.coveredDomains}/
+                  {notifizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Notifizability signals</span>
+                <strong>{notifizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {notifizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-notifizability-list">
+              {notifizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-notifizability-card workspace-notifizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatNotifizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {notifizabilityAdminSummary.availableActions.includes(
+              'refresh_notifizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={notifizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleNotifizabilityAdminAction(
+                    'refresh_notifizability_summary',
+                  )
+                }
+              >
+                {formatNotifizabilityAdminAction('refresh_notifizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {channelizabilityAdminSummary ? (
+          <div className="billing-admin workspace-channelizability-admin">
+            <div className="billing-admin__header">
+              <span>Channelizability admin</span>
+              <strong>{channelizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{channelizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice channelizability</span>
+                <strong>
+                  {channelizabilityAdminSummary.stats.channelizabilityPercent}%
+                </strong>
+                <small>
+                  {channelizabilityAdminSummary.stats.coveredDomains}/
+                  {channelizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Channelizability signals</span>
+                <strong>{channelizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {channelizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-channelizability-list">
+              {channelizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-channelizability-card workspace-channelizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatChannelizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {channelizabilityAdminSummary.availableActions.includes(
+              'refresh_channelizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={channelizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleChannelizabilityAdminAction(
+                    'refresh_channelizability_summary',
+                  )
+                }
+              >
+                {formatChannelizabilityAdminAction('refresh_channelizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {eventizabilityAdminSummary ? (
+          <div className="billing-admin workspace-eventizability-admin">
+            <div className="billing-admin__header">
+              <span>Eventizability admin</span>
+              <strong>{eventizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{eventizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership eventizability</span>
+                <strong>
+                  {eventizabilityAdminSummary.stats.eventizabilityPercent}%
+                </strong>
+                <small>
+                  {eventizabilityAdminSummary.stats.coveredDomains}/
+                  {eventizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Eventizability signals</span>
+                <strong>{eventizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {eventizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-eventizability-list">
+              {eventizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-eventizability-card workspace-eventizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatEventizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {eventizabilityAdminSummary.availableActions.includes(
+              'refresh_eventizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={eventizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleEventizabilityAdminAction(
+                    'refresh_eventizability_summary',
+                  )
+                }
+              >
+                {formatEventizabilityAdminAction('refresh_eventizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {queueizabilityAdminSummary ? (
+          <div className="billing-admin workspace-queueizability-admin">
+            <div className="billing-admin__header">
+              <span>Queueizability admin</span>
+              <strong>{queueizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{queueizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key queueizability</span>
+                <strong>
+                  {queueizabilityAdminSummary.stats.queueizabilityPercent}%
+                </strong>
+                <small>
+                  {queueizabilityAdminSummary.stats.coveredDomains}/
+                  {queueizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Queueizability signals</span>
+                <strong>{queueizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {queueizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-queueizability-list">
+              {queueizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-queueizability-card workspace-queueizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatQueueizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {queueizabilityAdminSummary.availableActions.includes(
+              'refresh_queueizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={queueizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleQueueizabilityAdminAction(
+                    'refresh_queueizability_summary',
+                  )
+                }
+              >
+                {formatQueueizabilityAdminAction('refresh_queueizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {routizabilityAdminSummary ? (
+          <div className="billing-admin workspace-routizability-admin">
+            <div className="billing-admin__header">
+              <span>Routizability admin</span>
+              <strong>{routizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{routizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan routizability</span>
+                <strong>
+                  {routizabilityAdminSummary.stats.routizabilityPercent}%
+                </strong>
+                <small>
+                  {routizabilityAdminSummary.stats.coveredDomains}/
+                  {routizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Routizability signals</span>
+                <strong>{routizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {routizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-routizability-list">
+              {routizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-routizability-card workspace-routizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatRoutizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {routizabilityAdminSummary.availableActions.includes(
+              'refresh_routizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={routizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleRoutizabilityAdminAction(
+                    'refresh_routizability_summary',
+                  )
+                }
+              >
+                {formatRoutizabilityAdminAction('refresh_routizability_summary')}
               </button>
             ) : null}
           </div>

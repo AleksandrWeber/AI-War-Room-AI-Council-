@@ -1,47 +1,26 @@
 
-describe('virtualizability rollout integration', () => {
-  let app: NestFastifyApplication | undefined
-
-  beforeAll(async () => {
-    const { AppModule } = await import('../app.module.js')
-
-    const moduleRef: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile()
-
-    app = moduleRef.createNestApplication<NestFastifyApplication>(
-      new FastifyAdapter(),
-    )
-    app.setGlobalPrefix('api')
-    await app.init()
-    await app.getHttpAdapter().getInstance().ready()
-  })
-
-  afterAll(async () => {
-    await app?.close()
-  })
-
-  it('reports virtualizability capabilities and rollout readiness', async () => {
-    const capabilities = await request(app!.getHttpServer())
-      .get('/api/virtualizability/capabilities')
+describe('routizability rollout integration', () => {
+  it('reports routizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/routizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsVirtualizabilityRollout: true,
-      supportsVirtualizabilityAdminTools: true,
-      supportsBillingWebhookVirtualizabilitySignals: true,
+      supportsRoutizabilityRollout: true,
+      supportsRoutizabilityAdminTools: true,
+      supportsShieldScanRoutizabilitySignals: true,
     })
 
-    const rollout = await request(app!.getHttpServer())
-      .get('/api/virtualizability/readiness')
+    const rollout = await request(app.getHttpServer())
+      .get('/api/routizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns virtualizability admin summary for owners', async () => {
-    const response = await request(app!.getHttpServer())
-      .get('/api/virtualizability/workspace/workspace_1/admin')
+  it('returns routizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/routizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -51,14 +30,14 @@ describe('virtualizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        virtualizabilityPercent: expect.any(Number),
+        routizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects virtualizability admin tools for members', async () => {
-    await request(app!.getHttpServer())
-      .get('/api/virtualizability/workspace/workspace_1/admin')
+  it('rejects routizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/routizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -68,49 +47,28 @@ describe('virtualizability rollout integration', () => {
 })
 
 
-describe('distributizability rollout integration', () => {
-  let app: NestFastifyApplication | undefined
-
-  beforeAll(async () => {
-    const { AppModule } = await import('../app.module.js')
-
-    const moduleRef: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile()
-
-    app = moduleRef.createNestApplication<NestFastifyApplication>(
-      new FastifyAdapter(),
-    )
-    app.setGlobalPrefix('api')
-    await app.init()
-    await app.getHttpAdapter().getInstance().ready()
-  })
-
-  afterAll(async () => {
-    await app?.close()
-  })
-
-  it('reports distributizability capabilities and rollout readiness', async () => {
-    const capabilities = await request(app!.getHttpServer())
-      .get('/api/distributizability/capabilities')
+describe('queueizability rollout integration', () => {
+  it('reports queueizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/queueizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsDistributizabilityRollout: true,
-      supportsDistributizabilityAdminTools: true,
-      supportsMeterUsageDistributizabilitySignals: true,
+      supportsQueueizabilityRollout: true,
+      supportsQueueizabilityAdminTools: true,
+      supportsIdempotencyKeyQueueizabilitySignals: true,
     })
 
-    const rollout = await request(app!.getHttpServer())
-      .get('/api/distributizability/readiness')
+    const rollout = await request(app.getHttpServer())
+      .get('/api/queueizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns distributizability admin summary for owners', async () => {
-    const response = await request(app!.getHttpServer())
-      .get('/api/distributizability/workspace/workspace_1/admin')
+  it('returns queueizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/queueizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -120,14 +78,14 @@ describe('distributizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        distributizabilityPercent: expect.any(Number),
+        queueizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects distributizability admin tools for members', async () => {
-    await request(app!.getHttpServer())
-      .get('/api/distributizability/workspace/workspace_1/admin')
+  it('rejects queueizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/queueizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -137,49 +95,28 @@ describe('distributizability rollout integration', () => {
 })
 
 
-describe('federatizability rollout integration', () => {
-  let app: NestFastifyApplication | undefined
-
-  beforeAll(async () => {
-    const { AppModule } = await import('../app.module.js')
-
-    const moduleRef: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile()
-
-    app = moduleRef.createNestApplication<NestFastifyApplication>(
-      new FastifyAdapter(),
-    )
-    app.setGlobalPrefix('api')
-    await app.init()
-    await app.getHttpAdapter().getInstance().ready()
-  })
-
-  afterAll(async () => {
-    await app?.close()
-  })
-
-  it('reports federatizability capabilities and rollout readiness', async () => {
-    const capabilities = await request(app!.getHttpServer())
-      .get('/api/federatizability/capabilities')
+describe('eventizability rollout integration', () => {
+  it('reports eventizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/eventizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsFederatizabilityRollout: true,
-      supportsFederatizabilityAdminTools: true,
-      supportsWorkspaceLimitFederatizabilitySignals: true,
+      supportsEventizabilityRollout: true,
+      supportsEventizabilityAdminTools: true,
+      supportsMembershipEventizabilitySignals: true,
     })
 
-    const rollout = await request(app!.getHttpServer())
-      .get('/api/federatizability/readiness')
+    const rollout = await request(app.getHttpServer())
+      .get('/api/eventizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns federatizability admin summary for owners', async () => {
-    const response = await request(app!.getHttpServer())
-      .get('/api/federatizability/workspace/workspace_1/admin')
+  it('returns eventizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/eventizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -189,14 +126,14 @@ describe('federatizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        federatizabilityPercent: expect.any(Number),
+        eventizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects federatizability admin tools for members', async () => {
-    await request(app!.getHttpServer())
-      .get('/api/federatizability/workspace/workspace_1/admin')
+  it('rejects eventizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/eventizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -206,49 +143,28 @@ describe('federatizability rollout integration', () => {
 })
 
 
-describe('decentralizability rollout integration', () => {
-  let app: NestFastifyApplication | undefined
-
-  beforeAll(async () => {
-    const { AppModule } = await import('../app.module.js')
-
-    const moduleRef: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile()
-
-    app = moduleRef.createNestApplication<NestFastifyApplication>(
-      new FastifyAdapter(),
-    )
-    app.setGlobalPrefix('api')
-    await app.init()
-    await app.getHttpAdapter().getInstance().ready()
-  })
-
-  afterAll(async () => {
-    await app?.close()
-  })
-
-  it('reports decentralizability capabilities and rollout readiness', async () => {
-    const capabilities = await request(app!.getHttpServer())
-      .get('/api/decentralizability/capabilities')
+describe('channelizability rollout integration', () => {
+  it('reports channelizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/channelizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsDecentralizabilityRollout: true,
-      supportsDecentralizabilityAdminTools: true,
-      supportsProviderCredentialDecentralizabilitySignals: true,
+      supportsChannelizabilityRollout: true,
+      supportsChannelizabilityAdminTools: true,
+      supportsBillingInvoiceChannelizabilitySignals: true,
     })
 
-    const rollout = await request(app!.getHttpServer())
-      .get('/api/decentralizability/readiness')
+    const rollout = await request(app.getHttpServer())
+      .get('/api/channelizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns decentralizability admin summary for owners', async () => {
-    const response = await request(app!.getHttpServer())
-      .get('/api/decentralizability/workspace/workspace_1/admin')
+  it('returns channelizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/channelizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -258,14 +174,14 @@ describe('decentralizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        decentralizabilityPercent: expect.any(Number),
+        channelizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects decentralizability admin tools for members', async () => {
-    await request(app!.getHttpServer())
-      .get('/api/decentralizability/workspace/workspace_1/admin')
+  it('rejects channelizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/channelizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -275,49 +191,28 @@ describe('decentralizability rollout integration', () => {
 })
 
 
-describe('meshabilizability rollout integration', () => {
-  let app: NestFastifyApplication | undefined
-
-  beforeAll(async () => {
-    const { AppModule } = await import('../app.module.js')
-
-    const moduleRef: TestingModule = await Test.createTestingModule({
-      imports: [AppModule],
-    }).compile()
-
-    app = moduleRef.createNestApplication<NestFastifyApplication>(
-      new FastifyAdapter(),
-    )
-    app.setGlobalPrefix('api')
-    await app.init()
-    await app.getHttpAdapter().getInstance().ready()
-  })
-
-  afterAll(async () => {
-    await app?.close()
-  })
-
-  it('reports meshabilizability capabilities and rollout readiness', async () => {
-    const capabilities = await request(app!.getHttpServer())
-      .get('/api/meshabilizability/capabilities')
+describe('notifizability rollout integration', () => {
+  it('reports notifizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/notifizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsMeshabilizabilityRollout: true,
-      supportsMeshabilizabilityAdminTools: true,
-      supportsModelHealthMeshabilizabilitySignals: true,
+      supportsNotifizabilityRollout: true,
+      supportsNotifizabilityAdminTools: true,
+      supportsBillingNotificationNotifizabilitySignals: true,
     })
 
-    const rollout = await request(app!.getHttpServer())
-      .get('/api/meshabilizability/readiness')
+    const rollout = await request(app.getHttpServer())
+      .get('/api/notifizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns meshabilizability admin summary for owners', async () => {
-    const response = await request(app!.getHttpServer())
-      .get('/api/meshabilizability/workspace/workspace_1/admin')
+  it('returns notifizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/notifizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -327,14 +222,14 @@ describe('meshabilizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        meshabilizabilityPercent: expect.any(Number),
+        notifizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects meshabilizability admin tools for members', async () => {
-    await request(app!.getHttpServer())
-      .get('/api/meshabilizability/workspace/workspace_1/admin')
+  it('rejects notifizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/notifizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
