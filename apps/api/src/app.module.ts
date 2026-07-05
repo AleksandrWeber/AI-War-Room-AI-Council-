@@ -87,6 +87,11 @@ import { SchedulabilityModule } from './schedulability/schedulability.module.js'
 import { AutomatabilityModule } from './automatability/automatability.module.js'
 import { MonitorabilityModule } from './monitorability/monitorability.module.js'
 import { PredictabilityModule } from './predictability/predictability.module.js'
+import { RepeatabilityModule } from './repeatability/repeatability.module.js'
+import { ResponsivenessModule } from './responsiveness/responsiveness.module.js'
+import { DependabilityModule } from './dependability/dependability.module.js'
+import { ComposabilityModule } from './composability/composability.module.js'
+import { TrustworthinessModule } from './trustworthiness/trustworthiness.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -193,6 +198,11 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     AutomatabilityModule,
     MonitorabilityModule,
     PredictabilityModule,
+    RepeatabilityModule,
+    ResponsivenessModule,
+    DependabilityModule,
+    ComposabilityModule,
+    TrustworthinessModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

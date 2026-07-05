@@ -204,6 +204,16 @@ import type {
   MonitorabilityAdminSummaryResponse,
   PredictabilityRolloutResponse,
   PredictabilityAdminSummaryResponse,
+  RepeatabilityRolloutResponse,
+  RepeatabilityAdminSummaryResponse,
+  ResponsivenessRolloutResponse,
+  ResponsivenessAdminSummaryResponse,
+  DependabilityRolloutResponse,
+  DependabilityAdminSummaryResponse,
+  ComposabilityRolloutResponse,
+  ComposabilityAdminSummaryResponse,
+  TrustworthinessRolloutResponse,
+  TrustworthinessAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -1081,6 +1091,51 @@ import {
   formatPredictabilityRolloutStatus,
 } from './predictability-ui'
 import {
+  executeRepeatabilityAdminAction,
+  fetchRepeatabilityAdminSummary,
+  fetchRepeatabilityRollout,
+  formatRepeatabilityAdminAction,
+  formatRepeatabilityDomain,
+  formatRepeatabilityRolloutCheckStatus,
+  formatRepeatabilityRolloutStatus,
+} from './repeatability-ui'
+import {
+  executeResponsivenessAdminAction,
+  fetchResponsivenessAdminSummary,
+  fetchResponsivenessRollout,
+  formatResponsivenessAdminAction,
+  formatResponsivenessDomain,
+  formatResponsivenessRolloutCheckStatus,
+  formatResponsivenessRolloutStatus,
+} from './responsiveness-ui'
+import {
+  executeDependabilityAdminAction,
+  fetchDependabilityAdminSummary,
+  fetchDependabilityRollout,
+  formatDependabilityAdminAction,
+  formatDependabilityDomain,
+  formatDependabilityRolloutCheckStatus,
+  formatDependabilityRolloutStatus,
+} from './dependability-ui'
+import {
+  executeComposabilityAdminAction,
+  fetchComposabilityAdminSummary,
+  fetchComposabilityRollout,
+  formatComposabilityAdminAction,
+  formatComposabilityDomain,
+  formatComposabilityRolloutCheckStatus,
+  formatComposabilityRolloutStatus,
+} from './composability-ui'
+import {
+  executeTrustworthinessAdminAction,
+  fetchTrustworthinessAdminSummary,
+  fetchTrustworthinessRollout,
+  formatTrustworthinessAdminAction,
+  formatTrustworthinessDomain,
+  formatTrustworthinessRolloutCheckStatus,
+  formatTrustworthinessRolloutStatus,
+} from './trustworthiness-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -1819,6 +1874,16 @@ function App() {
     useState<MonitorabilityRolloutResponse | null>(null)
   const [predictabilityRollout, setPredictabilityRollout] =
     useState<PredictabilityRolloutResponse | null>(null)
+  const [repeatabilityRollout, setRepeatabilityRollout] =
+    useState<RepeatabilityRolloutResponse | null>(null)
+  const [responsivenessRollout, setResponsivenessRollout] =
+    useState<ResponsivenessRolloutResponse | null>(null)
+  const [dependabilityRollout, setDependabilityRollout] =
+    useState<DependabilityRolloutResponse | null>(null)
+  const [composabilityRollout, setComposabilityRollout] =
+    useState<ComposabilityRolloutResponse | null>(null)
+  const [trustworthinessRollout, setTrustworthinessRollout] =
+    useState<TrustworthinessRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -2086,6 +2151,16 @@ function App() {
     useState<MonitorabilityAdminSummaryResponse | null>(null)
   const [predictabilityAdminSummary, setPredictabilityAdminSummary] =
     useState<PredictabilityAdminSummaryResponse | null>(null)
+  const [repeatabilityAdminSummary, setRepeatabilityAdminSummary] =
+    useState<RepeatabilityAdminSummaryResponse | null>(null)
+  const [responsivenessAdminSummary, setResponsivenessAdminSummary] =
+    useState<ResponsivenessAdminSummaryResponse | null>(null)
+  const [dependabilityAdminSummary, setDependabilityAdminSummary] =
+    useState<DependabilityAdminSummaryResponse | null>(null)
+  const [composabilityAdminSummary, setComposabilityAdminSummary] =
+    useState<ComposabilityAdminSummaryResponse | null>(null)
+  const [trustworthinessAdminSummary, setTrustworthinessAdminSummary] =
+    useState<TrustworthinessAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -2369,6 +2444,21 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [predictabilityAdminAction, setPredictabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [repeatabilityAdminAction, setRepeatabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [responsivenessAdminAction, setResponsivenessAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [dependabilityAdminAction, setDependabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [composabilityAdminAction, setComposabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [trustworthinessAdminAction, setTrustworthinessAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -3627,6 +3717,66 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setPredictabilityRollout(null)
+        }
+      })
+
+    fetchRepeatabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setRepeatabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setRepeatabilityRollout(null)
+        }
+      })
+
+    fetchResponsivenessRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setResponsivenessRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setResponsivenessRollout(null)
+        }
+      })
+
+    fetchDependabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setDependabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDependabilityRollout(null)
+        }
+      })
+
+    fetchComposabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setComposabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setComposabilityRollout(null)
+        }
+      })
+
+    fetchTrustworthinessRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setTrustworthinessRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTrustworthinessRollout(null)
         }
       })
 
@@ -4981,6 +5131,41 @@ function App() {
         workspaceAuthHeaders,
       )
       setPredictabilityAdminSummary(predictabilityAdmin)
+
+      const repeatabilityAdmin = await fetchRepeatabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRepeatabilityAdminSummary(repeatabilityAdmin)
+
+      const responsivenessAdmin = await fetchResponsivenessAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setResponsivenessAdminSummary(responsivenessAdmin)
+
+      const dependabilityAdmin = await fetchDependabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDependabilityAdminSummary(dependabilityAdmin)
+
+      const composabilityAdmin = await fetchComposabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setComposabilityAdminSummary(composabilityAdmin)
+
+      const trustworthinessAdmin = await fetchTrustworthinessAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTrustworthinessAdminSummary(trustworthinessAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -6213,6 +6398,151 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleTrustworthinessAdminAction(
+    action: 'refresh_trustworthiness_summary',
+  ) {
+    setTrustworthinessAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeTrustworthinessAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchTrustworthinessRollout(apiBaseUrl)
+      setTrustworthinessRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run trustworthiness admin action.',
+      )
+    } finally {
+      setTrustworthinessAdminAction('idle')
+    }
+  }
+
+  async function handleComposabilityAdminAction(
+    action: 'refresh_composability_summary',
+  ) {
+    setComposabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeComposabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchComposabilityRollout(apiBaseUrl)
+      setComposabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run composability admin action.',
+      )
+    } finally {
+      setComposabilityAdminAction('idle')
+    }
+  }
+
+  async function handleDependabilityAdminAction(
+    action: 'refresh_dependability_summary',
+  ) {
+    setDependabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeDependabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchDependabilityRollout(apiBaseUrl)
+      setDependabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run dependability admin action.',
+      )
+    } finally {
+      setDependabilityAdminAction('idle')
+    }
+  }
+
+  async function handleResponsivenessAdminAction(
+    action: 'refresh_responsiveness_summary',
+  ) {
+    setResponsivenessAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeResponsivenessAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchResponsivenessRollout(apiBaseUrl)
+      setResponsivenessRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run responsiveness admin action.',
+      )
+    } finally {
+      setResponsivenessAdminAction('idle')
+    }
+  }
+
+  async function handleRepeatabilityAdminAction(
+    action: 'refresh_repeatability_summary',
+  ) {
+    setRepeatabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeRepeatabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchRepeatabilityRollout(apiBaseUrl)
+      setRepeatabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run repeatability admin action.',
+      )
+    } finally {
+      setRepeatabilityAdminAction('idle')
     }
   }
 
@@ -11240,6 +11570,151 @@ function App() {
               ))}
             </div>
             <small>Checked at {orchestrabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {trustworthinessRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production trustworthiness rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${trustworthinessRollout.status}`}
+              >
+                {formatTrustworthinessRolloutStatus(trustworthinessRollout.status)}
+              </strong>
+            </div>
+            <p>{trustworthinessRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {trustworthinessRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatTrustworthinessRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {trustworthinessRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {composabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production composability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${composabilityRollout.status}`}
+              >
+                {formatComposabilityRolloutStatus(composabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{composabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {composabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatComposabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {composabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {dependabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production dependability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${dependabilityRollout.status}`}
+              >
+                {formatDependabilityRolloutStatus(dependabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{dependabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {dependabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatDependabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {dependabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {responsivenessRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production responsiveness rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${responsivenessRollout.status}`}
+              >
+                {formatResponsivenessRolloutStatus(responsivenessRollout.status)}
+              </strong>
+            </div>
+            <p>{responsivenessRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {responsivenessRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatResponsivenessRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {responsivenessRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {repeatabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production repeatability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${repeatabilityRollout.status}`}
+              >
+                {formatRepeatabilityRolloutStatus(repeatabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{repeatabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {repeatabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatRepeatabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {repeatabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -17752,6 +18227,331 @@ function App() {
                 }
               >
                 {formatOrchestrabilityAdminAction('refresh_orchestrability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {trustworthinessAdminSummary ? (
+          <div className="billing-admin workspace-trustworthiness-admin">
+            <div className="billing-admin__header">
+              <span>Trustworthiness admin</span>
+              <strong>{trustworthinessAdminSummary.role}</strong>
+            </div>
+            <p>{trustworthinessAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan trustworthiness</span>
+                <strong>
+                  {trustworthinessAdminSummary.stats.trustworthinessPercent}%
+                </strong>
+                <small>
+                  {trustworthinessAdminSummary.stats.coveredDomains}/
+                  {trustworthinessAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Trustworthiness signals</span>
+                <strong>{trustworthinessAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {trustworthinessAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-trustworthiness-list">
+              {trustworthinessAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-trustworthiness-card workspace-trustworthiness-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatTrustworthinessDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {trustworthinessAdminSummary.availableActions.includes(
+              'refresh_trustworthiness_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={trustworthinessAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleTrustworthinessAdminAction(
+                    'refresh_trustworthiness_summary',
+                  )
+                }
+              >
+                {formatTrustworthinessAdminAction('refresh_trustworthiness_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {composabilityAdminSummary ? (
+          <div className="billing-admin workspace-composability-admin">
+            <div className="billing-admin__header">
+              <span>Composability admin</span>
+              <strong>{composabilityAdminSummary.role}</strong>
+            </div>
+            <p>{composabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workflow composability</span>
+                <strong>
+                  {composabilityAdminSummary.stats.composabilityPercent}%
+                </strong>
+                <small>
+                  {composabilityAdminSummary.stats.coveredDomains}/
+                  {composabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Composability signals</span>
+                <strong>{composabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {composabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, run workflows, and agent outputs'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-composability-list">
+              {composabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-composability-card workspace-composability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatComposabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {composabilityAdminSummary.availableActions.includes(
+              'refresh_composability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={composabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleComposabilityAdminAction(
+                    'refresh_composability_summary',
+                  )
+                }
+              >
+                {formatComposabilityAdminAction('refresh_composability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {dependabilityAdminSummary ? (
+          <div className="billing-admin workspace-dependability-admin">
+            <div className="billing-admin__header">
+              <span>Dependability admin</span>
+              <strong>{dependabilityAdminSummary.role}</strong>
+            </div>
+            <p>{dependabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing record dependability</span>
+                <strong>
+                  {dependabilityAdminSummary.stats.dependabilityPercent}%
+                </strong>
+                <small>
+                  {dependabilityAdminSummary.stats.coveredDomains}/
+                  {dependabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Dependability signals</span>
+                <strong>{dependabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {dependabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing records, and billing invoices'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-dependability-list">
+              {dependabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-dependability-card workspace-dependability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatDependabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {dependabilityAdminSummary.availableActions.includes(
+              'refresh_dependability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={dependabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleDependabilityAdminAction(
+                    'refresh_dependability_summary',
+                  )
+                }
+              >
+                {formatDependabilityAdminAction('refresh_dependability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {responsivenessAdminSummary ? (
+          <div className="billing-admin workspace-responsiveness-admin">
+            <div className="billing-admin__header">
+              <span>Responsiveness admin</span>
+              <strong>{responsivenessAdminSummary.role}</strong>
+            </div>
+            <p>{responsivenessAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Usage event responsiveness</span>
+                <strong>
+                  {responsivenessAdminSummary.stats.responsivenessPercent}%
+                </strong>
+                <small>
+                  {responsivenessAdminSummary.stats.coveredDomains}/
+                  {responsivenessAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Responsiveness signals</span>
+                <strong>{responsivenessAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {responsivenessAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, usage events, and meter usage reports'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-responsiveness-list">
+              {responsivenessAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-responsiveness-card workspace-responsiveness-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatResponsivenessDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {responsivenessAdminSummary.availableActions.includes(
+              'refresh_responsiveness_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={responsivenessAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleResponsivenessAdminAction(
+                    'refresh_responsiveness_summary',
+                  )
+                }
+              >
+                {formatResponsivenessAdminAction('refresh_responsiveness_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {repeatabilityAdminSummary ? (
+          <div className="billing-admin workspace-repeatability-admin">
+            <div className="billing-admin__header">
+              <span>Repeatability admin</span>
+              <strong>{repeatabilityAdminSummary.role}</strong>
+            </div>
+            <p>{repeatabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Artifact repeatability</span>
+                <strong>
+                  {repeatabilityAdminSummary.stats.repeatabilityPercent}%
+                </strong>
+                <small>
+                  {repeatabilityAdminSummary.stats.coveredDomains}/
+                  {repeatabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Repeatability signals</span>
+                <strong>{repeatabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {repeatabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, artifacts, and run workflows'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-repeatability-list">
+              {repeatabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-repeatability-card workspace-repeatability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatRepeatabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {repeatabilityAdminSummary.availableActions.includes(
+              'refresh_repeatability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={repeatabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleRepeatabilityAdminAction(
+                    'refresh_repeatability_summary',
+                  )
+                }
+              >
+                {formatRepeatabilityAdminAction('refresh_repeatability_summary')}
               </button>
             ) : null}
           </div>

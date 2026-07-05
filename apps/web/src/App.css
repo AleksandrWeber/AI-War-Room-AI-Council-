@@ -3175,6 +3175,136 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-repeatability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-repeatability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-repeatability-card p,
+.workspace-repeatability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-repeatability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-repeatability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-responsiveness-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-responsiveness-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-responsiveness-card p,
+.workspace-responsiveness-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-responsiveness-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-responsiveness-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-dependability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-dependability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-dependability-card p,
+.workspace-dependability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-dependability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-dependability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-composability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-composability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-composability-card p,
+.workspace-composability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-composability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-composability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-trustworthiness-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-trustworthiness-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-trustworthiness-card p,
+.workspace-trustworthiness-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-trustworthiness-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-trustworthiness-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

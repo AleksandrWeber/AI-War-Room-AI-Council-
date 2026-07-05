@@ -796,6 +796,36 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.120` behavior:
+
+- Production trustworthiness rollout readiness validates trustworthiness coverage and readiness through `GET /api/trustworthiness/readiness`.
+- Workspace owners and admins can inspect workspace trustworthiness metrics from `GET /api/trustworthiness/workspace/:workspaceId/admin`.
+- The web billing panel shows trustworthiness rollout checks and workspace trustworthiness admin tools.
+
+Current `v5.119` behavior:
+
+- Production composability rollout readiness validates composability coverage and readiness through `GET /api/composability/readiness`.
+- Workspace owners and admins can inspect workspace composability metrics from `GET /api/composability/workspace/:workspaceId/admin`.
+- The web billing panel shows composability rollout checks and workspace composability admin tools.
+
+Current `v5.118` behavior:
+
+- Production dependability rollout readiness validates dependability coverage and readiness through `GET /api/dependability/readiness`.
+- Workspace owners and admins can inspect workspace dependability metrics from `GET /api/dependability/workspace/:workspaceId/admin`.
+- The web billing panel shows dependability rollout checks and workspace dependability admin tools.
+
+Current `v5.117` behavior:
+
+- Production responsiveness rollout readiness validates responsiveness coverage and readiness through `GET /api/responsiveness/readiness`.
+- Workspace owners and admins can inspect workspace responsiveness metrics from `GET /api/responsiveness/workspace/:workspaceId/admin`.
+- The web billing panel shows responsiveness rollout checks and workspace responsiveness admin tools.
+
+Current `v5.116` behavior:
+
+- Production repeatability rollout readiness validates repeatability coverage and readiness through `GET /api/repeatability/readiness`.
+- Workspace owners and admins can inspect workspace repeatability metrics from `GET /api/repeatability/workspace/:workspaceId/admin`.
+- The web billing panel shows repeatability rollout checks and workspace repeatability admin tools.
+
 Current `v5.115` behavior:
 
 - Production predictability rollout readiness validates predictability coverage and readiness through `GET /api/predictability/readiness`.
