@@ -990,3 +990,71 @@ describe('backup rollout integration', () => {
       .expect(403)
   })
 })
+
+describe('audit trail rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports audit trail capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/audit/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsAuditTrailRollout: true,
+      supportsAuditTrailAdminTools: true,
+      supportsWorkspaceAuditExport: true,
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/audit/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns audit admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/audit/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        totalRecords: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects audit admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/audit/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})

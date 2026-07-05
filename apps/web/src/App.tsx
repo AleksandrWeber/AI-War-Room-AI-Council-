@@ -40,6 +40,8 @@ import type {
   MigrationAdminSummaryResponse,
   BackupRolloutResponse,
   BackupAdminSummaryResponse,
+  AuditTrailRolloutResponse,
+  AuditTrailAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -178,6 +180,15 @@ import {
   formatBackupRolloutCheckStatus,
   formatBackupRolloutStatus,
 } from './backup-ui'
+import {
+  executeAuditAdminAction,
+  fetchAuditAdminSummary,
+  fetchAuditTrailRollout,
+  formatAuditAdminAction,
+  formatAuditDomain,
+  formatAuditTrailRolloutCheckStatus,
+  formatAuditTrailRolloutStatus,
+} from './audit-trail-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -754,6 +765,8 @@ function App() {
     useState<MigrationRolloutResponse | null>(null)
   const [backupRollout, setBackupRollout] =
     useState<BackupRolloutResponse | null>(null)
+  const [auditTrailRollout, setAuditTrailRollout] =
+    useState<AuditTrailRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -857,6 +870,8 @@ function App() {
     useState<MigrationAdminSummaryResponse | null>(null)
   const [backupAdminSummary, setBackupAdminSummary] =
     useState<BackupAdminSummaryResponse | null>(null)
+  const [auditAdminSummary, setAuditAdminSummary] =
+    useState<AuditTrailAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -894,6 +909,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [backupAdminAction, setBackupAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [auditAdminAction, setAuditAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1168,6 +1186,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setBackupRollout(null)
+        }
+      })
+
+    fetchAuditTrailRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAuditTrailRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAuditTrailRollout(null)
         }
       })
 
@@ -1948,6 +1978,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setBackupAdminSummary(backupAdmin)
+
+      const auditAdmin = await fetchAuditAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuditAdminSummary(auditAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -2409,6 +2446,33 @@ function App() {
       )
     } finally {
       setBackupAdminAction('idle')
+    }
+  }
+
+  async function handleAuditAdminAction(action: 'refresh_audit_summary') {
+    setAuditAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAuditAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAuditTrailRollout(apiBaseUrl)
+      setAuditTrailRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run audit admin action.',
+      )
+    } finally {
+      setAuditAdminAction('idle')
     }
   }
 
@@ -3467,6 +3531,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {backupRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {auditTrailRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production audit trail rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${auditTrailRollout.status}`}
+              >
+                {formatAuditTrailRolloutStatus(auditTrailRollout.status)}
+              </strong>
+            </div>
+            <p>{auditTrailRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {auditTrailRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAuditTrailRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {auditTrailRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -4687,6 +4780,67 @@ function App() {
                 }
               >
                 {formatBackupAdminAction('refresh_backup_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {auditAdminSummary ? (
+          <div className="billing-admin workspace-audit-trail-admin">
+            <div className="billing-admin__header">
+              <span>Audit trail admin</span>
+              <strong>{auditAdminSummary.role}</strong>
+            </div>
+            <p>{auditAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Audit records</span>
+                <strong>{auditAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {auditAdminSummary.stats.coveredDomains}/
+                  {auditAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Export</span>
+                <strong>Enabled</strong>
+                <small>
+                  {auditAdminSummary.stats.postgresConnectivity
+                    ? 'PostgreSQL audit tables'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-audit-trail-list">
+              {auditAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-audit-trail-card workspace-audit-trail-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAuditDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {auditAdminSummary.availableActions.includes(
+              'refresh_audit_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={auditAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAuditAdminAction('refresh_audit_summary')
+                }
+              >
+                {formatAuditAdminAction('refresh_audit_summary')}
               </button>
             ) : null}
           </div>

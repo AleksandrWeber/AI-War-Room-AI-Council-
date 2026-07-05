@@ -562,6 +562,25 @@ Workspace backup admin tools:
 - Only workspace owners and admins can access backup admin endpoints.
 - The web billing panel shows backup admin tools for authorized roles.
 
+Production audit trail rollout readiness:
+
+- `GET /api/audit/readiness` returns operator-facing production audit trail checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, persistent audit table coverage, workspace audit export support, and retention readiness signals.
+- The web billing panel shows audit trail rollout status and per-check guidance.
+
+Workspace audit trail admin tools:
+
+- `GET /api/audit/workspace/:workspaceId/admin` returns owner/admin audit summary with recoverable workspace audit domains.
+- `POST /api/audit/workspace/:workspaceId/admin/actions` runs audit admin actions such as refreshing the summary.
+- Only workspace owners and admins can access audit trail admin endpoints.
+- The web billing panel shows audit trail admin tools for authorized roles.
+
+Current `v5.34` behavior:
+
+- Production audit trail rollout readiness validates audit coverage and retention readiness through `GET /api/audit/readiness`.
+- Workspace owners and admins can inspect workspace audit metrics from `GET /api/audit/workspace/:workspaceId/admin`.
+- The web billing panel shows audit trail rollout checks and workspace audit admin tools.
+
 Current `v5.33` behavior:
 
 - Production backup rollout readiness validates backup coverage and restore readiness through `GET /api/backup/readiness`.
