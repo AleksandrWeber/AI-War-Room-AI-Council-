@@ -243,6 +243,16 @@ import { VersioningizabilityModule } from './versioningizability/versioningizabi
 import { CompactizabilityModule } from './compactizability/compactizability.module.js'
 import { ExpandizabilityModule } from './expandizability/expandizability.module.js'
 import { RetentionizabilityModule } from './retentionizability/retentionizability.module.js'
+import { QueryizabilityModule } from './queryizability/queryizability.module.js'
+import { FilterizabilityModule } from './filterizability/filterizability.module.js'
+import { SortizabilityModule } from './sortizability/sortizability.module.js'
+import { PaginizabilityModule } from './paginizability/paginizability.module.js'
+import { PivotizabilityModule } from './pivotizability/pivotizability.module.js'
+import { GroupizabilityModule } from './groupizability/groupizability.module.js'
+import { JoinizabilityModule } from './joinizability/joinizability.module.js'
+import { MergeizabilityModule } from './mergeizability/mergeizability.module.js'
+import { SplitizabilityModule } from './splitizability/splitizability.module.js'
+import { ProjectizabilityModule } from './projectizability/projectizability.module.js'
 
 @Module({
   imports: [
@@ -490,6 +500,16 @@ import { RetentionizabilityModule } from './retentionizability/retentionizabilit
     CompactizabilityModule,
     ExpandizabilityModule,
     RetentionizabilityModule,
+    QueryizabilityModule,
+    FilterizabilityModule,
+    SortizabilityModule,
+    PaginizabilityModule,
+    PivotizabilityModule,
+    GroupizabilityModule,
+    JoinizabilityModule,
+    MergeizabilityModule,
+    SplitizabilityModule,
+    ProjectizabilityModule,
   ],
   exports: [
     CustomizabilityModule,

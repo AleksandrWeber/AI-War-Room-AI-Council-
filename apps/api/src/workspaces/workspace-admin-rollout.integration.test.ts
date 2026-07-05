@@ -19295,3 +19295,479 @@ describe('retentionizability rollout integration', () => {
       .expect(403)
   })
 })
+describe('queryizability rollout integration', () => {
+  it('reports queryizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/queryizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsQueryizabilityRollout: true,
+      supportsQueryizabilityAdminTools: true,
+      supportsBillingWebhookQueryizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/queryizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns queryizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/queryizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        queryizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects queryizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/queryizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('filterizability rollout integration', () => {
+  it('reports filterizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/filterizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsFilterizabilityRollout: true,
+      supportsFilterizabilityAdminTools: true,
+      supportsMeterUsageFilterizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/filterizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns filterizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/filterizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        filterizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects filterizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/filterizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('sortizability rollout integration', () => {
+  it('reports sortizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/sortizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsSortizabilityRollout: true,
+      supportsSortizabilityAdminTools: true,
+      supportsWorkspaceLimitSortizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/sortizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns sortizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/sortizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        sortizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects sortizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/sortizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('paginizability rollout integration', () => {
+  it('reports paginizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/paginizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsPaginizabilityRollout: true,
+      supportsPaginizabilityAdminTools: true,
+      supportsProviderCredentialPaginizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/paginizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns paginizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/paginizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        paginizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects paginizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/paginizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('pivotizability rollout integration', () => {
+  it('reports pivotizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/pivotizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsPivotizabilityRollout: true,
+      supportsPivotizabilityAdminTools: true,
+      supportsModelHealthPivotizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/pivotizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns pivotizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/pivotizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        pivotizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects pivotizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/pivotizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+describe('groupizability rollout integration', () => {
+  it('reports groupizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/groupizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsGroupizabilityRollout: true,
+      supportsGroupizabilityAdminTools: true,
+      supportsShieldScanGroupizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/groupizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns groupizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/groupizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        groupizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects groupizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/groupizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('joinizability rollout integration', () => {
+  it('reports joinizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/joinizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsJoinizabilityRollout: true,
+      supportsJoinizabilityAdminTools: true,
+      supportsIdempotencyKeyJoinizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/joinizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns joinizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/joinizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        joinizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects joinizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/joinizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('mergeizability rollout integration', () => {
+  it('reports mergeizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/mergeizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsMergeizabilityRollout: true,
+      supportsMergeizabilityAdminTools: true,
+      supportsMembershipMergeizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/mergeizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns mergeizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/mergeizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        mergeizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects mergeizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/mergeizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('splitizability rollout integration', () => {
+  it('reports splitizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/splitizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsSplitizabilityRollout: true,
+      supportsSplitizabilityAdminTools: true,
+      supportsBillingInvoiceSplitizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/splitizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns splitizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/splitizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        splitizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects splitizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/splitizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('projectizability rollout integration', () => {
+  it('reports projectizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/projectizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsProjectizabilityRollout: true,
+      supportsProjectizabilityAdminTools: true,
+      supportsBillingNotificationProjectizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/projectizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns projectizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/projectizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        projectizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects projectizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/projectizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
