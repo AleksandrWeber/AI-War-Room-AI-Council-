@@ -3435,6 +3435,136 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-viability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-viability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-viability-card p,
+.workspace-viability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-viability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-viability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-feasibility-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-feasibility-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-feasibility-card p,
+.workspace-feasibility-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-feasibility-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-feasibility-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-conformance-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-conformance-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-conformance-card p,
+.workspace-conformance-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-conformance-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-conformance-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-adoptability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-adoptability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-adoptability-card p,
+.workspace-adoptability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-adoptability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-adoptability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-acceptability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-acceptability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-acceptability-card p,
+.workspace-acceptability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-acceptability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-acceptability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

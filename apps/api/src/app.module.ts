@@ -97,6 +97,11 @@ import { AccessibilityModule } from './accessibility/accessibility.module.js'
 import { EffectivenessModule } from './effectiveness/effectiveness.module.js'
 import { AppropriatenessModule } from './appropriateness/appropriateness.module.js'
 import { SurvivabilityModule } from './survivability/survivability.module.js'
+import { ViabilityModule } from './viability/viability.module.js'
+import { FeasibilityModule } from './feasibility/feasibility.module.js'
+import { ConformanceModule } from './conformance/conformance.module.js'
+import { AdoptabilityModule } from './adoptability/adoptability.module.js'
+import { AcceptabilityModule } from './acceptability/acceptability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -213,6 +218,11 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     EffectivenessModule,
     AppropriatenessModule,
     SurvivabilityModule,
+    ViabilityModule,
+    FeasibilityModule,
+    ConformanceModule,
+    AdoptabilityModule,
+    AcceptabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

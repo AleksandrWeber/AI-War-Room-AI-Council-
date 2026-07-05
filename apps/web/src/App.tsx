@@ -224,6 +224,16 @@ import type {
   AppropriatenessAdminSummaryResponse,
   SurvivabilityRolloutResponse,
   SurvivabilityAdminSummaryResponse,
+  ViabilityRolloutResponse,
+  ViabilityAdminSummaryResponse,
+  FeasibilityRolloutResponse,
+  FeasibilityAdminSummaryResponse,
+  ConformanceRolloutResponse,
+  ConformanceAdminSummaryResponse,
+  AdoptabilityRolloutResponse,
+  AdoptabilityAdminSummaryResponse,
+  AcceptabilityRolloutResponse,
+  AcceptabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -1191,6 +1201,51 @@ import {
   formatSurvivabilityRolloutStatus,
 } from './survivability-ui'
 import {
+  executeViabilityAdminAction,
+  fetchViabilityAdminSummary,
+  fetchViabilityRollout,
+  formatViabilityAdminAction,
+  formatViabilityDomain,
+  formatViabilityRolloutCheckStatus,
+  formatViabilityRolloutStatus,
+} from './viability-ui'
+import {
+  executeFeasibilityAdminAction,
+  fetchFeasibilityAdminSummary,
+  fetchFeasibilityRollout,
+  formatFeasibilityAdminAction,
+  formatFeasibilityDomain,
+  formatFeasibilityRolloutCheckStatus,
+  formatFeasibilityRolloutStatus,
+} from './feasibility-ui'
+import {
+  executeConformanceAdminAction,
+  fetchConformanceAdminSummary,
+  fetchConformanceRollout,
+  formatConformanceAdminAction,
+  formatConformanceDomain,
+  formatConformanceRolloutCheckStatus,
+  formatConformanceRolloutStatus,
+} from './conformance-ui'
+import {
+  executeAdoptabilityAdminAction,
+  fetchAdoptabilityAdminSummary,
+  fetchAdoptabilityRollout,
+  formatAdoptabilityAdminAction,
+  formatAdoptabilityDomain,
+  formatAdoptabilityRolloutCheckStatus,
+  formatAdoptabilityRolloutStatus,
+} from './adoptability-ui'
+import {
+  executeAcceptabilityAdminAction,
+  fetchAcceptabilityAdminSummary,
+  fetchAcceptabilityRollout,
+  formatAcceptabilityAdminAction,
+  formatAcceptabilityDomain,
+  formatAcceptabilityRolloutCheckStatus,
+  formatAcceptabilityRolloutStatus,
+} from './acceptability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -1949,6 +2004,16 @@ function App() {
     useState<AppropriatenessRolloutResponse | null>(null)
   const [survivabilityRollout, setSurvivabilityRollout] =
     useState<SurvivabilityRolloutResponse | null>(null)
+  const [viabilityRollout, setViabilityRollout] =
+    useState<ViabilityRolloutResponse | null>(null)
+  const [feasibilityRollout, setFeasibilityRollout] =
+    useState<FeasibilityRolloutResponse | null>(null)
+  const [conformanceRollout, setConformanceRollout] =
+    useState<ConformanceRolloutResponse | null>(null)
+  const [adoptabilityRollout, setAdoptabilityRollout] =
+    useState<AdoptabilityRolloutResponse | null>(null)
+  const [acceptabilityRollout, setAcceptabilityRollout] =
+    useState<AcceptabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -2236,6 +2301,16 @@ function App() {
     useState<AppropriatenessAdminSummaryResponse | null>(null)
   const [survivabilityAdminSummary, setSurvivabilityAdminSummary] =
     useState<SurvivabilityAdminSummaryResponse | null>(null)
+  const [viabilityAdminSummary, setViabilityAdminSummary] =
+    useState<ViabilityAdminSummaryResponse | null>(null)
+  const [feasibilityAdminSummary, setFeasibilityAdminSummary] =
+    useState<FeasibilityAdminSummaryResponse | null>(null)
+  const [conformanceAdminSummary, setConformanceAdminSummary] =
+    useState<ConformanceAdminSummaryResponse | null>(null)
+  const [adoptabilityAdminSummary, setAdoptabilityAdminSummary] =
+    useState<AdoptabilityAdminSummaryResponse | null>(null)
+  const [acceptabilityAdminSummary, setAcceptabilityAdminSummary] =
+    useState<AcceptabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -2549,6 +2624,21 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [survivabilityAdminAction, setSurvivabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [viabilityAdminAction, setViabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [feasibilityAdminAction, setFeasibilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [conformanceAdminAction, setConformanceAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [adoptabilityAdminAction, setAdoptabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [acceptabilityAdminAction, setAcceptabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -3927,6 +4017,66 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setSurvivabilityRollout(null)
+        }
+      })
+
+    fetchViabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setViabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setViabilityRollout(null)
+        }
+      })
+
+    fetchFeasibilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setFeasibilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setFeasibilityRollout(null)
+        }
+      })
+
+    fetchConformanceRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setConformanceRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setConformanceRollout(null)
+        }
+      })
+
+    fetchAdoptabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAdoptabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAdoptabilityRollout(null)
+        }
+      })
+
+    fetchAcceptabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAcceptabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAcceptabilityRollout(null)
         }
       })
 
@@ -5351,6 +5501,41 @@ function App() {
         workspaceAuthHeaders,
       )
       setSurvivabilityAdminSummary(survivabilityAdmin)
+
+      const viabilityAdmin = await fetchViabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setViabilityAdminSummary(viabilityAdmin)
+
+      const feasibilityAdmin = await fetchFeasibilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFeasibilityAdminSummary(feasibilityAdmin)
+
+      const conformanceAdmin = await fetchConformanceAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConformanceAdminSummary(conformanceAdmin)
+
+      const adoptabilityAdmin = await fetchAdoptabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAdoptabilityAdminSummary(adoptabilityAdmin)
+
+      const acceptabilityAdmin = await fetchAcceptabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAcceptabilityAdminSummary(acceptabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -6583,6 +6768,151 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleAcceptabilityAdminAction(
+    action: 'refresh_acceptability_summary',
+  ) {
+    setAcceptabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAcceptabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAcceptabilityRollout(apiBaseUrl)
+      setAcceptabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run acceptability admin action.',
+      )
+    } finally {
+      setAcceptabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAdoptabilityAdminAction(
+    action: 'refresh_adoptability_summary',
+  ) {
+    setAdoptabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAdoptabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAdoptabilityRollout(apiBaseUrl)
+      setAdoptabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run adoptability admin action.',
+      )
+    } finally {
+      setAdoptabilityAdminAction('idle')
+    }
+  }
+
+  async function handleConformanceAdminAction(
+    action: 'refresh_conformance_summary',
+  ) {
+    setConformanceAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeConformanceAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchConformanceRollout(apiBaseUrl)
+      setConformanceRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run conformance admin action.',
+      )
+    } finally {
+      setConformanceAdminAction('idle')
+    }
+  }
+
+  async function handleFeasibilityAdminAction(
+    action: 'refresh_feasibility_summary',
+  ) {
+    setFeasibilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeFeasibilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchFeasibilityRollout(apiBaseUrl)
+      setFeasibilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run feasibility admin action.',
+      )
+    } finally {
+      setFeasibilityAdminAction('idle')
+    }
+  }
+
+  async function handleViabilityAdminAction(
+    action: 'refresh_viability_summary',
+  ) {
+    setViabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeViabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchViabilityRollout(apiBaseUrl)
+      setViabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run viability admin action.',
+      )
+    } finally {
+      setViabilityAdminAction('idle')
     }
   }
 
@@ -12190,6 +12520,151 @@ function App() {
               ))}
             </div>
             <small>Checked at {usabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {acceptabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production acceptability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${acceptabilityRollout.status}`}
+              >
+                {formatAcceptabilityRolloutStatus(acceptabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{acceptabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {acceptabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAcceptabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {acceptabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {adoptabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production adoptability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${adoptabilityRollout.status}`}
+              >
+                {formatAdoptabilityRolloutStatus(adoptabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{adoptabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {adoptabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAdoptabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {adoptabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {conformanceRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production conformance rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${conformanceRollout.status}`}
+              >
+                {formatConformanceRolloutStatus(conformanceRollout.status)}
+              </strong>
+            </div>
+            <p>{conformanceRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {conformanceRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatConformanceRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {conformanceRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {feasibilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production feasibility rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${feasibilityRollout.status}`}
+              >
+                {formatFeasibilityRolloutStatus(feasibilityRollout.status)}
+              </strong>
+            </div>
+            <p>{feasibilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {feasibilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatFeasibilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {feasibilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {viabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production viability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${viabilityRollout.status}`}
+              >
+                {formatViabilityRolloutStatus(viabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{viabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {viabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatViabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {viabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -19352,6 +19827,331 @@ function App() {
                 }
               >
                 {formatUsabilityAdminAction('refresh_usability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {acceptabilityAdminSummary ? (
+          <div className="billing-admin workspace-acceptability-admin">
+            <div className="billing-admin__header">
+              <span>Acceptability admin</span>
+              <strong>{acceptabilityAdminSummary.role}</strong>
+            </div>
+            <p>{acceptabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing record acceptability</span>
+                <strong>
+                  {acceptabilityAdminSummary.stats.acceptabilityPercent}%
+                </strong>
+                <small>
+                  {acceptabilityAdminSummary.stats.coveredDomains}/
+                  {acceptabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Acceptability signals</span>
+                <strong>{acceptabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {acceptabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing records, and billing invoices'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-acceptability-list">
+              {acceptabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-acceptability-card workspace-acceptability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAcceptabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {acceptabilityAdminSummary.availableActions.includes(
+              'refresh_acceptability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={acceptabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAcceptabilityAdminAction(
+                    'refresh_acceptability_summary',
+                  )
+                }
+              >
+                {formatAcceptabilityAdminAction('refresh_acceptability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {adoptabilityAdminSummary ? (
+          <div className="billing-admin workspace-adoptability-admin">
+            <div className="billing-admin__header">
+              <span>Adoptability admin</span>
+              <strong>{adoptabilityAdminSummary.role}</strong>
+            </div>
+            <p>{adoptabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Usage event adoptability</span>
+                <strong>
+                  {adoptabilityAdminSummary.stats.adoptabilityPercent}%
+                </strong>
+                <small>
+                  {adoptabilityAdminSummary.stats.coveredDomains}/
+                  {adoptabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Adoptability signals</span>
+                <strong>{adoptabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {adoptabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, usage events, and workspace memberships'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-adoptability-list">
+              {adoptabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-adoptability-card workspace-adoptability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAdoptabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {adoptabilityAdminSummary.availableActions.includes(
+              'refresh_adoptability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={adoptabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAdoptabilityAdminAction(
+                    'refresh_adoptability_summary',
+                  )
+                }
+              >
+                {formatAdoptabilityAdminAction('refresh_adoptability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {conformanceAdminSummary ? (
+          <div className="billing-admin workspace-conformance-admin">
+            <div className="billing-admin__header">
+              <span>Conformance admin</span>
+              <strong>{conformanceAdminSummary.role}</strong>
+            </div>
+            <p>{conformanceAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan conformance</span>
+                <strong>
+                  {conformanceAdminSummary.stats.conformancePercent}%
+                </strong>
+                <small>
+                  {conformanceAdminSummary.stats.coveredDomains}/
+                  {conformanceAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Conformance signals</span>
+                <strong>{conformanceAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {conformanceAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-conformance-list">
+              {conformanceAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-conformance-card workspace-conformance-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatConformanceDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {conformanceAdminSummary.availableActions.includes(
+              'refresh_conformance_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={conformanceAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleConformanceAdminAction(
+                    'refresh_conformance_summary',
+                  )
+                }
+              >
+                {formatConformanceAdminAction('refresh_conformance_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {feasibilityAdminSummary ? (
+          <div className="billing-admin workspace-feasibility-admin">
+            <div className="billing-admin__header">
+              <span>Feasibility admin</span>
+              <strong>{feasibilityAdminSummary.role}</strong>
+            </div>
+            <p>{feasibilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Provider credential feasibility</span>
+                <strong>
+                  {feasibilityAdminSummary.stats.feasibilityPercent}%
+                </strong>
+                <small>
+                  {feasibilityAdminSummary.stats.coveredDomains}/
+                  {feasibilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Feasibility signals</span>
+                <strong>{feasibilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {feasibilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, provider credentials, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-feasibility-list">
+              {feasibilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-feasibility-card workspace-feasibility-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatFeasibilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {feasibilityAdminSummary.availableActions.includes(
+              'refresh_feasibility_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={feasibilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleFeasibilityAdminAction(
+                    'refresh_feasibility_summary',
+                  )
+                }
+              >
+                {formatFeasibilityAdminAction('refresh_feasibility_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {viabilityAdminSummary ? (
+          <div className="billing-admin workspace-viability-admin">
+            <div className="billing-admin__header">
+              <span>Viability admin</span>
+              <strong>{viabilityAdminSummary.role}</strong>
+            </div>
+            <p>{viabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice viability</span>
+                <strong>
+                  {viabilityAdminSummary.stats.viabilityPercent}%
+                </strong>
+                <small>
+                  {viabilityAdminSummary.stats.coveredDomains}/
+                  {viabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Viability signals</span>
+                <strong>{viabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {viabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-viability-list">
+              {viabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-viability-card workspace-viability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatViabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {viabilityAdminSummary.availableActions.includes(
+              'refresh_viability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={viabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleViabilityAdminAction(
+                    'refresh_viability_summary',
+                  )
+                }
+              >
+                {formatViabilityAdminAction('refresh_viability_summary')}
               </button>
             ) : null}
           </div>

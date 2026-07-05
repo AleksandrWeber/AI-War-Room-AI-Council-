@@ -796,6 +796,36 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.130` behavior:
+
+- Production acceptability rollout readiness validates acceptability coverage and readiness through `GET /api/acceptability/readiness`.
+- Workspace owners and admins can inspect workspace acceptability metrics from `GET /api/acceptability/workspace/:workspaceId/admin`.
+- The web billing panel shows acceptability rollout checks and workspace acceptability admin tools.
+
+Current `v5.129` behavior:
+
+- Production adoptability rollout readiness validates adoptability coverage and readiness through `GET /api/adoptability/readiness`.
+- Workspace owners and admins can inspect workspace adoptability metrics from `GET /api/adoptability/workspace/:workspaceId/admin`.
+- The web billing panel shows adoptability rollout checks and workspace adoptability admin tools.
+
+Current `v5.128` behavior:
+
+- Production conformance rollout readiness validates conformance coverage and readiness through `GET /api/conformance/readiness`.
+- Workspace owners and admins can inspect workspace conformance metrics from `GET /api/conformance/workspace/:workspaceId/admin`.
+- The web billing panel shows conformance rollout checks and workspace conformance admin tools.
+
+Current `v5.127` behavior:
+
+- Production feasibility rollout readiness validates feasibility coverage and readiness through `GET /api/feasibility/readiness`.
+- Workspace owners and admins can inspect workspace feasibility metrics from `GET /api/feasibility/workspace/:workspaceId/admin`.
+- The web billing panel shows feasibility rollout checks and workspace feasibility admin tools.
+
+Current `v5.126` behavior:
+
+- Production viability rollout readiness validates viability coverage and readiness through `GET /api/viability/readiness`.
+- Workspace owners and admins can inspect workspace viability metrics from `GET /api/viability/workspace/:workspaceId/admin`.
+- The web billing panel shows viability rollout checks and workspace viability admin tools.
+
 Current `v5.125` behavior:
 
 - Production survivability rollout readiness validates survivability coverage and readiness through `GET /api/survivability/readiness`.
