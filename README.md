@@ -588,6 +588,25 @@ Workspace compliance admin tools:
 - Only workspace owners and admins can access compliance admin endpoints.
 - The web billing panel shows compliance admin tools for authorized roles.
 
+Production incident response rollout readiness:
+
+- `GET /api/incidents/readiness` returns operator-facing production incident response checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, incident signal table coverage, billing alert escalation, observability incident buffers, and escalation readiness signals.
+- The web billing panel shows incident response rollout status and per-check guidance.
+
+Workspace incident admin tools:
+
+- `GET /api/incidents/workspace/:workspaceId/admin` returns owner/admin incident summary with workspace incident domains.
+- `POST /api/incidents/workspace/:workspaceId/admin/actions` runs incident admin actions such as refreshing the summary.
+- Only workspace owners and admins can access incident admin endpoints.
+- The web billing panel shows incident admin tools for authorized roles.
+
+Current `v5.36` behavior:
+
+- Production incident response rollout readiness validates incident coverage and escalation readiness through `GET /api/incidents/readiness`.
+- Workspace owners and admins can inspect workspace incident metrics from `GET /api/incidents/workspace/:workspaceId/admin`.
+- The web billing panel shows incident response rollout checks and workspace incident admin tools.
+
 Current `v5.35` behavior:
 
 - Production compliance rollout readiness validates policy coverage and attestation readiness through `GET /api/compliance/readiness`.

@@ -44,6 +44,8 @@ import type {
   AuditTrailAdminSummaryResponse,
   ComplianceRolloutResponse,
   ComplianceAdminSummaryResponse,
+  IncidentResponseRolloutResponse,
+  IncidentAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -200,6 +202,15 @@ import {
   formatComplianceRolloutCheckStatus,
   formatComplianceRolloutStatus,
 } from './compliance-ui'
+import {
+  executeIncidentAdminAction,
+  fetchIncidentAdminSummary,
+  fetchIncidentResponseRollout,
+  formatIncidentAdminAction,
+  formatIncidentDomain,
+  formatIncidentResponseRolloutCheckStatus,
+  formatIncidentResponseRolloutStatus,
+} from './incident-response-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -780,6 +791,8 @@ function App() {
     useState<AuditTrailRolloutResponse | null>(null)
   const [complianceRollout, setComplianceRollout] =
     useState<ComplianceRolloutResponse | null>(null)
+  const [incidentResponseRollout, setIncidentResponseRollout] =
+    useState<IncidentResponseRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -887,6 +900,8 @@ function App() {
     useState<AuditTrailAdminSummaryResponse | null>(null)
   const [complianceAdminSummary, setComplianceAdminSummary] =
     useState<ComplianceAdminSummaryResponse | null>(null)
+  const [incidentAdminSummary, setIncidentAdminSummary] =
+    useState<IncidentAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -930,6 +945,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [complianceAdminAction, setComplianceAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [incidentAdminAction, setIncidentAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1228,6 +1246,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setComplianceRollout(null)
+        }
+      })
+
+    fetchIncidentResponseRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setIncidentResponseRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setIncidentResponseRollout(null)
         }
       })
 
@@ -2022,6 +2052,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setComplianceAdminSummary(complianceAdmin)
+
+      const incidentAdmin = await fetchIncidentAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIncidentAdminSummary(incidentAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -2537,6 +2574,33 @@ function App() {
       )
     } finally {
       setComplianceAdminAction('idle')
+    }
+  }
+
+  async function handleIncidentAdminAction(action: 'refresh_incident_summary') {
+    setIncidentAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeIncidentAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchIncidentResponseRollout(apiBaseUrl)
+      setIncidentResponseRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run incident admin action.',
+      )
+    } finally {
+      setIncidentAdminAction('idle')
     }
   }
 
@@ -3653,6 +3717,37 @@ function App() {
               ))}
             </div>
             <small>Checked at {complianceRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {incidentResponseRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production incident response rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${incidentResponseRollout.status}`}
+              >
+                {formatIncidentResponseRolloutStatus(
+                  incidentResponseRollout.status,
+                )}
+              </strong>
+            </div>
+            <p>{incidentResponseRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {incidentResponseRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatIncidentResponseRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {incidentResponseRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -4999,6 +5094,69 @@ function App() {
                 }
               >
                 {formatComplianceAdminAction('refresh_compliance_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {incidentAdminSummary ? (
+          <div className="billing-admin workspace-incident-admin">
+            <div className="billing-admin__header">
+              <span>Incident admin</span>
+              <strong>{incidentAdminSummary.role}</strong>
+            </div>
+            <p>{incidentAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Incident records</span>
+                <strong>{incidentAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {incidentAdminSummary.stats.coveredDomains}/
+                  {incidentAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Observability errors</span>
+                <strong>
+                  {incidentAdminSummary.stats.observabilityErrorEvents}
+                </strong>
+                <small>
+                  {incidentAdminSummary.stats.postgresConnectivity
+                    ? 'Recent workspace error events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-incident-list">
+              {incidentAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-incident-card workspace-incident-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatIncidentDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {incidentAdminSummary.availableActions.includes(
+              'refresh_incident_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={incidentAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleIncidentAdminAction('refresh_incident_summary')
+                }
+              >
+                {formatIncidentAdminAction('refresh_incident_summary')}
               </button>
             ) : null}
           </div>

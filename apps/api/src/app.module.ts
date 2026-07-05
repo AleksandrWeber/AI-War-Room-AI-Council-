@@ -7,6 +7,7 @@ import { DeploymentModule } from './deployment/deployment.module.js'
 import { BackupModule } from './backup/backup.module.js'
 import { AuditModule } from './audit/audit.module.js'
 import { ComplianceModule } from './compliance/compliance.module.js'
+import { IncidentsModule } from './incidents/incidents.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -33,6 +34,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     BackupModule,
     AuditModule,
     ComplianceModule,
+    IncidentsModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,
