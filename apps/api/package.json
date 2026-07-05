@@ -15,7 +15,7 @@
     "worker:temporal": "npm run build && node dist/temporal/temporal.worker.js",
     "worker:temporal:dev": "tsx src/temporal/temporal.worker.ts",
     "lint": "oxlint .",
-    "test": "vitest run",
+    "test": "NODE_OPTIONS='--max-old-space-size=8192' vitest run --fileParallelism=false",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {

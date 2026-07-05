@@ -262,6 +262,16 @@ import { RedundizabilityModule } from './redundizability/redundizability.module.
 import { FailoverizabilityModule } from './failoverizability/failoverizability.module.js'
 import { ContinuizabilityModule } from './continuizability/continuizability.module.js'
 import { SustainizabilityModule } from './sustainizability/sustainizability.module.js'
+import { AvailabilizabilityModule } from './availabilizability/availabilizability.module.js'
+import { TraceabilizabilityModule } from './traceabilizability/traceabilizability.module.js'
+import { MonitorizabilityModule } from './monitorizability/monitorizability.module.js'
+import { AlertabilizabilityModule } from './alertabilizability/alertabilizability.module.js'
+import { ObservabilizabilityModule } from './observabilizability/observabilizability.module.js'
+import { RestorabilizabilityModule } from './restorabilizability/restorabilizability.module.js'
+import { ReplicabilizabilityModule } from './replicabilizability/replicabilizability.module.js'
+import { LoadbalancizabilityModule } from './loadbalancizability/loadbalancizability.module.js'
+import { AutoscalingizabilityModule } from './autoscalingizability/autoscalingizability.module.js'
+import { DeployabilizabilityModule } from './deployabilizability/deployabilizability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -543,6 +553,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     FailoverizabilityModule,
     ContinuizabilityModule,
     SustainizabilityModule,
+    AvailabilizabilityModule,
+    TraceabilizabilityModule,
+    MonitorizabilityModule,
+    AlertabilizabilityModule,
+    ObservabilizabilityModule,
+    RestorabilizabilityModule,
+    ReplicabilizabilityModule,
+    LoadbalancizabilityModule,
+    AutoscalingizabilityModule,
+    DeployabilizabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,
