@@ -1456,7 +1456,19 @@ Current `v5.326` behavior:
 - Workspace owners and admins can inspect workspace compatibilizability metrics from `GET /api/compatibilizability/workspace/:workspaceId/admin`.
 - The web billing panel shows compatibilizability rollout checks and workspace compatibilizability admin tools.
 
-Current `v5.370` behavior:
+Current `v5.380` behavior:
+
+- Production recoveryizability rollout readiness validates recoveryizability coverage and readiness through `GET /api/recoveryizability/readiness`.
+- Workspace owners and admins can inspect workspace recoveryizability metrics from `GET /api/recoveryizability/workspace/:workspaceId/admin`.
+- The web billing panel shows recoveryizability rollout checks and workspace recoveryizability admin tools.
+
+Current `v5.330` behavior:
+
+- Production sequencizability rollout readiness validates sequencizability coverage and readiness through `GET /api/sequencizability/readiness`.
+- Workspace owners and admins can inspect workspace sequencizability metrics from `GET /api/sequencizability/workspace/:workspaceId/admin`.
+- The web billing panel shows sequencizability rollout checks and workspace sequencizability admin tools.
+
+Current `v5.225` behavior:
 
 - Production timeoutizability rollout readiness validates timeoutizability coverage and readiness through `GET /api/timeoutizability/readiness`.
 - Workspace owners and admins can inspect workspace timeoutizability metrics from `GET /api/timeoutizability/workspace/:workspaceId/admin`.

@@ -1,0 +1,19 @@
+import { Module, forwardRef } from '@nestjs/common'
+import { AuthModule } from '../auth/auth.module.js'
+import { PersistenceModule } from '../persistence/persistence.module.js'
+import { WorkspacesModule } from '../workspaces/workspaces.module.js'
+import { SequencizabilityAdminService } from './sequencizability-admin.service.js'
+import { SequencizabilityController } from './sequencizability.controller.js'
+import { SequencizabilityStatusService } from './sequencizability-status.service.js'
+
+@Module({
+  imports: [
+    PersistenceModule,
+    forwardRef(() => AuthModule),
+    WorkspacesModule,
+  ],
+  controllers: [SequencizabilityController],
+  providers: [SequencizabilityStatusService, SequencizabilityAdminService],
+  exports: [SequencizabilityAdminService],
+})
+export class SequencizabilityModule {}

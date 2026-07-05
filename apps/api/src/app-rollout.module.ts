@@ -193,6 +193,16 @@ import { BatchizabilityModule } from './batchizability/batchizability.module.js'
 import { RetryizabilityModule } from './retryizability/retryizability.module.js'
 import { CircuitizabilityModule } from './circuitizability/circuitizability.module.js'
 import { TimeoutizabilityModule } from './timeoutizability/timeoutizability.module.js'
+import { AckizabilityModule } from './ackizability/ackizability.module.js'
+import { NackizabilityModule } from './nackizability/nackizability.module.js'
+import { DeadletterizabilityModule } from './deadletterizability/deadletterizability.module.js'
+import { DedupizabilityModule } from './dedupizability/dedupizability.module.js'
+import { SequencizabilityModule } from './sequencizability/sequencizability.module.js'
+import { PartitionizabilityModule } from './partitionizability/partitionizability.module.js'
+import { ShardingizabilityModule } from './shardingizability/shardingizability.module.js'
+import { OrderingizabilityModule } from './orderingizability/orderingizability.module.js'
+import { CheckpointizabilityModule } from './checkpointizability/checkpointizability.module.js'
+import { RecoveryizabilityModule } from './recoveryizability/recoveryizability.module.js'
 
 @Module({
   imports: [
@@ -390,6 +400,16 @@ import { TimeoutizabilityModule } from './timeoutizability/timeoutizability.modu
     RetryizabilityModule,
     CircuitizabilityModule,
     TimeoutizabilityModule,
+    AckizabilityModule,
+    NackizabilityModule,
+    DeadletterizabilityModule,
+    DedupizabilityModule,
+    SequencizabilityModule,
+    PartitionizabilityModule,
+    ShardingizabilityModule,
+    OrderingizabilityModule,
+    CheckpointizabilityModule,
+    RecoveryizabilityModule,
   ],
   exports: [
     CustomizabilityModule,
