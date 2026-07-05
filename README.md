@@ -666,6 +666,25 @@ Workspace resilience admin tools:
 - Only workspace owners and admins can access resilience admin endpoints.
 - The web billing panel shows resilience admin tools for authorized roles.
 
+Production availability rollout readiness:
+
+- `GET /api/availability/readiness` returns operator-facing production availability checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, availability signal table coverage, API health endpoints, dependency uptime signals, and uptime readiness signals.
+- The web billing panel shows availability rollout status and per-check guidance.
+
+Workspace availability admin tools:
+
+- `GET /api/availability/workspace/:workspaceId/admin` returns owner/admin availability summary with workspace run outcome domains.
+- `POST /api/availability/workspace/:workspaceId/admin/actions` runs availability admin actions such as refreshing the summary.
+- Only workspace owners and admins can access availability admin endpoints.
+- The web billing panel shows availability admin tools for authorized roles.
+
+Current `v5.42` behavior:
+
+- Production availability rollout readiness validates availability coverage and uptime readiness through `GET /api/availability/readiness`.
+- Workspace owners and admins can inspect workspace availability metrics from `GET /api/availability/workspace/:workspaceId/admin`.
+- The web billing panel shows availability rollout checks and workspace availability admin tools.
+
 Current `v5.41` behavior:
 
 - Production resilience rollout readiness validates resilience coverage and recovery readiness through `GET /api/resilience/readiness`.

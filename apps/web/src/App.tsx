@@ -56,6 +56,8 @@ import type {
   PerformanceAdminSummaryResponse,
   ResilienceRolloutResponse,
   ResilienceAdminSummaryResponse,
+  AvailabilityRolloutResponse,
+  AvailabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -266,6 +268,15 @@ import {
   formatResilienceRolloutCheckStatus,
   formatResilienceRolloutStatus,
 } from './resilience-ui'
+import {
+  executeAvailabilityAdminAction,
+  fetchAvailabilityAdminSummary,
+  fetchAvailabilityRollout,
+  formatAvailabilityAdminAction,
+  formatAvailabilityDomain,
+  formatAvailabilityRolloutCheckStatus,
+  formatAvailabilityRolloutStatus,
+} from './availability-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -857,6 +868,8 @@ function App() {
     useState<PerformanceRolloutResponse | null>(null)
   const [resilienceRollout, setResilienceRollout] =
     useState<ResilienceRolloutResponse | null>(null)
+  const [availabilityRollout, setAvailabilityRollout] =
+    useState<AvailabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -976,6 +989,8 @@ function App() {
     useState<PerformanceAdminSummaryResponse | null>(null)
   const [resilienceAdminSummary, setResilienceAdminSummary] =
     useState<ResilienceAdminSummaryResponse | null>(null)
+  const [availabilityAdminSummary, setAvailabilityAdminSummary] =
+    useState<AvailabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1037,6 +1052,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [resilienceAdminAction, setResilienceAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [availabilityAdminAction, setAvailabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1407,6 +1425,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setResilienceRollout(null)
+        }
+      })
+
+    fetchAvailabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAvailabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAvailabilityRollout(null)
         }
       })
 
@@ -2243,6 +2273,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setResilienceAdminSummary(resilienceAdmin)
+
+      const availabilityAdmin = await fetchAvailabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAvailabilityAdminSummary(availabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -2924,6 +2961,35 @@ function App() {
       )
     } finally {
       setResilienceAdminAction('idle')
+    }
+  }
+
+  async function handleAvailabilityAdminAction(
+    action: 'refresh_availability_summary',
+  ) {
+    setAvailabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAvailabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAvailabilityRollout(apiBaseUrl)
+      setAvailabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run availability admin action.',
+      )
+    } finally {
+      setAvailabilityAdminAction('idle')
     }
   }
 
@@ -4210,6 +4276,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {resilienceRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {availabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production availability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${availabilityRollout.status}`}
+              >
+                {formatAvailabilityRolloutStatus(availabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{availabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {availabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAvailabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {availabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -5924,6 +6019,67 @@ function App() {
                 }
               >
                 {formatResilienceAdminAction('refresh_resilience_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {availabilityAdminSummary ? (
+          <div className="billing-admin workspace-availability-admin">
+            <div className="billing-admin__header">
+              <span>Availability admin</span>
+              <strong>{availabilityAdminSummary.role}</strong>
+            </div>
+            <p>{availabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Run availability</span>
+                <strong>{availabilityAdminSummary.stats.availabilityPercent}%</strong>
+                <small>
+                  {availabilityAdminSummary.stats.coveredDomains}/
+                  {availabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Availability signals</span>
+                <strong>{availabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {availabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcome and usage availability signals'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-availability-list">
+              {availabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-availability-card workspace-availability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAvailabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {availabilityAdminSummary.availableActions.includes(
+              'refresh_availability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={availabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAvailabilityAdminAction('refresh_availability_summary')
+                }
+              >
+                {formatAvailabilityAdminAction('refresh_availability_summary')}
               </button>
             ) : null}
           </div>

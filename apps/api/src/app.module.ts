@@ -13,6 +13,7 @@ import { SloModule } from './slo/slo.module.js'
 import { CapacityModule } from './capacity/capacity.module.js'
 import { PerformanceModule } from './performance/performance.module.js'
 import { ResilienceModule } from './resilience/resilience.module.js'
+import { AvailabilityModule } from './availability/availability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -45,6 +46,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     CapacityModule,
     PerformanceModule,
     ResilienceModule,
+    AvailabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,
