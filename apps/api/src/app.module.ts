@@ -252,6 +252,16 @@ import { IterativizabilityModule } from './iterativizability/iterativizability.m
 import { ConvergizabilityModule } from './convergizability/convergizability.module.js'
 import { StabilizabilityModule } from './stabilizability/stabilizability.module.js'
 import { AdaptizabilityModule } from './adaptizability/adaptizability.module.js'
+import { ScalabilizabilityModule } from './scalabilizability/scalabilizability.module.js'
+import { ElasticizabilityModule } from './elasticizability/elasticizability.module.js'
+import { ResilientizabilityModule } from './resilientizability/resilientizability.module.js'
+import { RobustizabilityModule } from './robustizability/robustizability.module.js'
+import { DependableizabilityModule } from './dependableizability/dependableizability.module.js'
+import { RecoverizabilityModule } from './recoverizability/recoverizability.module.js'
+import { RedundizabilityModule } from './redundizability/redundizability.module.js'
+import { FailoverizabilityModule } from './failoverizability/failoverizability.module.js'
+import { ContinuizabilityModule } from './continuizability/continuizability.module.js'
+import { SustainizabilityModule } from './sustainizability/sustainizability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -523,6 +533,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     ConvergizabilityModule,
     StabilizabilityModule,
     AdaptizabilityModule,
+    ScalabilizabilityModule,
+    ElasticizabilityModule,
+    ResilientizabilityModule,
+    RobustizabilityModule,
+    DependableizabilityModule,
+    RecoverizabilityModule,
+    RedundizabilityModule,
+    FailoverizabilityModule,
+    ContinuizabilityModule,
+    SustainizabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

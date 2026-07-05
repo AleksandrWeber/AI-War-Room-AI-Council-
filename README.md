@@ -1096,6 +1096,36 @@ Current `v5.266` behavior:
 - Workspace owners and admins can inspect workspace interpolizability metrics from `GET /api/interpolizability/workspace/:workspaceId/admin`.
 - The web billing panel shows interpolizability rollout checks and workspace interpolizability admin tools.
 
+Current `v5.285` behavior:
+
+- Production dependableizability rollout readiness validates dependableizability coverage and readiness through `GET /api/dependableizability/readiness`.
+- Workspace owners and admins can inspect workspace dependableizability metrics from `GET /api/dependableizability/workspace/:workspaceId/admin`.
+- The web billing panel shows dependableizability rollout checks and workspace dependableizability admin tools.
+
+Current `v5.284` behavior:
+
+- Production robustizability rollout readiness validates robustizability coverage and readiness through `GET /api/robustizability/readiness`.
+- Workspace owners and admins can inspect workspace robustizability metrics from `GET /api/robustizability/workspace/:workspaceId/admin`.
+- The web billing panel shows robustizability rollout checks and workspace robustizability admin tools.
+
+Current `v5.283` behavior:
+
+- Production resilientizability rollout readiness validates resilientizability coverage and readiness through `GET /api/resilientizability/readiness`.
+- Workspace owners and admins can inspect workspace resilientizability metrics from `GET /api/resilientizability/workspace/:workspaceId/admin`.
+- The web billing panel shows resilientizability rollout checks and workspace resilientizability admin tools.
+
+Current `v5.282` behavior:
+
+- Production elasticizability rollout readiness validates elasticizability coverage and readiness through `GET /api/elasticizability/readiness`.
+- Workspace owners and admins can inspect workspace elasticizability metrics from `GET /api/elasticizability/workspace/:workspaceId/admin`.
+- The web billing panel shows elasticizability rollout checks and workspace elasticizability admin tools.
+
+Current `v5.281` behavior:
+
+- Production scalabilizability rollout readiness validates scalabilizability coverage and readiness through `GET /api/scalabilizability/readiness`.
+- Workspace owners and admins can inspect workspace scalabilizability metrics from `GET /api/scalabilizability/workspace/:workspaceId/admin`.
+- The web billing panel shows scalabilizability rollout checks and workspace scalabilizability admin tools.
+
 Current `v5.280` behavior:
 
 - Production adaptizability rollout readiness validates adaptizability coverage and readiness through `GET /api/adaptizability/readiness`.
@@ -1125,6 +1155,36 @@ Current `v5.276` behavior:
 - Production approximatizability rollout readiness validates approximatizability coverage and readiness through `GET /api/approximatizability/readiness`.
 - Workspace owners and admins can inspect workspace approximatizability metrics from `GET /api/approximatizability/workspace/:workspaceId/admin`.
 - The web billing panel shows approximatizability rollout checks and workspace approximatizability admin tools.
+
+Current `v5.290` behavior:
+
+- Production sustainizability rollout readiness validates sustainizability coverage and readiness through `GET /api/sustainizability/readiness`.
+- Workspace owners and admins can inspect workspace sustainizability metrics from `GET /api/sustainizability/workspace/:workspaceId/admin`.
+- The web billing panel shows sustainizability rollout checks and workspace sustainizability admin tools.
+
+Current `v5.289` behavior:
+
+- Production continuizability rollout readiness validates continuizability coverage and readiness through `GET /api/continuizability/readiness`.
+- Workspace owners and admins can inspect workspace continuizability metrics from `GET /api/continuizability/workspace/:workspaceId/admin`.
+- The web billing panel shows continuizability rollout checks and workspace continuizability admin tools.
+
+Current `v5.288` behavior:
+
+- Production failoverizability rollout readiness validates failoverizability coverage and readiness through `GET /api/failoverizability/readiness`.
+- Workspace owners and admins can inspect workspace failoverizability metrics from `GET /api/failoverizability/workspace/:workspaceId/admin`.
+- The web billing panel shows failoverizability rollout checks and workspace failoverizability admin tools.
+
+Current `v5.287` behavior:
+
+- Production redundizability rollout readiness validates redundizability coverage and readiness through `GET /api/redundizability/readiness`.
+- Workspace owners and admins can inspect workspace redundizability metrics from `GET /api/redundizability/workspace/:workspaceId/admin`.
+- The web billing panel shows redundizability rollout checks and workspace redundizability admin tools.
+
+Current `v5.286` behavior:
+
+- Production recoverizability rollout readiness validates recoverizability coverage and readiness through `GET /api/recoverizability/readiness`.
+- Workspace owners and admins can inspect workspace recoverizability metrics from `GET /api/recoverizability/workspace/:workspaceId/admin`.
+- The web billing panel shows recoverizability rollout checks and workspace recoverizability admin tools.
 
 Current `v5.225` behavior:
 

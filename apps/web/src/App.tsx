@@ -534,6 +534,26 @@ import type {
   StabilizabilityAdminSummaryResponse,
   AdaptizabilityRolloutResponse,
   AdaptizabilityAdminSummaryResponse,
+  ScalabilizabilityRolloutResponse,
+  ScalabilizabilityAdminSummaryResponse,
+  ElasticizabilityRolloutResponse,
+  ElasticizabilityAdminSummaryResponse,
+  ResilientizabilityRolloutResponse,
+  ResilientizabilityAdminSummaryResponse,
+  RobustizabilityRolloutResponse,
+  RobustizabilityAdminSummaryResponse,
+  DependableizabilityRolloutResponse,
+  DependableizabilityAdminSummaryResponse,
+  RecoverizabilityRolloutResponse,
+  RecoverizabilityAdminSummaryResponse,
+  RedundizabilityRolloutResponse,
+  RedundizabilityAdminSummaryResponse,
+  FailoverizabilityRolloutResponse,
+  FailoverizabilityAdminSummaryResponse,
+  ContinuizabilityRolloutResponse,
+  ContinuizabilityAdminSummaryResponse,
+  SustainizabilityRolloutResponse,
+  SustainizabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -2896,6 +2916,96 @@ import {
   formatAdaptizabilityRolloutStatus,
 } from './adaptizability-ui'
 import {
+  executeScalabilizabilityAdminAction,
+  fetchScalabilizabilityAdminSummary,
+  fetchScalabilizabilityRollout,
+  formatScalabilizabilityAdminAction,
+  formatScalabilizabilityDomain,
+  formatScalabilizabilityRolloutCheckStatus,
+  formatScalabilizabilityRolloutStatus,
+} from './scalabilizability-ui'
+import {
+  executeElasticizabilityAdminAction,
+  fetchElasticizabilityAdminSummary,
+  fetchElasticizabilityRollout,
+  formatElasticizabilityAdminAction,
+  formatElasticizabilityDomain,
+  formatElasticizabilityRolloutCheckStatus,
+  formatElasticizabilityRolloutStatus,
+} from './elasticizability-ui'
+import {
+  executeResilientizabilityAdminAction,
+  fetchResilientizabilityAdminSummary,
+  fetchResilientizabilityRollout,
+  formatResilientizabilityAdminAction,
+  formatResilientizabilityDomain,
+  formatResilientizabilityRolloutCheckStatus,
+  formatResilientizabilityRolloutStatus,
+} from './resilientizability-ui'
+import {
+  executeRobustizabilityAdminAction,
+  fetchRobustizabilityAdminSummary,
+  fetchRobustizabilityRollout,
+  formatRobustizabilityAdminAction,
+  formatRobustizabilityDomain,
+  formatRobustizabilityRolloutCheckStatus,
+  formatRobustizabilityRolloutStatus,
+} from './robustizability-ui'
+import {
+  executeDependableizabilityAdminAction,
+  fetchDependableizabilityAdminSummary,
+  fetchDependableizabilityRollout,
+  formatDependableizabilityAdminAction,
+  formatDependableizabilityDomain,
+  formatDependableizabilityRolloutCheckStatus,
+  formatDependableizabilityRolloutStatus,
+} from './dependableizability-ui'
+import {
+  executeRecoverizabilityAdminAction,
+  fetchRecoverizabilityAdminSummary,
+  fetchRecoverizabilityRollout,
+  formatRecoverizabilityAdminAction,
+  formatRecoverizabilityDomain,
+  formatRecoverizabilityRolloutCheckStatus,
+  formatRecoverizabilityRolloutStatus,
+} from './recoverizability-ui'
+import {
+  executeRedundizabilityAdminAction,
+  fetchRedundizabilityAdminSummary,
+  fetchRedundizabilityRollout,
+  formatRedundizabilityAdminAction,
+  formatRedundizabilityDomain,
+  formatRedundizabilityRolloutCheckStatus,
+  formatRedundizabilityRolloutStatus,
+} from './redundizability-ui'
+import {
+  executeFailoverizabilityAdminAction,
+  fetchFailoverizabilityAdminSummary,
+  fetchFailoverizabilityRollout,
+  formatFailoverizabilityAdminAction,
+  formatFailoverizabilityDomain,
+  formatFailoverizabilityRolloutCheckStatus,
+  formatFailoverizabilityRolloutStatus,
+} from './failoverizability-ui'
+import {
+  executeContinuizabilityAdminAction,
+  fetchContinuizabilityAdminSummary,
+  fetchContinuizabilityRollout,
+  formatContinuizabilityAdminAction,
+  formatContinuizabilityDomain,
+  formatContinuizabilityRolloutCheckStatus,
+  formatContinuizabilityRolloutStatus,
+} from './continuizability-ui'
+import {
+  executeSustainizabilityAdminAction,
+  fetchSustainizabilityAdminSummary,
+  fetchSustainizabilityRollout,
+  formatSustainizabilityAdminAction,
+  formatSustainizabilityDomain,
+  formatSustainizabilityRolloutCheckStatus,
+  formatSustainizabilityRolloutStatus,
+} from './sustainizability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -3964,6 +4074,26 @@ function App() {
     useState<StabilizabilityRolloutResponse | null>(null)
   const [adaptizabilityRollout, setAdaptizabilityRollout] =
     useState<AdaptizabilityRolloutResponse | null>(null)
+  const [scalabilizabilityRollout, setScalabilizabilityRollout] =
+    useState<ScalabilizabilityRolloutResponse | null>(null)
+  const [elasticizabilityRollout, setElasticizabilityRollout] =
+    useState<ElasticizabilityRolloutResponse | null>(null)
+  const [resilientizabilityRollout, setResilientizabilityRollout] =
+    useState<ResilientizabilityRolloutResponse | null>(null)
+  const [robustizabilityRollout, setRobustizabilityRollout] =
+    useState<RobustizabilityRolloutResponse | null>(null)
+  const [dependableizabilityRollout, setDependableizabilityRollout] =
+    useState<DependableizabilityRolloutResponse | null>(null)
+  const [recoverizabilityRollout, setRecoverizabilityRollout] =
+    useState<RecoverizabilityRolloutResponse | null>(null)
+  const [redundizabilityRollout, setRedundizabilityRollout] =
+    useState<RedundizabilityRolloutResponse | null>(null)
+  const [failoverizabilityRollout, setFailoverizabilityRollout] =
+    useState<FailoverizabilityRolloutResponse | null>(null)
+  const [continuizabilityRollout, setContinuizabilityRollout] =
+    useState<ContinuizabilityRolloutResponse | null>(null)
+  const [sustainizabilityRollout, setSustainizabilityRollout] =
+    useState<SustainizabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -4561,6 +4691,26 @@ function App() {
     useState<StabilizabilityAdminSummaryResponse | null>(null)
   const [adaptizabilityAdminSummary, setAdaptizabilityAdminSummary] =
     useState<AdaptizabilityAdminSummaryResponse | null>(null)
+  const [scalabilizabilityAdminSummary, setScalabilizabilityAdminSummary] =
+    useState<ScalabilizabilityAdminSummaryResponse | null>(null)
+  const [elasticizabilityAdminSummary, setElasticizabilityAdminSummary] =
+    useState<ElasticizabilityAdminSummaryResponse | null>(null)
+  const [resilientizabilityAdminSummary, setResilientizabilityAdminSummary] =
+    useState<ResilientizabilityAdminSummaryResponse | null>(null)
+  const [robustizabilityAdminSummary, setRobustizabilityAdminSummary] =
+    useState<RobustizabilityAdminSummaryResponse | null>(null)
+  const [dependableizabilityAdminSummary, setDependableizabilityAdminSummary] =
+    useState<DependableizabilityAdminSummaryResponse | null>(null)
+  const [recoverizabilityAdminSummary, setRecoverizabilityAdminSummary] =
+    useState<RecoverizabilityAdminSummaryResponse | null>(null)
+  const [redundizabilityAdminSummary, setRedundizabilityAdminSummary] =
+    useState<RedundizabilityAdminSummaryResponse | null>(null)
+  const [failoverizabilityAdminSummary, setFailoverizabilityAdminSummary] =
+    useState<FailoverizabilityAdminSummaryResponse | null>(null)
+  const [continuizabilityAdminSummary, setContinuizabilityAdminSummary] =
+    useState<ContinuizabilityAdminSummaryResponse | null>(null)
+  const [sustainizabilityAdminSummary, setSustainizabilityAdminSummary] =
+    useState<SustainizabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -5339,6 +5489,36 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [adaptizabilityAdminAction, setAdaptizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [scalabilizabilityAdminAction, setScalabilizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [elasticizabilityAdminAction, setElasticizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [resilientizabilityAdminAction, setResilientizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [robustizabilityAdminAction, setRobustizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [dependableizabilityAdminAction, setDependableizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [recoverizabilityAdminAction, setRecoverizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [redundizabilityAdminAction, setRedundizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [failoverizabilityAdminAction, setFailoverizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [continuizabilityAdminAction, setContinuizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [sustainizabilityAdminAction, setSustainizabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -8580,6 +8760,126 @@ function App() {
         }
       })
 
+    fetchScalabilizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setScalabilizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setScalabilizabilityRollout(null)
+        }
+      })
+
+    fetchElasticizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setElasticizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setElasticizabilityRollout(null)
+        }
+      })
+
+    fetchResilientizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setResilientizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setResilientizabilityRollout(null)
+        }
+      })
+
+    fetchRobustizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setRobustizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setRobustizabilityRollout(null)
+        }
+      })
+
+    fetchDependableizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setDependableizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDependableizabilityRollout(null)
+        }
+      })
+
+    fetchRecoverizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setRecoverizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setRecoverizabilityRollout(null)
+        }
+      })
+
+    fetchRedundizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setRedundizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setRedundizabilityRollout(null)
+        }
+      })
+
+    fetchFailoverizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setFailoverizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setFailoverizabilityRollout(null)
+        }
+      })
+
+    fetchContinuizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setContinuizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setContinuizabilityRollout(null)
+        }
+      })
+
+    fetchSustainizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setSustainizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setSustainizabilityRollout(null)
+        }
+      })
+
     fetchUsageCapabilities(apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
@@ -11086,6 +11386,76 @@ function App() {
         workspaceAuthHeaders,
       )
       setAdaptizabilityAdminSummary(adaptizabilityAdmin)
+
+      const scalabilizabilityAdmin = await fetchScalabilizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setScalabilizabilityAdminSummary(scalabilizabilityAdmin)
+
+      const elasticizabilityAdmin = await fetchElasticizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setElasticizabilityAdminSummary(elasticizabilityAdmin)
+
+      const resilientizabilityAdmin = await fetchResilientizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setResilientizabilityAdminSummary(resilientizabilityAdmin)
+
+      const robustizabilityAdmin = await fetchRobustizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRobustizabilityAdminSummary(robustizabilityAdmin)
+
+      const dependableizabilityAdmin = await fetchDependableizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDependableizabilityAdminSummary(dependableizabilityAdmin)
+
+      const recoverizabilityAdmin = await fetchRecoverizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRecoverizabilityAdminSummary(recoverizabilityAdmin)
+
+      const redundizabilityAdmin = await fetchRedundizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRedundizabilityAdminSummary(redundizabilityAdmin)
+
+      const failoverizabilityAdmin = await fetchFailoverizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFailoverizabilityAdminSummary(failoverizabilityAdmin)
+
+      const continuizabilityAdmin = await fetchContinuizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setContinuizabilityAdminSummary(continuizabilityAdmin)
+
+      const sustainizabilityAdmin = await fetchSustainizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSustainizabilityAdminSummary(sustainizabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -12318,6 +12688,296 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleSustainizabilityAdminAction(
+    action: 'refresh_sustainizability_summary',
+  ) {
+    setSustainizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeSustainizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchSustainizabilityRollout(apiBaseUrl)
+      setSustainizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run sustainizability admin action.',
+      )
+    } finally {
+      setSustainizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleContinuizabilityAdminAction(
+    action: 'refresh_continuizability_summary',
+  ) {
+    setContinuizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeContinuizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchContinuizabilityRollout(apiBaseUrl)
+      setContinuizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run continuizability admin action.',
+      )
+    } finally {
+      setContinuizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleFailoverizabilityAdminAction(
+    action: 'refresh_failoverizability_summary',
+  ) {
+    setFailoverizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeFailoverizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchFailoverizabilityRollout(apiBaseUrl)
+      setFailoverizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run failoverizability admin action.',
+      )
+    } finally {
+      setFailoverizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleRedundizabilityAdminAction(
+    action: 'refresh_redundizability_summary',
+  ) {
+    setRedundizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeRedundizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchRedundizabilityRollout(apiBaseUrl)
+      setRedundizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run redundizability admin action.',
+      )
+    } finally {
+      setRedundizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleRecoverizabilityAdminAction(
+    action: 'refresh_recoverizability_summary',
+  ) {
+    setRecoverizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeRecoverizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchRecoverizabilityRollout(apiBaseUrl)
+      setRecoverizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run recoverizability admin action.',
+      )
+    } finally {
+      setRecoverizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleDependableizabilityAdminAction(
+    action: 'refresh_dependableizability_summary',
+  ) {
+    setDependableizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeDependableizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchDependableizabilityRollout(apiBaseUrl)
+      setDependableizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run dependableizability admin action.',
+      )
+    } finally {
+      setDependableizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleRobustizabilityAdminAction(
+    action: 'refresh_robustizability_summary',
+  ) {
+    setRobustizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeRobustizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchRobustizabilityRollout(apiBaseUrl)
+      setRobustizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run robustizability admin action.',
+      )
+    } finally {
+      setRobustizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleResilientizabilityAdminAction(
+    action: 'refresh_resilientizability_summary',
+  ) {
+    setResilientizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeResilientizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchResilientizabilityRollout(apiBaseUrl)
+      setResilientizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run resilientizability admin action.',
+      )
+    } finally {
+      setResilientizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleElasticizabilityAdminAction(
+    action: 'refresh_elasticizability_summary',
+  ) {
+    setElasticizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeElasticizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchElasticizabilityRollout(apiBaseUrl)
+      setElasticizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run elasticizability admin action.',
+      )
+    } finally {
+      setElasticizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleScalabilizabilityAdminAction(
+    action: 'refresh_scalabilizability_summary',
+  ) {
+    setScalabilizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeScalabilizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchScalabilizabilityRollout(apiBaseUrl)
+      setScalabilizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run scalabilizability admin action.',
+      )
+    } finally {
+      setScalabilizabilityAdminAction('idle')
     }
   }
 
@@ -26915,6 +27575,296 @@ function App() {
               ))}
             </div>
             <small>Checked at {approximatizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {dependableizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production dependableizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${dependableizabilityRollout.status}`}
+              >
+                {formatDependableizabilityRolloutStatus(dependableizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{dependableizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {dependableizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatDependableizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {dependableizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {robustizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production robustizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${robustizabilityRollout.status}`}
+              >
+                {formatRobustizabilityRolloutStatus(robustizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{robustizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {robustizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatRobustizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {robustizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {resilientizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production resilientizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${resilientizabilityRollout.status}`}
+              >
+                {formatResilientizabilityRolloutStatus(resilientizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{resilientizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {resilientizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatResilientizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {resilientizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {elasticizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production elasticizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${elasticizabilityRollout.status}`}
+              >
+                {formatElasticizabilityRolloutStatus(elasticizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{elasticizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {elasticizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatElasticizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {elasticizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {scalabilizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production scalabilizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${scalabilizabilityRollout.status}`}
+              >
+                {formatScalabilizabilityRolloutStatus(scalabilizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{scalabilizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {scalabilizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatScalabilizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {scalabilizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {sustainizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production sustainizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${sustainizabilityRollout.status}`}
+              >
+                {formatSustainizabilityRolloutStatus(sustainizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{sustainizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {sustainizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatSustainizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {sustainizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {continuizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production continuizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${continuizabilityRollout.status}`}
+              >
+                {formatContinuizabilityRolloutStatus(continuizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{continuizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {continuizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatContinuizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {continuizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {failoverizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production failoverizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${failoverizabilityRollout.status}`}
+              >
+                {formatFailoverizabilityRolloutStatus(failoverizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{failoverizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {failoverizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatFailoverizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {failoverizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {redundizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production redundizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${redundizabilityRollout.status}`}
+              >
+                {formatRedundizabilityRolloutStatus(redundizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{redundizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {redundizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatRedundizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {redundizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {recoverizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production recoverizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${recoverizabilityRollout.status}`}
+              >
+                {formatRecoverizabilityRolloutStatus(recoverizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{recoverizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {recoverizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatRecoverizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {recoverizabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -44152,6 +45102,656 @@ function App() {
                 }
               >
                 {formatApproximatizabilityAdminAction('refresh_approximatizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {dependableizabilityAdminSummary ? (
+          <div className="billing-admin workspace-dependableizability-admin">
+            <div className="billing-admin__header">
+              <span>Dependableizability admin</span>
+              <strong>{dependableizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{dependableizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification dependableizability</span>
+                <strong>
+                  {dependableizabilityAdminSummary.stats.dependableizabilityPercent}%
+                </strong>
+                <small>
+                  {dependableizabilityAdminSummary.stats.coveredDomains}/
+                  {dependableizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Dependableizability signals</span>
+                <strong>{dependableizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {dependableizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-dependableizability-list">
+              {dependableizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-dependableizability-card workspace-dependableizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatDependableizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {dependableizabilityAdminSummary.availableActions.includes(
+              'refresh_dependableizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={dependableizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleDependableizabilityAdminAction(
+                    'refresh_dependableizability_summary',
+                  )
+                }
+              >
+                {formatDependableizabilityAdminAction('refresh_dependableizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {robustizabilityAdminSummary ? (
+          <div className="billing-admin workspace-robustizability-admin">
+            <div className="billing-admin__header">
+              <span>Robustizability admin</span>
+              <strong>{robustizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{robustizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice robustizability</span>
+                <strong>
+                  {robustizabilityAdminSummary.stats.robustizabilityPercent}%
+                </strong>
+                <small>
+                  {robustizabilityAdminSummary.stats.coveredDomains}/
+                  {robustizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Robustizability signals</span>
+                <strong>{robustizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {robustizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-robustizability-list">
+              {robustizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-robustizability-card workspace-robustizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatRobustizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {robustizabilityAdminSummary.availableActions.includes(
+              'refresh_robustizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={robustizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleRobustizabilityAdminAction(
+                    'refresh_robustizability_summary',
+                  )
+                }
+              >
+                {formatRobustizabilityAdminAction('refresh_robustizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {resilientizabilityAdminSummary ? (
+          <div className="billing-admin workspace-resilientizability-admin">
+            <div className="billing-admin__header">
+              <span>Resilientizability admin</span>
+              <strong>{resilientizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{resilientizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership resilientizability</span>
+                <strong>
+                  {resilientizabilityAdminSummary.stats.resilientizabilityPercent}%
+                </strong>
+                <small>
+                  {resilientizabilityAdminSummary.stats.coveredDomains}/
+                  {resilientizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Resilientizability signals</span>
+                <strong>{resilientizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {resilientizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-resilientizability-list">
+              {resilientizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-resilientizability-card workspace-resilientizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatResilientizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {resilientizabilityAdminSummary.availableActions.includes(
+              'refresh_resilientizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={resilientizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleResilientizabilityAdminAction(
+                    'refresh_resilientizability_summary',
+                  )
+                }
+              >
+                {formatResilientizabilityAdminAction('refresh_resilientizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {elasticizabilityAdminSummary ? (
+          <div className="billing-admin workspace-elasticizability-admin">
+            <div className="billing-admin__header">
+              <span>Elasticizability admin</span>
+              <strong>{elasticizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{elasticizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key elasticizability</span>
+                <strong>
+                  {elasticizabilityAdminSummary.stats.elasticizabilityPercent}%
+                </strong>
+                <small>
+                  {elasticizabilityAdminSummary.stats.coveredDomains}/
+                  {elasticizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Elasticizability signals</span>
+                <strong>{elasticizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {elasticizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-elasticizability-list">
+              {elasticizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-elasticizability-card workspace-elasticizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatElasticizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {elasticizabilityAdminSummary.availableActions.includes(
+              'refresh_elasticizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={elasticizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleElasticizabilityAdminAction(
+                    'refresh_elasticizability_summary',
+                  )
+                }
+              >
+                {formatElasticizabilityAdminAction('refresh_elasticizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {scalabilizabilityAdminSummary ? (
+          <div className="billing-admin workspace-scalabilizability-admin">
+            <div className="billing-admin__header">
+              <span>Scalabilizability admin</span>
+              <strong>{scalabilizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{scalabilizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan scalabilizability</span>
+                <strong>
+                  {scalabilizabilityAdminSummary.stats.scalabilizabilityPercent}%
+                </strong>
+                <small>
+                  {scalabilizabilityAdminSummary.stats.coveredDomains}/
+                  {scalabilizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Scalabilizability signals</span>
+                <strong>{scalabilizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {scalabilizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-scalabilizability-list">
+              {scalabilizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-scalabilizability-card workspace-scalabilizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatScalabilizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {scalabilizabilityAdminSummary.availableActions.includes(
+              'refresh_scalabilizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={scalabilizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleScalabilizabilityAdminAction(
+                    'refresh_scalabilizability_summary',
+                  )
+                }
+              >
+                {formatScalabilizabilityAdminAction('refresh_scalabilizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {sustainizabilityAdminSummary ? (
+          <div className="billing-admin workspace-sustainizability-admin">
+            <div className="billing-admin__header">
+              <span>Sustainizability admin</span>
+              <strong>{sustainizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{sustainizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Model health sustainizability</span>
+                <strong>
+                  {sustainizabilityAdminSummary.stats.sustainizabilityPercent}%
+                </strong>
+                <small>
+                  {sustainizabilityAdminSummary.stats.coveredDomains}/
+                  {sustainizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Sustainizability signals</span>
+                <strong>{sustainizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {sustainizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, model health events, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-sustainizability-list">
+              {sustainizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-sustainizability-card workspace-sustainizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatSustainizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {sustainizabilityAdminSummary.availableActions.includes(
+              'refresh_sustainizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={sustainizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleSustainizabilityAdminAction(
+                    'refresh_sustainizability_summary',
+                  )
+                }
+              >
+                {formatSustainizabilityAdminAction('refresh_sustainizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {continuizabilityAdminSummary ? (
+          <div className="billing-admin workspace-continuizability-admin">
+            <div className="billing-admin__header">
+              <span>Continuizability admin</span>
+              <strong>{continuizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{continuizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Provider credential continuizability</span>
+                <strong>
+                  {continuizabilityAdminSummary.stats.continuizabilityPercent}%
+                </strong>
+                <small>
+                  {continuizabilityAdminSummary.stats.coveredDomains}/
+                  {continuizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Continuizability signals</span>
+                <strong>{continuizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {continuizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, provider credentials, and model registry entries'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-continuizability-list">
+              {continuizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-continuizability-card workspace-continuizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatContinuizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {continuizabilityAdminSummary.availableActions.includes(
+              'refresh_continuizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={continuizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleContinuizabilityAdminAction(
+                    'refresh_continuizability_summary',
+                  )
+                }
+              >
+                {formatContinuizabilityAdminAction('refresh_continuizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {failoverizabilityAdminSummary ? (
+          <div className="billing-admin workspace-failoverizability-admin">
+            <div className="billing-admin__header">
+              <span>Failoverizability admin</span>
+              <strong>{failoverizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{failoverizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workspace limit failoverizability</span>
+                <strong>
+                  {failoverizabilityAdminSummary.stats.failoverizabilityPercent}%
+                </strong>
+                <small>
+                  {failoverizabilityAdminSummary.stats.coveredDomains}/
+                  {failoverizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Failoverizability signals</span>
+                <strong>{failoverizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {failoverizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace usage limits, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-failoverizability-list">
+              {failoverizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-failoverizability-card workspace-failoverizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatFailoverizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {failoverizabilityAdminSummary.availableActions.includes(
+              'refresh_failoverizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={failoverizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleFailoverizabilityAdminAction(
+                    'refresh_failoverizability_summary',
+                  )
+                }
+              >
+                {formatFailoverizabilityAdminAction('refresh_failoverizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {redundizabilityAdminSummary ? (
+          <div className="billing-admin workspace-redundizability-admin">
+            <div className="billing-admin__header">
+              <span>Redundizability admin</span>
+              <strong>{redundizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{redundizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Meter usage redundizability</span>
+                <strong>
+                  {redundizabilityAdminSummary.stats.redundizabilityPercent}%
+                </strong>
+                <small>
+                  {redundizabilityAdminSummary.stats.coveredDomains}/
+                  {redundizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Redundizability signals</span>
+                <strong>{redundizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {redundizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, meter usage reports, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-redundizability-list">
+              {redundizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-redundizability-card workspace-redundizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatRedundizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {redundizabilityAdminSummary.availableActions.includes(
+              'refresh_redundizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={redundizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleRedundizabilityAdminAction(
+                    'refresh_redundizability_summary',
+                  )
+                }
+              >
+                {formatRedundizabilityAdminAction('refresh_redundizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {recoverizabilityAdminSummary ? (
+          <div className="billing-admin workspace-recoverizability-admin">
+            <div className="billing-admin__header">
+              <span>Recoverizability admin</span>
+              <strong>{recoverizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{recoverizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing webhook recoverizability</span>
+                <strong>
+                  {recoverizabilityAdminSummary.stats.recoverizabilityPercent}%
+                </strong>
+                <small>
+                  {recoverizabilityAdminSummary.stats.coveredDomains}/
+                  {recoverizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Recoverizability signals</span>
+                <strong>{recoverizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {recoverizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing webhook events, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-recoverizability-list">
+              {recoverizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-recoverizability-card workspace-recoverizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatRecoverizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {recoverizabilityAdminSummary.availableActions.includes(
+              'refresh_recoverizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={recoverizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleRecoverizabilityAdminAction(
+                    'refresh_recoverizability_summary',
+                  )
+                }
+              >
+                {formatRecoverizabilityAdminAction('refresh_recoverizability_summary')}
               </button>
             ) : null}
           </div>
