@@ -1,0 +1,119 @@
+import {
+  distinctivenessAdminActionResponseSchema,
+  distinctivenessAdminSummaryResponseSchema,
+  distinctivenessCapabilitiesResponseSchema,
+  distinctivenessRolloutResponseSchema,
+} from '@ai-war-room/schemas'
+
+export async function fetchDistinctivenessRollout(apiBaseUrl: string) {
+  const response = await fetch(`${apiBaseUrl}/distinctiveness/readiness`)
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return distinctivenessRolloutResponseSchema.parse(await response.json())
+}
+
+export async function fetchDistinctivenessAdminSummary(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/distinctiveness/workspace/${encodeURIComponent(workspaceId)}/admin`,
+    { headers },
+  )
+
+  if (response.status === 403) {
+    return null
+  }
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return distinctivenessAdminSummaryResponseSchema.parse(await response.json())
+}
+
+export async function executeDistinctivenessAdminAction(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+  input: { action: 'refresh_distinctiveness_summary' },
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/distinctiveness/workspace/${encodeURIComponent(workspaceId)}/admin/actions`,
+    {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        workspaceId,
+        ...input,
+      }),
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return distinctivenessAdminActionResponseSchema.parse(await response.json())
+}
+
+export function formatDistinctivenessRolloutStatus(status: 'ready' | 'not_ready') {
+  switch (status) {
+    case 'ready':
+      return 'Ready'
+    case 'not_ready':
+      return 'Not ready'
+  }
+}
+
+export function formatDistinctivenessRolloutCheckStatus(
+  status: 'pass' | 'fail' | 'skip',
+) {
+  switch (status) {
+    case 'pass':
+      return 'Pass'
+    case 'fail':
+      return 'Fail'
+    case 'skip':
+      return 'Skip'
+  }
+}
+
+export function formatDistinctivenessAdminAction(action: 'refresh_distinctiveness_summary') {
+  switch (action) {
+    case 'refresh_distinctiveness_summary':
+      return 'Refresh distinctiveness summary'
+  }
+}
+
+export function formatDistinctivenessDomain(
+  domain: 'completed_runs' | 'failed_runs' | 'idempotency_keys' | 'usage_events',
+) {
+  switch (domain) {
+    case 'completed_runs':
+      return 'Completed runs'
+    case 'failed_runs':
+      return 'Failed runs'
+    case 'idempotency_keys':
+      return 'Idempotency keys'
+    case 'usage_events':
+      return 'Usage events'
+  }
+}
+
+export async function fetchDistinctivenessCapabilities(apiBaseUrl: string) {
+  const response = await fetch(`${apiBaseUrl}/distinctiveness/capabilities`)
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return distinctivenessCapabilitiesResponseSchema.parse(await response.json())
+}

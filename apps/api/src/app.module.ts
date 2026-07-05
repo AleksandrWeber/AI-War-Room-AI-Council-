@@ -122,6 +122,16 @@ import { LegibilityModule } from './legibility/legibility.module.js'
 import { ParsabilityModule } from './parsability/parsability.module.js'
 import { CoherenceModule } from './coherence/coherence.module.js'
 import { FamiliarityModule } from './familiarity/familiarity.module.js'
+import { RecognizabilityModule } from './recognizability/recognizability.module.js'
+import { InterpretabilityModule } from './interpretability/interpretability.module.js'
+import { ScannabilityModule } from './scannability/scannability.module.js'
+import { PerceptibilityModule } from './perceptibility/perceptibility.module.js'
+import { NoticeabilityModule } from './noticeability/noticeability.module.js'
+import { DiscernibilityModule } from './discernibility/discernibility.module.js'
+import { DistinctivenessModule } from './distinctiveness/distinctiveness.module.js'
+import { ConspicuousnessModule } from './conspicuousness/conspicuousness.module.js'
+import { DetectabilityModule } from './detectability/detectability.module.js'
+import { DescribabilityModule } from './describability/describability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -263,6 +273,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     ParsabilityModule,
     CoherenceModule,
     FamiliarityModule,
+    RecognizabilityModule,
+    InterpretabilityModule,
+    ScannabilityModule,
+    PerceptibilityModule,
+    NoticeabilityModule,
+    DiscernibilityModule,
+    DistinctivenessModule,
+    ConspicuousnessModule,
+    DetectabilityModule,
+    DescribabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

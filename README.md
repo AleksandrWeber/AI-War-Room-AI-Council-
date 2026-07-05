@@ -796,6 +796,66 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.160` behavior:
+
+- Production describability rollout readiness validates describability coverage and readiness through `GET /api/describability/readiness`.
+- Workspace owners and admins can inspect workspace describability metrics from `GET /api/describability/workspace/:workspaceId/admin`.
+- The web billing panel shows describability rollout checks and workspace describability admin tools.
+
+Current `v5.159` behavior:
+
+- Production detectability rollout readiness validates detectability coverage and readiness through `GET /api/detectability/readiness`.
+- Workspace owners and admins can inspect workspace detectability metrics from `GET /api/detectability/workspace/:workspaceId/admin`.
+- The web billing panel shows detectability rollout checks and workspace detectability admin tools.
+
+Current `v5.158` behavior:
+
+- Production conspicuousness rollout readiness validates conspicuousness coverage and readiness through `GET /api/conspicuousness/readiness`.
+- Workspace owners and admins can inspect workspace conspicuousness metrics from `GET /api/conspicuousness/workspace/:workspaceId/admin`.
+- The web billing panel shows conspicuousness rollout checks and workspace conspicuousness admin tools.
+
+Current `v5.157` behavior:
+
+- Production distinctiveness rollout readiness validates distinctiveness coverage and readiness through `GET /api/distinctiveness/readiness`.
+- Workspace owners and admins can inspect workspace distinctiveness metrics from `GET /api/distinctiveness/workspace/:workspaceId/admin`.
+- The web billing panel shows distinctiveness rollout checks and workspace distinctiveness admin tools.
+
+Current `v5.156` behavior:
+
+- Production discernibility rollout readiness validates discernibility coverage and readiness through `GET /api/discernibility/readiness`.
+- Workspace owners and admins can inspect workspace discernibility metrics from `GET /api/discernibility/workspace/:workspaceId/admin`.
+- The web billing panel shows discernibility rollout checks and workspace discernibility admin tools.
+
+Current `v5.155` behavior:
+
+- Production noticeability rollout readiness validates noticeability coverage and readiness through `GET /api/noticeability/readiness`.
+- Workspace owners and admins can inspect workspace noticeability metrics from `GET /api/noticeability/workspace/:workspaceId/admin`.
+- The web billing panel shows noticeability rollout checks and workspace noticeability admin tools.
+
+Current `v5.154` behavior:
+
+- Production perceptibility rollout readiness validates perceptibility coverage and readiness through `GET /api/perceptibility/readiness`.
+- Workspace owners and admins can inspect workspace perceptibility metrics from `GET /api/perceptibility/workspace/:workspaceId/admin`.
+- The web billing panel shows perceptibility rollout checks and workspace perceptibility admin tools.
+
+Current `v5.153` behavior:
+
+- Production scannability rollout readiness validates scannability coverage and readiness through `GET /api/scannability/readiness`.
+- Workspace owners and admins can inspect workspace scannability metrics from `GET /api/scannability/workspace/:workspaceId/admin`.
+- The web billing panel shows scannability rollout checks and workspace scannability admin tools.
+
+Current `v5.152` behavior:
+
+- Production interpretability rollout readiness validates interpretability coverage and readiness through `GET /api/interpretability/readiness`.
+- Workspace owners and admins can inspect workspace interpretability metrics from `GET /api/interpretability/workspace/:workspaceId/admin`.
+- The web billing panel shows interpretability rollout checks and workspace interpretability admin tools.
+
+Current `v5.151` behavior:
+
+- Production recognizability rollout readiness validates recognizability coverage and readiness through `GET /api/recognizability/readiness`.
+- Workspace owners and admins can inspect workspace recognizability metrics from `GET /api/recognizability/workspace/:workspaceId/admin`.
+- The web billing panel shows recognizability rollout checks and workspace recognizability admin tools.
+
 Current `v5.150` behavior:
 
 - Production familiarity rollout readiness validates familiarity coverage and readiness through `GET /api/familiarity/readiness`.

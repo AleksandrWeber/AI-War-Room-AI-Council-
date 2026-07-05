@@ -4085,6 +4085,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-recognizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-recognizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-recognizability-card p,
+.workspace-recognizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-recognizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-recognizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-interpretability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-interpretability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-interpretability-card p,
+.workspace-interpretability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-interpretability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-interpretability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-scannability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-scannability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-scannability-card p,
+.workspace-scannability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-scannability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-scannability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-perceptibility-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-perceptibility-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-perceptibility-card p,
+.workspace-perceptibility-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-perceptibility-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-perceptibility-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-noticeability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-noticeability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-noticeability-card p,
+.workspace-noticeability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-noticeability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-noticeability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-discernibility-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-discernibility-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-discernibility-card p,
+.workspace-discernibility-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-discernibility-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-discernibility-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-distinctiveness-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-distinctiveness-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-distinctiveness-card p,
+.workspace-distinctiveness-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-distinctiveness-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-distinctiveness-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-conspicuousness-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-conspicuousness-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-conspicuousness-card p,
+.workspace-conspicuousness-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-conspicuousness-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-conspicuousness-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-detectability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-detectability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-detectability-card p,
+.workspace-detectability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-detectability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-detectability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-describability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-describability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-describability-card p,
+.workspace-describability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-describability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-describability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

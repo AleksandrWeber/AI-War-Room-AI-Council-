@@ -274,6 +274,26 @@ import type {
   CoherenceAdminSummaryResponse,
   FamiliarityRolloutResponse,
   FamiliarityAdminSummaryResponse,
+  RecognizabilityRolloutResponse,
+  RecognizabilityAdminSummaryResponse,
+  InterpretabilityRolloutResponse,
+  InterpretabilityAdminSummaryResponse,
+  ScannabilityRolloutResponse,
+  ScannabilityAdminSummaryResponse,
+  PerceptibilityRolloutResponse,
+  PerceptibilityAdminSummaryResponse,
+  NoticeabilityRolloutResponse,
+  NoticeabilityAdminSummaryResponse,
+  DiscernibilityRolloutResponse,
+  DiscernibilityAdminSummaryResponse,
+  DistinctivenessRolloutResponse,
+  DistinctivenessAdminSummaryResponse,
+  ConspicuousnessRolloutResponse,
+  ConspicuousnessAdminSummaryResponse,
+  DetectabilityRolloutResponse,
+  DetectabilityAdminSummaryResponse,
+  DescribabilityRolloutResponse,
+  DescribabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -1466,6 +1486,96 @@ import {
   formatFamiliarityRolloutStatus,
 } from './familiarity-ui'
 import {
+  executeRecognizabilityAdminAction,
+  fetchRecognizabilityAdminSummary,
+  fetchRecognizabilityRollout,
+  formatRecognizabilityAdminAction,
+  formatRecognizabilityDomain,
+  formatRecognizabilityRolloutCheckStatus,
+  formatRecognizabilityRolloutStatus,
+} from './recognizability-ui'
+import {
+  executeInterpretabilityAdminAction,
+  fetchInterpretabilityAdminSummary,
+  fetchInterpretabilityRollout,
+  formatInterpretabilityAdminAction,
+  formatInterpretabilityDomain,
+  formatInterpretabilityRolloutCheckStatus,
+  formatInterpretabilityRolloutStatus,
+} from './interpretability-ui'
+import {
+  executeScannabilityAdminAction,
+  fetchScannabilityAdminSummary,
+  fetchScannabilityRollout,
+  formatScannabilityAdminAction,
+  formatScannabilityDomain,
+  formatScannabilityRolloutCheckStatus,
+  formatScannabilityRolloutStatus,
+} from './scannability-ui'
+import {
+  executePerceptibilityAdminAction,
+  fetchPerceptibilityAdminSummary,
+  fetchPerceptibilityRollout,
+  formatPerceptibilityAdminAction,
+  formatPerceptibilityDomain,
+  formatPerceptibilityRolloutCheckStatus,
+  formatPerceptibilityRolloutStatus,
+} from './perceptibility-ui'
+import {
+  executeNoticeabilityAdminAction,
+  fetchNoticeabilityAdminSummary,
+  fetchNoticeabilityRollout,
+  formatNoticeabilityAdminAction,
+  formatNoticeabilityDomain,
+  formatNoticeabilityRolloutCheckStatus,
+  formatNoticeabilityRolloutStatus,
+} from './noticeability-ui'
+import {
+  executeDiscernibilityAdminAction,
+  fetchDiscernibilityAdminSummary,
+  fetchDiscernibilityRollout,
+  formatDiscernibilityAdminAction,
+  formatDiscernibilityDomain,
+  formatDiscernibilityRolloutCheckStatus,
+  formatDiscernibilityRolloutStatus,
+} from './discernibility-ui'
+import {
+  executeDistinctivenessAdminAction,
+  fetchDistinctivenessAdminSummary,
+  fetchDistinctivenessRollout,
+  formatDistinctivenessAdminAction,
+  formatDistinctivenessDomain,
+  formatDistinctivenessRolloutCheckStatus,
+  formatDistinctivenessRolloutStatus,
+} from './distinctiveness-ui'
+import {
+  executeConspicuousnessAdminAction,
+  fetchConspicuousnessAdminSummary,
+  fetchConspicuousnessRollout,
+  formatConspicuousnessAdminAction,
+  formatConspicuousnessDomain,
+  formatConspicuousnessRolloutCheckStatus,
+  formatConspicuousnessRolloutStatus,
+} from './conspicuousness-ui'
+import {
+  executeDetectabilityAdminAction,
+  fetchDetectabilityAdminSummary,
+  fetchDetectabilityRollout,
+  formatDetectabilityAdminAction,
+  formatDetectabilityDomain,
+  formatDetectabilityRolloutCheckStatus,
+  formatDetectabilityRolloutStatus,
+} from './detectability-ui'
+import {
+  executeDescribabilityAdminAction,
+  fetchDescribabilityAdminSummary,
+  fetchDescribabilityRollout,
+  formatDescribabilityAdminAction,
+  formatDescribabilityDomain,
+  formatDescribabilityRolloutCheckStatus,
+  formatDescribabilityRolloutStatus,
+} from './describability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -2274,6 +2384,26 @@ function App() {
     useState<CoherenceRolloutResponse | null>(null)
   const [familiarityRollout, setFamiliarityRollout] =
     useState<FamiliarityRolloutResponse | null>(null)
+  const [recognizabilityRollout, setRecognizabilityRollout] =
+    useState<RecognizabilityRolloutResponse | null>(null)
+  const [interpretabilityRollout, setInterpretabilityRollout] =
+    useState<InterpretabilityRolloutResponse | null>(null)
+  const [scannabilityRollout, setScannabilityRollout] =
+    useState<ScannabilityRolloutResponse | null>(null)
+  const [perceptibilityRollout, setPerceptibilityRollout] =
+    useState<PerceptibilityRolloutResponse | null>(null)
+  const [noticeabilityRollout, setNoticeabilityRollout] =
+    useState<NoticeabilityRolloutResponse | null>(null)
+  const [discernibilityRollout, setDiscernibilityRollout] =
+    useState<DiscernibilityRolloutResponse | null>(null)
+  const [distinctivenessRollout, setDistinctivenessRollout] =
+    useState<DistinctivenessRolloutResponse | null>(null)
+  const [conspicuousnessRollout, setConspicuousnessRollout] =
+    useState<ConspicuousnessRolloutResponse | null>(null)
+  const [detectabilityRollout, setDetectabilityRollout] =
+    useState<DetectabilityRolloutResponse | null>(null)
+  const [describabilityRollout, setDescribabilityRollout] =
+    useState<DescribabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -2611,6 +2741,26 @@ function App() {
     useState<CoherenceAdminSummaryResponse | null>(null)
   const [familiarityAdminSummary, setFamiliarityAdminSummary] =
     useState<FamiliarityAdminSummaryResponse | null>(null)
+  const [recognizabilityAdminSummary, setRecognizabilityAdminSummary] =
+    useState<RecognizabilityAdminSummaryResponse | null>(null)
+  const [interpretabilityAdminSummary, setInterpretabilityAdminSummary] =
+    useState<InterpretabilityAdminSummaryResponse | null>(null)
+  const [scannabilityAdminSummary, setScannabilityAdminSummary] =
+    useState<ScannabilityAdminSummaryResponse | null>(null)
+  const [perceptibilityAdminSummary, setPerceptibilityAdminSummary] =
+    useState<PerceptibilityAdminSummaryResponse | null>(null)
+  const [noticeabilityAdminSummary, setNoticeabilityAdminSummary] =
+    useState<NoticeabilityAdminSummaryResponse | null>(null)
+  const [discernibilityAdminSummary, setDiscernibilityAdminSummary] =
+    useState<DiscernibilityAdminSummaryResponse | null>(null)
+  const [distinctivenessAdminSummary, setDistinctivenessAdminSummary] =
+    useState<DistinctivenessAdminSummaryResponse | null>(null)
+  const [conspicuousnessAdminSummary, setConspicuousnessAdminSummary] =
+    useState<ConspicuousnessAdminSummaryResponse | null>(null)
+  const [detectabilityAdminSummary, setDetectabilityAdminSummary] =
+    useState<DetectabilityAdminSummaryResponse | null>(null)
+  const [describabilityAdminSummary, setDescribabilityAdminSummary] =
+    useState<DescribabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -2999,6 +3149,36 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [familiarityAdminAction, setFamiliarityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [recognizabilityAdminAction, setRecognizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [interpretabilityAdminAction, setInterpretabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [scannabilityAdminAction, setScannabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [perceptibilityAdminAction, setPerceptibilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [noticeabilityAdminAction, setNoticeabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [discernibilityAdminAction, setDiscernibilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [distinctivenessAdminAction, setDistinctivenessAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [conspicuousnessAdminAction, setConspicuousnessAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [detectabilityAdminAction, setDetectabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [describabilityAdminAction, setDescribabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -4680,6 +4860,126 @@ function App() {
         }
       })
 
+    fetchRecognizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setRecognizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setRecognizabilityRollout(null)
+        }
+      })
+
+    fetchInterpretabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setInterpretabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setInterpretabilityRollout(null)
+        }
+      })
+
+    fetchScannabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setScannabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setScannabilityRollout(null)
+        }
+      })
+
+    fetchPerceptibilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setPerceptibilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setPerceptibilityRollout(null)
+        }
+      })
+
+    fetchNoticeabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setNoticeabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setNoticeabilityRollout(null)
+        }
+      })
+
+    fetchDiscernibilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setDiscernibilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDiscernibilityRollout(null)
+        }
+      })
+
+    fetchDistinctivenessRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setDistinctivenessRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDistinctivenessRollout(null)
+        }
+      })
+
+    fetchConspicuousnessRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setConspicuousnessRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setConspicuousnessRollout(null)
+        }
+      })
+
+    fetchDetectabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setDetectabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDetectabilityRollout(null)
+        }
+      })
+
+    fetchDescribabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setDescribabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDescribabilityRollout(null)
+        }
+      })
+
     fetchUsageCapabilities(apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
@@ -6276,6 +6576,76 @@ function App() {
         workspaceAuthHeaders,
       )
       setFamiliarityAdminSummary(familiarityAdmin)
+
+      const recognizabilityAdmin = await fetchRecognizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRecognizabilityAdminSummary(recognizabilityAdmin)
+
+      const interpretabilityAdmin = await fetchInterpretabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setInterpretabilityAdminSummary(interpretabilityAdmin)
+
+      const scannabilityAdmin = await fetchScannabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setScannabilityAdminSummary(scannabilityAdmin)
+
+      const perceptibilityAdmin = await fetchPerceptibilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPerceptibilityAdminSummary(perceptibilityAdmin)
+
+      const noticeabilityAdmin = await fetchNoticeabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNoticeabilityAdminSummary(noticeabilityAdmin)
+
+      const discernibilityAdmin = await fetchDiscernibilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDiscernibilityAdminSummary(discernibilityAdmin)
+
+      const distinctivenessAdmin = await fetchDistinctivenessAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDistinctivenessAdminSummary(distinctivenessAdmin)
+
+      const conspicuousnessAdmin = await fetchConspicuousnessAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConspicuousnessAdminSummary(conspicuousnessAdmin)
+
+      const detectabilityAdmin = await fetchDetectabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDetectabilityAdminSummary(detectabilityAdmin)
+
+      const describabilityAdmin = await fetchDescribabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDescribabilityAdminSummary(describabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -7508,6 +7878,296 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleDescribabilityAdminAction(
+    action: 'refresh_describability_summary',
+  ) {
+    setDescribabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeDescribabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchDescribabilityRollout(apiBaseUrl)
+      setDescribabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run describability admin action.',
+      )
+    } finally {
+      setDescribabilityAdminAction('idle')
+    }
+  }
+
+  async function handleDetectabilityAdminAction(
+    action: 'refresh_detectability_summary',
+  ) {
+    setDetectabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeDetectabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchDetectabilityRollout(apiBaseUrl)
+      setDetectabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run detectability admin action.',
+      )
+    } finally {
+      setDetectabilityAdminAction('idle')
+    }
+  }
+
+  async function handleConspicuousnessAdminAction(
+    action: 'refresh_conspicuousness_summary',
+  ) {
+    setConspicuousnessAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeConspicuousnessAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchConspicuousnessRollout(apiBaseUrl)
+      setConspicuousnessRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run conspicuousness admin action.',
+      )
+    } finally {
+      setConspicuousnessAdminAction('idle')
+    }
+  }
+
+  async function handleDistinctivenessAdminAction(
+    action: 'refresh_distinctiveness_summary',
+  ) {
+    setDistinctivenessAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeDistinctivenessAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchDistinctivenessRollout(apiBaseUrl)
+      setDistinctivenessRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run distinctiveness admin action.',
+      )
+    } finally {
+      setDistinctivenessAdminAction('idle')
+    }
+  }
+
+  async function handleDiscernibilityAdminAction(
+    action: 'refresh_discernibility_summary',
+  ) {
+    setDiscernibilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeDiscernibilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchDiscernibilityRollout(apiBaseUrl)
+      setDiscernibilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run discernibility admin action.',
+      )
+    } finally {
+      setDiscernibilityAdminAction('idle')
+    }
+  }
+
+  async function handleNoticeabilityAdminAction(
+    action: 'refresh_noticeability_summary',
+  ) {
+    setNoticeabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeNoticeabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchNoticeabilityRollout(apiBaseUrl)
+      setNoticeabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run noticeability admin action.',
+      )
+    } finally {
+      setNoticeabilityAdminAction('idle')
+    }
+  }
+
+  async function handlePerceptibilityAdminAction(
+    action: 'refresh_perceptibility_summary',
+  ) {
+    setPerceptibilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executePerceptibilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchPerceptibilityRollout(apiBaseUrl)
+      setPerceptibilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run perceptibility admin action.',
+      )
+    } finally {
+      setPerceptibilityAdminAction('idle')
+    }
+  }
+
+  async function handleScannabilityAdminAction(
+    action: 'refresh_scannability_summary',
+  ) {
+    setScannabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeScannabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchScannabilityRollout(apiBaseUrl)
+      setScannabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run scannability admin action.',
+      )
+    } finally {
+      setScannabilityAdminAction('idle')
+    }
+  }
+
+  async function handleInterpretabilityAdminAction(
+    action: 'refresh_interpretability_summary',
+  ) {
+    setInterpretabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeInterpretabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchInterpretabilityRollout(apiBaseUrl)
+      setInterpretabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run interpretability admin action.',
+      )
+    } finally {
+      setInterpretabilityAdminAction('idle')
+    }
+  }
+
+  async function handleRecognizabilityAdminAction(
+    action: 'refresh_recognizability_summary',
+  ) {
+    setRecognizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeRecognizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchRecognizabilityRollout(apiBaseUrl)
+      setRecognizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run recognizability admin action.',
+      )
+    } finally {
+      setRecognizabilityAdminAction('idle')
     }
   }
 
@@ -14565,6 +15225,296 @@ function App() {
               ))}
             </div>
             <small>Checked at {intelligibilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {noticeabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production noticeability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${noticeabilityRollout.status}`}
+              >
+                {formatNoticeabilityRolloutStatus(noticeabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{noticeabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {noticeabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatNoticeabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {noticeabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {perceptibilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production perceptibility rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${perceptibilityRollout.status}`}
+              >
+                {formatPerceptibilityRolloutStatus(perceptibilityRollout.status)}
+              </strong>
+            </div>
+            <p>{perceptibilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {perceptibilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatPerceptibilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {perceptibilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {scannabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production scannability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${scannabilityRollout.status}`}
+              >
+                {formatScannabilityRolloutStatus(scannabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{scannabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {scannabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatScannabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {scannabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {interpretabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production interpretability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${interpretabilityRollout.status}`}
+              >
+                {formatInterpretabilityRolloutStatus(interpretabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{interpretabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {interpretabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatInterpretabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {interpretabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {recognizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production recognizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${recognizabilityRollout.status}`}
+              >
+                {formatRecognizabilityRolloutStatus(recognizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{recognizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {recognizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatRecognizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {recognizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {describabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production describability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${describabilityRollout.status}`}
+              >
+                {formatDescribabilityRolloutStatus(describabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{describabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {describabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatDescribabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {describabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {detectabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production detectability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${detectabilityRollout.status}`}
+              >
+                {formatDetectabilityRolloutStatus(detectabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{detectabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {detectabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatDetectabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {detectabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {conspicuousnessRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production conspicuousness rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${conspicuousnessRollout.status}`}
+              >
+                {formatConspicuousnessRolloutStatus(conspicuousnessRollout.status)}
+              </strong>
+            </div>
+            <p>{conspicuousnessRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {conspicuousnessRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatConspicuousnessRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {conspicuousnessRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {distinctivenessRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production distinctiveness rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${distinctivenessRollout.status}`}
+              >
+                {formatDistinctivenessRolloutStatus(distinctivenessRollout.status)}
+              </strong>
+            </div>
+            <p>{distinctivenessRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {distinctivenessRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatDistinctivenessRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {distinctivenessRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {discernibilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production discernibility rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${discernibilityRollout.status}`}
+              >
+                {formatDiscernibilityRolloutStatus(discernibilityRollout.status)}
+              </strong>
+            </div>
+            <p>{discernibilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {discernibilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatDiscernibilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {discernibilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -23352,6 +24302,656 @@ function App() {
                 }
               >
                 {formatIntelligibilityAdminAction('refresh_intelligibility_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {noticeabilityAdminSummary ? (
+          <div className="billing-admin workspace-noticeability-admin">
+            <div className="billing-admin__header">
+              <span>Noticeability admin</span>
+              <strong>{noticeabilityAdminSummary.role}</strong>
+            </div>
+            <p>{noticeabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification noticeability</span>
+                <strong>
+                  {noticeabilityAdminSummary.stats.noticeabilityPercent}%
+                </strong>
+                <small>
+                  {noticeabilityAdminSummary.stats.coveredDomains}/
+                  {noticeabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Noticeability signals</span>
+                <strong>{noticeabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {noticeabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-noticeability-list">
+              {noticeabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-noticeability-card workspace-noticeability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatNoticeabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {noticeabilityAdminSummary.availableActions.includes(
+              'refresh_noticeability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={noticeabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleNoticeabilityAdminAction(
+                    'refresh_noticeability_summary',
+                  )
+                }
+              >
+                {formatNoticeabilityAdminAction('refresh_noticeability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {perceptibilityAdminSummary ? (
+          <div className="billing-admin workspace-perceptibility-admin">
+            <div className="billing-admin__header">
+              <span>Perceptibility admin</span>
+              <strong>{perceptibilityAdminSummary.role}</strong>
+            </div>
+            <p>{perceptibilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Usage event perceptibility</span>
+                <strong>
+                  {perceptibilityAdminSummary.stats.perceptibilityPercent}%
+                </strong>
+                <small>
+                  {perceptibilityAdminSummary.stats.coveredDomains}/
+                  {perceptibilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Perceptibility signals</span>
+                <strong>{perceptibilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {perceptibilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, usage events, and meter usage reports'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-perceptibility-list">
+              {perceptibilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-perceptibility-card workspace-perceptibility-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatPerceptibilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {perceptibilityAdminSummary.availableActions.includes(
+              'refresh_perceptibility_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={perceptibilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handlePerceptibilityAdminAction(
+                    'refresh_perceptibility_summary',
+                  )
+                }
+              >
+                {formatPerceptibilityAdminAction('refresh_perceptibility_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {scannabilityAdminSummary ? (
+          <div className="billing-admin workspace-scannability-admin">
+            <div className="billing-admin__header">
+              <span>Scannability admin</span>
+              <strong>{scannabilityAdminSummary.role}</strong>
+            </div>
+            <p>{scannabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan scannability</span>
+                <strong>
+                  {scannabilityAdminSummary.stats.scannabilityPercent}%
+                </strong>
+                <small>
+                  {scannabilityAdminSummary.stats.coveredDomains}/
+                  {scannabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Scannability signals</span>
+                <strong>{scannabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {scannabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-scannability-list">
+              {scannabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-scannability-card workspace-scannability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatScannabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {scannabilityAdminSummary.availableActions.includes(
+              'refresh_scannability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={scannabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleScannabilityAdminAction(
+                    'refresh_scannability_summary',
+                  )
+                }
+              >
+                {formatScannabilityAdminAction('refresh_scannability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {interpretabilityAdminSummary ? (
+          <div className="billing-admin workspace-interpretability-admin">
+            <div className="billing-admin__header">
+              <span>Interpretability admin</span>
+              <strong>{interpretabilityAdminSummary.role}</strong>
+            </div>
+            <p>{interpretabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Agent output interpretability</span>
+                <strong>
+                  {interpretabilityAdminSummary.stats.interpretabilityPercent}%
+                </strong>
+                <small>
+                  {interpretabilityAdminSummary.stats.coveredDomains}/
+                  {interpretabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Interpretability signals</span>
+                <strong>{interpretabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {interpretabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, agent outputs, and moderator syntheses'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-interpretability-list">
+              {interpretabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-interpretability-card workspace-interpretability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatInterpretabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {interpretabilityAdminSummary.availableActions.includes(
+              'refresh_interpretability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={interpretabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleInterpretabilityAdminAction(
+                    'refresh_interpretability_summary',
+                  )
+                }
+              >
+                {formatInterpretabilityAdminAction('refresh_interpretability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {recognizabilityAdminSummary ? (
+          <div className="billing-admin workspace-recognizability-admin">
+            <div className="billing-admin__header">
+              <span>Recognizability admin</span>
+              <strong>{recognizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{recognizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Artifact recognizability</span>
+                <strong>
+                  {recognizabilityAdminSummary.stats.recognizabilityPercent}%
+                </strong>
+                <small>
+                  {recognizabilityAdminSummary.stats.coveredDomains}/
+                  {recognizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Recognizability signals</span>
+                <strong>{recognizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {recognizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, artifacts, and run workflows'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-recognizability-list">
+              {recognizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-recognizability-card workspace-recognizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatRecognizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {recognizabilityAdminSummary.availableActions.includes(
+              'refresh_recognizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={recognizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleRecognizabilityAdminAction(
+                    'refresh_recognizability_summary',
+                  )
+                }
+              >
+                {formatRecognizabilityAdminAction('refresh_recognizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {describabilityAdminSummary ? (
+          <div className="billing-admin workspace-describability-admin">
+            <div className="billing-admin__header">
+              <span>Describability admin</span>
+              <strong>{describabilityAdminSummary.role}</strong>
+            </div>
+            <p>{describabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workflow describability</span>
+                <strong>
+                  {describabilityAdminSummary.stats.describabilityPercent}%
+                </strong>
+                <small>
+                  {describabilityAdminSummary.stats.coveredDomains}/
+                  {describabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Describability signals</span>
+                <strong>{describabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {describabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, run workflows, and agent outputs'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-describability-list">
+              {describabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-describability-card workspace-describability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatDescribabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {describabilityAdminSummary.availableActions.includes(
+              'refresh_describability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={describabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleDescribabilityAdminAction(
+                    'refresh_describability_summary',
+                  )
+                }
+              >
+                {formatDescribabilityAdminAction('refresh_describability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {detectabilityAdminSummary ? (
+          <div className="billing-admin workspace-detectability-admin">
+            <div className="billing-admin__header">
+              <span>Detectability admin</span>
+              <strong>{detectabilityAdminSummary.role}</strong>
+            </div>
+            <p>{detectabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing webhook detectability</span>
+                <strong>
+                  {detectabilityAdminSummary.stats.detectabilityPercent}%
+                </strong>
+                <small>
+                  {detectabilityAdminSummary.stats.coveredDomains}/
+                  {detectabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Detectability signals</span>
+                <strong>{detectabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {detectabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing webhook events, and billing notifications'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-detectability-list">
+              {detectabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-detectability-card workspace-detectability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatDetectabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {detectabilityAdminSummary.availableActions.includes(
+              'refresh_detectability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={detectabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleDetectabilityAdminAction(
+                    'refresh_detectability_summary',
+                  )
+                }
+              >
+                {formatDetectabilityAdminAction('refresh_detectability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {conspicuousnessAdminSummary ? (
+          <div className="billing-admin workspace-conspicuousness-admin">
+            <div className="billing-admin__header">
+              <span>Conspicuousness admin</span>
+              <strong>{conspicuousnessAdminSummary.role}</strong>
+            </div>
+            <p>{conspicuousnessAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership conspicuousness</span>
+                <strong>
+                  {conspicuousnessAdminSummary.stats.conspicuousnessPercent}%
+                </strong>
+                <small>
+                  {conspicuousnessAdminSummary.stats.coveredDomains}/
+                  {conspicuousnessAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Conspicuousness signals</span>
+                <strong>{conspicuousnessAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {conspicuousnessAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-conspicuousness-list">
+              {conspicuousnessAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-conspicuousness-card workspace-conspicuousness-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatConspicuousnessDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {conspicuousnessAdminSummary.availableActions.includes(
+              'refresh_conspicuousness_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={conspicuousnessAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleConspicuousnessAdminAction(
+                    'refresh_conspicuousness_summary',
+                  )
+                }
+              >
+                {formatConspicuousnessAdminAction('refresh_conspicuousness_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {distinctivenessAdminSummary ? (
+          <div className="billing-admin workspace-distinctiveness-admin">
+            <div className="billing-admin__header">
+              <span>Distinctiveness admin</span>
+              <strong>{distinctivenessAdminSummary.role}</strong>
+            </div>
+            <p>{distinctivenessAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key distinctiveness</span>
+                <strong>
+                  {distinctivenessAdminSummary.stats.distinctivenessPercent}%
+                </strong>
+                <small>
+                  {distinctivenessAdminSummary.stats.coveredDomains}/
+                  {distinctivenessAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Distinctiveness signals</span>
+                <strong>{distinctivenessAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {distinctivenessAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-distinctiveness-list">
+              {distinctivenessAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-distinctiveness-card workspace-distinctiveness-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatDistinctivenessDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {distinctivenessAdminSummary.availableActions.includes(
+              'refresh_distinctiveness_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={distinctivenessAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleDistinctivenessAdminAction(
+                    'refresh_distinctiveness_summary',
+                  )
+                }
+              >
+                {formatDistinctivenessAdminAction('refresh_distinctiveness_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {discernibilityAdminSummary ? (
+          <div className="billing-admin workspace-discernibility-admin">
+            <div className="billing-admin__header">
+              <span>Discernibility admin</span>
+              <strong>{discernibilityAdminSummary.role}</strong>
+            </div>
+            <p>{discernibilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Moderator synthesis discernibility</span>
+                <strong>
+                  {discernibilityAdminSummary.stats.discernibilityPercent}%
+                </strong>
+                <small>
+                  {discernibilityAdminSummary.stats.coveredDomains}/
+                  {discernibilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Discernibility signals</span>
+                <strong>{discernibilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {discernibilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, moderator syntheses, and agent outputs'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-discernibility-list">
+              {discernibilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-discernibility-card workspace-discernibility-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatDiscernibilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {discernibilityAdminSummary.availableActions.includes(
+              'refresh_discernibility_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={discernibilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleDiscernibilityAdminAction(
+                    'refresh_discernibility_summary',
+                  )
+                }
+              >
+                {formatDiscernibilityAdminAction('refresh_discernibility_summary')}
               </button>
             ) : null}
           </div>
