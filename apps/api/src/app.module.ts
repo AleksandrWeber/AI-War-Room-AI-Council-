@@ -62,6 +62,11 @@ import { LocatabilityModule } from './locatability/locatability.module.js'
 import { RetrievabilityModule } from './retrievability/retrievability.module.js'
 import { DiscoverabilityModule } from './discoverability/discoverability.module.js'
 import { NavigabilityModule } from './navigability/navigability.module.js'
+import { ConnectabilityModule } from './connectability/connectability.module.js'
+import { LinkabilityModule } from './linkability/linkability.module.js'
+import { InterchangeabilityModule } from './interchangeability/interchangeability.module.js'
+import { TransferabilityModule } from './transferability/transferability.module.js'
+import { PortabilityModule } from './portability/portability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -143,6 +148,11 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     RetrievabilityModule,
     DiscoverabilityModule,
     NavigabilityModule,
+    ConnectabilityModule,
+    LinkabilityModule,
+    InterchangeabilityModule,
+    TransferabilityModule,
+    PortabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

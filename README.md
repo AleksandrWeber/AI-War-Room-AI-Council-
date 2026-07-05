@@ -796,6 +796,36 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.95` behavior:
+
+- Production portability rollout readiness validates portability coverage and readiness through `GET /api/portability/readiness`.
+- Workspace owners and admins can inspect workspace portability metrics from `GET /api/portability/workspace/:workspaceId/admin`.
+- The web billing panel shows portability rollout checks and workspace portability admin tools.
+
+Current `v5.94` behavior:
+
+- Production transferability rollout readiness validates transferability coverage and readiness through `GET /api/transferability/readiness`.
+- Workspace owners and admins can inspect workspace transferability metrics from `GET /api/transferability/workspace/:workspaceId/admin`.
+- The web billing panel shows transferability rollout checks and workspace transferability admin tools.
+
+Current `v5.93` behavior:
+
+- Production interchangeability rollout readiness validates interchangeability coverage and readiness through `GET /api/interchangeability/readiness`.
+- Workspace owners and admins can inspect workspace interchangeability metrics from `GET /api/interchangeability/workspace/:workspaceId/admin`.
+- The web billing panel shows interchangeability rollout checks and workspace interchangeability admin tools.
+
+Current `v5.92` behavior:
+
+- Production linkability rollout readiness validates linkability coverage and readiness through `GET /api/linkability/readiness`.
+- Workspace owners and admins can inspect workspace linkability metrics from `GET /api/linkability/workspace/:workspaceId/admin`.
+- The web billing panel shows linkability rollout checks and workspace linkability admin tools.
+
+Current `v5.91` behavior:
+
+- Production connectability rollout readiness validates connectability coverage and readiness through `GET /api/connectability/readiness`.
+- Workspace owners and admins can inspect workspace connectability metrics from `GET /api/connectability/workspace/:workspaceId/admin`.
+- The web billing panel shows connectability rollout checks and workspace connectability admin tools.
+
 Current `v5.90` behavior:
 
 - Production navigability rollout readiness validates navigability coverage and readiness through `GET /api/navigability/readiness`.

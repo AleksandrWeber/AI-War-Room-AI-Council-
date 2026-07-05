@@ -154,6 +154,16 @@ import type {
   DiscoverabilityAdminSummaryResponse,
   NavigabilityRolloutResponse,
   NavigabilityAdminSummaryResponse,
+  ConnectabilityRolloutResponse,
+  ConnectabilityAdminSummaryResponse,
+  LinkabilityRolloutResponse,
+  LinkabilityAdminSummaryResponse,
+  InterchangeabilityRolloutResponse,
+  InterchangeabilityAdminSummaryResponse,
+  TransferabilityRolloutResponse,
+  TransferabilityAdminSummaryResponse,
+  PortabilityRolloutResponse,
+  PortabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -805,6 +815,51 @@ import {
   formatNavigabilityRolloutCheckStatus,
   formatNavigabilityRolloutStatus,
 } from './navigability-ui'
+import {
+  executeConnectabilityAdminAction,
+  fetchConnectabilityAdminSummary,
+  fetchConnectabilityRollout,
+  formatConnectabilityAdminAction,
+  formatConnectabilityDomain,
+  formatConnectabilityRolloutCheckStatus,
+  formatConnectabilityRolloutStatus,
+} from './connectability-ui'
+import {
+  executeLinkabilityAdminAction,
+  fetchLinkabilityAdminSummary,
+  fetchLinkabilityRollout,
+  formatLinkabilityAdminAction,
+  formatLinkabilityDomain,
+  formatLinkabilityRolloutCheckStatus,
+  formatLinkabilityRolloutStatus,
+} from './linkability-ui'
+import {
+  executeInterchangeabilityAdminAction,
+  fetchInterchangeabilityAdminSummary,
+  fetchInterchangeabilityRollout,
+  formatInterchangeabilityAdminAction,
+  formatInterchangeabilityDomain,
+  formatInterchangeabilityRolloutCheckStatus,
+  formatInterchangeabilityRolloutStatus,
+} from './interchangeability-ui'
+import {
+  executeTransferabilityAdminAction,
+  fetchTransferabilityAdminSummary,
+  fetchTransferabilityRollout,
+  formatTransferabilityAdminAction,
+  formatTransferabilityDomain,
+  formatTransferabilityRolloutCheckStatus,
+  formatTransferabilityRolloutStatus,
+} from './transferability-ui'
+import {
+  executePortabilityAdminAction,
+  fetchPortabilityAdminSummary,
+  fetchPortabilityRollout,
+  formatPortabilityAdminAction,
+  formatPortabilityDomain,
+  formatPortabilityRolloutCheckStatus,
+  formatPortabilityRolloutStatus,
+} from './portability-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -1494,6 +1549,16 @@ function App() {
     useState<DiscoverabilityRolloutResponse | null>(null)
   const [navigabilityRollout, setNavigabilityRollout] =
     useState<NavigabilityRolloutResponse | null>(null)
+  const [connectabilityRollout, setConnectabilityRollout] =
+    useState<ConnectabilityRolloutResponse | null>(null)
+  const [linkabilityRollout, setLinkabilityRollout] =
+    useState<LinkabilityRolloutResponse | null>(null)
+  const [interchangeabilityRollout, setInterchangeabilityRollout] =
+    useState<InterchangeabilityRolloutResponse | null>(null)
+  const [transferabilityRollout, setTransferabilityRollout] =
+    useState<TransferabilityRolloutResponse | null>(null)
+  const [portabilityRollout, setPortabilityRollout] =
+    useState<PortabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1711,6 +1776,16 @@ function App() {
     useState<DiscoverabilityAdminSummaryResponse | null>(null)
   const [navigabilityAdminSummary, setNavigabilityAdminSummary] =
     useState<NavigabilityAdminSummaryResponse | null>(null)
+  const [connectabilityAdminSummary, setConnectabilityAdminSummary] =
+    useState<ConnectabilityAdminSummaryResponse | null>(null)
+  const [linkabilityAdminSummary, setLinkabilityAdminSummary] =
+    useState<LinkabilityAdminSummaryResponse | null>(null)
+  const [interchangeabilityAdminSummary, setInterchangeabilityAdminSummary] =
+    useState<InterchangeabilityAdminSummaryResponse | null>(null)
+  const [transferabilityAdminSummary, setTransferabilityAdminSummary] =
+    useState<TransferabilityAdminSummaryResponse | null>(null)
+  const [portabilityAdminSummary, setPortabilityAdminSummary] =
+    useState<PortabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1919,6 +1994,21 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [navigabilityAdminAction, setNavigabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [connectabilityAdminAction, setConnectabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [linkabilityAdminAction, setLinkabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [interchangeabilityAdminAction, setInterchangeabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [transferabilityAdminAction, setTransferabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [portabilityAdminAction, setPortabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -2877,6 +2967,66 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setNavigabilityRollout(null)
+        }
+      })
+
+    fetchConnectabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setConnectabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setConnectabilityRollout(null)
+        }
+      })
+
+    fetchLinkabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setLinkabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setLinkabilityRollout(null)
+        }
+      })
+
+    fetchInterchangeabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setInterchangeabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setInterchangeabilityRollout(null)
+        }
+      })
+
+    fetchTransferabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setTransferabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTransferabilityRollout(null)
+        }
+      })
+
+    fetchPortabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setPortabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setPortabilityRollout(null)
         }
       })
 
@@ -4056,6 +4206,41 @@ function App() {
         workspaceAuthHeaders,
       )
       setNavigabilityAdminSummary(navigabilityAdmin)
+
+      const connectabilityAdmin = await fetchConnectabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConnectabilityAdminSummary(connectabilityAdmin)
+
+      const linkabilityAdmin = await fetchLinkabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setLinkabilityAdminSummary(linkabilityAdmin)
+
+      const interchangeabilityAdmin = await fetchInterchangeabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setInterchangeabilityAdminSummary(interchangeabilityAdmin)
+
+      const transferabilityAdmin = await fetchTransferabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTransferabilityAdminSummary(transferabilityAdmin)
+
+      const portabilityAdmin = await fetchPortabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPortabilityAdminSummary(portabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -5288,6 +5473,151 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handlePortabilityAdminAction(
+    action: 'refresh_portability_summary',
+  ) {
+    setPortabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executePortabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchPortabilityRollout(apiBaseUrl)
+      setPortabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run portability admin action.',
+      )
+    } finally {
+      setPortabilityAdminAction('idle')
+    }
+  }
+
+  async function handleTransferabilityAdminAction(
+    action: 'refresh_transferability_summary',
+  ) {
+    setTransferabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeTransferabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchTransferabilityRollout(apiBaseUrl)
+      setTransferabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run transferability admin action.',
+      )
+    } finally {
+      setTransferabilityAdminAction('idle')
+    }
+  }
+
+  async function handleInterchangeabilityAdminAction(
+    action: 'refresh_interchangeability_summary',
+  ) {
+    setInterchangeabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeInterchangeabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchInterchangeabilityRollout(apiBaseUrl)
+      setInterchangeabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run interchangeability admin action.',
+      )
+    } finally {
+      setInterchangeabilityAdminAction('idle')
+    }
+  }
+
+  async function handleLinkabilityAdminAction(
+    action: 'refresh_linkability_summary',
+  ) {
+    setLinkabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeLinkabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchLinkabilityRollout(apiBaseUrl)
+      setLinkabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run linkability admin action.',
+      )
+    } finally {
+      setLinkabilityAdminAction('idle')
+    }
+  }
+
+  async function handleConnectabilityAdminAction(
+    action: 'refresh_connectability_summary',
+  ) {
+    setConnectabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeConnectabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchConnectabilityRollout(apiBaseUrl)
+      setConnectabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run connectability admin action.',
+      )
+    } finally {
+      setConnectabilityAdminAction('idle')
     }
   }
 
@@ -8865,6 +9195,151 @@ function App() {
               ))}
             </div>
             <small>Checked at {referencabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {portabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production portability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${portabilityRollout.status}`}
+              >
+                {formatPortabilityRolloutStatus(portabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{portabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {portabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatPortabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {portabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {transferabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production transferability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${transferabilityRollout.status}`}
+              >
+                {formatTransferabilityRolloutStatus(transferabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{transferabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {transferabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatTransferabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {transferabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {interchangeabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production interchangeability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${interchangeabilityRollout.status}`}
+              >
+                {formatInterchangeabilityRolloutStatus(interchangeabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{interchangeabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {interchangeabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatInterchangeabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {interchangeabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {linkabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production linkability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${linkabilityRollout.status}`}
+              >
+                {formatLinkabilityRolloutStatus(linkabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{linkabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {linkabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatLinkabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {linkabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {connectabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production connectability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${connectabilityRollout.status}`}
+              >
+                {formatConnectabilityRolloutStatus(connectabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{connectabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {connectabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatConnectabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {connectabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -13752,6 +14227,331 @@ function App() {
                 }
               >
                 {formatReferencabilityAdminAction('refresh_referencability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {portabilityAdminSummary ? (
+          <div className="billing-admin workspace-portability-admin">
+            <div className="billing-admin__header">
+              <span>Portability admin</span>
+              <strong>{portabilityAdminSummary.role}</strong>
+            </div>
+            <p>{portabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Artifact portability</span>
+                <strong>
+                  {portabilityAdminSummary.stats.portabilityPercent}%
+                </strong>
+                <small>
+                  {portabilityAdminSummary.stats.coveredDomains}/
+                  {portabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Portability signals</span>
+                <strong>{portabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {portabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, artifacts, and agent outputs'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-portability-list">
+              {portabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-portability-card workspace-portability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatPortabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {portabilityAdminSummary.availableActions.includes(
+              'refresh_portability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={portabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handlePortabilityAdminAction(
+                    'refresh_portability_summary',
+                  )
+                }
+              >
+                {formatPortabilityAdminAction('refresh_portability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {transferabilityAdminSummary ? (
+          <div className="billing-admin workspace-transferability-admin">
+            <div className="billing-admin__header">
+              <span>Transferability admin</span>
+              <strong>{transferabilityAdminSummary.role}</strong>
+            </div>
+            <p>{transferabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing record transferability</span>
+                <strong>
+                  {transferabilityAdminSummary.stats.transferabilityPercent}%
+                </strong>
+                <small>
+                  {transferabilityAdminSummary.stats.coveredDomains}/
+                  {transferabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Transferability signals</span>
+                <strong>{transferabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {transferabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing records, and billing invoices'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-transferability-list">
+              {transferabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-transferability-card workspace-transferability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatTransferabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {transferabilityAdminSummary.availableActions.includes(
+              'refresh_transferability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={transferabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleTransferabilityAdminAction(
+                    'refresh_transferability_summary',
+                  )
+                }
+              >
+                {formatTransferabilityAdminAction('refresh_transferability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {interchangeabilityAdminSummary ? (
+          <div className="billing-admin workspace-interchangeability-admin">
+            <div className="billing-admin__header">
+              <span>Interchangeability admin</span>
+              <strong>{interchangeabilityAdminSummary.role}</strong>
+            </div>
+            <p>{interchangeabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Meter usage interchangeability</span>
+                <strong>
+                  {interchangeabilityAdminSummary.stats.interchangeabilityPercent}%
+                </strong>
+                <small>
+                  {interchangeabilityAdminSummary.stats.coveredDomains}/
+                  {interchangeabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Interchangeability signals</span>
+                <strong>{interchangeabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {interchangeabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, meter usage reports, and idempotency keys'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-interchangeability-list">
+              {interchangeabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-interchangeability-card workspace-interchangeability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatInterchangeabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {interchangeabilityAdminSummary.availableActions.includes(
+              'refresh_interchangeability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={interchangeabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleInterchangeabilityAdminAction(
+                    'refresh_interchangeability_summary',
+                  )
+                }
+              >
+                {formatInterchangeabilityAdminAction('refresh_interchangeability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {linkabilityAdminSummary ? (
+          <div className="billing-admin workspace-linkability-admin">
+            <div className="billing-admin__header">
+              <span>Linkability admin</span>
+              <strong>{linkabilityAdminSummary.role}</strong>
+            </div>
+            <p>{linkabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workflow linkability</span>
+                <strong>
+                  {linkabilityAdminSummary.stats.linkabilityPercent}%
+                </strong>
+                <small>
+                  {linkabilityAdminSummary.stats.coveredDomains}/
+                  {linkabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Linkability signals</span>
+                <strong>{linkabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {linkabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, run workflows, and artifacts'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-linkability-list">
+              {linkabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-linkability-card workspace-linkability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatLinkabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {linkabilityAdminSummary.availableActions.includes(
+              'refresh_linkability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={linkabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleLinkabilityAdminAction(
+                    'refresh_linkability_summary',
+                  )
+                }
+              >
+                {formatLinkabilityAdminAction('refresh_linkability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {connectabilityAdminSummary ? (
+          <div className="billing-admin workspace-connectability-admin">
+            <div className="billing-admin__header">
+              <span>Connectability admin</span>
+              <strong>{connectabilityAdminSummary.role}</strong>
+            </div>
+            <p>{connectabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Usage event connectability</span>
+                <strong>
+                  {connectabilityAdminSummary.stats.connectabilityPercent}%
+                </strong>
+                <small>
+                  {connectabilityAdminSummary.stats.coveredDomains}/
+                  {connectabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Connectability signals</span>
+                <strong>{connectabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {connectabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, usage events, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-connectability-list">
+              {connectabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-connectability-card workspace-connectability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatConnectabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {connectabilityAdminSummary.availableActions.includes(
+              'refresh_connectability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={connectabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleConnectabilityAdminAction(
+                    'refresh_connectability_summary',
+                  )
+                }
+              >
+                {formatConnectabilityAdminAction('refresh_connectability_summary')}
               </button>
             ) : null}
           </div>

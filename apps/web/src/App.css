@@ -2525,6 +2525,136 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-connectability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-connectability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-connectability-card p,
+.workspace-connectability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-connectability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-connectability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-linkability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-linkability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-linkability-card p,
+.workspace-linkability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-linkability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-linkability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-interchangeability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-interchangeability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-interchangeability-card p,
+.workspace-interchangeability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-interchangeability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-interchangeability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-transferability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-transferability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-transferability-card p,
+.workspace-transferability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-transferability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-transferability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-portability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-portability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-portability-card p,
+.workspace-portability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-portability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-portability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;
