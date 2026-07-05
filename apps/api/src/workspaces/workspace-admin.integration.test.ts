@@ -2556,3 +2556,71 @@ describe('governance rollout integration', () => {
       .expect(403)
   })
 })
+
+describe('oversight rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports oversight capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/oversight/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsOversightRollout: true,
+      supportsOversightAdminTools: true,
+      supportsBillingOversightSignals: true,
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/oversight/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns oversight admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/oversight/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        oversightPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects oversight admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/oversight/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})

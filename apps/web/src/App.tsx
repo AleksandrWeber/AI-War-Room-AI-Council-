@@ -86,6 +86,8 @@ import type {
   SustainabilityAdminSummaryResponse,
   GovernanceRolloutResponse,
   GovernanceAdminSummaryResponse,
+  OversightRolloutResponse,
+  OversightAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -431,6 +433,15 @@ import {
   formatGovernanceRolloutCheckStatus,
   formatGovernanceRolloutStatus,
 } from './governance-ui'
+import {
+  executeOversightAdminAction,
+  fetchOversightAdminSummary,
+  fetchOversightRollout,
+  formatOversightAdminAction,
+  formatOversightDomain,
+  formatOversightRolloutCheckStatus,
+  formatOversightRolloutStatus,
+} from './oversight-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -1052,6 +1063,8 @@ function App() {
     useState<SustainabilityRolloutResponse | null>(null)
   const [governanceRollout, setGovernanceRollout] =
     useState<GovernanceRolloutResponse | null>(null)
+  const [oversightRollout, setOversightRollout] =
+    useState<OversightRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1201,6 +1214,8 @@ function App() {
     useState<SustainabilityAdminSummaryResponse | null>(null)
   const [governanceAdminSummary, setGovernanceAdminSummary] =
     useState<GovernanceAdminSummaryResponse | null>(null)
+  const [oversightAdminSummary, setOversightAdminSummary] =
+    useState<OversightAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1307,6 +1322,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [governanceAdminAction, setGovernanceAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [oversightAdminAction, setOversightAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1857,6 +1875,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setGovernanceRollout(null)
+        }
+      })
+
+    fetchOversightRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setOversightRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setOversightRollout(null)
         }
       })
 
@@ -2798,6 +2828,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setGovernanceAdminSummary(governanceAdmin)
+
+      const oversightAdmin = await fetchOversightAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setOversightAdminSummary(oversightAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -3914,6 +3951,35 @@ function App() {
       )
     } finally {
       setGovernanceAdminAction('idle')
+    }
+  }
+
+  async function handleOversightAdminAction(
+    action: 'refresh_oversight_summary',
+  ) {
+    setOversightAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeOversightAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchOversightRollout(apiBaseUrl)
+      setOversightRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run oversight admin action.',
+      )
+    } finally {
+      setOversightAdminAction('idle')
     }
   }
 
@@ -5635,6 +5701,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {governanceRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {oversightRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production oversight rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${oversightRollout.status}`}
+              >
+                {formatOversightRolloutStatus(oversightRollout.status)}
+              </strong>
+            </div>
+            <p>{oversightRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {oversightRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatOversightRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {oversightRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -8308,6 +8403,71 @@ function App() {
                 }
               >
                 {formatGovernanceAdminAction('refresh_governance_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {oversightAdminSummary ? (
+          <div className="billing-admin workspace-oversight-admin">
+            <div className="billing-admin__header">
+              <span>Oversight admin</span>
+              <strong>{oversightAdminSummary.role}</strong>
+            </div>
+            <p>{oversightAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing oversight</span>
+                <strong>
+                  {oversightAdminSummary.stats.oversightPercent}%
+                </strong>
+                <small>
+                  {oversightAdminSummary.stats.coveredDomains}/
+                  {oversightAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Oversight signals</span>
+                <strong>{oversightAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {oversightAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, invoices, and webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-oversight-list">
+              {oversightAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-oversight-card workspace-oversight-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatOversightDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {oversightAdminSummary.availableActions.includes(
+              'refresh_oversight_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={oversightAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleOversightAdminAction(
+                    'refresh_oversight_summary',
+                  )
+                }
+              >
+                {formatOversightAdminAction('refresh_oversight_summary')}
               </button>
             ) : null}
           </div>

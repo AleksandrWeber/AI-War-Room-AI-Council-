@@ -28,6 +28,7 @@ import { OptimizationModule } from './optimization/optimization.module.js'
 import { UtilizationModule } from './utilization/utilization.module.js'
 import { SustainabilityModule } from './sustainability/sustainability.module.js'
 import { GovernanceModule } from './governance/governance.module.js'
+import { OversightModule } from './oversight/oversight.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -75,6 +76,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     UtilizationModule,
     SustainabilityModule,
     GovernanceModule,
+    OversightModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,
