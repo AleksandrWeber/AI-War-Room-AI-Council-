@@ -2395,6 +2395,136 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-referencability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-referencability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-referencability-card p,
+.workspace-referencability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-referencability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-referencability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-locatability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-locatability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-locatability-card p,
+.workspace-locatability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-locatability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-locatability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-retrievability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-retrievability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-retrievability-card p,
+.workspace-retrievability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-retrievability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-retrievability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-discoverability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-discoverability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-discoverability-card p,
+.workspace-discoverability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-discoverability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-discoverability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-navigability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-navigability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-navigability-card p,
+.workspace-navigability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-navigability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-navigability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

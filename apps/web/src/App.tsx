@@ -144,6 +144,16 @@ import type {
   DistinguishabilityAdminSummaryResponse,
   AssignabilityRolloutResponse,
   AssignabilityAdminSummaryResponse,
+  ReferencabilityRolloutResponse,
+  ReferencabilityAdminSummaryResponse,
+  LocatabilityRolloutResponse,
+  LocatabilityAdminSummaryResponse,
+  RetrievabilityRolloutResponse,
+  RetrievabilityAdminSummaryResponse,
+  DiscoverabilityRolloutResponse,
+  DiscoverabilityAdminSummaryResponse,
+  NavigabilityRolloutResponse,
+  NavigabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -750,6 +760,51 @@ import {
   formatAssignabilityRolloutCheckStatus,
   formatAssignabilityRolloutStatus,
 } from './assignability-ui'
+import {
+  executeReferencabilityAdminAction,
+  fetchReferencabilityAdminSummary,
+  fetchReferencabilityRollout,
+  formatReferencabilityAdminAction,
+  formatReferencabilityDomain,
+  formatReferencabilityRolloutCheckStatus,
+  formatReferencabilityRolloutStatus,
+} from './referencability-ui'
+import {
+  executeLocatabilityAdminAction,
+  fetchLocatabilityAdminSummary,
+  fetchLocatabilityRollout,
+  formatLocatabilityAdminAction,
+  formatLocatabilityDomain,
+  formatLocatabilityRolloutCheckStatus,
+  formatLocatabilityRolloutStatus,
+} from './locatability-ui'
+import {
+  executeRetrievabilityAdminAction,
+  fetchRetrievabilityAdminSummary,
+  fetchRetrievabilityRollout,
+  formatRetrievabilityAdminAction,
+  formatRetrievabilityDomain,
+  formatRetrievabilityRolloutCheckStatus,
+  formatRetrievabilityRolloutStatus,
+} from './retrievability-ui'
+import {
+  executeDiscoverabilityAdminAction,
+  fetchDiscoverabilityAdminSummary,
+  fetchDiscoverabilityRollout,
+  formatDiscoverabilityAdminAction,
+  formatDiscoverabilityDomain,
+  formatDiscoverabilityRolloutCheckStatus,
+  formatDiscoverabilityRolloutStatus,
+} from './discoverability-ui'
+import {
+  executeNavigabilityAdminAction,
+  fetchNavigabilityAdminSummary,
+  fetchNavigabilityRollout,
+  formatNavigabilityAdminAction,
+  formatNavigabilityDomain,
+  formatNavigabilityRolloutCheckStatus,
+  formatNavigabilityRolloutStatus,
+} from './navigability-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -1429,6 +1484,16 @@ function App() {
     useState<DistinguishabilityRolloutResponse | null>(null)
   const [assignabilityRollout, setAssignabilityRollout] =
     useState<AssignabilityRolloutResponse | null>(null)
+  const [referencabilityRollout, setReferencabilityRollout] =
+    useState<ReferencabilityRolloutResponse | null>(null)
+  const [locatabilityRollout, setLocatabilityRollout] =
+    useState<LocatabilityRolloutResponse | null>(null)
+  const [retrievabilityRollout, setRetrievabilityRollout] =
+    useState<RetrievabilityRolloutResponse | null>(null)
+  const [discoverabilityRollout, setDiscoverabilityRollout] =
+    useState<DiscoverabilityRolloutResponse | null>(null)
+  const [navigabilityRollout, setNavigabilityRollout] =
+    useState<NavigabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1636,6 +1701,16 @@ function App() {
     useState<DistinguishabilityAdminSummaryResponse | null>(null)
   const [assignabilityAdminSummary, setAssignabilityAdminSummary] =
     useState<AssignabilityAdminSummaryResponse | null>(null)
+  const [referencabilityAdminSummary, setReferencabilityAdminSummary] =
+    useState<ReferencabilityAdminSummaryResponse | null>(null)
+  const [locatabilityAdminSummary, setLocatabilityAdminSummary] =
+    useState<LocatabilityAdminSummaryResponse | null>(null)
+  const [retrievabilityAdminSummary, setRetrievabilityAdminSummary] =
+    useState<RetrievabilityAdminSummaryResponse | null>(null)
+  const [discoverabilityAdminSummary, setDiscoverabilityAdminSummary] =
+    useState<DiscoverabilityAdminSummaryResponse | null>(null)
+  const [navigabilityAdminSummary, setNavigabilityAdminSummary] =
+    useState<NavigabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1829,6 +1904,21 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [assignabilityAdminAction, setAssignabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [referencabilityAdminAction, setReferencabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [locatabilityAdminAction, setLocatabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [retrievabilityAdminAction, setRetrievabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [discoverabilityAdminAction, setDiscoverabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [navigabilityAdminAction, setNavigabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -2727,6 +2817,66 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setAssignabilityRollout(null)
+        }
+      })
+
+    fetchReferencabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setReferencabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setReferencabilityRollout(null)
+        }
+      })
+
+    fetchLocatabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setLocatabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setLocatabilityRollout(null)
+        }
+      })
+
+    fetchRetrievabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setRetrievabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setRetrievabilityRollout(null)
+        }
+      })
+
+    fetchDiscoverabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setDiscoverabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDiscoverabilityRollout(null)
+        }
+      })
+
+    fetchNavigabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setNavigabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setNavigabilityRollout(null)
         }
       })
 
@@ -3871,6 +4021,41 @@ function App() {
         workspaceAuthHeaders,
       )
       setAssignabilityAdminSummary(assignabilityAdmin)
+
+      const referencabilityAdmin = await fetchReferencabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReferencabilityAdminSummary(referencabilityAdmin)
+
+      const locatabilityAdmin = await fetchLocatabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setLocatabilityAdminSummary(locatabilityAdmin)
+
+      const retrievabilityAdmin = await fetchRetrievabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRetrievabilityAdminSummary(retrievabilityAdmin)
+
+      const discoverabilityAdmin = await fetchDiscoverabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDiscoverabilityAdminSummary(discoverabilityAdmin)
+
+      const navigabilityAdmin = await fetchNavigabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNavigabilityAdminSummary(navigabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -5103,6 +5288,151 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleNavigabilityAdminAction(
+    action: 'refresh_navigability_summary',
+  ) {
+    setNavigabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeNavigabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchNavigabilityRollout(apiBaseUrl)
+      setNavigabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run navigability admin action.',
+      )
+    } finally {
+      setNavigabilityAdminAction('idle')
+    }
+  }
+
+  async function handleDiscoverabilityAdminAction(
+    action: 'refresh_discoverability_summary',
+  ) {
+    setDiscoverabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeDiscoverabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchDiscoverabilityRollout(apiBaseUrl)
+      setDiscoverabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run discoverability admin action.',
+      )
+    } finally {
+      setDiscoverabilityAdminAction('idle')
+    }
+  }
+
+  async function handleRetrievabilityAdminAction(
+    action: 'refresh_retrievability_summary',
+  ) {
+    setRetrievabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeRetrievabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchRetrievabilityRollout(apiBaseUrl)
+      setRetrievabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run retrievability admin action.',
+      )
+    } finally {
+      setRetrievabilityAdminAction('idle')
+    }
+  }
+
+  async function handleLocatabilityAdminAction(
+    action: 'refresh_locatability_summary',
+  ) {
+    setLocatabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeLocatabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchLocatabilityRollout(apiBaseUrl)
+      setLocatabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run locatability admin action.',
+      )
+    } finally {
+      setLocatabilityAdminAction('idle')
+    }
+  }
+
+  async function handleReferencabilityAdminAction(
+    action: 'refresh_referencability_summary',
+  ) {
+    setReferencabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeReferencabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchReferencabilityRollout(apiBaseUrl)
+      setReferencabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run referencability admin action.',
+      )
+    } finally {
+      setReferencabilityAdminAction('idle')
     }
   }
 
@@ -8390,6 +8720,151 @@ function App() {
               ))}
             </div>
             <small>Checked at {attributabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {navigabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production navigability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${navigabilityRollout.status}`}
+              >
+                {formatNavigabilityRolloutStatus(navigabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{navigabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {navigabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatNavigabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {navigabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {discoverabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production discoverability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${discoverabilityRollout.status}`}
+              >
+                {formatDiscoverabilityRolloutStatus(discoverabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{discoverabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {discoverabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatDiscoverabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {discoverabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {retrievabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production retrievability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${retrievabilityRollout.status}`}
+              >
+                {formatRetrievabilityRolloutStatus(retrievabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{retrievabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {retrievabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatRetrievabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {retrievabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {locatabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production locatability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${locatabilityRollout.status}`}
+              >
+                {formatLocatabilityRolloutStatus(locatabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{locatabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {locatabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatLocatabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {locatabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {referencabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production referencability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${referencabilityRollout.status}`}
+              >
+                {formatReferencabilityRolloutStatus(referencabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{referencabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {referencabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatReferencabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {referencabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -12952,6 +13427,331 @@ function App() {
                 }
               >
                 {formatAttributabilityAdminAction('refresh_attributability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {navigabilityAdminSummary ? (
+          <div className="billing-admin workspace-navigability-admin">
+            <div className="billing-admin__header">
+              <span>Navigability admin</span>
+              <strong>{navigabilityAdminSummary.role}</strong>
+            </div>
+            <p>{navigabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workflow navigability</span>
+                <strong>
+                  {navigabilityAdminSummary.stats.navigabilityPercent}%
+                </strong>
+                <small>
+                  {navigabilityAdminSummary.stats.coveredDomains}/
+                  {navigabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Navigability signals</span>
+                <strong>{navigabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {navigabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, run workflows, and billing invoices'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-navigability-list">
+              {navigabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-navigability-card workspace-navigability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatNavigabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {navigabilityAdminSummary.availableActions.includes(
+              'refresh_navigability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={navigabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleNavigabilityAdminAction(
+                    'refresh_navigability_summary',
+                  )
+                }
+              >
+                {formatNavigabilityAdminAction('refresh_navigability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {discoverabilityAdminSummary ? (
+          <div className="billing-admin workspace-discoverability-admin">
+            <div className="billing-admin__header">
+              <span>Discoverability admin</span>
+              <strong>{discoverabilityAdminSummary.role}</strong>
+            </div>
+            <p>{discoverabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Meter usage discoverability</span>
+                <strong>
+                  {discoverabilityAdminSummary.stats.discoverabilityPercent}%
+                </strong>
+                <small>
+                  {discoverabilityAdminSummary.stats.coveredDomains}/
+                  {discoverabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Discoverability signals</span>
+                <strong>{discoverabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {discoverabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, meter usage reports, and billing notifications'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-discoverability-list">
+              {discoverabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-discoverability-card workspace-discoverability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatDiscoverabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {discoverabilityAdminSummary.availableActions.includes(
+              'refresh_discoverability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={discoverabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleDiscoverabilityAdminAction(
+                    'refresh_discoverability_summary',
+                  )
+                }
+              >
+                {formatDiscoverabilityAdminAction('refresh_discoverability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {retrievabilityAdminSummary ? (
+          <div className="billing-admin workspace-retrievability-admin">
+            <div className="billing-admin__header">
+              <span>Retrievability admin</span>
+              <strong>{retrievabilityAdminSummary.role}</strong>
+            </div>
+            <p>{retrievabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan retrievability</span>
+                <strong>
+                  {retrievabilityAdminSummary.stats.retrievabilityPercent}%
+                </strong>
+                <small>
+                  {retrievabilityAdminSummary.stats.coveredDomains}/
+                  {retrievabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Retrievability signals</span>
+                <strong>{retrievabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {retrievabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and idempotency keys'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-retrievability-list">
+              {retrievabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-retrievability-card workspace-retrievability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatRetrievabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {retrievabilityAdminSummary.availableActions.includes(
+              'refresh_retrievability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={retrievabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleRetrievabilityAdminAction(
+                    'refresh_retrievability_summary',
+                  )
+                }
+              >
+                {formatRetrievabilityAdminAction('refresh_retrievability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {locatabilityAdminSummary ? (
+          <div className="billing-admin workspace-locatability-admin">
+            <div className="billing-admin__header">
+              <span>Locatability admin</span>
+              <strong>{locatabilityAdminSummary.role}</strong>
+            </div>
+            <p>{locatabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Provider credential locatability</span>
+                <strong>
+                  {locatabilityAdminSummary.stats.locatabilityPercent}%
+                </strong>
+                <small>
+                  {locatabilityAdminSummary.stats.coveredDomains}/
+                  {locatabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Locatability signals</span>
+                <strong>{locatabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {locatabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, provider credentials, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-locatability-list">
+              {locatabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-locatability-card workspace-locatability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatLocatabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {locatabilityAdminSummary.availableActions.includes(
+              'refresh_locatability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={locatabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleLocatabilityAdminAction(
+                    'refresh_locatability_summary',
+                  )
+                }
+              >
+                {formatLocatabilityAdminAction('refresh_locatability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {referencabilityAdminSummary ? (
+          <div className="billing-admin workspace-referencability-admin">
+            <div className="billing-admin__header">
+              <span>Referencability admin</span>
+              <strong>{referencabilityAdminSummary.role}</strong>
+            </div>
+            <p>{referencabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Artifact referencability</span>
+                <strong>
+                  {referencabilityAdminSummary.stats.referencabilityPercent}%
+                </strong>
+                <small>
+                  {referencabilityAdminSummary.stats.coveredDomains}/
+                  {referencabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Referencability signals</span>
+                <strong>{referencabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {referencabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, artifacts, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-referencability-list">
+              {referencabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-referencability-card workspace-referencability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatReferencabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {referencabilityAdminSummary.availableActions.includes(
+              'refresh_referencability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={referencabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleReferencabilityAdminAction(
+                    'refresh_referencability_summary',
+                  )
+                }
+              >
+                {formatReferencabilityAdminAction('refresh_referencability_summary')}
               </button>
             ) : null}
           </div>

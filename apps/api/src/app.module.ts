@@ -57,6 +57,11 @@ import { IdentifiabilityModule } from './identifiability/identifiability.module.
 import { ComparabilityModule } from './comparability/comparability.module.js'
 import { DistinguishabilityModule } from './distinguishability/distinguishability.module.js'
 import { AssignabilityModule } from './assignability/assignability.module.js'
+import { ReferencabilityModule } from './referencability/referencability.module.js'
+import { LocatabilityModule } from './locatability/locatability.module.js'
+import { RetrievabilityModule } from './retrievability/retrievability.module.js'
+import { DiscoverabilityModule } from './discoverability/discoverability.module.js'
+import { NavigabilityModule } from './navigability/navigability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -133,6 +138,11 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     ComparabilityModule,
     DistinguishabilityModule,
     AssignabilityModule,
+    ReferencabilityModule,
+    LocatabilityModule,
+    RetrievabilityModule,
+    DiscoverabilityModule,
+    NavigabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

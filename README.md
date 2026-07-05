@@ -796,6 +796,36 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.90` behavior:
+
+- Production navigability rollout readiness validates navigability coverage and readiness through `GET /api/navigability/readiness`.
+- Workspace owners and admins can inspect workspace navigability metrics from `GET /api/navigability/workspace/:workspaceId/admin`.
+- The web billing panel shows navigability rollout checks and workspace navigability admin tools.
+
+Current `v5.89` behavior:
+
+- Production discoverability rollout readiness validates discoverability coverage and readiness through `GET /api/discoverability/readiness`.
+- Workspace owners and admins can inspect workspace discoverability metrics from `GET /api/discoverability/workspace/:workspaceId/admin`.
+- The web billing panel shows discoverability rollout checks and workspace discoverability admin tools.
+
+Current `v5.88` behavior:
+
+- Production retrievability rollout readiness validates retrievability coverage and readiness through `GET /api/retrievability/readiness`.
+- Workspace owners and admins can inspect workspace retrievability metrics from `GET /api/retrievability/workspace/:workspaceId/admin`.
+- The web billing panel shows retrievability rollout checks and workspace retrievability admin tools.
+
+Current `v5.87` behavior:
+
+- Production locatability rollout readiness validates locatability coverage and readiness through `GET /api/locatability/readiness`.
+- Workspace owners and admins can inspect workspace locatability metrics from `GET /api/locatability/workspace/:workspaceId/admin`.
+- The web billing panel shows locatability rollout checks and workspace locatability admin tools.
+
+Current `v5.86` behavior:
+
+- Production referencability rollout readiness validates referencability coverage and readiness through `GET /api/referencability/readiness`.
+- Workspace owners and admins can inspect workspace referencability metrics from `GET /api/referencability/workspace/:workspaceId/admin`.
+- The web billing panel shows referencability rollout checks and workspace referencability admin tools.
+
 Current `v5.85` behavior:
 
 - Production assignability rollout readiness validates assignability coverage and readiness through `GET /api/assignability/readiness`.
