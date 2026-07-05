@@ -976,6 +976,23 @@
   border-color: color-mix(in srgb, var(--danger) 35%, var(--border));
 }
 
+.workspace-quota-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.workspace-quota-card {
+  border: 1px solid var(--border);
+  border-radius: 0.75rem;
+  padding: 0.875rem 1rem;
+}
+
+.workspace-quota-card p,
+.workspace-quota-card small {
+  margin: 0;
+  color: var(--muted);
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

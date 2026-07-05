@@ -7,6 +7,8 @@ import { WorkspacesModule } from '../workspaces/workspaces.module.js'
 import { InMemoryUsageRepository } from './in-memory-usage.repository.js'
 import { PostgresUsageRepository } from './postgres-usage.repository.js'
 import { UsageController } from './usage.controller.js'
+import { UsageLimitsAdminService } from './usage-limits-admin.service.js'
+import { UsageLimitsController } from './usage-limits.controller.js'
 import { UsageService } from './usage.service.js'
 import { USAGE_REPOSITORY } from './usage.repository.js'
 
@@ -16,10 +18,11 @@ import { USAGE_REPOSITORY } from './usage.repository.js'
     forwardRef(() => AuthModule),
     forwardRef(() => WorkspacesModule),
   ],
-  controllers: [UsageController],
+  controllers: [UsageController, UsageLimitsController],
   providers: [
     PostgresUsageRepository,
     UsageService,
+    UsageLimitsAdminService,
     {
       provide: USAGE_REPOSITORY,
       inject: [ConfigService, PostgresUsageRepository],

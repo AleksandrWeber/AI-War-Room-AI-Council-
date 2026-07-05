@@ -510,6 +510,25 @@ Workspace idempotency admin tools:
 - Only workspace owners and admins can access idempotency admin endpoints.
 - The web billing panel shows idempotency admin tools for authorized roles.
 
+Usage limits rollout readiness:
+
+- `GET /api/usage/limits/readiness` returns operator-facing production usage limits checklist results (`ready` or `not_ready`).
+- Checks cover persisted limits, daily cost quota enforcement, token tracking, and tier configuration.
+- The web billing panel shows usage limits rollout status and per-check guidance.
+
+Workspace quota admin tools:
+
+- `GET /api/usage/limits/workspace/:workspaceId/admin` returns owner/admin quota summary with recent usage events.
+- `POST /api/usage/limits/workspace/:workspaceId/admin/actions` runs quota admin actions such as refreshing the summary.
+- Only workspace owners and admins can access quota admin endpoints.
+- The web billing panel shows quota admin tools for authorized roles.
+
+Current `v5.30` behavior:
+
+- Usage limits rollout readiness validates quota enforcement through `GET /api/usage/limits/readiness`.
+- Workspace owners and admins can inspect quota utilization from `GET /api/usage/limits/workspace/:workspaceId/admin`.
+- The web billing panel shows usage limits rollout checks and workspace quota admin tools.
+
 Current `v5.29` behavior:
 
 - Idempotency rollout readiness validates Redis reservations and persisted keys through `GET /api/idempotency/readiness`.

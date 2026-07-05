@@ -32,6 +32,8 @@ import type {
   StreamRecoveryAdminSummaryResponse,
   IdempotencyRolloutResponse,
   IdempotencyAdminSummaryResponse,
+  UsageLimitsRolloutResponse,
+  QuotaAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -133,6 +135,15 @@ import {
   formatIdempotencyRolloutCheckStatus,
   formatIdempotencyRolloutStatus,
 } from './idempotency-ui'
+import {
+  executeQuotaAdminAction,
+  fetchQuotaAdminSummary,
+  fetchUsageLimitsRollout,
+  formatQuotaAdminAction,
+  formatUsageLimitsRolloutCheckStatus,
+  formatUsageLimitsRolloutStatus,
+  formatUsagePhase,
+} from './usage-limits-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -701,6 +712,8 @@ function App() {
     useState<StreamReplayRolloutResponse | null>(null)
   const [idempotencyRollout, setIdempotencyRollout] =
     useState<IdempotencyRolloutResponse | null>(null)
+  const [usageLimitsRollout, setUsageLimitsRollout] =
+    useState<UsageLimitsRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -796,6 +809,8 @@ function App() {
     useState<StreamRecoveryAdminSummaryResponse | null>(null)
   const [idempotencyAdminSummary, setIdempotencyAdminSummary] =
     useState<IdempotencyAdminSummaryResponse | null>(null)
+  const [quotaAdminSummary, setQuotaAdminSummary] =
+    useState<QuotaAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -823,6 +838,9 @@ function App() {
   const [idempotencyAdminAction, setIdempotencyAdminAction] = useState<
     'idle' | 'running'
   >('idle')
+  const [quotaAdminAction, setQuotaAdminAction] = useState<'idle' | 'running'>(
+    'idle',
+  )
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
   const [memberAdminAction, setMemberAdminAction] = useState<
     'idle' | 'running'
@@ -1047,6 +1065,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setIdempotencyRollout(null)
+        }
+      })
+
+    fetchUsageLimitsRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setUsageLimitsRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setUsageLimitsRollout(null)
         }
       })
 
@@ -1799,6 +1829,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setIdempotencyAdminSummary(idempotencyAdmin)
+
+      const quotaAdmin = await fetchQuotaAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setQuotaAdminSummary(quotaAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -2152,6 +2189,33 @@ function App() {
       )
     } finally {
       setIdempotencyAdminAction('idle')
+    }
+  }
+
+  async function handleQuotaAdminAction(action: 'refresh_quota_summary') {
+    setQuotaAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeQuotaAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchUsageLimitsRollout(apiBaseUrl)
+      setUsageLimitsRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run quota admin action.',
+      )
+    } finally {
+      setQuotaAdminAction('idle')
     }
   }
 
@@ -3096,6 +3160,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {idempotencyRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {usageLimitsRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Usage limits rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${usageLimitsRollout.status}`}
+              >
+                {formatUsageLimitsRolloutStatus(usageLimitsRollout.status)}
+              </strong>
+            </div>
+            <p>{usageLimitsRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {usageLimitsRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatUsageLimitsRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {usageLimitsRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -4069,6 +4162,67 @@ function App() {
                 {formatIdempotencyAdminAction(
                   'clear_workspace_idempotency_reservations',
                 )}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {quotaAdminSummary ? (
+          <div className="billing-admin workspace-quota-admin">
+            <div className="billing-admin__header">
+              <span>Quota admin</span>
+              <strong>{quotaAdminSummary.role}</strong>
+            </div>
+            <p>{quotaAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Token quota</span>
+                <strong>{quotaAdminSummary.stats.tokenUtilizationPercent}%</strong>
+                <small>
+                  {quotaAdminSummary.usage.dailyUsage.totalTokens.toLocaleString()} /{' '}
+                  {quotaAdminSummary.usage.dailyTokenLimit.toLocaleString()}
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Cost quota</span>
+                <strong>{quotaAdminSummary.stats.costUtilizationPercent}%</strong>
+                <small>
+                  ${quotaAdminSummary.usage.dailyUsage.estimatedCostUsd.toFixed(2)} / $
+                  {quotaAdminSummary.usage.dailyCostLimitUsd.toFixed(2)}
+                  {quotaAdminSummary.stats.quotaExceeded ? ' · Exceeded' : ''}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-quota-list">
+              {quotaAdminSummary.records.length ? (
+                quotaAdminSummary.records.map((record) => (
+                  <article className="workspace-quota-card" key={record.usageEventId}>
+                    <div>
+                      <strong>{formatUsagePhase(record.phase)}</strong>
+                      <p>
+                        Run {record.runId} · {record.totalTokens.toLocaleString()} tokens
+                      </p>
+                      <small>
+                        ${record.estimatedCostUsd.toFixed(2)} ·{' '}
+                        {record.createdAt.slice(0, 19).replace('T', ' ')}
+                      </small>
+                    </div>
+                  </article>
+                ))
+              ) : (
+                <p className="clear-copy">
+                  No usage events recorded for this workspace yet.
+                </p>
+              )}
+            </div>
+            {quotaAdminSummary.availableActions.includes('refresh_quota_summary') ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={quotaAdminAction !== 'idle'}
+                onClick={() => void handleQuotaAdminAction('refresh_quota_summary')}
+              >
+                {formatQuotaAdminAction('refresh_quota_summary')}
               </button>
             ) : null}
           </div>

@@ -69,6 +69,14 @@ export class UsageService {
     }
   }
 
+  async getDailyUsageMetrics(workspaceId: string) {
+    return this.usageRepository.getDailyUsageMetrics(workspaceId)
+  }
+
+  async listRecentUsageEvents(workspaceId: string) {
+    return this.usageRepository.listWorkspaceUsageEvents(workspaceId, 20)
+  }
+
   async getWorkspaceUsageSummary(workspaceId: string) {
     const limit = await this.usageRepository.getWorkspaceLimit(workspaceId)
     const usage = await this.usageRepository.getDailyUsageTotal(workspaceId)
