@@ -223,6 +223,16 @@ import { InvalidationizabilityModule } from './invalidationizability/invalidatio
 import { EvictionizabilityModule } from './evictionizability/evictionizability.module.js'
 import { TtlizabilityModule } from './ttlizability/ttlizability.module.js'
 import { ExpirationizabilityModule } from './expirationizability/expirationizability.module.js'
+import { RefreshizabilityModule } from './refreshizability/refreshizability.module.js'
+import { WarmizabilityModule } from './warmizability/warmizability.module.js'
+import { ColdizabilityModule } from './coldizability/coldizability.module.js'
+import { PrefetchizabilityModule } from './prefetchizability/prefetchizability.module.js'
+import { CacheizabilityModule } from './cacheizability/cacheizability.module.js'
+import { MemorizabilityModule } from './memorizability/memorizability.module.js'
+import { PersistizabilityModule } from './persistizability/persistizability.module.js'
+import { CompressizabilityModule } from './compressizability/compressizability.module.js'
+import { DecompressizabilityModule } from './decompressizability/decompressizability.module.js'
+import { ArchiveizabilityModule } from './archiveizability/archiveizability.module.js'
 
 @Module({
   imports: [
@@ -450,6 +460,16 @@ import { ExpirationizabilityModule } from './expirationizability/expirationizabi
     EvictionizabilityModule,
     TtlizabilityModule,
     ExpirationizabilityModule,
+    RefreshizabilityModule,
+    WarmizabilityModule,
+    ColdizabilityModule,
+    PrefetchizabilityModule,
+    CacheizabilityModule,
+    MemorizabilityModule,
+    PersistizabilityModule,
+    CompressizabilityModule,
+    DecompressizabilityModule,
+    ArchiveizabilityModule,
   ],
   exports: [
     CustomizabilityModule,
