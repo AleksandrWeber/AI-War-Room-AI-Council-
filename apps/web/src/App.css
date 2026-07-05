@@ -5385,6 +5385,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-epistemizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-epistemizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-epistemizability-card p,
+.workspace-epistemizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-epistemizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-epistemizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-dialectizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-dialectizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-dialectizability-card p,
+.workspace-dialectizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-dialectizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-dialectizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-ontologizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-ontologizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-ontologizability-card p,
+.workspace-ontologizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-ontologizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-ontologizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-phenomenizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-phenomenizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-phenomenizability-card p,
+.workspace-phenomenizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-phenomenizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-phenomenizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-axiologizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-axiologizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-axiologizability-card p,
+.workspace-axiologizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-axiologizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-axiologizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-teleologizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-teleologizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-teleologizability-card p,
+.workspace-teleologizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-teleologizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-teleologizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-gnoseizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-gnoseizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-gnoseizability-card p,
+.workspace-gnoseizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-gnoseizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-gnoseizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-methodizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-methodizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-methodizability-card p,
+.workspace-methodizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-methodizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-methodizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-historizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-historizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-historizability-card p,
+.workspace-historizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-historizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-historizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-categorizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-categorizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-categorizability-card p,
+.workspace-categorizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-categorizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-categorizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

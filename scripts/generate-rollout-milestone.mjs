@@ -2,7 +2,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { milestones } from './milestones-v696-v700.mjs'
+import { milestones } from './milestones-v706-v710.mjs'
 
 const root = join(import.meta.dirname, '..')
 

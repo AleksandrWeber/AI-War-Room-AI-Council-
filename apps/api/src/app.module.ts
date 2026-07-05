@@ -172,6 +172,16 @@ import { RhetorizabilityModule } from './rhetorizability/rhetorizability.module.
 import { MorphizabilityModule } from './morphizability/morphizability.module.js'
 import { CodifiabilityModule } from './codifiability/codifiability.module.js'
 import { HermeticizabilityModule } from './hermeticizability/hermeticizability.module.js'
+import { EpistemizabilityModule } from './epistemizability/epistemizability.module.js'
+import { DialectizabilityModule } from './dialectizability/dialectizability.module.js'
+import { OntologizabilityModule } from './ontologizability/ontologizability.module.js'
+import { PhenomenizabilityModule } from './phenomenizability/phenomenizability.module.js'
+import { AxiologizabilityModule } from './axiologizability/axiologizability.module.js'
+import { TeleologizabilityModule } from './teleologizability/teleologizability.module.js'
+import { GnoseizabilityModule } from './gnoseizability/gnoseizability.module.js'
+import { MethodizabilityModule } from './methodizability/methodizability.module.js'
+import { HistorizabilityModule } from './historizability/historizability.module.js'
+import { CategorizabilityModule } from './categorizability/categorizability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -363,6 +373,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     MorphizabilityModule,
     CodifiabilityModule,
     HermeticizabilityModule,
+    EpistemizabilityModule,
+    DialectizabilityModule,
+    OntologizabilityModule,
+    PhenomenizabilityModule,
+    AxiologizabilityModule,
+    TeleologizabilityModule,
+    GnoseizabilityModule,
+    MethodizabilityModule,
+    HistorizabilityModule,
+    CategorizabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,
