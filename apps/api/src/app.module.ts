@@ -282,6 +282,16 @@ import { CanaryizabilityModule } from './canaryizability/canaryizability.module.
 import { BluegreenizabilityModule } from './bluegreenizability/bluegreenizability.module.js'
 import { ProgressiveizabilityModule } from './progressiveizability/progressiveizability.module.js'
 import { FeatureflagizabilityModule } from './featureflagizability/featureflagizability.module.js'
+import { ScriptabilizabilityModule } from './scriptabilizability/scriptabilizability.module.js'
+import { AutomatizabilityModule } from './automatizability/automatizability.module.js'
+import { OrchestrizabilityModule } from './orchestrizability/orchestrizability.module.js'
+import { SchedulizabilityModule } from './schedulizability/schedulizability.module.js'
+import { TriggerizabilityModule } from './triggerizability/triggerizability.module.js'
+import { ReleasizabilityModule } from './releasizability/releasizability.module.js'
+import { VersionizabilityModule } from './versionizability/versionizability.module.js'
+import { MigratizabilityModule } from './migratizability/migratizability.module.js'
+import { UpgradizabilityModule } from './upgradizability/upgradizability.module.js'
+import { PatchizabilityModule } from './patchizability/patchizability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -583,6 +593,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     BluegreenizabilityModule,
     ProgressiveizabilityModule,
     FeatureflagizabilityModule,
+    ScriptabilizabilityModule,
+    AutomatizabilityModule,
+    OrchestrizabilityModule,
+    SchedulizabilityModule,
+    TriggerizabilityModule,
+    ReleasizabilityModule,
+    VersionizabilityModule,
+    MigratizabilityModule,
+    UpgradizabilityModule,
+    PatchizabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,
