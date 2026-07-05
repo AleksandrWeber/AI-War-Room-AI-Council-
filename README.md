@@ -796,6 +796,36 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.80` behavior:
+
+- Production warrantability rollout readiness validates warrantability coverage and readiness through `GET /api/warrantability/readiness`.
+- Workspace owners and admins can inspect workspace warrantability metrics from `GET /api/warrantability/workspace/:workspaceId/admin`.
+- The web billing panel shows warrantability rollout checks and workspace warrantability admin tools.
+
+Current `v5.79` behavior:
+
+- Production substantiability rollout readiness validates substantiability coverage and readiness through `GET /api/substantiability/readiness`.
+- Workspace owners and admins can inspect workspace substantiability metrics from `GET /api/substantiability/workspace/:workspaceId/admin`.
+- The web billing panel shows substantiability rollout checks and workspace substantiability admin tools.
+
+Current `v5.78` behavior:
+
+- Production certifiability rollout readiness validates certifiability coverage and readiness through `GET /api/certifiability/readiness`.
+- Workspace owners and admins can inspect workspace certifiability metrics from `GET /api/certifiability/workspace/:workspaceId/admin`.
+- The web billing panel shows certifiability rollout checks and workspace certifiability admin tools.
+
+Current `v5.77` behavior:
+
+- Production measurability rollout readiness validates measurability coverage and readiness through `GET /api/measurability/readiness`.
+- Workspace owners and admins can inspect workspace measurability metrics from `GET /api/measurability/workspace/:workspaceId/admin`.
+- The web billing panel shows measurability rollout checks and workspace measurability admin tools.
+
+Current `v5.76` behavior:
+
+- Production assessability rollout readiness validates assessability coverage and readiness through `GET /api/assessability/readiness`.
+- Workspace owners and admins can inspect workspace assessability metrics from `GET /api/assessability/workspace/:workspaceId/admin`.
+- The web billing panel shows assessability rollout checks and workspace assessability admin tools.
+
 Current `v5.75` behavior:
 
 - Production reviewability rollout readiness validates reviewability coverage and readiness through `GET /api/reviewability/readiness`.

@@ -47,6 +47,11 @@ import { ExplainabilityModule } from './explainability/explainability.module.js'
 import { DemonstrabilityModule } from './demonstrability/demonstrability.module.js'
 import { JustifiabilityModule } from './justifiability/justifiability.module.js'
 import { ReviewabilityModule } from './reviewability/reviewability.module.js'
+import { AssessabilityModule } from './assessability/assessability.module.js'
+import { MeasurabilityModule } from './measurability/measurability.module.js'
+import { CertifiabilityModule } from './certifiability/certifiability.module.js'
+import { SubstantiabilityModule } from './substantiability/substantiability.module.js'
+import { WarrantabilityModule } from './warrantability/warrantability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -113,6 +118,11 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     DemonstrabilityModule,
     JustifiabilityModule,
     ReviewabilityModule,
+    AssessabilityModule,
+    MeasurabilityModule,
+    CertifiabilityModule,
+    SubstantiabilityModule,
+    WarrantabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

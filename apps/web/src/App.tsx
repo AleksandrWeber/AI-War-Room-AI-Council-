@@ -124,6 +124,16 @@ import type {
   JustifiabilityAdminSummaryResponse,
   ReviewabilityRolloutResponse,
   ReviewabilityAdminSummaryResponse,
+  AssessabilityRolloutResponse,
+  AssessabilityAdminSummaryResponse,
+  MeasurabilityRolloutResponse,
+  MeasurabilityAdminSummaryResponse,
+  CertifiabilityRolloutResponse,
+  CertifiabilityAdminSummaryResponse,
+  SubstantiabilityRolloutResponse,
+  SubstantiabilityAdminSummaryResponse,
+  WarrantabilityRolloutResponse,
+  WarrantabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -640,6 +650,51 @@ import {
   formatReviewabilityRolloutCheckStatus,
   formatReviewabilityRolloutStatus,
 } from './reviewability-ui'
+import {
+  executeAssessabilityAdminAction,
+  fetchAssessabilityAdminSummary,
+  fetchAssessabilityRollout,
+  formatAssessabilityAdminAction,
+  formatAssessabilityDomain,
+  formatAssessabilityRolloutCheckStatus,
+  formatAssessabilityRolloutStatus,
+} from './assessability-ui'
+import {
+  executeMeasurabilityAdminAction,
+  fetchMeasurabilityAdminSummary,
+  fetchMeasurabilityRollout,
+  formatMeasurabilityAdminAction,
+  formatMeasurabilityDomain,
+  formatMeasurabilityRolloutCheckStatus,
+  formatMeasurabilityRolloutStatus,
+} from './measurability-ui'
+import {
+  executeCertifiabilityAdminAction,
+  fetchCertifiabilityAdminSummary,
+  fetchCertifiabilityRollout,
+  formatCertifiabilityAdminAction,
+  formatCertifiabilityDomain,
+  formatCertifiabilityRolloutCheckStatus,
+  formatCertifiabilityRolloutStatus,
+} from './certifiability-ui'
+import {
+  executeSubstantiabilityAdminAction,
+  fetchSubstantiabilityAdminSummary,
+  fetchSubstantiabilityRollout,
+  formatSubstantiabilityAdminAction,
+  formatSubstantiabilityDomain,
+  formatSubstantiabilityRolloutCheckStatus,
+  formatSubstantiabilityRolloutStatus,
+} from './substantiability-ui'
+import {
+  executeWarrantabilityAdminAction,
+  fetchWarrantabilityAdminSummary,
+  fetchWarrantabilityRollout,
+  formatWarrantabilityAdminAction,
+  formatWarrantabilityDomain,
+  formatWarrantabilityRolloutCheckStatus,
+  formatWarrantabilityRolloutStatus,
+} from './warrantability-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -1299,6 +1354,16 @@ function App() {
     useState<JustifiabilityRolloutResponse | null>(null)
   const [reviewabilityRollout, setReviewabilityRollout] =
     useState<ReviewabilityRolloutResponse | null>(null)
+  const [assessabilityRollout, setAssessabilityRollout] =
+    useState<AssessabilityRolloutResponse | null>(null)
+  const [measurabilityRollout, setMeasurabilityRollout] =
+    useState<MeasurabilityRolloutResponse | null>(null)
+  const [certifiabilityRollout, setCertifiabilityRollout] =
+    useState<CertifiabilityRolloutResponse | null>(null)
+  const [substantiabilityRollout, setSubstantiabilityRollout] =
+    useState<SubstantiabilityRolloutResponse | null>(null)
+  const [warrantabilityRollout, setWarrantabilityRollout] =
+    useState<WarrantabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1486,6 +1551,16 @@ function App() {
     useState<JustifiabilityAdminSummaryResponse | null>(null)
   const [reviewabilityAdminSummary, setReviewabilityAdminSummary] =
     useState<ReviewabilityAdminSummaryResponse | null>(null)
+  const [assessabilityAdminSummary, setAssessabilityAdminSummary] =
+    useState<AssessabilityAdminSummaryResponse | null>(null)
+  const [measurabilityAdminSummary, setMeasurabilityAdminSummary] =
+    useState<MeasurabilityAdminSummaryResponse | null>(null)
+  const [certifiabilityAdminSummary, setCertifiabilityAdminSummary] =
+    useState<CertifiabilityAdminSummaryResponse | null>(null)
+  const [substantiabilityAdminSummary, setSubstantiabilityAdminSummary] =
+    useState<SubstantiabilityAdminSummaryResponse | null>(null)
+  const [warrantabilityAdminSummary, setWarrantabilityAdminSummary] =
+    useState<WarrantabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1649,6 +1724,21 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [reviewabilityAdminAction, setReviewabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [assessabilityAdminAction, setAssessabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [measurabilityAdminAction, setMeasurabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [certifiabilityAdminAction, setCertifiabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [substantiabilityAdminAction, setSubstantiabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [warrantabilityAdminAction, setWarrantabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -2427,6 +2517,66 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setReviewabilityRollout(null)
+        }
+      })
+
+    fetchAssessabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAssessabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAssessabilityRollout(null)
+        }
+      })
+
+    fetchMeasurabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setMeasurabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setMeasurabilityRollout(null)
+        }
+      })
+
+    fetchCertifiabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setCertifiabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setCertifiabilityRollout(null)
+        }
+      })
+
+    fetchSubstantiabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setSubstantiabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setSubstantiabilityRollout(null)
+        }
+      })
+
+    fetchWarrantabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setWarrantabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setWarrantabilityRollout(null)
         }
       })
 
@@ -3501,6 +3651,41 @@ function App() {
         workspaceAuthHeaders,
       )
       setReviewabilityAdminSummary(reviewabilityAdmin)
+
+      const assessabilityAdmin = await fetchAssessabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAssessabilityAdminSummary(assessabilityAdmin)
+
+      const measurabilityAdmin = await fetchMeasurabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMeasurabilityAdminSummary(measurabilityAdmin)
+
+      const certifiabilityAdmin = await fetchCertifiabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCertifiabilityAdminSummary(certifiabilityAdmin)
+
+      const substantiabilityAdmin = await fetchSubstantiabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSubstantiabilityAdminSummary(substantiabilityAdmin)
+
+      const warrantabilityAdmin = await fetchWarrantabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setWarrantabilityAdminSummary(warrantabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -4733,6 +4918,151 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleWarrantabilityAdminAction(
+    action: 'refresh_warrantability_summary',
+  ) {
+    setWarrantabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeWarrantabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchWarrantabilityRollout(apiBaseUrl)
+      setWarrantabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run warrantability admin action.',
+      )
+    } finally {
+      setWarrantabilityAdminAction('idle')
+    }
+  }
+
+  async function handleSubstantiabilityAdminAction(
+    action: 'refresh_substantiability_summary',
+  ) {
+    setSubstantiabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeSubstantiabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchSubstantiabilityRollout(apiBaseUrl)
+      setSubstantiabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run substantiability admin action.',
+      )
+    } finally {
+      setSubstantiabilityAdminAction('idle')
+    }
+  }
+
+  async function handleCertifiabilityAdminAction(
+    action: 'refresh_certifiability_summary',
+  ) {
+    setCertifiabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeCertifiabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchCertifiabilityRollout(apiBaseUrl)
+      setCertifiabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run certifiability admin action.',
+      )
+    } finally {
+      setCertifiabilityAdminAction('idle')
+    }
+  }
+
+  async function handleMeasurabilityAdminAction(
+    action: 'refresh_measurability_summary',
+  ) {
+    setMeasurabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeMeasurabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchMeasurabilityRollout(apiBaseUrl)
+      setMeasurabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run measurability admin action.',
+      )
+    } finally {
+      setMeasurabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAssessabilityAdminAction(
+    action: 'refresh_assessability_summary',
+  ) {
+    setAssessabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAssessabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAssessabilityRollout(apiBaseUrl)
+      setAssessabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run assessability admin action.',
+      )
+    } finally {
+      setAssessabilityAdminAction('idle')
     }
   }
 
@@ -7440,6 +7770,151 @@ function App() {
               ))}
             </div>
             <small>Checked at {inspectabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {warrantabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production warrantability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${warrantabilityRollout.status}`}
+              >
+                {formatWarrantabilityRolloutStatus(warrantabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{warrantabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {warrantabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatWarrantabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {warrantabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {substantiabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production substantiability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${substantiabilityRollout.status}`}
+              >
+                {formatSubstantiabilityRolloutStatus(substantiabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{substantiabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {substantiabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatSubstantiabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {substantiabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {certifiabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production certifiability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${certifiabilityRollout.status}`}
+              >
+                {formatCertifiabilityRolloutStatus(certifiabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{certifiabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {certifiabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatCertifiabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {certifiabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {measurabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production measurability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${measurabilityRollout.status}`}
+              >
+                {formatMeasurabilityRolloutStatus(measurabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{measurabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {measurabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatMeasurabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {measurabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {assessabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production assessability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${assessabilityRollout.status}`}
+              >
+                {formatAssessabilityRolloutStatus(assessabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{assessabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {assessabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAssessabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {assessabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -11352,6 +11827,331 @@ function App() {
                 }
               >
                 {formatInspectabilityAdminAction('refresh_inspectability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {warrantabilityAdminSummary ? (
+          <div className="billing-admin workspace-warrantability-admin">
+            <div className="billing-admin__header">
+              <span>Warrantability admin</span>
+              <strong>{warrantabilityAdminSummary.role}</strong>
+            </div>
+            <p>{warrantabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan warrantability</span>
+                <strong>
+                  {warrantabilityAdminSummary.stats.warrantabilityPercent}%
+                </strong>
+                <small>
+                  {warrantabilityAdminSummary.stats.coveredDomains}/
+                  {warrantabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Warrantability signals</span>
+                <strong>{warrantabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {warrantabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and run workflows'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-warrantability-list">
+              {warrantabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-warrantability-card workspace-warrantability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatWarrantabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {warrantabilityAdminSummary.availableActions.includes(
+              'refresh_warrantability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={warrantabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleWarrantabilityAdminAction(
+                    'refresh_warrantability_summary',
+                  )
+                }
+              >
+                {formatWarrantabilityAdminAction('refresh_warrantability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {substantiabilityAdminSummary ? (
+          <div className="billing-admin workspace-substantiability-admin">
+            <div className="billing-admin__header">
+              <span>Substantiability admin</span>
+              <strong>{substantiabilityAdminSummary.role}</strong>
+            </div>
+            <p>{substantiabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing record substantiability</span>
+                <strong>
+                  {substantiabilityAdminSummary.stats.substantiabilityPercent}%
+                </strong>
+                <small>
+                  {substantiabilityAdminSummary.stats.coveredDomains}/
+                  {substantiabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Substantiability signals</span>
+                <strong>{substantiabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {substantiabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing records, and idempotency keys'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-substantiability-list">
+              {substantiabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-substantiability-card workspace-substantiability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatSubstantiabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {substantiabilityAdminSummary.availableActions.includes(
+              'refresh_substantiability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={substantiabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleSubstantiabilityAdminAction(
+                    'refresh_substantiability_summary',
+                  )
+                }
+              >
+                {formatSubstantiabilityAdminAction('refresh_substantiability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {certifiabilityAdminSummary ? (
+          <div className="billing-admin workspace-certifiability-admin">
+            <div className="billing-admin__header">
+              <span>Certifiability admin</span>
+              <strong>{certifiabilityAdminSummary.role}</strong>
+            </div>
+            <p>{certifiabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Provider credential certifiability</span>
+                <strong>
+                  {certifiabilityAdminSummary.stats.certifiabilityPercent}%
+                </strong>
+                <small>
+                  {certifiabilityAdminSummary.stats.coveredDomains}/
+                  {certifiabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Certifiability signals</span>
+                <strong>{certifiabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {certifiabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, provider credentials, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-certifiability-list">
+              {certifiabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-certifiability-card workspace-certifiability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatCertifiabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {certifiabilityAdminSummary.availableActions.includes(
+              'refresh_certifiability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={certifiabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleCertifiabilityAdminAction(
+                    'refresh_certifiability_summary',
+                  )
+                }
+              >
+                {formatCertifiabilityAdminAction('refresh_certifiability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {measurabilityAdminSummary ? (
+          <div className="billing-admin workspace-measurability-admin">
+            <div className="billing-admin__header">
+              <span>Measurability admin</span>
+              <strong>{measurabilityAdminSummary.role}</strong>
+            </div>
+            <p>{measurabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Meter usage measurability</span>
+                <strong>
+                  {measurabilityAdminSummary.stats.measurabilityPercent}%
+                </strong>
+                <small>
+                  {measurabilityAdminSummary.stats.coveredDomains}/
+                  {measurabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Measurability signals</span>
+                <strong>{measurabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {measurabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, meter usage reports, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-measurability-list">
+              {measurabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-measurability-card workspace-measurability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatMeasurabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {measurabilityAdminSummary.availableActions.includes(
+              'refresh_measurability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={measurabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleMeasurabilityAdminAction(
+                    'refresh_measurability_summary',
+                  )
+                }
+              >
+                {formatMeasurabilityAdminAction('refresh_measurability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {assessabilityAdminSummary ? (
+          <div className="billing-admin workspace-assessability-admin">
+            <div className="billing-admin__header">
+              <span>Assessability admin</span>
+              <strong>{assessabilityAdminSummary.role}</strong>
+            </div>
+            <p>{assessabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Model health assessability</span>
+                <strong>
+                  {assessabilityAdminSummary.stats.assessabilityPercent}%
+                </strong>
+                <small>
+                  {assessabilityAdminSummary.stats.coveredDomains}/
+                  {assessabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Assessability signals</span>
+                <strong>{assessabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {assessabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, model health events, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-assessability-list">
+              {assessabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-assessability-card workspace-assessability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAssessabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {assessabilityAdminSummary.availableActions.includes(
+              'refresh_assessability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={assessabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAssessabilityAdminAction(
+                    'refresh_assessability_summary',
+                  )
+                }
+              >
+                {formatAssessabilityAdminAction('refresh_assessability_summary')}
               </button>
             ) : null}
           </div>

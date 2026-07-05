@@ -2135,6 +2135,136 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-assessability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-assessability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-assessability-card p,
+.workspace-assessability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-assessability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-assessability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-measurability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-measurability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-measurability-card p,
+.workspace-measurability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-measurability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-measurability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-certifiability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-certifiability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-certifiability-card p,
+.workspace-certifiability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-certifiability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-certifiability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-substantiability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-substantiability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-substantiability-card p,
+.workspace-substantiability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-substantiability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-substantiability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-warrantability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-warrantability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-warrantability-card p,
+.workspace-warrantability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-warrantability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-warrantability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;
