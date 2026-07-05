@@ -457,6 +457,25 @@ Workspace observability admin tools:
 - Only workspace owners and admins can access observability admin endpoints.
 - The web billing panel shows observability admin tools for authorized roles.
 
+Prompt evaluation rollout readiness:
+
+- `GET /api/evaluation/readiness` returns operator-facing production prompt evaluation checklist results (`ready` or `not_ready`).
+- Checks cover regression dataset coverage, schema validity, prompt version drift, and production regression budget.
+- The web billing panel shows prompt evaluation rollout status and per-check guidance.
+
+Workspace prompt regression admin tools:
+
+- `GET /api/evaluation/workspace/:workspaceId/admin` returns owner/admin prompt regression summary.
+- `POST /api/evaluation/workspace/:workspaceId/admin/actions` runs prompt regression admin actions such as rerunning the evaluation suite.
+- Only workspace owners and admins can access prompt regression admin endpoints.
+- The web billing panel shows prompt regression admin tools for authorized roles.
+
+Current `v5.26` behavior:
+
+- Prompt evaluation rollout readiness validates regression dataset coverage through `GET /api/evaluation/readiness`.
+- Workspace owners and admins can inspect and rerun prompt regression metrics from `GET /api/evaluation/workspace/:workspaceId/admin`.
+- The web billing panel shows prompt evaluation rollout checks and workspace prompt regression admin tools.
+
 Current `v5.25` behavior:
 
 - Observability rollout readiness validates structured logging and pipeline event coverage through `GET /api/observability/readiness`.

@@ -24,6 +24,8 @@ import type {
   ProviderKeyAdminSummaryResponse,
   ObservabilityRolloutResponse,
   ObservabilityAdminSummaryResponse,
+  PromptEvaluationRolloutResponse,
+  PromptRegressionAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -89,6 +91,15 @@ import {
   formatObservabilityRolloutCheckStatus,
   formatObservabilityRolloutStatus,
 } from './observability-ui'
+import {
+  executePromptRegressionAdminAction,
+  fetchPromptEvaluationRollout,
+  fetchPromptRegressionAdminSummary,
+  formatPromptEvaluationRolloutCheckStatus,
+  formatPromptEvaluationRolloutStatus,
+  formatPromptRegressionAdminAction,
+  formatPromptRegressionScore,
+} from './evaluation-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -649,6 +660,8 @@ function App() {
     useState<ProviderCredentialsRolloutResponse | null>(null)
   const [observabilityRollout, setObservabilityRollout] =
     useState<ObservabilityRolloutResponse | null>(null)
+  const [promptEvaluationRollout, setPromptEvaluationRollout] =
+    useState<PromptEvaluationRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -736,6 +749,8 @@ function App() {
     useState<ProviderKeyAdminSummaryResponse | null>(null)
   const [observabilityAdminSummary, setObservabilityAdminSummary] =
     useState<ObservabilityAdminSummaryResponse | null>(null)
+  const [promptRegressionAdminSummary, setPromptRegressionAdminSummary] =
+    useState<PromptRegressionAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -749,6 +764,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [observabilityAdminAction, setObservabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [promptRegressionAdminAction, setPromptRegressionAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -927,6 +945,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setObservabilityRollout(null)
+        }
+      })
+
+    fetchPromptEvaluationRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setPromptEvaluationRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setPromptEvaluationRollout(null)
         }
       })
 
@@ -1651,6 +1681,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setObservabilityAdminSummary(observabilityAdmin)
+
+      const promptRegressionAdmin = await fetchPromptRegressionAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPromptRegressionAdminSummary(promptRegressionAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -1886,6 +1923,35 @@ function App() {
       )
     } finally {
       setObservabilityAdminAction('idle')
+    }
+  }
+
+  async function handlePromptRegressionAdminAction(
+    action: 'rerun_prompt_regression',
+  ) {
+    setPromptRegressionAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executePromptRegressionAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchPromptEvaluationRollout(apiBaseUrl)
+      setPromptEvaluationRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run prompt regression admin action.',
+      )
+    } finally {
+      setPromptRegressionAdminAction('idle')
     }
   }
 
@@ -2698,6 +2764,35 @@ function App() {
           </div>
         ) : null}
 
+        {promptEvaluationRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Prompt evaluation rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${promptEvaluationRollout.status}`}
+              >
+                {formatPromptEvaluationRolloutStatus(promptEvaluationRollout.status)}
+              </strong>
+            </div>
+            <p>{promptEvaluationRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {promptEvaluationRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatPromptEvaluationRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {promptEvaluationRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
         {billingCapabilities?.supportsBillingRollout && billingRollout ? (
           <div className="billing-rollout">
             <div className="billing-rollout__header">
@@ -3357,6 +3452,68 @@ function App() {
                   </button>
                 ))}
               </div>
+            ) : null}
+          </div>
+        ) : null}
+
+        {promptRegressionAdminSummary ? (
+          <div className="billing-admin workspace-prompt-regression-admin">
+            <div className="billing-admin__header">
+              <span>Prompt regression admin</span>
+              <strong>{promptRegressionAdminSummary.role}</strong>
+            </div>
+            <p>{promptRegressionAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Regression cases</span>
+                <strong>{promptRegressionAdminSummary.stats.totalCases}</strong>
+                <small>{promptRegressionAdminSummary.stats.passedCases} passed</small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Failures / drift</span>
+                <strong>{promptRegressionAdminSummary.stats.failedCases}</strong>
+                <small>
+                  {promptRegressionAdminSummary.stats.promptVersionDriftCount} drift
+                </small>
+              </article>
+            </div>
+            <p className="clear-copy">
+              Generated at {promptRegressionAdminSummary.generatedAt.slice(0, 19).replace('T', ' ')}
+            </p>
+            <div className="workspace-prompt-regression-list">
+              {promptRegressionAdminSummary.cases.map((regressionCase) => (
+                <article
+                  className={`workspace-prompt-regression-card workspace-prompt-regression-card--${regressionCase.passed ? 'pass' : 'fail'}`}
+                  key={regressionCase.caseId}
+                >
+                  <div>
+                    <strong>{regressionCase.caseId}</strong>
+                    <p>
+                      {regressionCase.expectedPromptVersion} →{' '}
+                      {regressionCase.actualPromptVersion}
+                    </p>
+                    <small>
+                      Clarity {formatPromptRegressionScore(regressionCase.clarityScore)} ·
+                      Usefulness {formatPromptRegressionScore(regressionCase.usefulnessScore)}
+                      {regressionCase.promptVersionChanged ? ' · Drift detected' : ''}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {promptRegressionAdminSummary.availableActions.includes(
+              'rerun_prompt_regression',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={promptRegressionAdminAction !== 'idle'}
+                onClick={() =>
+                  void handlePromptRegressionAdminAction('rerun_prompt_regression')
+                }
+              >
+                {formatPromptRegressionAdminAction('rerun_prompt_regression')}
+              </button>
             ) : null}
           </div>
         ) : null}
