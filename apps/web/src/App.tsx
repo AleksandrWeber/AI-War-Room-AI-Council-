@@ -244,6 +244,16 @@ import type {
   SuitabilityAdminSummaryResponse,
   ProfitabilityRolloutResponse,
   ProfitabilityAdminSummaryResponse,
+  LearnabilityRolloutResponse,
+  LearnabilityAdminSummaryResponse,
+  DeliverabilityRolloutResponse,
+  DeliverabilityAdminSummaryResponse,
+  UnderstandabilityRolloutResponse,
+  UnderstandabilityAdminSummaryResponse,
+  MemorabilityRolloutResponse,
+  MemorabilityAdminSummaryResponse,
+  TeachabilityRolloutResponse,
+  TeachabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -1301,6 +1311,51 @@ import {
   formatProfitabilityRolloutStatus,
 } from './profitability-ui'
 import {
+  executeLearnabilityAdminAction,
+  fetchLearnabilityAdminSummary,
+  fetchLearnabilityRollout,
+  formatLearnabilityAdminAction,
+  formatLearnabilityDomain,
+  formatLearnabilityRolloutCheckStatus,
+  formatLearnabilityRolloutStatus,
+} from './learnability-ui'
+import {
+  executeDeliverabilityAdminAction,
+  fetchDeliverabilityAdminSummary,
+  fetchDeliverabilityRollout,
+  formatDeliverabilityAdminAction,
+  formatDeliverabilityDomain,
+  formatDeliverabilityRolloutCheckStatus,
+  formatDeliverabilityRolloutStatus,
+} from './deliverability-ui'
+import {
+  executeUnderstandabilityAdminAction,
+  fetchUnderstandabilityAdminSummary,
+  fetchUnderstandabilityRollout,
+  formatUnderstandabilityAdminAction,
+  formatUnderstandabilityDomain,
+  formatUnderstandabilityRolloutCheckStatus,
+  formatUnderstandabilityRolloutStatus,
+} from './understandability-ui'
+import {
+  executeMemorabilityAdminAction,
+  fetchMemorabilityAdminSummary,
+  fetchMemorabilityRollout,
+  formatMemorabilityAdminAction,
+  formatMemorabilityDomain,
+  formatMemorabilityRolloutCheckStatus,
+  formatMemorabilityRolloutStatus,
+} from './memorability-ui'
+import {
+  executeTeachabilityAdminAction,
+  fetchTeachabilityAdminSummary,
+  fetchTeachabilityRollout,
+  formatTeachabilityAdminAction,
+  formatTeachabilityDomain,
+  formatTeachabilityRolloutCheckStatus,
+  formatTeachabilityRolloutStatus,
+} from './teachability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -2079,6 +2134,16 @@ function App() {
     useState<SuitabilityRolloutResponse | null>(null)
   const [profitabilityRollout, setProfitabilityRollout] =
     useState<ProfitabilityRolloutResponse | null>(null)
+  const [learnabilityRollout, setLearnabilityRollout] =
+    useState<LearnabilityRolloutResponse | null>(null)
+  const [deliverabilityRollout, setDeliverabilityRollout] =
+    useState<DeliverabilityRolloutResponse | null>(null)
+  const [understandabilityRollout, setUnderstandabilityRollout] =
+    useState<UnderstandabilityRolloutResponse | null>(null)
+  const [memorabilityRollout, setMemorabilityRollout] =
+    useState<MemorabilityRolloutResponse | null>(null)
+  const [teachabilityRollout, setTeachabilityRollout] =
+    useState<TeachabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -2386,6 +2451,16 @@ function App() {
     useState<SuitabilityAdminSummaryResponse | null>(null)
   const [profitabilityAdminSummary, setProfitabilityAdminSummary] =
     useState<ProfitabilityAdminSummaryResponse | null>(null)
+  const [learnabilityAdminSummary, setLearnabilityAdminSummary] =
+    useState<LearnabilityAdminSummaryResponse | null>(null)
+  const [deliverabilityAdminSummary, setDeliverabilityAdminSummary] =
+    useState<DeliverabilityAdminSummaryResponse | null>(null)
+  const [understandabilityAdminSummary, setUnderstandabilityAdminSummary] =
+    useState<UnderstandabilityAdminSummaryResponse | null>(null)
+  const [memorabilityAdminSummary, setMemorabilityAdminSummary] =
+    useState<MemorabilityAdminSummaryResponse | null>(null)
+  const [teachabilityAdminSummary, setTeachabilityAdminSummary] =
+    useState<TeachabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -2729,6 +2804,21 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [profitabilityAdminAction, setProfitabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [learnabilityAdminAction, setLearnabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [deliverabilityAdminAction, setDeliverabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [understandabilityAdminAction, setUnderstandabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [memorabilityAdminAction, setMemorabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [teachabilityAdminAction, setTeachabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -4230,6 +4320,66 @@ function App() {
         }
       })
 
+    fetchLearnabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setLearnabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setLearnabilityRollout(null)
+        }
+      })
+
+    fetchDeliverabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setDeliverabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDeliverabilityRollout(null)
+        }
+      })
+
+    fetchUnderstandabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setUnderstandabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setUnderstandabilityRollout(null)
+        }
+      })
+
+    fetchMemorabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setMemorabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setMemorabilityRollout(null)
+        }
+      })
+
+    fetchTeachabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setTeachabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTeachabilityRollout(null)
+        }
+      })
+
     fetchUsageCapabilities(apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
@@ -5721,6 +5871,41 @@ function App() {
         workspaceAuthHeaders,
       )
       setProfitabilityAdminSummary(profitabilityAdmin)
+
+      const learnabilityAdmin = await fetchLearnabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setLearnabilityAdminSummary(learnabilityAdmin)
+
+      const deliverabilityAdmin = await fetchDeliverabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDeliverabilityAdminSummary(deliverabilityAdmin)
+
+      const understandabilityAdmin = await fetchUnderstandabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setUnderstandabilityAdminSummary(understandabilityAdmin)
+
+      const memorabilityAdmin = await fetchMemorabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMemorabilityAdminSummary(memorabilityAdmin)
+
+      const teachabilityAdmin = await fetchTeachabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTeachabilityAdminSummary(teachabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -6953,6 +7138,151 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleTeachabilityAdminAction(
+    action: 'refresh_teachability_summary',
+  ) {
+    setTeachabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeTeachabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchTeachabilityRollout(apiBaseUrl)
+      setTeachabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run teachability admin action.',
+      )
+    } finally {
+      setTeachabilityAdminAction('idle')
+    }
+  }
+
+  async function handleMemorabilityAdminAction(
+    action: 'refresh_memorability_summary',
+  ) {
+    setMemorabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeMemorabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchMemorabilityRollout(apiBaseUrl)
+      setMemorabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run memorability admin action.',
+      )
+    } finally {
+      setMemorabilityAdminAction('idle')
+    }
+  }
+
+  async function handleUnderstandabilityAdminAction(
+    action: 'refresh_understandability_summary',
+  ) {
+    setUnderstandabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeUnderstandabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchUnderstandabilityRollout(apiBaseUrl)
+      setUnderstandabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run understandability admin action.',
+      )
+    } finally {
+      setUnderstandabilityAdminAction('idle')
+    }
+  }
+
+  async function handleDeliverabilityAdminAction(
+    action: 'refresh_deliverability_summary',
+  ) {
+    setDeliverabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeDeliverabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchDeliverabilityRollout(apiBaseUrl)
+      setDeliverabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run deliverability admin action.',
+      )
+    } finally {
+      setDeliverabilityAdminAction('idle')
+    }
+  }
+
+  async function handleLearnabilityAdminAction(
+    action: 'refresh_learnability_summary',
+  ) {
+    setLearnabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeLearnabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchLearnabilityRollout(apiBaseUrl)
+      setLearnabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run learnability admin action.',
+      )
+    } finally {
+      setLearnabilityAdminAction('idle')
     }
   }
 
@@ -13140,6 +13470,151 @@ function App() {
               ))}
             </div>
             <small>Checked at {affordabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {teachabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production teachability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${teachabilityRollout.status}`}
+              >
+                {formatTeachabilityRolloutStatus(teachabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{teachabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {teachabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatTeachabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {teachabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {memorabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production memorability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${memorabilityRollout.status}`}
+              >
+                {formatMemorabilityRolloutStatus(memorabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{memorabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {memorabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatMemorabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {memorabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {understandabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production understandability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${understandabilityRollout.status}`}
+              >
+                {formatUnderstandabilityRolloutStatus(understandabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{understandabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {understandabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatUnderstandabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {understandabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {deliverabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production deliverability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${deliverabilityRollout.status}`}
+              >
+                {formatDeliverabilityRolloutStatus(deliverabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{deliverabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {deliverabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatDeliverabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {deliverabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {learnabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production learnability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${learnabilityRollout.status}`}
+              >
+                {formatLearnabilityRolloutStatus(learnabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{learnabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {learnabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatLearnabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {learnabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -20952,6 +21427,331 @@ function App() {
                 }
               >
                 {formatAffordabilityAdminAction('refresh_affordability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {teachabilityAdminSummary ? (
+          <div className="billing-admin workspace-teachability-admin">
+            <div className="billing-admin__header">
+              <span>Teachability admin</span>
+              <strong>{teachabilityAdminSummary.role}</strong>
+            </div>
+            <p>{teachabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workflow teachability</span>
+                <strong>
+                  {teachabilityAdminSummary.stats.teachabilityPercent}%
+                </strong>
+                <small>
+                  {teachabilityAdminSummary.stats.coveredDomains}/
+                  {teachabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Teachability signals</span>
+                <strong>{teachabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {teachabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, run workflows, and agent outputs'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-teachability-list">
+              {teachabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-teachability-card workspace-teachability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatTeachabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {teachabilityAdminSummary.availableActions.includes(
+              'refresh_teachability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={teachabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleTeachabilityAdminAction(
+                    'refresh_teachability_summary',
+                  )
+                }
+              >
+                {formatTeachabilityAdminAction('refresh_teachability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {memorabilityAdminSummary ? (
+          <div className="billing-admin workspace-memorability-admin">
+            <div className="billing-admin__header">
+              <span>Memorability admin</span>
+              <strong>{memorabilityAdminSummary.role}</strong>
+            </div>
+            <p>{memorabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Artifact memorability</span>
+                <strong>
+                  {memorabilityAdminSummary.stats.memorabilityPercent}%
+                </strong>
+                <small>
+                  {memorabilityAdminSummary.stats.coveredDomains}/
+                  {memorabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Memorability signals</span>
+                <strong>{memorabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {memorabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, artifacts, and run workflows'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-memorability-list">
+              {memorabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-memorability-card workspace-memorability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatMemorabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {memorabilityAdminSummary.availableActions.includes(
+              'refresh_memorability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={memorabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleMemorabilityAdminAction(
+                    'refresh_memorability_summary',
+                  )
+                }
+              >
+                {formatMemorabilityAdminAction('refresh_memorability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {understandabilityAdminSummary ? (
+          <div className="billing-admin workspace-understandability-admin">
+            <div className="billing-admin__header">
+              <span>Understandability admin</span>
+              <strong>{understandabilityAdminSummary.role}</strong>
+            </div>
+            <p>{understandabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Moderator synthesis understandability</span>
+                <strong>
+                  {understandabilityAdminSummary.stats.understandabilityPercent}%
+                </strong>
+                <small>
+                  {understandabilityAdminSummary.stats.coveredDomains}/
+                  {understandabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Understandability signals</span>
+                <strong>{understandabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {understandabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, moderator syntheses, and agent outputs'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-understandability-list">
+              {understandabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-understandability-card workspace-understandability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatUnderstandabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {understandabilityAdminSummary.availableActions.includes(
+              'refresh_understandability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={understandabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleUnderstandabilityAdminAction(
+                    'refresh_understandability_summary',
+                  )
+                }
+              >
+                {formatUnderstandabilityAdminAction('refresh_understandability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {deliverabilityAdminSummary ? (
+          <div className="billing-admin workspace-deliverability-admin">
+            <div className="billing-admin__header">
+              <span>Deliverability admin</span>
+              <strong>{deliverabilityAdminSummary.role}</strong>
+            </div>
+            <p>{deliverabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification deliverability</span>
+                <strong>
+                  {deliverabilityAdminSummary.stats.deliverabilityPercent}%
+                </strong>
+                <small>
+                  {deliverabilityAdminSummary.stats.coveredDomains}/
+                  {deliverabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Deliverability signals</span>
+                <strong>{deliverabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {deliverabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-deliverability-list">
+              {deliverabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-deliverability-card workspace-deliverability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatDeliverabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {deliverabilityAdminSummary.availableActions.includes(
+              'refresh_deliverability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={deliverabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleDeliverabilityAdminAction(
+                    'refresh_deliverability_summary',
+                  )
+                }
+              >
+                {formatDeliverabilityAdminAction('refresh_deliverability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {learnabilityAdminSummary ? (
+          <div className="billing-admin workspace-learnability-admin">
+            <div className="billing-admin__header">
+              <span>Learnability admin</span>
+              <strong>{learnabilityAdminSummary.role}</strong>
+            </div>
+            <p>{learnabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Agent output learnability</span>
+                <strong>
+                  {learnabilityAdminSummary.stats.learnabilityPercent}%
+                </strong>
+                <small>
+                  {learnabilityAdminSummary.stats.coveredDomains}/
+                  {learnabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Learnability signals</span>
+                <strong>{learnabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {learnabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, agent outputs, and artifacts'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-learnability-list">
+              {learnabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-learnability-card workspace-learnability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatLearnabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {learnabilityAdminSummary.availableActions.includes(
+              'refresh_learnability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={learnabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleLearnabilityAdminAction(
+                    'refresh_learnability_summary',
+                  )
+                }
+              >
+                {formatLearnabilityAdminAction('refresh_learnability_summary')}
               </button>
             ) : null}
           </div>

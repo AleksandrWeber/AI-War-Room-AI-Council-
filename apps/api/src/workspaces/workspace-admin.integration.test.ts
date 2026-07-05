@@ -7973,3 +7973,346 @@ describe('profitability rollout integration', () => {
       .expect(403)
   })
 })
+describe('learnability rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports learnability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/learnability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsLearnabilityRollout: true,
+      supportsLearnabilityAdminTools: true,
+      supportsAgentOutputLearnabilitySignals: true,
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/learnability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns learnability admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/learnability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        learnabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects learnability admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/learnability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('deliverability rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports deliverability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/deliverability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsDeliverabilityRollout: true,
+      supportsDeliverabilityAdminTools: true,
+      supportsBillingNotificationDeliverabilitySignals: true,
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/deliverability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns deliverability admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/deliverability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        deliverabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects deliverability admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/deliverability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('understandability rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports understandability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/understandability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsUnderstandabilityRollout: true,
+      supportsUnderstandabilityAdminTools: true,
+      supportsSynthesisUnderstandabilitySignals: true,
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/understandability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns understandability admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/understandability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        understandabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects understandability admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/understandability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('memorability rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports memorability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/memorability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsMemorabilityRollout: true,
+      supportsMemorabilityAdminTools: true,
+      supportsArtifactMemorabilitySignals: true,
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/memorability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns memorability admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/memorability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        memorabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects memorability admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/memorability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('teachability rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports teachability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/teachability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsTeachabilityRollout: true,
+      supportsTeachabilityAdminTools: true,
+      supportsWorkflowTeachabilitySignals: true,
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/teachability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns teachability admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/teachability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        teachabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects teachability admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/teachability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})

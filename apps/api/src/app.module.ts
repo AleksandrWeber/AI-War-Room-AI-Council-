@@ -107,6 +107,11 @@ import { DesirabilityModule } from './desirability/desirability.module.js'
 import { MarketabilityModule } from './marketability/marketability.module.js'
 import { SuitabilityModule } from './suitability/suitability.module.js'
 import { ProfitabilityModule } from './profitability/profitability.module.js'
+import { LearnabilityModule } from './learnability/learnability.module.js'
+import { DeliverabilityModule } from './deliverability/deliverability.module.js'
+import { UnderstandabilityModule } from './understandability/understandability.module.js'
+import { MemorabilityModule } from './memorability/memorability.module.js'
+import { TeachabilityModule } from './teachability/teachability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -233,6 +238,11 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     MarketabilityModule,
     SuitabilityModule,
     ProfitabilityModule,
+    LearnabilityModule,
+    DeliverabilityModule,
+    UnderstandabilityModule,
+    MemorabilityModule,
+    TeachabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

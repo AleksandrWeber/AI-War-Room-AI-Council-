@@ -3695,6 +3695,136 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-learnability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-learnability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-learnability-card p,
+.workspace-learnability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-learnability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-learnability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-deliverability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-deliverability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-deliverability-card p,
+.workspace-deliverability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-deliverability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-deliverability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-understandability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-understandability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-understandability-card p,
+.workspace-understandability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-understandability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-understandability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-memorability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-memorability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-memorability-card p,
+.workspace-memorability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-memorability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-memorability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-teachability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-teachability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-teachability-card p,
+.workspace-teachability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-teachability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-teachability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

@@ -796,6 +796,36 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.140` behavior:
+
+- Production teachability rollout readiness validates teachability coverage and readiness through `GET /api/teachability/readiness`.
+- Workspace owners and admins can inspect workspace teachability metrics from `GET /api/teachability/workspace/:workspaceId/admin`.
+- The web billing panel shows teachability rollout checks and workspace teachability admin tools.
+
+Current `v5.139` behavior:
+
+- Production memorability rollout readiness validates memorability coverage and readiness through `GET /api/memorability/readiness`.
+- Workspace owners and admins can inspect workspace memorability metrics from `GET /api/memorability/workspace/:workspaceId/admin`.
+- The web billing panel shows memorability rollout checks and workspace memorability admin tools.
+
+Current `v5.138` behavior:
+
+- Production understandability rollout readiness validates understandability coverage and readiness through `GET /api/understandability/readiness`.
+- Workspace owners and admins can inspect workspace understandability metrics from `GET /api/understandability/workspace/:workspaceId/admin`.
+- The web billing panel shows understandability rollout checks and workspace understandability admin tools.
+
+Current `v5.137` behavior:
+
+- Production deliverability rollout readiness validates deliverability coverage and readiness through `GET /api/deliverability/readiness`.
+- Workspace owners and admins can inspect workspace deliverability metrics from `GET /api/deliverability/workspace/:workspaceId/admin`.
+- The web billing panel shows deliverability rollout checks and workspace deliverability admin tools.
+
+Current `v5.136` behavior:
+
+- Production learnability rollout readiness validates learnability coverage and readiness through `GET /api/learnability/readiness`.
+- Workspace owners and admins can inspect workspace learnability metrics from `GET /api/learnability/workspace/:workspaceId/admin`.
+- The web billing panel shows learnability rollout checks and workspace learnability admin tools.
+
 Current `v5.135` behavior:
 
 - Production profitability rollout readiness validates profitability coverage and readiness through `GET /api/profitability/readiness`.
