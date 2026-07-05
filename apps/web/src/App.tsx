@@ -52,6 +52,8 @@ import type {
   SloAdminSummaryResponse,
   CapacityRolloutResponse,
   CapacityAdminSummaryResponse,
+  PerformanceRolloutResponse,
+  PerformanceAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -244,6 +246,15 @@ import {
   formatCapacityRolloutCheckStatus,
   formatCapacityRolloutStatus,
 } from './capacity-ui'
+import {
+  executePerformanceAdminAction,
+  fetchPerformanceAdminSummary,
+  fetchPerformanceRollout,
+  formatPerformanceAdminAction,
+  formatPerformanceDomain,
+  formatPerformanceRolloutCheckStatus,
+  formatPerformanceRolloutStatus,
+} from './performance-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -831,6 +842,8 @@ function App() {
   const [sloRollout, setSloRollout] = useState<SloRolloutResponse | null>(null)
   const [capacityRollout, setCapacityRollout] =
     useState<CapacityRolloutResponse | null>(null)
+  const [performanceRollout, setPerformanceRollout] =
+    useState<PerformanceRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -946,6 +959,8 @@ function App() {
     useState<SloAdminSummaryResponse | null>(null)
   const [capacityAdminSummary, setCapacityAdminSummary] =
     useState<CapacityAdminSummaryResponse | null>(null)
+  const [performanceAdminSummary, setPerformanceAdminSummary] =
+    useState<PerformanceAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1001,6 +1016,9 @@ function App() {
     'idle',
   )
   const [capacityAdminAction, setCapacityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [performanceAdminAction, setPerformanceAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1347,6 +1365,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setCapacityRollout(null)
+        }
+      })
+
+    fetchPerformanceRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setPerformanceRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setPerformanceRollout(null)
         }
       })
 
@@ -2169,6 +2199,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setCapacityAdminSummary(capacityAdmin)
+
+      const performanceAdmin = await fetchPerformanceAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPerformanceAdminSummary(performanceAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -2792,6 +2829,35 @@ function App() {
       )
     } finally {
       setCapacityAdminAction('idle')
+    }
+  }
+
+  async function handlePerformanceAdminAction(
+    action: 'refresh_performance_summary',
+  ) {
+    setPerformanceAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executePerformanceAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchPerformanceRollout(apiBaseUrl)
+      setPerformanceRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run performance admin action.',
+      )
+    } finally {
+      setPerformanceAdminAction('idle')
     }
   }
 
@@ -4020,6 +4086,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {capacityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {performanceRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production performance rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${performanceRollout.status}`}
+              >
+                {formatPerformanceRolloutStatus(performanceRollout.status)}
+              </strong>
+            </div>
+            <p>{performanceRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {performanceRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatPerformanceRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {performanceRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -5610,6 +5705,67 @@ function App() {
                 }
               >
                 {formatCapacityAdminAction('refresh_capacity_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {performanceAdminSummary ? (
+          <div className="billing-admin workspace-performance-admin">
+            <div className="billing-admin__header">
+              <span>Performance admin</span>
+              <strong>{performanceAdminSummary.role}</strong>
+            </div>
+            <p>{performanceAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Average latency</span>
+                <strong>{performanceAdminSummary.stats.averageLatencyMs}ms</strong>
+                <small>
+                  {performanceAdminSummary.stats.latencySignalPercent}% latency
+                  signal coverage
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Performance signals</span>
+                <strong>{performanceAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {performanceAdminSummary.stats.postgresConnectivity
+                    ? `${performanceAdminSummary.stats.coveredDomains}/${performanceAdminSummary.stats.totalDomains} domains covered`
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-performance-list">
+              {performanceAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-performance-card workspace-performance-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatPerformanceDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {performanceAdminSummary.availableActions.includes(
+              'refresh_performance_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={performanceAdminAction !== 'idle'}
+                onClick={() =>
+                  void handlePerformanceAdminAction('refresh_performance_summary')
+                }
+              >
+                {formatPerformanceAdminAction('refresh_performance_summary')}
               </button>
             ) : null}
           </div>

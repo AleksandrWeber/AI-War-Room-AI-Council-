@@ -640,6 +640,25 @@ Workspace capacity admin tools:
 - Only workspace owners and admins can access capacity admin endpoints.
 - The web billing panel shows capacity admin tools for authorized roles.
 
+Production performance rollout readiness:
+
+- `GET /api/performance/readiness` returns operator-facing production performance checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, performance signal table coverage, observability performance buffer capacity, tracing latency signals, and latency readiness signals.
+- The web billing panel shows performance rollout status and per-check guidance.
+
+Workspace performance admin tools:
+
+- `GET /api/performance/workspace/:workspaceId/admin` returns owner/admin performance summary with workspace performance signal domains.
+- `POST /api/performance/workspace/:workspaceId/admin/actions` runs performance admin actions such as refreshing the summary.
+- Only workspace owners and admins can access performance admin endpoints.
+- The web billing panel shows performance admin tools for authorized roles.
+
+Current `v5.40` behavior:
+
+- Production performance rollout readiness validates performance coverage and latency readiness through `GET /api/performance/readiness`.
+- Workspace owners and admins can inspect workspace performance metrics from `GET /api/performance/workspace/:workspaceId/admin`.
+- The web billing panel shows performance rollout checks and workspace performance admin tools.
+
 Current `v5.39` behavior:
 
 - Production capacity rollout readiness validates capacity coverage and scaling readiness through `GET /api/capacity/readiness`.
