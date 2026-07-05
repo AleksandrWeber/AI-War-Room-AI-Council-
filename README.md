@@ -796,6 +796,66 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.190` behavior:
+
+- Production mythicizability rollout readiness validates mythicizability coverage and readiness through `GET /api/mythicizability/readiness`.
+- Workspace owners and admins can inspect workspace mythicizability metrics from `GET /api/mythicizability/workspace/:workspaceId/admin`.
+- The web billing panel shows mythicizability rollout checks and workspace mythicizability admin tools.
+
+Current `v5.189` behavior:
+
+- Production caracterizability rollout readiness validates caracterizability coverage and readiness through `GET /api/caracterizability/readiness`.
+- Workspace owners and admins can inspect workspace caracterizability metrics from `GET /api/caracterizability/workspace/:workspaceId/admin`.
+- The web billing panel shows caracterizability rollout checks and workspace caracterizability admin tools.
+
+Current `v5.188` behavior:
+
+- Production archetypizability rollout readiness validates archetypizability coverage and readiness through `GET /api/archetypizability/readiness`.
+- Workspace owners and admins can inspect workspace archetypizability metrics from `GET /api/archetypizability/workspace/:workspaceId/admin`.
+- The web billing panel shows archetypizability rollout checks and workspace archetypizability admin tools.
+
+Current `v5.187` behavior:
+
+- Production parabolizability rollout readiness validates parabolizability coverage and readiness through `GET /api/parabolizability/readiness`.
+- Workspace owners and admins can inspect workspace parabolizability metrics from `GET /api/parabolizability/workspace/:workspaceId/admin`.
+- The web billing panel shows parabolizability rollout checks and workspace parabolizability admin tools.
+
+Current `v5.186` behavior:
+
+- Production analogizability rollout readiness validates analogizability coverage and readiness through `GET /api/analogizability/readiness`.
+- Workspace owners and admins can inspect workspace analogizability metrics from `GET /api/analogizability/workspace/:workspaceId/admin`.
+- The web billing panel shows analogizability rollout checks and workspace analogizability admin tools.
+
+Current `v5.185` behavior:
+
+- Production emblemizability rollout readiness validates emblemizability coverage and readiness through `GET /api/emblemizability/readiness`.
+- Workspace owners and admins can inspect workspace emblemizability metrics from `GET /api/emblemizability/workspace/:workspaceId/admin`.
+- The web billing panel shows emblemizability rollout checks and workspace emblemizability admin tools.
+
+Current `v5.184` behavior:
+
+- Production stylizability rollout readiness validates stylizability coverage and readiness through `GET /api/stylizability/readiness`.
+- Workspace owners and admins can inspect workspace stylizability metrics from `GET /api/stylizability/workspace/:workspaceId/admin`.
+- The web billing panel shows stylizability rollout checks and workspace stylizability admin tools.
+
+Current `v5.183` behavior:
+
+- Production tokenizability rollout readiness validates tokenizability coverage and readiness through `GET /api/tokenizability/readiness`.
+- Workspace owners and admins can inspect workspace tokenizability metrics from `GET /api/tokenizability/workspace/:workspaceId/admin`.
+- The web billing panel shows tokenizability rollout checks and workspace tokenizability admin tools.
+
+Current `v5.182` behavior:
+
+- Production allegorizability rollout readiness validates allegorizability coverage and readiness through `GET /api/allegorizability/readiness`.
+- Workspace owners and admins can inspect workspace allegorizability metrics from `GET /api/allegorizability/workspace/:workspaceId/admin`.
+- The web billing panel shows allegorizability rollout checks and workspace allegorizability admin tools.
+
+Current `v5.181` behavior:
+
+- Production iconizability rollout readiness validates iconizability coverage and readiness through `GET /api/iconizability/readiness`.
+- Workspace owners and admins can inspect workspace iconizability metrics from `GET /api/iconizability/workspace/:workspaceId/admin`.
+- The web billing panel shows iconizability rollout checks and workspace iconizability admin tools.
+
 Current `v5.180` behavior:
 
 - Production materializability rollout readiness validates materializability coverage and readiness through `GET /api/materializability/readiness`.

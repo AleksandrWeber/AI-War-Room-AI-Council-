@@ -152,6 +152,16 @@ import { MetaphorizabilityModule } from './metaphorizability/metaphorizability.m
 import { DramatizabilityModule } from './dramatizability/dramatizability.module.js'
 import { PersonifiabilityModule } from './personifiability/personifiability.module.js'
 import { MaterializabilityModule } from './materializability/materializability.module.js'
+import { IconizabilityModule } from './iconizability/iconizability.module.js'
+import { AllegorizabilityModule } from './allegorizability/allegorizability.module.js'
+import { TokenizabilityModule } from './tokenizability/tokenizability.module.js'
+import { StylizabilityModule } from './stylizability/stylizability.module.js'
+import { EmblemizabilityModule } from './emblemizability/emblemizability.module.js'
+import { AnalogizabilityModule } from './analogizability/analogizability.module.js'
+import { ParabolizabilityModule } from './parabolizability/parabolizability.module.js'
+import { ArchetypizabilityModule } from './archetypizability/archetypizability.module.js'
+import { CaracterizabilityModule } from './caracterizability/caracterizability.module.js'
+import { MythicizabilityModule } from './mythicizability/mythicizability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -323,6 +333,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     DramatizabilityModule,
     PersonifiabilityModule,
     MaterializabilityModule,
+    IconizabilityModule,
+    AllegorizabilityModule,
+    TokenizabilityModule,
+    StylizabilityModule,
+    EmblemizabilityModule,
+    AnalogizabilityModule,
+    ParabolizabilityModule,
+    ArchetypizabilityModule,
+    CaracterizabilityModule,
+    MythicizabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,
