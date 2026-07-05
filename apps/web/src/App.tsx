@@ -62,6 +62,8 @@ import type {
   ReliabilityAdminSummaryResponse,
   StabilityRolloutResponse,
   StabilityAdminSummaryResponse,
+  ConsistencyRolloutResponse,
+  ConsistencyAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -299,6 +301,15 @@ import {
   formatStabilityRolloutCheckStatus,
   formatStabilityRolloutStatus,
 } from './stability-ui'
+import {
+  executeConsistencyAdminAction,
+  fetchConsistencyAdminSummary,
+  fetchConsistencyRollout,
+  formatConsistencyAdminAction,
+  formatConsistencyDomain,
+  formatConsistencyRolloutCheckStatus,
+  formatConsistencyRolloutStatus,
+} from './consistency-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -896,6 +907,8 @@ function App() {
     useState<ReliabilityRolloutResponse | null>(null)
   const [stabilityRollout, setStabilityRollout] =
     useState<StabilityRolloutResponse | null>(null)
+  const [consistencyRollout, setConsistencyRollout] =
+    useState<ConsistencyRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1021,6 +1034,8 @@ function App() {
     useState<ReliabilityAdminSummaryResponse | null>(null)
   const [stabilityAdminSummary, setStabilityAdminSummary] =
     useState<StabilityAdminSummaryResponse | null>(null)
+  const [consistencyAdminSummary, setConsistencyAdminSummary] =
+    useState<ConsistencyAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1091,6 +1106,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [stabilityAdminAction, setStabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [consistencyAdminAction, setConsistencyAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1497,6 +1515,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setStabilityRollout(null)
+        }
+      })
+
+    fetchConsistencyRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setConsistencyRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setConsistencyRollout(null)
         }
       })
 
@@ -2354,6 +2384,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setStabilityAdminSummary(stabilityAdmin)
+
+      const consistencyAdmin = await fetchConsistencyAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConsistencyAdminSummary(consistencyAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -3122,6 +3159,35 @@ function App() {
       )
     } finally {
       setStabilityAdminAction('idle')
+    }
+  }
+
+  async function handleConsistencyAdminAction(
+    action: 'refresh_consistency_summary',
+  ) {
+    setConsistencyAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeConsistencyAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchConsistencyRollout(apiBaseUrl)
+      setConsistencyRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run consistency admin action.',
+      )
+    } finally {
+      setConsistencyAdminAction('idle')
     }
   }
 
@@ -4495,6 +4561,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {stabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {consistencyRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production consistency rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${consistencyRollout.status}`}
+              >
+                {formatConsistencyRolloutStatus(consistencyRollout.status)}
+              </strong>
+            </div>
+            <p>{consistencyRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {consistencyRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatConsistencyRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {consistencyRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -6392,6 +6487,71 @@ function App() {
                 }
               >
                 {formatStabilityAdminAction('refresh_stability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {consistencyAdminSummary ? (
+          <div className="billing-admin workspace-consistency-admin">
+            <div className="billing-admin__header">
+              <span>Consistency admin</span>
+              <strong>{consistencyAdminSummary.role}</strong>
+            </div>
+            <p>{consistencyAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Run consistency</span>
+                <strong>
+                  {consistencyAdminSummary.stats.consistencyPercent}%
+                </strong>
+                <small>
+                  {consistencyAdminSummary.stats.coveredDomains}/
+                  {consistencyAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Consistency signals</span>
+                <strong>{consistencyAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {consistencyAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workflows, and idempotency signals'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-consistency-list">
+              {consistencyAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-consistency-card workspace-consistency-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatConsistencyDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {consistencyAdminSummary.availableActions.includes(
+              'refresh_consistency_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={consistencyAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleConsistencyAdminAction(
+                    'refresh_consistency_summary',
+                  )
+                }
+              >
+                {formatConsistencyAdminAction('refresh_consistency_summary')}
               </button>
             ) : null}
           </div>

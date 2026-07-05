@@ -705,6 +705,25 @@ Workspace stability admin tools:
 - Only workspace owners and admins can access stability admin endpoints.
 - The web billing panel shows stability admin tools for authorized roles.
 
+Production consistency rollout readiness:
+
+- `GET /api/consistency/readiness` returns operator-facing production consistency checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, consistency signal table coverage, run workflow alignment, idempotency consistency, and alignment readiness signals.
+- The web billing panel shows consistency rollout status and per-check guidance.
+
+Workspace consistency admin tools:
+
+- `GET /api/consistency/workspace/:workspaceId/admin` returns owner/admin consistency summary with workspace workflow and idempotency domains.
+- `POST /api/consistency/workspace/:workspaceId/admin/actions` runs consistency admin actions such as refreshing the summary.
+- Only workspace owners and admins can access consistency admin endpoints.
+- The web billing panel shows consistency admin tools for authorized roles.
+
+Current `v5.45` behavior:
+
+- Production consistency rollout readiness validates consistency coverage and alignment readiness through `GET /api/consistency/readiness`.
+- Workspace owners and admins can inspect workspace consistency metrics from `GET /api/consistency/workspace/:workspaceId/admin`.
+- The web billing panel shows consistency rollout checks and workspace consistency admin tools.
+
 Current `v5.44` behavior:
 
 - Production stability rollout readiness validates stability coverage and drift readiness through `GET /api/stability/readiness`.
