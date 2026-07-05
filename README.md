@@ -1036,6 +1036,36 @@ Current `v5.256` behavior:
 - Workspace owners and admins can inspect workspace probabilizability metrics from `GET /api/probabilizability/workspace/:workspaceId/admin`.
 - The web billing panel shows probabilizability rollout checks and workspace probabilizability admin tools.
 
+Current `v5.275` behavior:
+
+- Production tolerizability rollout readiness validates tolerizability coverage and readiness through `GET /api/tolerizability/readiness`.
+- Workspace owners and admins can inspect workspace tolerizability metrics from `GET /api/tolerizability/workspace/:workspaceId/admin`.
+- The web billing panel shows tolerizability rollout checks and workspace tolerizability admin tools.
+
+Current `v5.274` behavior:
+
+- Production comparizability rollout readiness validates comparizability coverage and readiness through `GET /api/comparizability/readiness`.
+- Workspace owners and admins can inspect workspace comparizability metrics from `GET /api/comparizability/workspace/:workspaceId/admin`.
+- The web billing panel shows comparizability rollout checks and workspace comparizability admin tools.
+
+Current `v5.273` behavior:
+
+- Production benchmarkizability rollout readiness validates benchmarkizability coverage and readiness through `GET /api/benchmarkizability/readiness`.
+- Workspace owners and admins can inspect workspace benchmarkizability metrics from `GET /api/benchmarkizability/workspace/:workspaceId/admin`.
+- The web billing panel shows benchmarkizability rollout checks and workspace benchmarkizability admin tools.
+
+Current `v5.272` behavior:
+
+- Production metricizability rollout readiness validates metricizability coverage and readiness through `GET /api/metricizability/readiness`.
+- Workspace owners and admins can inspect workspace metricizability metrics from `GET /api/metricizability/workspace/:workspaceId/admin`.
+- The web billing panel shows metricizability rollout checks and workspace metricizability admin tools.
+
+Current `v5.271` behavior:
+
+- Production calibratizability rollout readiness validates calibratizability coverage and readiness through `GET /api/calibratizability/readiness`.
+- Workspace owners and admins can inspect workspace calibratizability metrics from `GET /api/calibratizability/workspace/:workspaceId/admin`.
+- The web billing panel shows calibratizability rollout checks and workspace calibratizability admin tools.
+
 Current `v5.270` behavior:
 
 - Production optimizability rollout readiness validates optimizability coverage and readiness through `GET /api/optimizability/readiness`.
@@ -1065,6 +1095,36 @@ Current `v5.266` behavior:
 - Production interpolizability rollout readiness validates interpolizability coverage and readiness through `GET /api/interpolizability/readiness`.
 - Workspace owners and admins can inspect workspace interpolizability metrics from `GET /api/interpolizability/workspace/:workspaceId/admin`.
 - The web billing panel shows interpolizability rollout checks and workspace interpolizability admin tools.
+
+Current `v5.280` behavior:
+
+- Production adaptizability rollout readiness validates adaptizability coverage and readiness through `GET /api/adaptizability/readiness`.
+- Workspace owners and admins can inspect workspace adaptizability metrics from `GET /api/adaptizability/workspace/:workspaceId/admin`.
+- The web billing panel shows adaptizability rollout checks and workspace adaptizability admin tools.
+
+Current `v5.279` behavior:
+
+- Production stabilizability rollout readiness validates stabilizability coverage and readiness through `GET /api/stabilizability/readiness`.
+- Workspace owners and admins can inspect workspace stabilizability metrics from `GET /api/stabilizability/workspace/:workspaceId/admin`.
+- The web billing panel shows stabilizability rollout checks and workspace stabilizability admin tools.
+
+Current `v5.278` behavior:
+
+- Production convergizability rollout readiness validates convergizability coverage and readiness through `GET /api/convergizability/readiness`.
+- Workspace owners and admins can inspect workspace convergizability metrics from `GET /api/convergizability/workspace/:workspaceId/admin`.
+- The web billing panel shows convergizability rollout checks and workspace convergizability admin tools.
+
+Current `v5.277` behavior:
+
+- Production iterativizability rollout readiness validates iterativizability coverage and readiness through `GET /api/iterativizability/readiness`.
+- Workspace owners and admins can inspect workspace iterativizability metrics from `GET /api/iterativizability/workspace/:workspaceId/admin`.
+- The web billing panel shows iterativizability rollout checks and workspace iterativizability admin tools.
+
+Current `v5.276` behavior:
+
+- Production approximatizability rollout readiness validates approximatizability coverage and readiness through `GET /api/approximatizability/readiness`.
+- Workspace owners and admins can inspect workspace approximatizability metrics from `GET /api/approximatizability/workspace/:workspaceId/admin`.
+- The web billing panel shows approximatizability rollout checks and workspace approximatizability admin tools.
 
 Current `v5.225` behavior:
 

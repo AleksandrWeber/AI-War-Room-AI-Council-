@@ -242,6 +242,16 @@ import { RegressizabilityModule } from './regressizability/regressizability.modu
 import { HeuristizabilityModule } from './heuristizability/heuristizability.module.js'
 import { SimulatizabilityModule } from './simulatizability/simulatizability.module.js'
 import { OptimizabilityModule } from './optimizability/optimizability.module.js'
+import { CalibratizabilityModule } from './calibratizability/calibratizability.module.js'
+import { MetricizabilityModule } from './metricizability/metricizability.module.js'
+import { BenchmarkizabilityModule } from './benchmarkizability/benchmarkizability.module.js'
+import { ComparizabilityModule } from './comparizability/comparizability.module.js'
+import { TolerizabilityModule } from './tolerizability/tolerizability.module.js'
+import { ApproximatizabilityModule } from './approximatizability/approximatizability.module.js'
+import { IterativizabilityModule } from './iterativizability/iterativizability.module.js'
+import { ConvergizabilityModule } from './convergizability/convergizability.module.js'
+import { StabilizabilityModule } from './stabilizability/stabilizability.module.js'
+import { AdaptizabilityModule } from './adaptizability/adaptizability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -503,6 +513,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     HeuristizabilityModule,
     SimulatizabilityModule,
     OptimizabilityModule,
+    CalibratizabilityModule,
+    MetricizabilityModule,
+    BenchmarkizabilityModule,
+    ComparizabilityModule,
+    TolerizabilityModule,
+    ApproximatizabilityModule,
+    IterativizabilityModule,
+    ConvergizabilityModule,
+    StabilizabilityModule,
+    AdaptizabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,
