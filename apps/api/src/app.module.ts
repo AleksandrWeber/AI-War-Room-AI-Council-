@@ -132,6 +132,16 @@ import { DistinctivenessModule } from './distinctiveness/distinctiveness.module.
 import { ConspicuousnessModule } from './conspicuousness/conspicuousness.module.js'
 import { DetectabilityModule } from './detectability/detectability.module.js'
 import { DescribabilityModule } from './describability/describability.module.js'
+import { ExpressivenessModule } from './expressiveness/expressiveness.module.js'
+import { CommunicabilityModule } from './communicability/communicability.module.js'
+import { ArticulabilityModule } from './articulability/articulability.module.js'
+import { ElaboratabilityModule } from './elaboratability/elaboratability.module.js'
+import { RepresentabilityModule } from './representability/representability.module.js'
+import { PresentabilityModule } from './presentability/presentability.module.js'
+import { EnunciabilityModule } from './enunciability/enunciability.module.js'
+import { FormulatabilityModule } from './formulatability/formulatability.module.js'
+import { NarratabilityModule } from './narratability/narratability.module.js'
+import { IllustratabilityModule } from './illustratability/illustratability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -283,6 +293,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     ConspicuousnessModule,
     DetectabilityModule,
     DescribabilityModule,
+    ExpressivenessModule,
+    CommunicabilityModule,
+    ArticulabilityModule,
+    ElaboratabilityModule,
+    RepresentabilityModule,
+    PresentabilityModule,
+    EnunciabilityModule,
+    FormulatabilityModule,
+    NarratabilityModule,
+    IllustratabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

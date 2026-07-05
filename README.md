@@ -796,6 +796,66 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.170` behavior:
+
+- Production illustratability rollout readiness validates illustratability coverage and readiness through `GET /api/illustratability/readiness`.
+- Workspace owners and admins can inspect workspace illustratability metrics from `GET /api/illustratability/workspace/:workspaceId/admin`.
+- The web billing panel shows illustratability rollout checks and workspace illustratability admin tools.
+
+Current `v5.169` behavior:
+
+- Production narratability rollout readiness validates narratability coverage and readiness through `GET /api/narratability/readiness`.
+- Workspace owners and admins can inspect workspace narratability metrics from `GET /api/narratability/workspace/:workspaceId/admin`.
+- The web billing panel shows narratability rollout checks and workspace narratability admin tools.
+
+Current `v5.168` behavior:
+
+- Production formulatability rollout readiness validates formulatability coverage and readiness through `GET /api/formulatability/readiness`.
+- Workspace owners and admins can inspect workspace formulatability metrics from `GET /api/formulatability/workspace/:workspaceId/admin`.
+- The web billing panel shows formulatability rollout checks and workspace formulatability admin tools.
+
+Current `v5.167` behavior:
+
+- Production enunciability rollout readiness validates enunciability coverage and readiness through `GET /api/enunciability/readiness`.
+- Workspace owners and admins can inspect workspace enunciability metrics from `GET /api/enunciability/workspace/:workspaceId/admin`.
+- The web billing panel shows enunciability rollout checks and workspace enunciability admin tools.
+
+Current `v5.166` behavior:
+
+- Production presentability rollout readiness validates presentability coverage and readiness through `GET /api/presentability/readiness`.
+- Workspace owners and admins can inspect workspace presentability metrics from `GET /api/presentability/workspace/:workspaceId/admin`.
+- The web billing panel shows presentability rollout checks and workspace presentability admin tools.
+
+Current `v5.165` behavior:
+
+- Production representability rollout readiness validates representability coverage and readiness through `GET /api/representability/readiness`.
+- Workspace owners and admins can inspect workspace representability metrics from `GET /api/representability/workspace/:workspaceId/admin`.
+- The web billing panel shows representability rollout checks and workspace representability admin tools.
+
+Current `v5.164` behavior:
+
+- Production elaboratability rollout readiness validates elaboratability coverage and readiness through `GET /api/elaboratability/readiness`.
+- Workspace owners and admins can inspect workspace elaboratability metrics from `GET /api/elaboratability/workspace/:workspaceId/admin`.
+- The web billing panel shows elaboratability rollout checks and workspace elaboratability admin tools.
+
+Current `v5.163` behavior:
+
+- Production articulability rollout readiness validates articulability coverage and readiness through `GET /api/articulability/readiness`.
+- Workspace owners and admins can inspect workspace articulability metrics from `GET /api/articulability/workspace/:workspaceId/admin`.
+- The web billing panel shows articulability rollout checks and workspace articulability admin tools.
+
+Current `v5.162` behavior:
+
+- Production communicability rollout readiness validates communicability coverage and readiness through `GET /api/communicability/readiness`.
+- Workspace owners and admins can inspect workspace communicability metrics from `GET /api/communicability/workspace/:workspaceId/admin`.
+- The web billing panel shows communicability rollout checks and workspace communicability admin tools.
+
+Current `v5.161` behavior:
+
+- Production expressiveness rollout readiness validates expressiveness coverage and readiness through `GET /api/expressiveness/readiness`.
+- Workspace owners and admins can inspect workspace expressiveness metrics from `GET /api/expressiveness/workspace/:workspaceId/admin`.
+- The web billing panel shows expressiveness rollout checks and workspace expressiveness admin tools.
+
 Current `v5.160` behavior:
 
 - Production describability rollout readiness validates describability coverage and readiness through `GET /api/describability/readiness`.

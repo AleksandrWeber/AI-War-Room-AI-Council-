@@ -1,5 +1,5 @@
 
-describe('discernibility rollout integration', () => {
+describe('presentability rollout integration', () => {
   let app: NestFastifyApplication | undefined
 
   beforeAll(async () => {
@@ -21,27 +21,27 @@ describe('discernibility rollout integration', () => {
     await app?.close()
   })
 
-  it('reports discernibility capabilities and rollout readiness', async () => {
+  it('reports presentability capabilities and rollout readiness', async () => {
     const capabilities = await request(app!.getHttpServer())
-      .get('/api/discernibility/capabilities')
+      .get('/api/presentability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsDiscernibilityRollout: true,
-      supportsDiscernibilityAdminTools: true,
-      supportsSynthesisDiscernibilitySignals: true,
+      supportsPresentabilityRollout: true,
+      supportsPresentabilityAdminTools: true,
+      supportsUsageEventPresentabilitySignals: true,
     })
 
     const rollout = await request(app!.getHttpServer())
-      .get('/api/discernibility/readiness')
+      .get('/api/presentability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns discernibility admin summary for owners', async () => {
+  it('returns presentability admin summary for owners', async () => {
     const response = await request(app!.getHttpServer())
-      .get('/api/discernibility/workspace/workspace_1/admin')
+      .get('/api/presentability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -51,14 +51,14 @@ describe('discernibility rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        discernibilityPercent: expect.any(Number),
+        presentabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects discernibility admin tools for members', async () => {
+  it('rejects presentability admin tools for members', async () => {
     await request(app!.getHttpServer())
-      .get('/api/discernibility/workspace/workspace_1/admin')
+      .get('/api/presentability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -68,7 +68,7 @@ describe('discernibility rollout integration', () => {
 })
 
 
-describe('distinctiveness rollout integration', () => {
+describe('enunciability rollout integration', () => {
   let app: NestFastifyApplication | undefined
 
   beforeAll(async () => {
@@ -90,27 +90,27 @@ describe('distinctiveness rollout integration', () => {
     await app?.close()
   })
 
-  it('reports distinctiveness capabilities and rollout readiness', async () => {
+  it('reports enunciability capabilities and rollout readiness', async () => {
     const capabilities = await request(app!.getHttpServer())
-      .get('/api/distinctiveness/capabilities')
+      .get('/api/enunciability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsDistinctivenessRollout: true,
-      supportsDistinctivenessAdminTools: true,
-      supportsIdempotencyKeyDistinctivenessSignals: true,
+      supportsEnunciabilityRollout: true,
+      supportsEnunciabilityAdminTools: true,
+      supportsBillingNotificationEnunciabilitySignals: true,
     })
 
     const rollout = await request(app!.getHttpServer())
-      .get('/api/distinctiveness/readiness')
+      .get('/api/enunciability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns distinctiveness admin summary for owners', async () => {
+  it('returns enunciability admin summary for owners', async () => {
     const response = await request(app!.getHttpServer())
-      .get('/api/distinctiveness/workspace/workspace_1/admin')
+      .get('/api/enunciability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -120,14 +120,14 @@ describe('distinctiveness rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        distinctivenessPercent: expect.any(Number),
+        enunciabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects distinctiveness admin tools for members', async () => {
+  it('rejects enunciability admin tools for members', async () => {
     await request(app!.getHttpServer())
-      .get('/api/distinctiveness/workspace/workspace_1/admin')
+      .get('/api/enunciability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -137,7 +137,7 @@ describe('distinctiveness rollout integration', () => {
 })
 
 
-describe('conspicuousness rollout integration', () => {
+describe('formulatability rollout integration', () => {
   let app: NestFastifyApplication | undefined
 
   beforeAll(async () => {
@@ -159,27 +159,27 @@ describe('conspicuousness rollout integration', () => {
     await app?.close()
   })
 
-  it('reports conspicuousness capabilities and rollout readiness', async () => {
+  it('reports formulatability capabilities and rollout readiness', async () => {
     const capabilities = await request(app!.getHttpServer())
-      .get('/api/conspicuousness/capabilities')
+      .get('/api/formulatability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsConspicuousnessRollout: true,
-      supportsConspicuousnessAdminTools: true,
-      supportsMembershipConspicuousnessSignals: true,
+      supportsFormulatabilityRollout: true,
+      supportsFormulatabilityAdminTools: true,
+      supportsIdempotencyKeyFormulatabilitySignals: true,
     })
 
     const rollout = await request(app!.getHttpServer())
-      .get('/api/conspicuousness/readiness')
+      .get('/api/formulatability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns conspicuousness admin summary for owners', async () => {
+  it('returns formulatability admin summary for owners', async () => {
     const response = await request(app!.getHttpServer())
-      .get('/api/conspicuousness/workspace/workspace_1/admin')
+      .get('/api/formulatability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -189,14 +189,14 @@ describe('conspicuousness rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        conspicuousnessPercent: expect.any(Number),
+        formulatabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects conspicuousness admin tools for members', async () => {
+  it('rejects formulatability admin tools for members', async () => {
     await request(app!.getHttpServer())
-      .get('/api/conspicuousness/workspace/workspace_1/admin')
+      .get('/api/formulatability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -206,7 +206,7 @@ describe('conspicuousness rollout integration', () => {
 })
 
 
-describe('detectability rollout integration', () => {
+describe('narratability rollout integration', () => {
   let app: NestFastifyApplication | undefined
 
   beforeAll(async () => {
@@ -228,27 +228,27 @@ describe('detectability rollout integration', () => {
     await app?.close()
   })
 
-  it('reports detectability capabilities and rollout readiness', async () => {
+  it('reports narratability capabilities and rollout readiness', async () => {
     const capabilities = await request(app!.getHttpServer())
-      .get('/api/detectability/capabilities')
+      .get('/api/narratability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsDetectabilityRollout: true,
-      supportsDetectabilityAdminTools: true,
-      supportsBillingWebhookDetectabilitySignals: true,
+      supportsNarratabilityRollout: true,
+      supportsNarratabilityAdminTools: true,
+      supportsMembershipNarratabilitySignals: true,
     })
 
     const rollout = await request(app!.getHttpServer())
-      .get('/api/detectability/readiness')
+      .get('/api/narratability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns detectability admin summary for owners', async () => {
+  it('returns narratability admin summary for owners', async () => {
     const response = await request(app!.getHttpServer())
-      .get('/api/detectability/workspace/workspace_1/admin')
+      .get('/api/narratability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -258,14 +258,14 @@ describe('detectability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        detectabilityPercent: expect.any(Number),
+        narratabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects detectability admin tools for members', async () => {
+  it('rejects narratability admin tools for members', async () => {
     await request(app!.getHttpServer())
-      .get('/api/detectability/workspace/workspace_1/admin')
+      .get('/api/narratability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -275,7 +275,7 @@ describe('detectability rollout integration', () => {
 })
 
 
-describe('describability rollout integration', () => {
+describe('illustratability rollout integration', () => {
   let app: NestFastifyApplication | undefined
 
   beforeAll(async () => {
@@ -297,27 +297,27 @@ describe('describability rollout integration', () => {
     await app?.close()
   })
 
-  it('reports describability capabilities and rollout readiness', async () => {
+  it('reports illustratability capabilities and rollout readiness', async () => {
     const capabilities = await request(app!.getHttpServer())
-      .get('/api/describability/capabilities')
+      .get('/api/illustratability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsDescribabilityRollout: true,
-      supportsDescribabilityAdminTools: true,
-      supportsWorkflowDescribabilitySignals: true,
+      supportsIllustratabilityRollout: true,
+      supportsIllustratabilityAdminTools: true,
+      supportsShieldScanIllustratabilitySignals: true,
     })
 
     const rollout = await request(app!.getHttpServer())
-      .get('/api/describability/readiness')
+      .get('/api/illustratability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns describability admin summary for owners', async () => {
+  it('returns illustratability admin summary for owners', async () => {
     const response = await request(app!.getHttpServer())
-      .get('/api/describability/workspace/workspace_1/admin')
+      .get('/api/illustratability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -327,14 +327,14 @@ describe('describability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        describabilityPercent: expect.any(Number),
+        illustratabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects describability admin tools for members', async () => {
+  it('rejects illustratability admin tools for members', async () => {
     await request(app!.getHttpServer())
-      .get('/api/describability/workspace/workspace_1/admin')
+      .get('/api/illustratability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',

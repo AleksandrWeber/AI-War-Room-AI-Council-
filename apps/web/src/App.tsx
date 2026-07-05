@@ -294,6 +294,26 @@ import type {
   DetectabilityAdminSummaryResponse,
   DescribabilityRolloutResponse,
   DescribabilityAdminSummaryResponse,
+  ExpressivenessRolloutResponse,
+  ExpressivenessAdminSummaryResponse,
+  CommunicabilityRolloutResponse,
+  CommunicabilityAdminSummaryResponse,
+  ArticulabilityRolloutResponse,
+  ArticulabilityAdminSummaryResponse,
+  ElaboratabilityRolloutResponse,
+  ElaboratabilityAdminSummaryResponse,
+  RepresentabilityRolloutResponse,
+  RepresentabilityAdminSummaryResponse,
+  PresentabilityRolloutResponse,
+  PresentabilityAdminSummaryResponse,
+  EnunciabilityRolloutResponse,
+  EnunciabilityAdminSummaryResponse,
+  FormulatabilityRolloutResponse,
+  FormulatabilityAdminSummaryResponse,
+  NarratabilityRolloutResponse,
+  NarratabilityAdminSummaryResponse,
+  IllustratabilityRolloutResponse,
+  IllustratabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -1576,6 +1596,96 @@ import {
   formatDescribabilityRolloutStatus,
 } from './describability-ui'
 import {
+  executeExpressivenessAdminAction,
+  fetchExpressivenessAdminSummary,
+  fetchExpressivenessRollout,
+  formatExpressivenessAdminAction,
+  formatExpressivenessDomain,
+  formatExpressivenessRolloutCheckStatus,
+  formatExpressivenessRolloutStatus,
+} from './expressiveness-ui'
+import {
+  executeCommunicabilityAdminAction,
+  fetchCommunicabilityAdminSummary,
+  fetchCommunicabilityRollout,
+  formatCommunicabilityAdminAction,
+  formatCommunicabilityDomain,
+  formatCommunicabilityRolloutCheckStatus,
+  formatCommunicabilityRolloutStatus,
+} from './communicability-ui'
+import {
+  executeArticulabilityAdminAction,
+  fetchArticulabilityAdminSummary,
+  fetchArticulabilityRollout,
+  formatArticulabilityAdminAction,
+  formatArticulabilityDomain,
+  formatArticulabilityRolloutCheckStatus,
+  formatArticulabilityRolloutStatus,
+} from './articulability-ui'
+import {
+  executeElaboratabilityAdminAction,
+  fetchElaboratabilityAdminSummary,
+  fetchElaboratabilityRollout,
+  formatElaboratabilityAdminAction,
+  formatElaboratabilityDomain,
+  formatElaboratabilityRolloutCheckStatus,
+  formatElaboratabilityRolloutStatus,
+} from './elaboratability-ui'
+import {
+  executeRepresentabilityAdminAction,
+  fetchRepresentabilityAdminSummary,
+  fetchRepresentabilityRollout,
+  formatRepresentabilityAdminAction,
+  formatRepresentabilityDomain,
+  formatRepresentabilityRolloutCheckStatus,
+  formatRepresentabilityRolloutStatus,
+} from './representability-ui'
+import {
+  executePresentabilityAdminAction,
+  fetchPresentabilityAdminSummary,
+  fetchPresentabilityRollout,
+  formatPresentabilityAdminAction,
+  formatPresentabilityDomain,
+  formatPresentabilityRolloutCheckStatus,
+  formatPresentabilityRolloutStatus,
+} from './presentability-ui'
+import {
+  executeEnunciabilityAdminAction,
+  fetchEnunciabilityAdminSummary,
+  fetchEnunciabilityRollout,
+  formatEnunciabilityAdminAction,
+  formatEnunciabilityDomain,
+  formatEnunciabilityRolloutCheckStatus,
+  formatEnunciabilityRolloutStatus,
+} from './enunciability-ui'
+import {
+  executeFormulatabilityAdminAction,
+  fetchFormulatabilityAdminSummary,
+  fetchFormulatabilityRollout,
+  formatFormulatabilityAdminAction,
+  formatFormulatabilityDomain,
+  formatFormulatabilityRolloutCheckStatus,
+  formatFormulatabilityRolloutStatus,
+} from './formulatability-ui'
+import {
+  executeNarratabilityAdminAction,
+  fetchNarratabilityAdminSummary,
+  fetchNarratabilityRollout,
+  formatNarratabilityAdminAction,
+  formatNarratabilityDomain,
+  formatNarratabilityRolloutCheckStatus,
+  formatNarratabilityRolloutStatus,
+} from './narratability-ui'
+import {
+  executeIllustratabilityAdminAction,
+  fetchIllustratabilityAdminSummary,
+  fetchIllustratabilityRollout,
+  formatIllustratabilityAdminAction,
+  formatIllustratabilityDomain,
+  formatIllustratabilityRolloutCheckStatus,
+  formatIllustratabilityRolloutStatus,
+} from './illustratability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -2404,6 +2514,26 @@ function App() {
     useState<DetectabilityRolloutResponse | null>(null)
   const [describabilityRollout, setDescribabilityRollout] =
     useState<DescribabilityRolloutResponse | null>(null)
+  const [expressivenessRollout, setExpressivenessRollout] =
+    useState<ExpressivenessRolloutResponse | null>(null)
+  const [communicabilityRollout, setCommunicabilityRollout] =
+    useState<CommunicabilityRolloutResponse | null>(null)
+  const [articulabilityRollout, setArticulabilityRollout] =
+    useState<ArticulabilityRolloutResponse | null>(null)
+  const [elaboratabilityRollout, setElaboratabilityRollout] =
+    useState<ElaboratabilityRolloutResponse | null>(null)
+  const [representabilityRollout, setRepresentabilityRollout] =
+    useState<RepresentabilityRolloutResponse | null>(null)
+  const [presentabilityRollout, setPresentabilityRollout] =
+    useState<PresentabilityRolloutResponse | null>(null)
+  const [enunciabilityRollout, setEnunciabilityRollout] =
+    useState<EnunciabilityRolloutResponse | null>(null)
+  const [formulatabilityRollout, setFormulatabilityRollout] =
+    useState<FormulatabilityRolloutResponse | null>(null)
+  const [narratabilityRollout, setNarratabilityRollout] =
+    useState<NarratabilityRolloutResponse | null>(null)
+  const [illustratabilityRollout, setIllustratabilityRollout] =
+    useState<IllustratabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -2761,6 +2891,26 @@ function App() {
     useState<DetectabilityAdminSummaryResponse | null>(null)
   const [describabilityAdminSummary, setDescribabilityAdminSummary] =
     useState<DescribabilityAdminSummaryResponse | null>(null)
+  const [expressivenessAdminSummary, setExpressivenessAdminSummary] =
+    useState<ExpressivenessAdminSummaryResponse | null>(null)
+  const [communicabilityAdminSummary, setCommunicabilityAdminSummary] =
+    useState<CommunicabilityAdminSummaryResponse | null>(null)
+  const [articulabilityAdminSummary, setArticulabilityAdminSummary] =
+    useState<ArticulabilityAdminSummaryResponse | null>(null)
+  const [elaboratabilityAdminSummary, setElaboratabilityAdminSummary] =
+    useState<ElaboratabilityAdminSummaryResponse | null>(null)
+  const [representabilityAdminSummary, setRepresentabilityAdminSummary] =
+    useState<RepresentabilityAdminSummaryResponse | null>(null)
+  const [presentabilityAdminSummary, setPresentabilityAdminSummary] =
+    useState<PresentabilityAdminSummaryResponse | null>(null)
+  const [enunciabilityAdminSummary, setEnunciabilityAdminSummary] =
+    useState<EnunciabilityAdminSummaryResponse | null>(null)
+  const [formulatabilityAdminSummary, setFormulatabilityAdminSummary] =
+    useState<FormulatabilityAdminSummaryResponse | null>(null)
+  const [narratabilityAdminSummary, setNarratabilityAdminSummary] =
+    useState<NarratabilityAdminSummaryResponse | null>(null)
+  const [illustratabilityAdminSummary, setIllustratabilityAdminSummary] =
+    useState<IllustratabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -3179,6 +3329,36 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [describabilityAdminAction, setDescribabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [expressivenessAdminAction, setExpressivenessAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [communicabilityAdminAction, setCommunicabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [articulabilityAdminAction, setArticulabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [elaboratabilityAdminAction, setElaboratabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [representabilityAdminAction, setRepresentabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [presentabilityAdminAction, setPresentabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [enunciabilityAdminAction, setEnunciabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [formulatabilityAdminAction, setFormulatabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [narratabilityAdminAction, setNarratabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [illustratabilityAdminAction, setIllustratabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -4980,6 +5160,126 @@ function App() {
         }
       })
 
+    fetchExpressivenessRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setExpressivenessRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setExpressivenessRollout(null)
+        }
+      })
+
+    fetchCommunicabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setCommunicabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setCommunicabilityRollout(null)
+        }
+      })
+
+    fetchArticulabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setArticulabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setArticulabilityRollout(null)
+        }
+      })
+
+    fetchElaboratabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setElaboratabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setElaboratabilityRollout(null)
+        }
+      })
+
+    fetchRepresentabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setRepresentabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setRepresentabilityRollout(null)
+        }
+      })
+
+    fetchPresentabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setPresentabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setPresentabilityRollout(null)
+        }
+      })
+
+    fetchEnunciabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setEnunciabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setEnunciabilityRollout(null)
+        }
+      })
+
+    fetchFormulatabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setFormulatabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setFormulatabilityRollout(null)
+        }
+      })
+
+    fetchNarratabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setNarratabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setNarratabilityRollout(null)
+        }
+      })
+
+    fetchIllustratabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setIllustratabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setIllustratabilityRollout(null)
+        }
+      })
+
     fetchUsageCapabilities(apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
@@ -6646,6 +6946,76 @@ function App() {
         workspaceAuthHeaders,
       )
       setDescribabilityAdminSummary(describabilityAdmin)
+
+      const expressivenessAdmin = await fetchExpressivenessAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setExpressivenessAdminSummary(expressivenessAdmin)
+
+      const communicabilityAdmin = await fetchCommunicabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCommunicabilityAdminSummary(communicabilityAdmin)
+
+      const articulabilityAdmin = await fetchArticulabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setArticulabilityAdminSummary(articulabilityAdmin)
+
+      const elaboratabilityAdmin = await fetchElaboratabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setElaboratabilityAdminSummary(elaboratabilityAdmin)
+
+      const representabilityAdmin = await fetchRepresentabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRepresentabilityAdminSummary(representabilityAdmin)
+
+      const presentabilityAdmin = await fetchPresentabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPresentabilityAdminSummary(presentabilityAdmin)
+
+      const enunciabilityAdmin = await fetchEnunciabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEnunciabilityAdminSummary(enunciabilityAdmin)
+
+      const formulatabilityAdmin = await fetchFormulatabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFormulatabilityAdminSummary(formulatabilityAdmin)
+
+      const narratabilityAdmin = await fetchNarratabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNarratabilityAdminSummary(narratabilityAdmin)
+
+      const illustratabilityAdmin = await fetchIllustratabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIllustratabilityAdminSummary(illustratabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -7878,6 +8248,296 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleIllustratabilityAdminAction(
+    action: 'refresh_illustratability_summary',
+  ) {
+    setIllustratabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeIllustratabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchIllustratabilityRollout(apiBaseUrl)
+      setIllustratabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run illustratability admin action.',
+      )
+    } finally {
+      setIllustratabilityAdminAction('idle')
+    }
+  }
+
+  async function handleNarratabilityAdminAction(
+    action: 'refresh_narratability_summary',
+  ) {
+    setNarratabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeNarratabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchNarratabilityRollout(apiBaseUrl)
+      setNarratabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run narratability admin action.',
+      )
+    } finally {
+      setNarratabilityAdminAction('idle')
+    }
+  }
+
+  async function handleFormulatabilityAdminAction(
+    action: 'refresh_formulatability_summary',
+  ) {
+    setFormulatabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeFormulatabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchFormulatabilityRollout(apiBaseUrl)
+      setFormulatabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run formulatability admin action.',
+      )
+    } finally {
+      setFormulatabilityAdminAction('idle')
+    }
+  }
+
+  async function handleEnunciabilityAdminAction(
+    action: 'refresh_enunciability_summary',
+  ) {
+    setEnunciabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeEnunciabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchEnunciabilityRollout(apiBaseUrl)
+      setEnunciabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run enunciability admin action.',
+      )
+    } finally {
+      setEnunciabilityAdminAction('idle')
+    }
+  }
+
+  async function handlePresentabilityAdminAction(
+    action: 'refresh_presentability_summary',
+  ) {
+    setPresentabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executePresentabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchPresentabilityRollout(apiBaseUrl)
+      setPresentabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run presentability admin action.',
+      )
+    } finally {
+      setPresentabilityAdminAction('idle')
+    }
+  }
+
+  async function handleRepresentabilityAdminAction(
+    action: 'refresh_representability_summary',
+  ) {
+    setRepresentabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeRepresentabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchRepresentabilityRollout(apiBaseUrl)
+      setRepresentabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run representability admin action.',
+      )
+    } finally {
+      setRepresentabilityAdminAction('idle')
+    }
+  }
+
+  async function handleElaboratabilityAdminAction(
+    action: 'refresh_elaboratability_summary',
+  ) {
+    setElaboratabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeElaboratabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchElaboratabilityRollout(apiBaseUrl)
+      setElaboratabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run elaboratability admin action.',
+      )
+    } finally {
+      setElaboratabilityAdminAction('idle')
+    }
+  }
+
+  async function handleArticulabilityAdminAction(
+    action: 'refresh_articulability_summary',
+  ) {
+    setArticulabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeArticulabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchArticulabilityRollout(apiBaseUrl)
+      setArticulabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run articulability admin action.',
+      )
+    } finally {
+      setArticulabilityAdminAction('idle')
+    }
+  }
+
+  async function handleCommunicabilityAdminAction(
+    action: 'refresh_communicability_summary',
+  ) {
+    setCommunicabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeCommunicabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchCommunicabilityRollout(apiBaseUrl)
+      setCommunicabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run communicability admin action.',
+      )
+    } finally {
+      setCommunicabilityAdminAction('idle')
+    }
+  }
+
+  async function handleExpressivenessAdminAction(
+    action: 'refresh_expressiveness_summary',
+  ) {
+    setExpressivenessAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeExpressivenessAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchExpressivenessRollout(apiBaseUrl)
+      setExpressivenessRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run expressiveness admin action.',
+      )
+    } finally {
+      setExpressivenessAdminAction('idle')
     }
   }
 
@@ -15515,6 +16175,296 @@ function App() {
               ))}
             </div>
             <small>Checked at {discernibilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {representabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production representability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${representabilityRollout.status}`}
+              >
+                {formatRepresentabilityRolloutStatus(representabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{representabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {representabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatRepresentabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {representabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {elaboratabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production elaboratability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${elaboratabilityRollout.status}`}
+              >
+                {formatElaboratabilityRolloutStatus(elaboratabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{elaboratabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {elaboratabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatElaboratabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {elaboratabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {articulabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production articulability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${articulabilityRollout.status}`}
+              >
+                {formatArticulabilityRolloutStatus(articulabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{articulabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {articulabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatArticulabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {articulabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {communicabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production communicability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${communicabilityRollout.status}`}
+              >
+                {formatCommunicabilityRolloutStatus(communicabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{communicabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {communicabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatCommunicabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {communicabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {expressivenessRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production expressiveness rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${expressivenessRollout.status}`}
+              >
+                {formatExpressivenessRolloutStatus(expressivenessRollout.status)}
+              </strong>
+            </div>
+            <p>{expressivenessRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {expressivenessRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatExpressivenessRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {expressivenessRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {illustratabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production illustratability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${illustratabilityRollout.status}`}
+              >
+                {formatIllustratabilityRolloutStatus(illustratabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{illustratabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {illustratabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatIllustratabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {illustratabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {narratabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production narratability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${narratabilityRollout.status}`}
+              >
+                {formatNarratabilityRolloutStatus(narratabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{narratabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {narratabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatNarratabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {narratabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {formulatabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production formulatability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${formulatabilityRollout.status}`}
+              >
+                {formatFormulatabilityRolloutStatus(formulatabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{formulatabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {formulatabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatFormulatabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {formulatabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {enunciabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production enunciability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${enunciabilityRollout.status}`}
+              >
+                {formatEnunciabilityRolloutStatus(enunciabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{enunciabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {enunciabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatEnunciabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {enunciabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {presentabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production presentability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${presentabilityRollout.status}`}
+              >
+                {formatPresentabilityRolloutStatus(presentabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{presentabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {presentabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatPresentabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {presentabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -24952,6 +25902,656 @@ function App() {
                 }
               >
                 {formatDiscernibilityAdminAction('refresh_discernibility_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {representabilityAdminSummary ? (
+          <div className="billing-admin workspace-representability-admin">
+            <div className="billing-admin__header">
+              <span>Representability admin</span>
+              <strong>{representabilityAdminSummary.role}</strong>
+            </div>
+            <p>{representabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice representability</span>
+                <strong>
+                  {representabilityAdminSummary.stats.representabilityPercent}%
+                </strong>
+                <small>
+                  {representabilityAdminSummary.stats.coveredDomains}/
+                  {representabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Representability signals</span>
+                <strong>{representabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {representabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-representability-list">
+              {representabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-representability-card workspace-representability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatRepresentabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {representabilityAdminSummary.availableActions.includes(
+              'refresh_representability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={representabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleRepresentabilityAdminAction(
+                    'refresh_representability_summary',
+                  )
+                }
+              >
+                {formatRepresentabilityAdminAction('refresh_representability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {elaboratabilityAdminSummary ? (
+          <div className="billing-admin workspace-elaboratability-admin">
+            <div className="billing-admin__header">
+              <span>Elaboratability admin</span>
+              <strong>{elaboratabilityAdminSummary.role}</strong>
+            </div>
+            <p>{elaboratabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workflow elaboratability</span>
+                <strong>
+                  {elaboratabilityAdminSummary.stats.elaboratabilityPercent}%
+                </strong>
+                <small>
+                  {elaboratabilityAdminSummary.stats.coveredDomains}/
+                  {elaboratabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Elaboratability signals</span>
+                <strong>{elaboratabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {elaboratabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, run workflows, and agent outputs'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-elaboratability-list">
+              {elaboratabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-elaboratability-card workspace-elaboratability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatElaboratabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {elaboratabilityAdminSummary.availableActions.includes(
+              'refresh_elaboratability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={elaboratabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleElaboratabilityAdminAction(
+                    'refresh_elaboratability_summary',
+                  )
+                }
+              >
+                {formatElaboratabilityAdminAction('refresh_elaboratability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {articulabilityAdminSummary ? (
+          <div className="billing-admin workspace-articulability-admin">
+            <div className="billing-admin__header">
+              <span>Articulability admin</span>
+              <strong>{articulabilityAdminSummary.role}</strong>
+            </div>
+            <p>{articulabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Artifact articulability</span>
+                <strong>
+                  {articulabilityAdminSummary.stats.articulabilityPercent}%
+                </strong>
+                <small>
+                  {articulabilityAdminSummary.stats.coveredDomains}/
+                  {articulabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Articulability signals</span>
+                <strong>{articulabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {articulabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, artifacts, and run workflows'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-articulability-list">
+              {articulabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-articulability-card workspace-articulability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatArticulabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {articulabilityAdminSummary.availableActions.includes(
+              'refresh_articulability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={articulabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleArticulabilityAdminAction(
+                    'refresh_articulability_summary',
+                  )
+                }
+              >
+                {formatArticulabilityAdminAction('refresh_articulability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {communicabilityAdminSummary ? (
+          <div className="billing-admin workspace-communicability-admin">
+            <div className="billing-admin__header">
+              <span>Communicability admin</span>
+              <strong>{communicabilityAdminSummary.role}</strong>
+            </div>
+            <p>{communicabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Moderator synthesis communicability</span>
+                <strong>
+                  {communicabilityAdminSummary.stats.communicabilityPercent}%
+                </strong>
+                <small>
+                  {communicabilityAdminSummary.stats.coveredDomains}/
+                  {communicabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Communicability signals</span>
+                <strong>{communicabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {communicabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, moderator syntheses, and agent outputs'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-communicability-list">
+              {communicabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-communicability-card workspace-communicability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatCommunicabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {communicabilityAdminSummary.availableActions.includes(
+              'refresh_communicability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={communicabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleCommunicabilityAdminAction(
+                    'refresh_communicability_summary',
+                  )
+                }
+              >
+                {formatCommunicabilityAdminAction('refresh_communicability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {expressivenessAdminSummary ? (
+          <div className="billing-admin workspace-expressiveness-admin">
+            <div className="billing-admin__header">
+              <span>Expressiveness admin</span>
+              <strong>{expressivenessAdminSummary.role}</strong>
+            </div>
+            <p>{expressivenessAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Agent output expressiveness</span>
+                <strong>
+                  {expressivenessAdminSummary.stats.expressivenessPercent}%
+                </strong>
+                <small>
+                  {expressivenessAdminSummary.stats.coveredDomains}/
+                  {expressivenessAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Expressiveness signals</span>
+                <strong>{expressivenessAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {expressivenessAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, agent outputs, and moderator syntheses'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-expressiveness-list">
+              {expressivenessAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-expressiveness-card workspace-expressiveness-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatExpressivenessDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {expressivenessAdminSummary.availableActions.includes(
+              'refresh_expressiveness_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={expressivenessAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleExpressivenessAdminAction(
+                    'refresh_expressiveness_summary',
+                  )
+                }
+              >
+                {formatExpressivenessAdminAction('refresh_expressiveness_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {illustratabilityAdminSummary ? (
+          <div className="billing-admin workspace-illustratability-admin">
+            <div className="billing-admin__header">
+              <span>Illustratability admin</span>
+              <strong>{illustratabilityAdminSummary.role}</strong>
+            </div>
+            <p>{illustratabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan illustratability</span>
+                <strong>
+                  {illustratabilityAdminSummary.stats.illustratabilityPercent}%
+                </strong>
+                <small>
+                  {illustratabilityAdminSummary.stats.coveredDomains}/
+                  {illustratabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Illustratability signals</span>
+                <strong>{illustratabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {illustratabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-illustratability-list">
+              {illustratabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-illustratability-card workspace-illustratability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatIllustratabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {illustratabilityAdminSummary.availableActions.includes(
+              'refresh_illustratability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={illustratabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleIllustratabilityAdminAction(
+                    'refresh_illustratability_summary',
+                  )
+                }
+              >
+                {formatIllustratabilityAdminAction('refresh_illustratability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {narratabilityAdminSummary ? (
+          <div className="billing-admin workspace-narratability-admin">
+            <div className="billing-admin__header">
+              <span>Narratability admin</span>
+              <strong>{narratabilityAdminSummary.role}</strong>
+            </div>
+            <p>{narratabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership narratability</span>
+                <strong>
+                  {narratabilityAdminSummary.stats.narratabilityPercent}%
+                </strong>
+                <small>
+                  {narratabilityAdminSummary.stats.coveredDomains}/
+                  {narratabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Narratability signals</span>
+                <strong>{narratabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {narratabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-narratability-list">
+              {narratabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-narratability-card workspace-narratability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatNarratabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {narratabilityAdminSummary.availableActions.includes(
+              'refresh_narratability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={narratabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleNarratabilityAdminAction(
+                    'refresh_narratability_summary',
+                  )
+                }
+              >
+                {formatNarratabilityAdminAction('refresh_narratability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {formulatabilityAdminSummary ? (
+          <div className="billing-admin workspace-formulatability-admin">
+            <div className="billing-admin__header">
+              <span>Formulatability admin</span>
+              <strong>{formulatabilityAdminSummary.role}</strong>
+            </div>
+            <p>{formulatabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key formulatability</span>
+                <strong>
+                  {formulatabilityAdminSummary.stats.formulatabilityPercent}%
+                </strong>
+                <small>
+                  {formulatabilityAdminSummary.stats.coveredDomains}/
+                  {formulatabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Formulatability signals</span>
+                <strong>{formulatabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {formulatabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-formulatability-list">
+              {formulatabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-formulatability-card workspace-formulatability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatFormulatabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {formulatabilityAdminSummary.availableActions.includes(
+              'refresh_formulatability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={formulatabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleFormulatabilityAdminAction(
+                    'refresh_formulatability_summary',
+                  )
+                }
+              >
+                {formatFormulatabilityAdminAction('refresh_formulatability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {enunciabilityAdminSummary ? (
+          <div className="billing-admin workspace-enunciability-admin">
+            <div className="billing-admin__header">
+              <span>Enunciability admin</span>
+              <strong>{enunciabilityAdminSummary.role}</strong>
+            </div>
+            <p>{enunciabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification enunciability</span>
+                <strong>
+                  {enunciabilityAdminSummary.stats.enunciabilityPercent}%
+                </strong>
+                <small>
+                  {enunciabilityAdminSummary.stats.coveredDomains}/
+                  {enunciabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Enunciability signals</span>
+                <strong>{enunciabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {enunciabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-enunciability-list">
+              {enunciabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-enunciability-card workspace-enunciability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatEnunciabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {enunciabilityAdminSummary.availableActions.includes(
+              'refresh_enunciability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={enunciabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleEnunciabilityAdminAction(
+                    'refresh_enunciability_summary',
+                  )
+                }
+              >
+                {formatEnunciabilityAdminAction('refresh_enunciability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {presentabilityAdminSummary ? (
+          <div className="billing-admin workspace-presentability-admin">
+            <div className="billing-admin__header">
+              <span>Presentability admin</span>
+              <strong>{presentabilityAdminSummary.role}</strong>
+            </div>
+            <p>{presentabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Usage event presentability</span>
+                <strong>
+                  {presentabilityAdminSummary.stats.presentabilityPercent}%
+                </strong>
+                <small>
+                  {presentabilityAdminSummary.stats.coveredDomains}/
+                  {presentabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Presentability signals</span>
+                <strong>{presentabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {presentabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, usage events, and meter usage reports'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-presentability-list">
+              {presentabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-presentability-card workspace-presentability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatPresentabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {presentabilityAdminSummary.availableActions.includes(
+              'refresh_presentability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={presentabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handlePresentabilityAdminAction(
+                    'refresh_presentability_summary',
+                  )
+                }
+              >
+                {formatPresentabilityAdminAction('refresh_presentability_summary')}
               </button>
             ) : null}
           </div>
