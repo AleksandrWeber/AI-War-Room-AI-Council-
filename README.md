@@ -796,6 +796,36 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.100` behavior:
+
+- Production modifiability rollout readiness validates modifiability coverage and readiness through `GET /api/modifiability/readiness`.
+- Workspace owners and admins can inspect workspace modifiability metrics from `GET /api/modifiability/workspace/:workspaceId/admin`.
+- The web billing panel shows modifiability rollout checks and workspace modifiability admin tools.
+
+Current `v5.99` behavior:
+
+- Production extensibility rollout readiness validates extensibility coverage and readiness through `GET /api/extensibility/readiness`.
+- Workspace owners and admins can inspect workspace extensibility metrics from `GET /api/extensibility/workspace/:workspaceId/admin`.
+- The web billing panel shows extensibility rollout checks and workspace extensibility admin tools.
+
+Current `v5.98` behavior:
+
+- Production flexibility rollout readiness validates flexibility coverage and readiness through `GET /api/flexibility/readiness`.
+- Workspace owners and admins can inspect workspace flexibility metrics from `GET /api/flexibility/workspace/:workspaceId/admin`.
+- The web billing panel shows flexibility rollout checks and workspace flexibility admin tools.
+
+Current `v5.97` behavior:
+
+- Production adaptability rollout readiness validates adaptability coverage and readiness through `GET /api/adaptability/readiness`.
+- Workspace owners and admins can inspect workspace adaptability metrics from `GET /api/adaptability/workspace/:workspaceId/admin`.
+- The web billing panel shows adaptability rollout checks and workspace adaptability admin tools.
+
+Current `v5.96` behavior:
+
+- Production compatibility rollout readiness validates compatibility coverage and readiness through `GET /api/compatibility/readiness`.
+- Workspace owners and admins can inspect workspace compatibility metrics from `GET /api/compatibility/workspace/:workspaceId/admin`.
+- The web billing panel shows compatibility rollout checks and workspace compatibility admin tools.
+
 Current `v5.95` behavior:
 
 - Production portability rollout readiness validates portability coverage and readiness through `GET /api/portability/readiness`.

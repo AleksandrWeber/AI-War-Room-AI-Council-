@@ -2655,6 +2655,136 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-compatibility-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-compatibility-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-compatibility-card p,
+.workspace-compatibility-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-compatibility-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-compatibility-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-adaptability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-adaptability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-adaptability-card p,
+.workspace-adaptability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-adaptability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-adaptability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-flexibility-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-flexibility-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-flexibility-card p,
+.workspace-flexibility-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-flexibility-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-flexibility-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-extensibility-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-extensibility-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-extensibility-card p,
+.workspace-extensibility-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-extensibility-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-extensibility-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-modifiability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-modifiability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-modifiability-card p,
+.workspace-modifiability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-modifiability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-modifiability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

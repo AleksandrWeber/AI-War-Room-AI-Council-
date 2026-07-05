@@ -67,6 +67,11 @@ import { LinkabilityModule } from './linkability/linkability.module.js'
 import { InterchangeabilityModule } from './interchangeability/interchangeability.module.js'
 import { TransferabilityModule } from './transferability/transferability.module.js'
 import { PortabilityModule } from './portability/portability.module.js'
+import { CompatibilityModule } from './compatibility/compatibility.module.js'
+import { AdaptabilityModule } from './adaptability/adaptability.module.js'
+import { FlexibilityModule } from './flexibility/flexibility.module.js'
+import { ExtensibilityModule } from './extensibility/extensibility.module.js'
+import { ModifiabilityModule } from './modifiability/modifiability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -153,6 +158,11 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     InterchangeabilityModule,
     TransferabilityModule,
     PortabilityModule,
+    CompatibilityModule,
+    AdaptabilityModule,
+    FlexibilityModule,
+    ExtensibilityModule,
+    ModifiabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

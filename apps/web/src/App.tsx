@@ -164,6 +164,16 @@ import type {
   TransferabilityAdminSummaryResponse,
   PortabilityRolloutResponse,
   PortabilityAdminSummaryResponse,
+  CompatibilityRolloutResponse,
+  CompatibilityAdminSummaryResponse,
+  AdaptabilityRolloutResponse,
+  AdaptabilityAdminSummaryResponse,
+  FlexibilityRolloutResponse,
+  FlexibilityAdminSummaryResponse,
+  ExtensibilityRolloutResponse,
+  ExtensibilityAdminSummaryResponse,
+  ModifiabilityRolloutResponse,
+  ModifiabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -860,6 +870,51 @@ import {
   formatPortabilityRolloutCheckStatus,
   formatPortabilityRolloutStatus,
 } from './portability-ui'
+import {
+  executeCompatibilityAdminAction,
+  fetchCompatibilityAdminSummary,
+  fetchCompatibilityRollout,
+  formatCompatibilityAdminAction,
+  formatCompatibilityDomain,
+  formatCompatibilityRolloutCheckStatus,
+  formatCompatibilityRolloutStatus,
+} from './compatibility-ui'
+import {
+  executeAdaptabilityAdminAction,
+  fetchAdaptabilityAdminSummary,
+  fetchAdaptabilityRollout,
+  formatAdaptabilityAdminAction,
+  formatAdaptabilityDomain,
+  formatAdaptabilityRolloutCheckStatus,
+  formatAdaptabilityRolloutStatus,
+} from './adaptability-ui'
+import {
+  executeFlexibilityAdminAction,
+  fetchFlexibilityAdminSummary,
+  fetchFlexibilityRollout,
+  formatFlexibilityAdminAction,
+  formatFlexibilityDomain,
+  formatFlexibilityRolloutCheckStatus,
+  formatFlexibilityRolloutStatus,
+} from './flexibility-ui'
+import {
+  executeExtensibilityAdminAction,
+  fetchExtensibilityAdminSummary,
+  fetchExtensibilityRollout,
+  formatExtensibilityAdminAction,
+  formatExtensibilityDomain,
+  formatExtensibilityRolloutCheckStatus,
+  formatExtensibilityRolloutStatus,
+} from './extensibility-ui'
+import {
+  executeModifiabilityAdminAction,
+  fetchModifiabilityAdminSummary,
+  fetchModifiabilityRollout,
+  formatModifiabilityAdminAction,
+  formatModifiabilityDomain,
+  formatModifiabilityRolloutCheckStatus,
+  formatModifiabilityRolloutStatus,
+} from './modifiability-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -1559,6 +1614,16 @@ function App() {
     useState<TransferabilityRolloutResponse | null>(null)
   const [portabilityRollout, setPortabilityRollout] =
     useState<PortabilityRolloutResponse | null>(null)
+  const [compatibilityRollout, setCompatibilityRollout] =
+    useState<CompatibilityRolloutResponse | null>(null)
+  const [adaptabilityRollout, setAdaptabilityRollout] =
+    useState<AdaptabilityRolloutResponse | null>(null)
+  const [flexibilityRollout, setFlexibilityRollout] =
+    useState<FlexibilityRolloutResponse | null>(null)
+  const [extensibilityRollout, setExtensibilityRollout] =
+    useState<ExtensibilityRolloutResponse | null>(null)
+  const [modifiabilityRollout, setModifiabilityRollout] =
+    useState<ModifiabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1786,6 +1851,16 @@ function App() {
     useState<TransferabilityAdminSummaryResponse | null>(null)
   const [portabilityAdminSummary, setPortabilityAdminSummary] =
     useState<PortabilityAdminSummaryResponse | null>(null)
+  const [compatibilityAdminSummary, setCompatibilityAdminSummary] =
+    useState<CompatibilityAdminSummaryResponse | null>(null)
+  const [adaptabilityAdminSummary, setAdaptabilityAdminSummary] =
+    useState<AdaptabilityAdminSummaryResponse | null>(null)
+  const [flexibilityAdminSummary, setFlexibilityAdminSummary] =
+    useState<FlexibilityAdminSummaryResponse | null>(null)
+  const [extensibilityAdminSummary, setExtensibilityAdminSummary] =
+    useState<ExtensibilityAdminSummaryResponse | null>(null)
+  const [modifiabilityAdminSummary, setModifiabilityAdminSummary] =
+    useState<ModifiabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -2009,6 +2084,21 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [portabilityAdminAction, setPortabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [compatibilityAdminAction, setCompatibilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [adaptabilityAdminAction, setAdaptabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [flexibilityAdminAction, setFlexibilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [extensibilityAdminAction, setExtensibilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [modifiabilityAdminAction, setModifiabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -3027,6 +3117,66 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setPortabilityRollout(null)
+        }
+      })
+
+    fetchCompatibilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setCompatibilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setCompatibilityRollout(null)
+        }
+      })
+
+    fetchAdaptabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAdaptabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAdaptabilityRollout(null)
+        }
+      })
+
+    fetchFlexibilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setFlexibilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setFlexibilityRollout(null)
+        }
+      })
+
+    fetchExtensibilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setExtensibilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setExtensibilityRollout(null)
+        }
+      })
+
+    fetchModifiabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setModifiabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setModifiabilityRollout(null)
         }
       })
 
@@ -4241,6 +4391,41 @@ function App() {
         workspaceAuthHeaders,
       )
       setPortabilityAdminSummary(portabilityAdmin)
+
+      const compatibilityAdmin = await fetchCompatibilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCompatibilityAdminSummary(compatibilityAdmin)
+
+      const adaptabilityAdmin = await fetchAdaptabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAdaptabilityAdminSummary(adaptabilityAdmin)
+
+      const flexibilityAdmin = await fetchFlexibilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFlexibilityAdminSummary(flexibilityAdmin)
+
+      const extensibilityAdmin = await fetchExtensibilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setExtensibilityAdminSummary(extensibilityAdmin)
+
+      const modifiabilityAdmin = await fetchModifiabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setModifiabilityAdminSummary(modifiabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -5473,6 +5658,151 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleModifiabilityAdminAction(
+    action: 'refresh_modifiability_summary',
+  ) {
+    setModifiabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeModifiabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchModifiabilityRollout(apiBaseUrl)
+      setModifiabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run modifiability admin action.',
+      )
+    } finally {
+      setModifiabilityAdminAction('idle')
+    }
+  }
+
+  async function handleExtensibilityAdminAction(
+    action: 'refresh_extensibility_summary',
+  ) {
+    setExtensibilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeExtensibilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchExtensibilityRollout(apiBaseUrl)
+      setExtensibilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run extensibility admin action.',
+      )
+    } finally {
+      setExtensibilityAdminAction('idle')
+    }
+  }
+
+  async function handleFlexibilityAdminAction(
+    action: 'refresh_flexibility_summary',
+  ) {
+    setFlexibilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeFlexibilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchFlexibilityRollout(apiBaseUrl)
+      setFlexibilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run flexibility admin action.',
+      )
+    } finally {
+      setFlexibilityAdminAction('idle')
+    }
+  }
+
+  async function handleAdaptabilityAdminAction(
+    action: 'refresh_adaptability_summary',
+  ) {
+    setAdaptabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAdaptabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAdaptabilityRollout(apiBaseUrl)
+      setAdaptabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run adaptability admin action.',
+      )
+    } finally {
+      setAdaptabilityAdminAction('idle')
+    }
+  }
+
+  async function handleCompatibilityAdminAction(
+    action: 'refresh_compatibility_summary',
+  ) {
+    setCompatibilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeCompatibilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchCompatibilityRollout(apiBaseUrl)
+      setCompatibilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run compatibility admin action.',
+      )
+    } finally {
+      setCompatibilityAdminAction('idle')
     }
   }
 
@@ -9340,6 +9670,151 @@ function App() {
               ))}
             </div>
             <small>Checked at {connectabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {modifiabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production modifiability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${modifiabilityRollout.status}`}
+              >
+                {formatModifiabilityRolloutStatus(modifiabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{modifiabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {modifiabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatModifiabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {modifiabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {extensibilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production extensibility rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${extensibilityRollout.status}`}
+              >
+                {formatExtensibilityRolloutStatus(extensibilityRollout.status)}
+              </strong>
+            </div>
+            <p>{extensibilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {extensibilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatExtensibilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {extensibilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {flexibilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production flexibility rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${flexibilityRollout.status}`}
+              >
+                {formatFlexibilityRolloutStatus(flexibilityRollout.status)}
+              </strong>
+            </div>
+            <p>{flexibilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {flexibilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatFlexibilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {flexibilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {adaptabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production adaptability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${adaptabilityRollout.status}`}
+              >
+                {formatAdaptabilityRolloutStatus(adaptabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{adaptabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {adaptabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAdaptabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {adaptabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {compatibilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production compatibility rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${compatibilityRollout.status}`}
+              >
+                {formatCompatibilityRolloutStatus(compatibilityRollout.status)}
+              </strong>
+            </div>
+            <p>{compatibilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {compatibilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatCompatibilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {compatibilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -14552,6 +15027,331 @@ function App() {
                 }
               >
                 {formatConnectabilityAdminAction('refresh_connectability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {modifiabilityAdminSummary ? (
+          <div className="billing-admin workspace-modifiability-admin">
+            <div className="billing-admin__header">
+              <span>Modifiability admin</span>
+              <strong>{modifiabilityAdminSummary.role}</strong>
+            </div>
+            <p>{modifiabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key modifiability</span>
+                <strong>
+                  {modifiabilityAdminSummary.stats.modifiabilityPercent}%
+                </strong>
+                <small>
+                  {modifiabilityAdminSummary.stats.coveredDomains}/
+                  {modifiabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Modifiability signals</span>
+                <strong>{modifiabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {modifiabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and workspace memberships'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-modifiability-list">
+              {modifiabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-modifiability-card workspace-modifiability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatModifiabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {modifiabilityAdminSummary.availableActions.includes(
+              'refresh_modifiability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={modifiabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleModifiabilityAdminAction(
+                    'refresh_modifiability_summary',
+                  )
+                }
+              >
+                {formatModifiabilityAdminAction('refresh_modifiability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {extensibilityAdminSummary ? (
+          <div className="billing-admin workspace-extensibility-admin">
+            <div className="billing-admin__header">
+              <span>Extensibility admin</span>
+              <strong>{extensibilityAdminSummary.role}</strong>
+            </div>
+            <p>{extensibilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Agent output extensibility</span>
+                <strong>
+                  {extensibilityAdminSummary.stats.extensibilityPercent}%
+                </strong>
+                <small>
+                  {extensibilityAdminSummary.stats.coveredDomains}/
+                  {extensibilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Extensibility signals</span>
+                <strong>{extensibilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {extensibilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, agent outputs, and artifacts'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-extensibility-list">
+              {extensibilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-extensibility-card workspace-extensibility-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatExtensibilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {extensibilityAdminSummary.availableActions.includes(
+              'refresh_extensibility_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={extensibilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleExtensibilityAdminAction(
+                    'refresh_extensibility_summary',
+                  )
+                }
+              >
+                {formatExtensibilityAdminAction('refresh_extensibility_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {flexibilityAdminSummary ? (
+          <div className="billing-admin workspace-flexibility-admin">
+            <div className="billing-admin__header">
+              <span>Flexibility admin</span>
+              <strong>{flexibilityAdminSummary.role}</strong>
+            </div>
+            <p>{flexibilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workflow flexibility</span>
+                <strong>
+                  {flexibilityAdminSummary.stats.flexibilityPercent}%
+                </strong>
+                <small>
+                  {flexibilityAdminSummary.stats.coveredDomains}/
+                  {flexibilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Flexibility signals</span>
+                <strong>{flexibilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {flexibilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, run workflows, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-flexibility-list">
+              {flexibilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-flexibility-card workspace-flexibility-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatFlexibilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {flexibilityAdminSummary.availableActions.includes(
+              'refresh_flexibility_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={flexibilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleFlexibilityAdminAction(
+                    'refresh_flexibility_summary',
+                  )
+                }
+              >
+                {formatFlexibilityAdminAction('refresh_flexibility_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {adaptabilityAdminSummary ? (
+          <div className="billing-admin workspace-adaptability-admin">
+            <div className="billing-admin__header">
+              <span>Adaptability admin</span>
+              <strong>{adaptabilityAdminSummary.role}</strong>
+            </div>
+            <p>{adaptabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing webhook adaptability</span>
+                <strong>
+                  {adaptabilityAdminSummary.stats.adaptabilityPercent}%
+                </strong>
+                <small>
+                  {adaptabilityAdminSummary.stats.coveredDomains}/
+                  {adaptabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Adaptability signals</span>
+                <strong>{adaptabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {adaptabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing webhook events, and billing notifications'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-adaptability-list">
+              {adaptabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-adaptability-card workspace-adaptability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAdaptabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {adaptabilityAdminSummary.availableActions.includes(
+              'refresh_adaptability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={adaptabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAdaptabilityAdminAction(
+                    'refresh_adaptability_summary',
+                  )
+                }
+              >
+                {formatAdaptabilityAdminAction('refresh_adaptability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {compatibilityAdminSummary ? (
+          <div className="billing-admin workspace-compatibility-admin">
+            <div className="billing-admin__header">
+              <span>Compatibility admin</span>
+              <strong>{compatibilityAdminSummary.role}</strong>
+            </div>
+            <p>{compatibilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Provider credential compatibility</span>
+                <strong>
+                  {compatibilityAdminSummary.stats.compatibilityPercent}%
+                </strong>
+                <small>
+                  {compatibilityAdminSummary.stats.coveredDomains}/
+                  {compatibilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Compatibility signals</span>
+                <strong>{compatibilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {compatibilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, provider credentials, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-compatibility-list">
+              {compatibilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-compatibility-card workspace-compatibility-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatCompatibilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {compatibilityAdminSummary.availableActions.includes(
+              'refresh_compatibility_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={compatibilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleCompatibilityAdminAction(
+                    'refresh_compatibility_summary',
+                  )
+                }
+              >
+                {formatCompatibilityAdminAction('refresh_compatibility_summary')}
               </button>
             ) : null}
           </div>
