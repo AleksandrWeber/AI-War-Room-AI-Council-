@@ -26,6 +26,7 @@ import { TraceabilityModule } from './traceability/traceability.module.js'
 import { EfficiencyModule } from './efficiency/efficiency.module.js'
 import { OptimizationModule } from './optimization/optimization.module.js'
 import { UtilizationModule } from './utilization/utilization.module.js'
+import { SustainabilityModule } from './sustainability/sustainability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -71,6 +72,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     EfficiencyModule,
     OptimizationModule,
     UtilizationModule,
+    SustainabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

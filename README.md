@@ -796,6 +796,12 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.55` behavior:
+
+- Production sustainability rollout readiness validates sustainability coverage and operational readiness through `GET /api/sustainability/readiness`.
+- Workspace owners and admins can inspect workspace sustainability metrics from `GET /api/sustainability/workspace/:workspaceId/admin`.
+- The web billing panel shows sustainability rollout checks and workspace sustainability admin tools.
+
 Current `v5.54` behavior:
 
 - Production utilization rollout readiness validates utilization coverage and capacity readiness through `GET /api/utilization/readiness`.

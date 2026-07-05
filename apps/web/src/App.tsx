@@ -82,6 +82,8 @@ import type {
   OptimizationAdminSummaryResponse,
   UtilizationRolloutResponse,
   UtilizationAdminSummaryResponse,
+  SustainabilityRolloutResponse,
+  SustainabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -409,6 +411,15 @@ import {
   formatUtilizationRolloutCheckStatus,
   formatUtilizationRolloutStatus,
 } from './utilization-ui'
+import {
+  executeSustainabilityAdminAction,
+  fetchSustainabilityAdminSummary,
+  fetchSustainabilityRollout,
+  formatSustainabilityAdminAction,
+  formatSustainabilityDomain,
+  formatSustainabilityRolloutCheckStatus,
+  formatSustainabilityRolloutStatus,
+} from './sustainability-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -1026,6 +1037,8 @@ function App() {
     useState<OptimizationRolloutResponse | null>(null)
   const [utilizationRollout, setUtilizationRollout] =
     useState<UtilizationRolloutResponse | null>(null)
+  const [sustainabilityRollout, setSustainabilityRollout] =
+    useState<SustainabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1171,6 +1184,8 @@ function App() {
     useState<OptimizationAdminSummaryResponse | null>(null)
   const [utilizationAdminSummary, setUtilizationAdminSummary] =
     useState<UtilizationAdminSummaryResponse | null>(null)
+  const [sustainabilityAdminSummary, setSustainabilityAdminSummary] =
+    useState<SustainabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1271,6 +1286,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [utilizationAdminAction, setUtilizationAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [sustainabilityAdminAction, setSustainabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1797,6 +1815,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setUtilizationRollout(null)
+        }
+      })
+
+    fetchSustainabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setSustainabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setSustainabilityRollout(null)
         }
       })
 
@@ -2724,6 +2754,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setUtilizationAdminSummary(utilizationAdmin)
+
+      const sustainabilityAdmin = await fetchSustainabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSustainabilityAdminSummary(sustainabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -3782,6 +3819,35 @@ function App() {
       )
     } finally {
       setUtilizationAdminAction('idle')
+    }
+  }
+
+  async function handleSustainabilityAdminAction(
+    action: 'refresh_sustainability_summary',
+  ) {
+    setSustainabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeSustainabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchSustainabilityRollout(apiBaseUrl)
+      setSustainabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run sustainability admin action.',
+      )
+    } finally {
+      setSustainabilityAdminAction('idle')
     }
   }
 
@@ -5445,6 +5511,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {utilizationRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {sustainabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production sustainability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${sustainabilityRollout.status}`}
+              >
+                {formatSustainabilityRolloutStatus(sustainabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{sustainabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {sustainabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatSustainabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {sustainabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -7988,6 +8083,71 @@ function App() {
                 }
               >
                 {formatUtilizationAdminAction('refresh_utilization_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {sustainabilityAdminSummary ? (
+          <div className="billing-admin workspace-sustainability-admin">
+            <div className="billing-admin__header">
+              <span>Sustainability admin</span>
+              <strong>{sustainabilityAdminSummary.role}</strong>
+            </div>
+            <p>{sustainabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Run sustainability</span>
+                <strong>
+                  {sustainabilityAdminSummary.stats.sustainabilityPercent}%
+                </strong>
+                <small>
+                  {sustainabilityAdminSummary.stats.coveredDomains}/
+                  {sustainabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Sustainability signals</span>
+                <strong>{sustainabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {sustainabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing records, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-sustainability-list">
+              {sustainabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-sustainability-card workspace-sustainability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatSustainabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {sustainabilityAdminSummary.availableActions.includes(
+              'refresh_sustainability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={sustainabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleSustainabilityAdminAction(
+                    'refresh_sustainability_summary',
+                  )
+                }
+              >
+                {formatSustainabilityAdminAction('refresh_sustainability_summary')}
               </button>
             ) : null}
           </div>
