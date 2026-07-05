@@ -90,6 +90,10 @@ import type {
   OversightAdminSummaryResponse,
   AssuranceRolloutResponse,
   AssuranceAdminSummaryResponse,
+  AccountabilityRolloutResponse,
+  AccountabilityAdminSummaryResponse,
+  TransparencyRolloutResponse,
+  TransparencyAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -453,6 +457,24 @@ import {
   formatAssuranceRolloutCheckStatus,
   formatAssuranceRolloutStatus,
 } from './assurance-ui'
+import {
+  executeAccountabilityAdminAction,
+  fetchAccountabilityAdminSummary,
+  fetchAccountabilityRollout,
+  formatAccountabilityAdminAction,
+  formatAccountabilityDomain,
+  formatAccountabilityRolloutCheckStatus,
+  formatAccountabilityRolloutStatus,
+} from './accountability-ui'
+import {
+  executeTransparencyAdminAction,
+  fetchTransparencyAdminSummary,
+  fetchTransparencyRollout,
+  formatTransparencyAdminAction,
+  formatTransparencyDomain,
+  formatTransparencyRolloutCheckStatus,
+  formatTransparencyRolloutStatus,
+} from './transparency-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -1078,6 +1100,10 @@ function App() {
     useState<OversightRolloutResponse | null>(null)
   const [assuranceRollout, setAssuranceRollout] =
     useState<AssuranceRolloutResponse | null>(null)
+  const [accountabilityRollout, setAccountabilityRollout] =
+    useState<AccountabilityRolloutResponse | null>(null)
+  const [transparencyRollout, setTransparencyRollout] =
+    useState<TransparencyRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1231,6 +1257,10 @@ function App() {
     useState<OversightAdminSummaryResponse | null>(null)
   const [assuranceAdminSummary, setAssuranceAdminSummary] =
     useState<AssuranceAdminSummaryResponse | null>(null)
+  const [accountabilityAdminSummary, setAccountabilityAdminSummary] =
+    useState<AccountabilityAdminSummaryResponse | null>(null)
+  const [transparencyAdminSummary, setTransparencyAdminSummary] =
+    useState<TransparencyAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1343,6 +1373,12 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [assuranceAdminAction, setAssuranceAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [accountabilityAdminAction, setAccountabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [transparencyAdminAction, setTransparencyAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1917,6 +1953,30 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setAssuranceRollout(null)
+        }
+      })
+
+    fetchAccountabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAccountabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAccountabilityRollout(null)
+        }
+      })
+
+    fetchTransparencyRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setTransparencyRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTransparencyRollout(null)
         }
       })
 
@@ -2872,6 +2932,20 @@ function App() {
         workspaceAuthHeaders,
       )
       setAssuranceAdminSummary(assuranceAdmin)
+
+      const accountabilityAdmin = await fetchAccountabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAccountabilityAdminSummary(accountabilityAdmin)
+
+      const transparencyAdmin = await fetchTransparencyAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTransparencyAdminSummary(transparencyAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -4046,6 +4120,64 @@ function App() {
       )
     } finally {
       setAssuranceAdminAction('idle')
+    }
+  }
+
+  async function handleAccountabilityAdminAction(
+    action: 'refresh_accountability_summary',
+  ) {
+    setAccountabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAccountabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAccountabilityRollout(apiBaseUrl)
+      setAccountabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run accountability admin action.',
+      )
+    } finally {
+      setAccountabilityAdminAction('idle')
+    }
+  }
+
+  async function handleTransparencyAdminAction(
+    action: 'refresh_transparency_summary',
+  ) {
+    setTransparencyAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeTransparencyAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchTransparencyRollout(apiBaseUrl)
+      setTransparencyRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run transparency admin action.',
+      )
+    } finally {
+      setTransparencyAdminAction('idle')
     }
   }
 
@@ -5825,6 +5957,64 @@ function App() {
               ))}
             </div>
             <small>Checked at {assuranceRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {accountabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production accountability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${accountabilityRollout.status}`}
+              >
+                {formatAccountabilityRolloutStatus(accountabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{accountabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {accountabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAccountabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {accountabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {transparencyRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production transparency rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${transparencyRollout.status}`}
+              >
+                {formatTransparencyRolloutStatus(transparencyRollout.status)}
+              </strong>
+            </div>
+            <p>{transparencyRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {transparencyRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatTransparencyRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {transparencyRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -8628,6 +8818,140 @@ function App() {
                 }
               >
                 {formatAssuranceAdminAction('refresh_assurance_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {accountabilityAdminSummary ? (
+          <div className="billing-admin workspace-accountability-admin">
+            <div className="billing-admin__header">
+              <span>Accountability admin</span>
+              <strong>{accountabilityAdminSummary.role}</strong>
+            </div>
+            <p>{accountabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency accountability</span>
+                <strong>
+                  {accountabilityAdminSummary.stats.accountabilityPercent}%
+                </strong>
+                <small>
+                  {accountabilityAdminSummary.stats.coveredDomains}/
+                  {accountabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Accountability signals</span>
+                <strong>
+                  {accountabilityAdminSummary.stats.totalRecords}
+                </strong>
+                <small>
+                  {accountabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-accountability-list">
+              {accountabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-accountability-card workspace-accountability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAccountabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {accountabilityAdminSummary.availableActions.includes(
+              'refresh_accountability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={accountabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAccountabilityAdminAction(
+                    'refresh_accountability_summary',
+                  )
+                }
+              >
+                {formatAccountabilityAdminAction(
+                  'refresh_accountability_summary',
+                )}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {transparencyAdminSummary ? (
+          <div className="billing-admin workspace-transparency-admin">
+            <div className="billing-admin__header">
+              <span>Transparency admin</span>
+              <strong>{transparencyAdminSummary.role}</strong>
+            </div>
+            <p>{transparencyAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workflow transparency</span>
+                <strong>
+                  {transparencyAdminSummary.stats.transparencyPercent}%
+                </strong>
+                <small>
+                  {transparencyAdminSummary.stats.coveredDomains}/
+                  {transparencyAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Transparency signals</span>
+                <strong>{transparencyAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {transparencyAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workflows, and billing notifications'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-transparency-list">
+              {transparencyAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-transparency-card workspace-transparency-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatTransparencyDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {transparencyAdminSummary.availableActions.includes(
+              'refresh_transparency_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={transparencyAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleTransparencyAdminAction(
+                    'refresh_transparency_summary',
+                  )
+                }
+              >
+                {formatTransparencyAdminAction('refresh_transparency_summary')}
               </button>
             ) : null}
           </div>

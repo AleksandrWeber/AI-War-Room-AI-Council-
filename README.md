@@ -796,6 +796,18 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.60` behavior:
+
+- Production transparency rollout readiness validates transparency coverage and disclosure readiness through `GET /api/transparency/readiness`.
+- Workspace owners and admins can inspect workspace transparency metrics from `GET /api/transparency/workspace/:workspaceId/admin`.
+- The web billing panel shows transparency rollout checks and workspace transparency admin tools.
+
+Current `v5.59` behavior:
+
+- Production accountability rollout readiness validates accountability coverage and audit readiness through `GET /api/accountability/readiness`.
+- Workspace owners and admins can inspect workspace accountability metrics from `GET /api/accountability/workspace/:workspaceId/admin`.
+- The web billing panel shows accountability rollout checks and workspace accountability admin tools.
+
 Current `v5.58` behavior:
 
 - Production assurance rollout readiness validates assurance coverage and quality readiness through `GET /api/assurance/readiness`.

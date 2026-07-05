@@ -30,6 +30,8 @@ import { SustainabilityModule } from './sustainability/sustainability.module.js'
 import { GovernanceModule } from './governance/governance.module.js'
 import { OversightModule } from './oversight/oversight.module.js'
 import { AssuranceModule } from './assurance/assurance.module.js'
+import { AccountabilityModule } from './accountability/accountability.module.js'
+import { TransparencyModule } from './transparency/transparency.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -79,6 +81,8 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     GovernanceModule,
     OversightModule,
     AssuranceModule,
+    AccountabilityModule,
+    TransparencyModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,
