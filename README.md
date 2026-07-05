@@ -744,6 +744,25 @@ Workspace durability admin tools:
 - Only workspace owners and admins can access durability admin endpoints.
 - The web billing panel shows durability admin tools for authorized roles.
 
+Production recoverability rollout readiness:
+
+- `GET /api/recoverability/readiness` returns operator-facing production recoverability checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, recoverability signal table coverage, run workflow recovery, stream recovery signals, and recovery readiness signals.
+- The web billing panel shows recoverability rollout status and per-check guidance.
+
+Workspace recoverability admin tools:
+
+- `GET /api/recoverability/workspace/:workspaceId/admin` returns owner/admin recoverability summary with workspace run outcome and workflow domains.
+- `POST /api/recoverability/workspace/:workspaceId/admin/actions` runs recoverability admin actions such as refreshing the summary.
+- Only workspace owners and admins can access recoverability admin endpoints.
+- The web billing panel shows recoverability admin tools for authorized roles.
+
+Current `v5.48` behavior:
+
+- Production recoverability rollout readiness validates recoverability coverage and recovery readiness through `GET /api/recoverability/readiness`.
+- Workspace owners and admins can inspect workspace recoverability metrics from `GET /api/recoverability/workspace/:workspaceId/admin`.
+- The web billing panel shows recoverability rollout checks and workspace recoverability admin tools.
+
 Current `v5.47` behavior:
 
 - Production durability rollout readiness validates durability coverage and persistence readiness through `GET /api/durability/readiness`.

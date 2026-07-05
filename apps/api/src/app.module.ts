@@ -19,6 +19,7 @@ import { StabilityModule } from './stability/stability.module.js'
 import { ConsistencyModule } from './consistency/consistency.module.js'
 import { IntegrityModule } from './integrity/integrity.module.js'
 import { DurabilityModule } from './durability/durability.module.js'
+import { RecoverabilityModule } from './recoverability/recoverability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -57,6 +58,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     ConsistencyModule,
     IntegrityModule,
     DurabilityModule,
+    RecoverabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

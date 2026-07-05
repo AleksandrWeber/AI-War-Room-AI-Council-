@@ -68,6 +68,8 @@ import type {
   IntegrityAdminSummaryResponse,
   DurabilityRolloutResponse,
   DurabilityAdminSummaryResponse,
+  RecoverabilityRolloutResponse,
+  RecoverabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -332,6 +334,15 @@ import {
   formatDurabilityRolloutCheckStatus,
   formatDurabilityRolloutStatus,
 } from './durability-ui'
+import {
+  executeRecoverabilityAdminAction,
+  fetchRecoverabilityAdminSummary,
+  fetchRecoverabilityRollout,
+  formatRecoverabilityAdminAction,
+  formatRecoverabilityDomain,
+  formatRecoverabilityRolloutCheckStatus,
+  formatRecoverabilityRolloutStatus,
+} from './recoverability-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -935,6 +946,8 @@ function App() {
     useState<IntegrityRolloutResponse | null>(null)
   const [durabilityRollout, setDurabilityRollout] =
     useState<DurabilityRolloutResponse | null>(null)
+  const [recoverabilityRollout, setRecoverabilityRollout] =
+    useState<RecoverabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1066,6 +1079,8 @@ function App() {
     useState<IntegrityAdminSummaryResponse | null>(null)
   const [durabilityAdminSummary, setDurabilityAdminSummary] =
     useState<DurabilityAdminSummaryResponse | null>(null)
+  const [recoverabilityAdminSummary, setRecoverabilityAdminSummary] =
+    useState<RecoverabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1145,6 +1160,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [durabilityAdminAction, setDurabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [recoverabilityAdminAction, setRecoverabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1587,6 +1605,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setDurabilityRollout(null)
+        }
+      })
+
+    fetchRecoverabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setRecoverabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setRecoverabilityRollout(null)
         }
       })
 
@@ -2465,6 +2495,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setDurabilityAdminSummary(durabilityAdmin)
+
+      const recoverabilityAdmin = await fetchRecoverabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRecoverabilityAdminSummary(recoverabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -3320,6 +3357,35 @@ function App() {
       )
     } finally {
       setDurabilityAdminAction('idle')
+    }
+  }
+
+  async function handleRecoverabilityAdminAction(
+    action: 'refresh_recoverability_summary',
+  ) {
+    setRecoverabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeRecoverabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchRecoverabilityRollout(apiBaseUrl)
+      setRecoverabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run recoverability admin action.',
+      )
+    } finally {
+      setRecoverabilityAdminAction('idle')
     }
   }
 
@@ -4780,6 +4846,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {durabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {recoverabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production recoverability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${recoverabilityRollout.status}`}
+              >
+                {formatRecoverabilityRolloutStatus(recoverabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{recoverabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {recoverabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatRecoverabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {recoverabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -6866,6 +6961,73 @@ function App() {
                 }
               >
                 {formatDurabilityAdminAction('refresh_durability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {recoverabilityAdminSummary ? (
+          <div className="billing-admin workspace-recoverability-admin">
+            <div className="billing-admin__header">
+              <span>Recoverability admin</span>
+              <strong>{recoverabilityAdminSummary.role}</strong>
+            </div>
+            <p>{recoverabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Run recoverability</span>
+                <strong>
+                  {recoverabilityAdminSummary.stats.recoverabilityPercent}%
+                </strong>
+                <small>
+                  {recoverabilityAdminSummary.stats.coveredDomains}/
+                  {recoverabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Recovery signals</span>
+                <strong>{recoverabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {recoverabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workflows, and recovery signals'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-recoverability-list">
+              {recoverabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-recoverability-card workspace-recoverability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatRecoverabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {recoverabilityAdminSummary.availableActions.includes(
+              'refresh_recoverability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={recoverabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleRecoverabilityAdminAction(
+                    'refresh_recoverability_summary',
+                  )
+                }
+              >
+                {formatRecoverabilityAdminAction(
+                  'refresh_recoverability_summary',
+                )}
               </button>
             ) : null}
           </div>
