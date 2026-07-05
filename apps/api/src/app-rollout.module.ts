@@ -233,6 +233,16 @@ import { PersistizabilityModule } from './persistizability/persistizability.modu
 import { CompressizabilityModule } from './compressizability/compressizability.module.js'
 import { DecompressizabilityModule } from './decompressizability/decompressizability.module.js'
 import { ArchiveizabilityModule } from './archiveizability/archiveizability.module.js'
+import { RestoreizabilityModule } from './restoreizability/restoreizability.module.js'
+import { BackupizabilityModule } from './backupizability/backupizability.module.js'
+import { ExportizabilityModule } from './exportizability/exportizability.module.js'
+import { ImportizabilityModule } from './importizability/importizability.module.js'
+import { IndexingizabilityModule } from './indexingizability/indexingizability.module.js'
+import { SearchizabilityModule } from './searchizability/searchizability.module.js'
+import { VersioningizabilityModule } from './versioningizability/versioningizability.module.js'
+import { CompactizabilityModule } from './compactizability/compactizability.module.js'
+import { ExpandizabilityModule } from './expandizability/expandizability.module.js'
+import { RetentionizabilityModule } from './retentionizability/retentionizability.module.js'
 
 @Module({
   imports: [
@@ -470,6 +480,16 @@ import { ArchiveizabilityModule } from './archiveizability/archiveizability.modu
     CompressizabilityModule,
     DecompressizabilityModule,
     ArchiveizabilityModule,
+    RestoreizabilityModule,
+    BackupizabilityModule,
+    ExportizabilityModule,
+    ImportizabilityModule,
+    IndexingizabilityModule,
+    SearchizabilityModule,
+    VersioningizabilityModule,
+    CompactizabilityModule,
+    ExpandizabilityModule,
+    RetentionizabilityModule,
   ],
   exports: [
     CustomizabilityModule,

@@ -1456,7 +1456,19 @@ Current `v5.326` behavior:
 - Workspace owners and admins can inspect workspace compatibilizability metrics from `GET /api/compatibilizability/workspace/:workspaceId/admin`.
 - The web billing panel shows compatibilizability rollout checks and workspace compatibilizability admin tools.
 
-Current `v5.410` behavior:
+Current `v5.420` behavior:
+
+- Production retentionizability rollout readiness validates retentionizability coverage and readiness through `GET /api/retentionizability/readiness`.
+- Workspace owners and admins can inspect workspace retentionizability metrics from `GET /api/retentionizability/workspace/:workspaceId/admin`.
+- The web billing panel shows retentionizability rollout checks and workspace retentionizability admin tools.
+
+Current `v5.330` behavior:
+
+- Production indexingizability rollout readiness validates indexingizability coverage and readiness through `GET /api/indexingizability/readiness`.
+- Workspace owners and admins can inspect workspace indexingizability metrics from `GET /api/indexingizability/workspace/:workspaceId/admin`.
+- The web billing panel shows indexingizability rollout checks and workspace indexingizability admin tools.
+
+Current `v5.225` behavior:
 
 - Production archiveizability rollout readiness validates archiveizability coverage and readiness through `GET /api/archiveizability/readiness`.
 - Workspace owners and admins can inspect workspace archiveizability metrics from `GET /api/archiveizability/workspace/:workspaceId/admin`.
