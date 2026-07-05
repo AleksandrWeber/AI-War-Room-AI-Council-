@@ -314,6 +314,26 @@ import type {
   NarratabilityAdminSummaryResponse,
   IllustratabilityRolloutResponse,
   IllustratabilityAdminSummaryResponse,
+  SymbolizabilityRolloutResponse,
+  SymbolizabilityAdminSummaryResponse,
+  VisualizabilityRolloutResponse,
+  VisualizabilityAdminSummaryResponse,
+  EvocatabilityRolloutResponse,
+  EvocatabilityAdminSummaryResponse,
+  SignifiabilityRolloutResponse,
+  SignifiabilityAdminSummaryResponse,
+  ConnotabilityRolloutResponse,
+  ConnotabilityAdminSummaryResponse,
+  TypifiabilityRolloutResponse,
+  TypifiabilityAdminSummaryResponse,
+  MetaphorizabilityRolloutResponse,
+  MetaphorizabilityAdminSummaryResponse,
+  DramatizabilityRolloutResponse,
+  DramatizabilityAdminSummaryResponse,
+  PersonifiabilityRolloutResponse,
+  PersonifiabilityAdminSummaryResponse,
+  MaterializabilityRolloutResponse,
+  MaterializabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -1686,6 +1706,96 @@ import {
   formatIllustratabilityRolloutStatus,
 } from './illustratability-ui'
 import {
+  executeSymbolizabilityAdminAction,
+  fetchSymbolizabilityAdminSummary,
+  fetchSymbolizabilityRollout,
+  formatSymbolizabilityAdminAction,
+  formatSymbolizabilityDomain,
+  formatSymbolizabilityRolloutCheckStatus,
+  formatSymbolizabilityRolloutStatus,
+} from './symbolizability-ui'
+import {
+  executeVisualizabilityAdminAction,
+  fetchVisualizabilityAdminSummary,
+  fetchVisualizabilityRollout,
+  formatVisualizabilityAdminAction,
+  formatVisualizabilityDomain,
+  formatVisualizabilityRolloutCheckStatus,
+  formatVisualizabilityRolloutStatus,
+} from './visualizability-ui'
+import {
+  executeEvocatabilityAdminAction,
+  fetchEvocatabilityAdminSummary,
+  fetchEvocatabilityRollout,
+  formatEvocatabilityAdminAction,
+  formatEvocatabilityDomain,
+  formatEvocatabilityRolloutCheckStatus,
+  formatEvocatabilityRolloutStatus,
+} from './evocatability-ui'
+import {
+  executeSignifiabilityAdminAction,
+  fetchSignifiabilityAdminSummary,
+  fetchSignifiabilityRollout,
+  formatSignifiabilityAdminAction,
+  formatSignifiabilityDomain,
+  formatSignifiabilityRolloutCheckStatus,
+  formatSignifiabilityRolloutStatus,
+} from './signifiability-ui'
+import {
+  executeConnotabilityAdminAction,
+  fetchConnotabilityAdminSummary,
+  fetchConnotabilityRollout,
+  formatConnotabilityAdminAction,
+  formatConnotabilityDomain,
+  formatConnotabilityRolloutCheckStatus,
+  formatConnotabilityRolloutStatus,
+} from './connotability-ui'
+import {
+  executeTypifiabilityAdminAction,
+  fetchTypifiabilityAdminSummary,
+  fetchTypifiabilityRollout,
+  formatTypifiabilityAdminAction,
+  formatTypifiabilityDomain,
+  formatTypifiabilityRolloutCheckStatus,
+  formatTypifiabilityRolloutStatus,
+} from './typifiability-ui'
+import {
+  executeMetaphorizabilityAdminAction,
+  fetchMetaphorizabilityAdminSummary,
+  fetchMetaphorizabilityRollout,
+  formatMetaphorizabilityAdminAction,
+  formatMetaphorizabilityDomain,
+  formatMetaphorizabilityRolloutCheckStatus,
+  formatMetaphorizabilityRolloutStatus,
+} from './metaphorizability-ui'
+import {
+  executeDramatizabilityAdminAction,
+  fetchDramatizabilityAdminSummary,
+  fetchDramatizabilityRollout,
+  formatDramatizabilityAdminAction,
+  formatDramatizabilityDomain,
+  formatDramatizabilityRolloutCheckStatus,
+  formatDramatizabilityRolloutStatus,
+} from './dramatizability-ui'
+import {
+  executePersonifiabilityAdminAction,
+  fetchPersonifiabilityAdminSummary,
+  fetchPersonifiabilityRollout,
+  formatPersonifiabilityAdminAction,
+  formatPersonifiabilityDomain,
+  formatPersonifiabilityRolloutCheckStatus,
+  formatPersonifiabilityRolloutStatus,
+} from './personifiability-ui'
+import {
+  executeMaterializabilityAdminAction,
+  fetchMaterializabilityAdminSummary,
+  fetchMaterializabilityRollout,
+  formatMaterializabilityAdminAction,
+  formatMaterializabilityDomain,
+  formatMaterializabilityRolloutCheckStatus,
+  formatMaterializabilityRolloutStatus,
+} from './materializability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -2534,6 +2644,26 @@ function App() {
     useState<NarratabilityRolloutResponse | null>(null)
   const [illustratabilityRollout, setIllustratabilityRollout] =
     useState<IllustratabilityRolloutResponse | null>(null)
+  const [symbolizabilityRollout, setSymbolizabilityRollout] =
+    useState<SymbolizabilityRolloutResponse | null>(null)
+  const [visualizabilityRollout, setVisualizabilityRollout] =
+    useState<VisualizabilityRolloutResponse | null>(null)
+  const [evocatabilityRollout, setEvocatabilityRollout] =
+    useState<EvocatabilityRolloutResponse | null>(null)
+  const [signifiabilityRollout, setSignifiabilityRollout] =
+    useState<SignifiabilityRolloutResponse | null>(null)
+  const [connotabilityRollout, setConnotabilityRollout] =
+    useState<ConnotabilityRolloutResponse | null>(null)
+  const [typifiabilityRollout, setTypifiabilityRollout] =
+    useState<TypifiabilityRolloutResponse | null>(null)
+  const [metaphorizabilityRollout, setMetaphorizabilityRollout] =
+    useState<MetaphorizabilityRolloutResponse | null>(null)
+  const [dramatizabilityRollout, setDramatizabilityRollout] =
+    useState<DramatizabilityRolloutResponse | null>(null)
+  const [personifiabilityRollout, setPersonifiabilityRollout] =
+    useState<PersonifiabilityRolloutResponse | null>(null)
+  const [materializabilityRollout, setMaterializabilityRollout] =
+    useState<MaterializabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -2911,6 +3041,26 @@ function App() {
     useState<NarratabilityAdminSummaryResponse | null>(null)
   const [illustratabilityAdminSummary, setIllustratabilityAdminSummary] =
     useState<IllustratabilityAdminSummaryResponse | null>(null)
+  const [symbolizabilityAdminSummary, setSymbolizabilityAdminSummary] =
+    useState<SymbolizabilityAdminSummaryResponse | null>(null)
+  const [visualizabilityAdminSummary, setVisualizabilityAdminSummary] =
+    useState<VisualizabilityAdminSummaryResponse | null>(null)
+  const [evocatabilityAdminSummary, setEvocatabilityAdminSummary] =
+    useState<EvocatabilityAdminSummaryResponse | null>(null)
+  const [signifiabilityAdminSummary, setSignifiabilityAdminSummary] =
+    useState<SignifiabilityAdminSummaryResponse | null>(null)
+  const [connotabilityAdminSummary, setConnotabilityAdminSummary] =
+    useState<ConnotabilityAdminSummaryResponse | null>(null)
+  const [typifiabilityAdminSummary, setTypifiabilityAdminSummary] =
+    useState<TypifiabilityAdminSummaryResponse | null>(null)
+  const [metaphorizabilityAdminSummary, setMetaphorizabilityAdminSummary] =
+    useState<MetaphorizabilityAdminSummaryResponse | null>(null)
+  const [dramatizabilityAdminSummary, setDramatizabilityAdminSummary] =
+    useState<DramatizabilityAdminSummaryResponse | null>(null)
+  const [personifiabilityAdminSummary, setPersonifiabilityAdminSummary] =
+    useState<PersonifiabilityAdminSummaryResponse | null>(null)
+  const [materializabilityAdminSummary, setMaterializabilityAdminSummary] =
+    useState<MaterializabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -3359,6 +3509,36 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [illustratabilityAdminAction, setIllustratabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [symbolizabilityAdminAction, setSymbolizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [visualizabilityAdminAction, setVisualizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [evocatabilityAdminAction, setEvocatabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [signifiabilityAdminAction, setSignifiabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [connotabilityAdminAction, setConnotabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [typifiabilityAdminAction, setTypifiabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [metaphorizabilityAdminAction, setMetaphorizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [dramatizabilityAdminAction, setDramatizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [personifiabilityAdminAction, setPersonifiabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [materializabilityAdminAction, setMaterializabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -5280,6 +5460,126 @@ function App() {
         }
       })
 
+    fetchSymbolizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setSymbolizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setSymbolizabilityRollout(null)
+        }
+      })
+
+    fetchVisualizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setVisualizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setVisualizabilityRollout(null)
+        }
+      })
+
+    fetchEvocatabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setEvocatabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setEvocatabilityRollout(null)
+        }
+      })
+
+    fetchSignifiabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setSignifiabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setSignifiabilityRollout(null)
+        }
+      })
+
+    fetchConnotabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setConnotabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setConnotabilityRollout(null)
+        }
+      })
+
+    fetchTypifiabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setTypifiabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTypifiabilityRollout(null)
+        }
+      })
+
+    fetchMetaphorizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setMetaphorizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setMetaphorizabilityRollout(null)
+        }
+      })
+
+    fetchDramatizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setDramatizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDramatizabilityRollout(null)
+        }
+      })
+
+    fetchPersonifiabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setPersonifiabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setPersonifiabilityRollout(null)
+        }
+      })
+
+    fetchMaterializabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setMaterializabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setMaterializabilityRollout(null)
+        }
+      })
+
     fetchUsageCapabilities(apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
@@ -7016,6 +7316,76 @@ function App() {
         workspaceAuthHeaders,
       )
       setIllustratabilityAdminSummary(illustratabilityAdmin)
+
+      const symbolizabilityAdmin = await fetchSymbolizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSymbolizabilityAdminSummary(symbolizabilityAdmin)
+
+      const visualizabilityAdmin = await fetchVisualizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setVisualizabilityAdminSummary(visualizabilityAdmin)
+
+      const evocatabilityAdmin = await fetchEvocatabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEvocatabilityAdminSummary(evocatabilityAdmin)
+
+      const signifiabilityAdmin = await fetchSignifiabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSignifiabilityAdminSummary(signifiabilityAdmin)
+
+      const connotabilityAdmin = await fetchConnotabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConnotabilityAdminSummary(connotabilityAdmin)
+
+      const typifiabilityAdmin = await fetchTypifiabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTypifiabilityAdminSummary(typifiabilityAdmin)
+
+      const metaphorizabilityAdmin = await fetchMetaphorizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMetaphorizabilityAdminSummary(metaphorizabilityAdmin)
+
+      const dramatizabilityAdmin = await fetchDramatizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDramatizabilityAdminSummary(dramatizabilityAdmin)
+
+      const personifiabilityAdmin = await fetchPersonifiabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPersonifiabilityAdminSummary(personifiabilityAdmin)
+
+      const materializabilityAdmin = await fetchMaterializabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMaterializabilityAdminSummary(materializabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -8248,6 +8618,296 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleMaterializabilityAdminAction(
+    action: 'refresh_materializability_summary',
+  ) {
+    setMaterializabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeMaterializabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchMaterializabilityRollout(apiBaseUrl)
+      setMaterializabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run materializability admin action.',
+      )
+    } finally {
+      setMaterializabilityAdminAction('idle')
+    }
+  }
+
+  async function handlePersonifiabilityAdminAction(
+    action: 'refresh_personifiability_summary',
+  ) {
+    setPersonifiabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executePersonifiabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchPersonifiabilityRollout(apiBaseUrl)
+      setPersonifiabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run personifiability admin action.',
+      )
+    } finally {
+      setPersonifiabilityAdminAction('idle')
+    }
+  }
+
+  async function handleDramatizabilityAdminAction(
+    action: 'refresh_dramatizability_summary',
+  ) {
+    setDramatizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeDramatizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchDramatizabilityRollout(apiBaseUrl)
+      setDramatizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run dramatizability admin action.',
+      )
+    } finally {
+      setDramatizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleMetaphorizabilityAdminAction(
+    action: 'refresh_metaphorizability_summary',
+  ) {
+    setMetaphorizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeMetaphorizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchMetaphorizabilityRollout(apiBaseUrl)
+      setMetaphorizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run metaphorizability admin action.',
+      )
+    } finally {
+      setMetaphorizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleTypifiabilityAdminAction(
+    action: 'refresh_typifiability_summary',
+  ) {
+    setTypifiabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeTypifiabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchTypifiabilityRollout(apiBaseUrl)
+      setTypifiabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run typifiability admin action.',
+      )
+    } finally {
+      setTypifiabilityAdminAction('idle')
+    }
+  }
+
+  async function handleConnotabilityAdminAction(
+    action: 'refresh_connotability_summary',
+  ) {
+    setConnotabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeConnotabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchConnotabilityRollout(apiBaseUrl)
+      setConnotabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run connotability admin action.',
+      )
+    } finally {
+      setConnotabilityAdminAction('idle')
+    }
+  }
+
+  async function handleSignifiabilityAdminAction(
+    action: 'refresh_signifiability_summary',
+  ) {
+    setSignifiabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeSignifiabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchSignifiabilityRollout(apiBaseUrl)
+      setSignifiabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run signifiability admin action.',
+      )
+    } finally {
+      setSignifiabilityAdminAction('idle')
+    }
+  }
+
+  async function handleEvocatabilityAdminAction(
+    action: 'refresh_evocatability_summary',
+  ) {
+    setEvocatabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeEvocatabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchEvocatabilityRollout(apiBaseUrl)
+      setEvocatabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run evocatability admin action.',
+      )
+    } finally {
+      setEvocatabilityAdminAction('idle')
+    }
+  }
+
+  async function handleVisualizabilityAdminAction(
+    action: 'refresh_visualizability_summary',
+  ) {
+    setVisualizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeVisualizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchVisualizabilityRollout(apiBaseUrl)
+      setVisualizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run visualizability admin action.',
+      )
+    } finally {
+      setVisualizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleSymbolizabilityAdminAction(
+    action: 'refresh_symbolizability_summary',
+  ) {
+    setSymbolizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeSymbolizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchSymbolizabilityRollout(apiBaseUrl)
+      setSymbolizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run symbolizability admin action.',
+      )
+    } finally {
+      setSymbolizabilityAdminAction('idle')
     }
   }
 
@@ -16465,6 +17125,296 @@ function App() {
               ))}
             </div>
             <small>Checked at {presentabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {connotabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production connotability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${connotabilityRollout.status}`}
+              >
+                {formatConnotabilityRolloutStatus(connotabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{connotabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {connotabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatConnotabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {connotabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {signifiabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production signifiability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${signifiabilityRollout.status}`}
+              >
+                {formatSignifiabilityRolloutStatus(signifiabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{signifiabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {signifiabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatSignifiabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {signifiabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {evocatabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production evocatability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${evocatabilityRollout.status}`}
+              >
+                {formatEvocatabilityRolloutStatus(evocatabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{evocatabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {evocatabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatEvocatabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {evocatabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {visualizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production visualizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${visualizabilityRollout.status}`}
+              >
+                {formatVisualizabilityRolloutStatus(visualizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{visualizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {visualizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatVisualizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {visualizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {symbolizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production symbolizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${symbolizabilityRollout.status}`}
+              >
+                {formatSymbolizabilityRolloutStatus(symbolizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{symbolizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {symbolizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatSymbolizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {symbolizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {materializabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production materializability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${materializabilityRollout.status}`}
+              >
+                {formatMaterializabilityRolloutStatus(materializabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{materializabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {materializabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatMaterializabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {materializabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {personifiabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production personifiability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${personifiabilityRollout.status}`}
+              >
+                {formatPersonifiabilityRolloutStatus(personifiabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{personifiabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {personifiabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatPersonifiabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {personifiabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {dramatizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production dramatizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${dramatizabilityRollout.status}`}
+              >
+                {formatDramatizabilityRolloutStatus(dramatizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{dramatizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {dramatizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatDramatizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {dramatizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {metaphorizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production metaphorizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${metaphorizabilityRollout.status}`}
+              >
+                {formatMetaphorizabilityRolloutStatus(metaphorizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{metaphorizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {metaphorizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatMetaphorizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {metaphorizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {typifiabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production typifiability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${typifiabilityRollout.status}`}
+              >
+                {formatTypifiabilityRolloutStatus(typifiabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{typifiabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {typifiabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatTypifiabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {typifiabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -26552,6 +27502,656 @@ function App() {
                 }
               >
                 {formatPresentabilityAdminAction('refresh_presentability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {connotabilityAdminSummary ? (
+          <div className="billing-admin workspace-connotability-admin">
+            <div className="billing-admin__header">
+              <span>Connotability admin</span>
+              <strong>{connotabilityAdminSummary.role}</strong>
+            </div>
+            <p>{connotabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Meter usage connotability</span>
+                <strong>
+                  {connotabilityAdminSummary.stats.connotabilityPercent}%
+                </strong>
+                <small>
+                  {connotabilityAdminSummary.stats.coveredDomains}/
+                  {connotabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Connotability signals</span>
+                <strong>{connotabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {connotabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, meter usage reports, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-connotability-list">
+              {connotabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-connotability-card workspace-connotability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatConnotabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {connotabilityAdminSummary.availableActions.includes(
+              'refresh_connotability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={connotabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleConnotabilityAdminAction(
+                    'refresh_connotability_summary',
+                  )
+                }
+              >
+                {formatConnotabilityAdminAction('refresh_connotability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {signifiabilityAdminSummary ? (
+          <div className="billing-admin workspace-signifiability-admin">
+            <div className="billing-admin__header">
+              <span>Signifiability admin</span>
+              <strong>{signifiabilityAdminSummary.role}</strong>
+            </div>
+            <p>{signifiabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing webhook signifiability</span>
+                <strong>
+                  {signifiabilityAdminSummary.stats.signifiabilityPercent}%
+                </strong>
+                <small>
+                  {signifiabilityAdminSummary.stats.coveredDomains}/
+                  {signifiabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Signifiability signals</span>
+                <strong>{signifiabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {signifiabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing webhook events, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-signifiability-list">
+              {signifiabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-signifiability-card workspace-signifiability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatSignifiabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {signifiabilityAdminSummary.availableActions.includes(
+              'refresh_signifiability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={signifiabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleSignifiabilityAdminAction(
+                    'refresh_signifiability_summary',
+                  )
+                }
+              >
+                {formatSignifiabilityAdminAction('refresh_signifiability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {evocatabilityAdminSummary ? (
+          <div className="billing-admin workspace-evocatability-admin">
+            <div className="billing-admin__header">
+              <span>Evocatability admin</span>
+              <strong>{evocatabilityAdminSummary.role}</strong>
+            </div>
+            <p>{evocatabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Model health evocatability</span>
+                <strong>
+                  {evocatabilityAdminSummary.stats.evocatabilityPercent}%
+                </strong>
+                <small>
+                  {evocatabilityAdminSummary.stats.coveredDomains}/
+                  {evocatabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Evocatability signals</span>
+                <strong>{evocatabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {evocatabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, model health events, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-evocatability-list">
+              {evocatabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-evocatability-card workspace-evocatability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatEvocatabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {evocatabilityAdminSummary.availableActions.includes(
+              'refresh_evocatability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={evocatabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleEvocatabilityAdminAction(
+                    'refresh_evocatability_summary',
+                  )
+                }
+              >
+                {formatEvocatabilityAdminAction('refresh_evocatability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {visualizabilityAdminSummary ? (
+          <div className="billing-admin workspace-visualizability-admin">
+            <div className="billing-admin__header">
+              <span>Visualizability admin</span>
+              <strong>{visualizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{visualizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Model registry visualizability</span>
+                <strong>
+                  {visualizabilityAdminSummary.stats.visualizabilityPercent}%
+                </strong>
+                <small>
+                  {visualizabilityAdminSummary.stats.coveredDomains}/
+                  {visualizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Visualizability signals</span>
+                <strong>{visualizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {visualizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, model registry entries, and model health events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-visualizability-list">
+              {visualizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-visualizability-card workspace-visualizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatVisualizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {visualizabilityAdminSummary.availableActions.includes(
+              'refresh_visualizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={visualizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleVisualizabilityAdminAction(
+                    'refresh_visualizability_summary',
+                  )
+                }
+              >
+                {formatVisualizabilityAdminAction('refresh_visualizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {symbolizabilityAdminSummary ? (
+          <div className="billing-admin workspace-symbolizability-admin">
+            <div className="billing-admin__header">
+              <span>Symbolizability admin</span>
+              <strong>{symbolizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{symbolizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing record symbolizability</span>
+                <strong>
+                  {symbolizabilityAdminSummary.stats.symbolizabilityPercent}%
+                </strong>
+                <small>
+                  {symbolizabilityAdminSummary.stats.coveredDomains}/
+                  {symbolizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Symbolizability signals</span>
+                <strong>{symbolizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {symbolizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing records, and billing invoices'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-symbolizability-list">
+              {symbolizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-symbolizability-card workspace-symbolizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatSymbolizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {symbolizabilityAdminSummary.availableActions.includes(
+              'refresh_symbolizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={symbolizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleSymbolizabilityAdminAction(
+                    'refresh_symbolizability_summary',
+                  )
+                }
+              >
+                {formatSymbolizabilityAdminAction('refresh_symbolizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {materializabilityAdminSummary ? (
+          <div className="billing-admin workspace-materializability-admin">
+            <div className="billing-admin__header">
+              <span>Materializability admin</span>
+              <strong>{materializabilityAdminSummary.role}</strong>
+            </div>
+            <p>{materializabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workflow materializability</span>
+                <strong>
+                  {materializabilityAdminSummary.stats.materializabilityPercent}%
+                </strong>
+                <small>
+                  {materializabilityAdminSummary.stats.coveredDomains}/
+                  {materializabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Materializability signals</span>
+                <strong>{materializabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {materializabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, run workflows, and artifacts'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-materializability-list">
+              {materializabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-materializability-card workspace-materializability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatMaterializabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {materializabilityAdminSummary.availableActions.includes(
+              'refresh_materializability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={materializabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleMaterializabilityAdminAction(
+                    'refresh_materializability_summary',
+                  )
+                }
+              >
+                {formatMaterializabilityAdminAction('refresh_materializability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {personifiabilityAdminSummary ? (
+          <div className="billing-admin workspace-personifiability-admin">
+            <div className="billing-admin__header">
+              <span>Personifiability admin</span>
+              <strong>{personifiabilityAdminSummary.role}</strong>
+            </div>
+            <p>{personifiabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Agent output personifiability</span>
+                <strong>
+                  {personifiabilityAdminSummary.stats.personifiabilityPercent}%
+                </strong>
+                <small>
+                  {personifiabilityAdminSummary.stats.coveredDomains}/
+                  {personifiabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Personifiability signals</span>
+                <strong>{personifiabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {personifiabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, agent outputs, and moderator syntheses'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-personifiability-list">
+              {personifiabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-personifiability-card workspace-personifiability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatPersonifiabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {personifiabilityAdminSummary.availableActions.includes(
+              'refresh_personifiability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={personifiabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handlePersonifiabilityAdminAction(
+                    'refresh_personifiability_summary',
+                  )
+                }
+              >
+                {formatPersonifiabilityAdminAction('refresh_personifiability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {dramatizabilityAdminSummary ? (
+          <div className="billing-admin workspace-dramatizability-admin">
+            <div className="billing-admin__header">
+              <span>Dramatizability admin</span>
+              <strong>{dramatizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{dramatizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Artifact dramatizability</span>
+                <strong>
+                  {dramatizabilityAdminSummary.stats.dramatizabilityPercent}%
+                </strong>
+                <small>
+                  {dramatizabilityAdminSummary.stats.coveredDomains}/
+                  {dramatizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Dramatizability signals</span>
+                <strong>{dramatizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {dramatizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, artifacts, and agent outputs'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-dramatizability-list">
+              {dramatizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-dramatizability-card workspace-dramatizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatDramatizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {dramatizabilityAdminSummary.availableActions.includes(
+              'refresh_dramatizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={dramatizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleDramatizabilityAdminAction(
+                    'refresh_dramatizability_summary',
+                  )
+                }
+              >
+                {formatDramatizabilityAdminAction('refresh_dramatizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {metaphorizabilityAdminSummary ? (
+          <div className="billing-admin workspace-metaphorizability-admin">
+            <div className="billing-admin__header">
+              <span>Metaphorizability admin</span>
+              <strong>{metaphorizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{metaphorizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Provider credential metaphorizability</span>
+                <strong>
+                  {metaphorizabilityAdminSummary.stats.metaphorizabilityPercent}%
+                </strong>
+                <small>
+                  {metaphorizabilityAdminSummary.stats.coveredDomains}/
+                  {metaphorizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Metaphorizability signals</span>
+                <strong>{metaphorizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {metaphorizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, provider credentials, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-metaphorizability-list">
+              {metaphorizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-metaphorizability-card workspace-metaphorizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatMetaphorizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {metaphorizabilityAdminSummary.availableActions.includes(
+              'refresh_metaphorizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={metaphorizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleMetaphorizabilityAdminAction(
+                    'refresh_metaphorizability_summary',
+                  )
+                }
+              >
+                {formatMetaphorizabilityAdminAction('refresh_metaphorizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {typifiabilityAdminSummary ? (
+          <div className="billing-admin workspace-typifiability-admin">
+            <div className="billing-admin__header">
+              <span>Typifiability admin</span>
+              <strong>{typifiabilityAdminSummary.role}</strong>
+            </div>
+            <p>{typifiabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workspace limit typifiability</span>
+                <strong>
+                  {typifiabilityAdminSummary.stats.typifiabilityPercent}%
+                </strong>
+                <small>
+                  {typifiabilityAdminSummary.stats.coveredDomains}/
+                  {typifiabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Typifiability signals</span>
+                <strong>{typifiabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {typifiabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace usage limits, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-typifiability-list">
+              {typifiabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-typifiability-card workspace-typifiability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatTypifiabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {typifiabilityAdminSummary.availableActions.includes(
+              'refresh_typifiability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={typifiabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleTypifiabilityAdminAction(
+                    'refresh_typifiability_summary',
+                  )
+                }
+              >
+                {formatTypifiabilityAdminAction('refresh_typifiability_summary')}
               </button>
             ) : null}
           </div>

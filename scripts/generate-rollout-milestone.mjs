@@ -2,7 +2,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { milestones } from './milestones-v666-v670.mjs'
+import { milestones } from './milestones-v676-v680.mjs'
 
 const root = join(import.meta.dirname, '..')
 
@@ -330,11 +330,12 @@ function statusService(m) {
   const domainBlocks = m.domains
     .map((d) => {
       const params = d.params === false ? '[]' : '[workspaceId]'
+      const workspaceParam = d.params === false ? '_workspaceId' : 'workspaceId'
       return `  {
     domain: '${d.domain}',
     tableName: '${d.tableName}',
     requiredTables: [${d.requiredTables.map((t) => `'${t}'`).join(', ')}],
-    countQuery: (workspaceId) => ({
+    countQuery: (${workspaceParam}) => ({
       sql: \`
         ${d.sql}
       \`,

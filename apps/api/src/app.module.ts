@@ -142,6 +142,16 @@ import { EnunciabilityModule } from './enunciability/enunciability.module.js'
 import { FormulatabilityModule } from './formulatability/formulatability.module.js'
 import { NarratabilityModule } from './narratability/narratability.module.js'
 import { IllustratabilityModule } from './illustratability/illustratability.module.js'
+import { SymbolizabilityModule } from './symbolizability/symbolizability.module.js'
+import { VisualizabilityModule } from './visualizability/visualizability.module.js'
+import { EvocatabilityModule } from './evocatability/evocatability.module.js'
+import { SignifiabilityModule } from './signifiability/signifiability.module.js'
+import { ConnotabilityModule } from './connotability/connotability.module.js'
+import { TypifiabilityModule } from './typifiability/typifiability.module.js'
+import { MetaphorizabilityModule } from './metaphorizability/metaphorizability.module.js'
+import { DramatizabilityModule } from './dramatizability/dramatizability.module.js'
+import { PersonifiabilityModule } from './personifiability/personifiability.module.js'
+import { MaterializabilityModule } from './materializability/materializability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -303,6 +313,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     FormulatabilityModule,
     NarratabilityModule,
     IllustratabilityModule,
+    SymbolizabilityModule,
+    VisualizabilityModule,
+    EvocatabilityModule,
+    SignifiabilityModule,
+    ConnotabilityModule,
+    TypifiabilityModule,
+    MetaphorizabilityModule,
+    DramatizabilityModule,
+    PersonifiabilityModule,
+    MaterializabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,
