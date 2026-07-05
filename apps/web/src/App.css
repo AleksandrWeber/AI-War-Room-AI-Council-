@@ -2915,6 +2915,136 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-programmability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-programmability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-programmability-card p,
+.workspace-programmability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-programmability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-programmability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-deployability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-deployability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-deployability-card p,
+.workspace-deployability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-deployability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-deployability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-manageability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-manageability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-manageability-card p,
+.workspace-manageability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-manageability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-manageability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-controllability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-controllability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-controllability-card p,
+.workspace-controllability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-controllability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-controllability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-integrability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-integrability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-integrability-card p,
+.workspace-integrability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-integrability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-integrability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

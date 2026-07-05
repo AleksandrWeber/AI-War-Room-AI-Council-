@@ -796,6 +796,36 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.110` behavior:
+
+- Production integrability rollout readiness validates integrability coverage and readiness through `GET /api/integrability/readiness`.
+- Workspace owners and admins can inspect workspace integrability metrics from `GET /api/integrability/workspace/:workspaceId/admin`.
+- The web billing panel shows integrability rollout checks and workspace integrability admin tools.
+
+Current `v5.109` behavior:
+
+- Production controllability rollout readiness validates controllability coverage and readiness through `GET /api/controllability/readiness`.
+- Workspace owners and admins can inspect workspace controllability metrics from `GET /api/controllability/workspace/:workspaceId/admin`.
+- The web billing panel shows controllability rollout checks and workspace controllability admin tools.
+
+Current `v5.108` behavior:
+
+- Production manageability rollout readiness validates manageability coverage and readiness through `GET /api/manageability/readiness`.
+- Workspace owners and admins can inspect workspace manageability metrics from `GET /api/manageability/workspace/:workspaceId/admin`.
+- The web billing panel shows manageability rollout checks and workspace manageability admin tools.
+
+Current `v5.107` behavior:
+
+- Production deployability rollout readiness validates deployability coverage and readiness through `GET /api/deployability/readiness`.
+- Workspace owners and admins can inspect workspace deployability metrics from `GET /api/deployability/workspace/:workspaceId/admin`.
+- The web billing panel shows deployability rollout checks and workspace deployability admin tools.
+
+Current `v5.106` behavior:
+
+- Production programmability rollout readiness validates programmability coverage and readiness through `GET /api/programmability/readiness`.
+- Workspace owners and admins can inspect workspace programmability metrics from `GET /api/programmability/workspace/:workspaceId/admin`.
+- The web billing panel shows programmability rollout checks and workspace programmability admin tools.
+
 Current `v5.105` behavior:
 
 - Production adjustability rollout readiness validates adjustability coverage and readiness through `GET /api/adjustability/readiness`.

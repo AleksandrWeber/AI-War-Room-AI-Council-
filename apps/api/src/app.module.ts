@@ -77,6 +77,11 @@ import { CustomizabilityModule } from './customizability/customizability.module.
 import { OperabilityModule } from './operability/operability.module.js'
 import { TunabilityModule } from './tunability/tunability.module.js'
 import { AdjustabilityModule } from './adjustability/adjustability.module.js'
+import { ProgrammabilityModule } from './programmability/programmability.module.js'
+import { DeployabilityModule } from './deployability/deployability.module.js'
+import { ManageabilityModule } from './manageability/manageability.module.js'
+import { ControllabilityModule } from './controllability/controllability.module.js'
+import { IntegrabilityModule } from './integrability/integrability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -173,6 +178,11 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     OperabilityModule,
     TunabilityModule,
     AdjustabilityModule,
+    ProgrammabilityModule,
+    DeployabilityModule,
+    ManageabilityModule,
+    ControllabilityModule,
+    IntegrabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

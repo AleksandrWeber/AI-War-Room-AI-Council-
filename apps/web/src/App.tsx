@@ -184,6 +184,16 @@ import type {
   TunabilityAdminSummaryResponse,
   AdjustabilityRolloutResponse,
   AdjustabilityAdminSummaryResponse,
+  ProgrammabilityRolloutResponse,
+  ProgrammabilityAdminSummaryResponse,
+  DeployabilityRolloutResponse,
+  DeployabilityAdminSummaryResponse,
+  ManageabilityRolloutResponse,
+  ManageabilityAdminSummaryResponse,
+  ControllabilityRolloutResponse,
+  ControllabilityAdminSummaryResponse,
+  IntegrabilityRolloutResponse,
+  IntegrabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -971,6 +981,51 @@ import {
   formatAdjustabilityRolloutStatus,
 } from './adjustability-ui'
 import {
+  executeProgrammabilityAdminAction,
+  fetchProgrammabilityAdminSummary,
+  fetchProgrammabilityRollout,
+  formatProgrammabilityAdminAction,
+  formatProgrammabilityDomain,
+  formatProgrammabilityRolloutCheckStatus,
+  formatProgrammabilityRolloutStatus,
+} from './programmability-ui'
+import {
+  executeDeployabilityAdminAction,
+  fetchDeployabilityAdminSummary,
+  fetchDeployabilityRollout,
+  formatDeployabilityAdminAction,
+  formatDeployabilityDomain,
+  formatDeployabilityRolloutCheckStatus,
+  formatDeployabilityRolloutStatus,
+} from './deployability-ui'
+import {
+  executeManageabilityAdminAction,
+  fetchManageabilityAdminSummary,
+  fetchManageabilityRollout,
+  formatManageabilityAdminAction,
+  formatManageabilityDomain,
+  formatManageabilityRolloutCheckStatus,
+  formatManageabilityRolloutStatus,
+} from './manageability-ui'
+import {
+  executeControllabilityAdminAction,
+  fetchControllabilityAdminSummary,
+  fetchControllabilityRollout,
+  formatControllabilityAdminAction,
+  formatControllabilityDomain,
+  formatControllabilityRolloutCheckStatus,
+  formatControllabilityRolloutStatus,
+} from './controllability-ui'
+import {
+  executeIntegrabilityAdminAction,
+  fetchIntegrabilityAdminSummary,
+  fetchIntegrabilityRollout,
+  formatIntegrabilityAdminAction,
+  formatIntegrabilityDomain,
+  formatIntegrabilityRolloutCheckStatus,
+  formatIntegrabilityRolloutStatus,
+} from './integrability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -1689,6 +1744,16 @@ function App() {
     useState<TunabilityRolloutResponse | null>(null)
   const [adjustabilityRollout, setAdjustabilityRollout] =
     useState<AdjustabilityRolloutResponse | null>(null)
+  const [programmabilityRollout, setProgrammabilityRollout] =
+    useState<ProgrammabilityRolloutResponse | null>(null)
+  const [deployabilityRollout, setDeployabilityRollout] =
+    useState<DeployabilityRolloutResponse | null>(null)
+  const [manageabilityRollout, setManageabilityRollout] =
+    useState<ManageabilityRolloutResponse | null>(null)
+  const [controllabilityRollout, setControllabilityRollout] =
+    useState<ControllabilityRolloutResponse | null>(null)
+  const [integrabilityRollout, setIntegrabilityRollout] =
+    useState<IntegrabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1936,6 +2001,16 @@ function App() {
     useState<TunabilityAdminSummaryResponse | null>(null)
   const [adjustabilityAdminSummary, setAdjustabilityAdminSummary] =
     useState<AdjustabilityAdminSummaryResponse | null>(null)
+  const [programmabilityAdminSummary, setProgrammabilityAdminSummary] =
+    useState<ProgrammabilityAdminSummaryResponse | null>(null)
+  const [deployabilityAdminSummary, setDeployabilityAdminSummary] =
+    useState<DeployabilityAdminSummaryResponse | null>(null)
+  const [manageabilityAdminSummary, setManageabilityAdminSummary] =
+    useState<ManageabilityAdminSummaryResponse | null>(null)
+  const [controllabilityAdminSummary, setControllabilityAdminSummary] =
+    useState<ControllabilityAdminSummaryResponse | null>(null)
+  const [integrabilityAdminSummary, setIntegrabilityAdminSummary] =
+    useState<IntegrabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -2189,6 +2264,21 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [adjustabilityAdminAction, setAdjustabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [programmabilityAdminAction, setProgrammabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [deployabilityAdminAction, setDeployabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [manageabilityAdminAction, setManageabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [controllabilityAdminAction, setControllabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [integrabilityAdminAction, setIntegrabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -3327,6 +3417,66 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setAdjustabilityRollout(null)
+        }
+      })
+
+    fetchProgrammabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setProgrammabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setProgrammabilityRollout(null)
+        }
+      })
+
+    fetchDeployabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setDeployabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDeployabilityRollout(null)
+        }
+      })
+
+    fetchManageabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setManageabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setManageabilityRollout(null)
+        }
+      })
+
+    fetchControllabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setControllabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setControllabilityRollout(null)
+        }
+      })
+
+    fetchIntegrabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setIntegrabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setIntegrabilityRollout(null)
         }
       })
 
@@ -4611,6 +4761,41 @@ function App() {
         workspaceAuthHeaders,
       )
       setAdjustabilityAdminSummary(adjustabilityAdmin)
+
+      const programmabilityAdmin = await fetchProgrammabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProgrammabilityAdminSummary(programmabilityAdmin)
+
+      const deployabilityAdmin = await fetchDeployabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDeployabilityAdminSummary(deployabilityAdmin)
+
+      const manageabilityAdmin = await fetchManageabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setManageabilityAdminSummary(manageabilityAdmin)
+
+      const controllabilityAdmin = await fetchControllabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setControllabilityAdminSummary(controllabilityAdmin)
+
+      const integrabilityAdmin = await fetchIntegrabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIntegrabilityAdminSummary(integrabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -5843,6 +6028,151 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleIntegrabilityAdminAction(
+    action: 'refresh_integrability_summary',
+  ) {
+    setIntegrabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeIntegrabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchIntegrabilityRollout(apiBaseUrl)
+      setIntegrabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run integrability admin action.',
+      )
+    } finally {
+      setIntegrabilityAdminAction('idle')
+    }
+  }
+
+  async function handleControllabilityAdminAction(
+    action: 'refresh_controllability_summary',
+  ) {
+    setControllabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeControllabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchControllabilityRollout(apiBaseUrl)
+      setControllabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run controllability admin action.',
+      )
+    } finally {
+      setControllabilityAdminAction('idle')
+    }
+  }
+
+  async function handleManageabilityAdminAction(
+    action: 'refresh_manageability_summary',
+  ) {
+    setManageabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeManageabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchManageabilityRollout(apiBaseUrl)
+      setManageabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run manageability admin action.',
+      )
+    } finally {
+      setManageabilityAdminAction('idle')
+    }
+  }
+
+  async function handleDeployabilityAdminAction(
+    action: 'refresh_deployability_summary',
+  ) {
+    setDeployabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeDeployabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchDeployabilityRollout(apiBaseUrl)
+      setDeployabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run deployability admin action.',
+      )
+    } finally {
+      setDeployabilityAdminAction('idle')
+    }
+  }
+
+  async function handleProgrammabilityAdminAction(
+    action: 'refresh_programmability_summary',
+  ) {
+    setProgrammabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeProgrammabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchProgrammabilityRollout(apiBaseUrl)
+      setProgrammabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run programmability admin action.',
+      )
+    } finally {
+      setProgrammabilityAdminAction('idle')
     }
   }
 
@@ -10290,6 +10620,151 @@ function App() {
               ))}
             </div>
             <small>Checked at {configurabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {integrabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production integrability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${integrabilityRollout.status}`}
+              >
+                {formatIntegrabilityRolloutStatus(integrabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{integrabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {integrabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatIntegrabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {integrabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {controllabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production controllability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${controllabilityRollout.status}`}
+              >
+                {formatControllabilityRolloutStatus(controllabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{controllabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {controllabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatControllabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {controllabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {manageabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production manageability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${manageabilityRollout.status}`}
+              >
+                {formatManageabilityRolloutStatus(manageabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{manageabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {manageabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatManageabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {manageabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {deployabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production deployability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${deployabilityRollout.status}`}
+              >
+                {formatDeployabilityRolloutStatus(deployabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{deployabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {deployabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatDeployabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {deployabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {programmabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production programmability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${programmabilityRollout.status}`}
+              >
+                {formatProgrammabilityRolloutStatus(programmabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{programmabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {programmabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatProgrammabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {programmabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -16152,6 +16627,331 @@ function App() {
                 }
               >
                 {formatConfigurabilityAdminAction('refresh_configurability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {integrabilityAdminSummary ? (
+          <div className="billing-admin workspace-integrability-admin">
+            <div className="billing-admin__header">
+              <span>Integrability admin</span>
+              <strong>{integrabilityAdminSummary.role}</strong>
+            </div>
+            <p>{integrabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing webhook integrability</span>
+                <strong>
+                  {integrabilityAdminSummary.stats.integrabilityPercent}%
+                </strong>
+                <small>
+                  {integrabilityAdminSummary.stats.coveredDomains}/
+                  {integrabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Integrability signals</span>
+                <strong>{integrabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {integrabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing webhook events, and workspace memberships'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-integrability-list">
+              {integrabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-integrability-card workspace-integrability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatIntegrabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {integrabilityAdminSummary.availableActions.includes(
+              'refresh_integrability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={integrabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleIntegrabilityAdminAction(
+                    'refresh_integrability_summary',
+                  )
+                }
+              >
+                {formatIntegrabilityAdminAction('refresh_integrability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {controllabilityAdminSummary ? (
+          <div className="billing-admin workspace-controllability-admin">
+            <div className="billing-admin__header">
+              <span>Controllability admin</span>
+              <strong>{controllabilityAdminSummary.role}</strong>
+            </div>
+            <p>{controllabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key controllability</span>
+                <strong>
+                  {controllabilityAdminSummary.stats.controllabilityPercent}%
+                </strong>
+                <small>
+                  {controllabilityAdminSummary.stats.coveredDomains}/
+                  {controllabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Controllability signals</span>
+                <strong>{controllabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {controllabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-controllability-list">
+              {controllabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-controllability-card workspace-controllability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatControllabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {controllabilityAdminSummary.availableActions.includes(
+              'refresh_controllability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={controllabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleControllabilityAdminAction(
+                    'refresh_controllability_summary',
+                  )
+                }
+              >
+                {formatControllabilityAdminAction('refresh_controllability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {manageabilityAdminSummary ? (
+          <div className="billing-admin workspace-manageability-admin">
+            <div className="billing-admin__header">
+              <span>Manageability admin</span>
+              <strong>{manageabilityAdminSummary.role}</strong>
+            </div>
+            <p>{manageabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification manageability</span>
+                <strong>
+                  {manageabilityAdminSummary.stats.manageabilityPercent}%
+                </strong>
+                <small>
+                  {manageabilityAdminSummary.stats.coveredDomains}/
+                  {manageabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Manageability signals</span>
+                <strong>{manageabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {manageabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and idempotency keys'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-manageability-list">
+              {manageabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-manageability-card workspace-manageability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatManageabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {manageabilityAdminSummary.availableActions.includes(
+              'refresh_manageability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={manageabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleManageabilityAdminAction(
+                    'refresh_manageability_summary',
+                  )
+                }
+              >
+                {formatManageabilityAdminAction('refresh_manageability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {deployabilityAdminSummary ? (
+          <div className="billing-admin workspace-deployability-admin">
+            <div className="billing-admin__header">
+              <span>Deployability admin</span>
+              <strong>{deployabilityAdminSummary.role}</strong>
+            </div>
+            <p>{deployabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Provider credential deployability</span>
+                <strong>
+                  {deployabilityAdminSummary.stats.deployabilityPercent}%
+                </strong>
+                <small>
+                  {deployabilityAdminSummary.stats.coveredDomains}/
+                  {deployabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Deployability signals</span>
+                <strong>{deployabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {deployabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, provider credentials, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-deployability-list">
+              {deployabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-deployability-card workspace-deployability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatDeployabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {deployabilityAdminSummary.availableActions.includes(
+              'refresh_deployability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={deployabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleDeployabilityAdminAction(
+                    'refresh_deployability_summary',
+                  )
+                }
+              >
+                {formatDeployabilityAdminAction('refresh_deployability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {programmabilityAdminSummary ? (
+          <div className="billing-admin workspace-programmability-admin">
+            <div className="billing-admin__header">
+              <span>Programmability admin</span>
+              <strong>{programmabilityAdminSummary.role}</strong>
+            </div>
+            <p>{programmabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workflow programmability</span>
+                <strong>
+                  {programmabilityAdminSummary.stats.programmabilityPercent}%
+                </strong>
+                <small>
+                  {programmabilityAdminSummary.stats.coveredDomains}/
+                  {programmabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Programmability signals</span>
+                <strong>{programmabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {programmabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, run workflows, and artifacts'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-programmability-list">
+              {programmabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-programmability-card workspace-programmability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatProgrammabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {programmabilityAdminSummary.availableActions.includes(
+              'refresh_programmability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={programmabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleProgrammabilityAdminAction(
+                    'refresh_programmability_summary',
+                  )
+                }
+              >
+                {formatProgrammabilityAdminAction('refresh_programmability_summary')}
               </button>
             ) : null}
           </div>
