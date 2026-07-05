@@ -78,6 +78,8 @@ import type {
   TraceabilityAdminSummaryResponse,
   EfficiencyRolloutResponse,
   EfficiencyAdminSummaryResponse,
+  OptimizationRolloutResponse,
+  OptimizationAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -387,6 +389,15 @@ import {
   formatEfficiencyRolloutCheckStatus,
   formatEfficiencyRolloutStatus,
 } from './efficiency-ui'
+import {
+  executeOptimizationAdminAction,
+  fetchOptimizationAdminSummary,
+  fetchOptimizationRollout,
+  formatOptimizationAdminAction,
+  formatOptimizationDomain,
+  formatOptimizationRolloutCheckStatus,
+  formatOptimizationRolloutStatus,
+} from './optimization-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -1000,6 +1011,8 @@ function App() {
     useState<TraceabilityRolloutResponse | null>(null)
   const [efficiencyRollout, setEfficiencyRollout] =
     useState<EfficiencyRolloutResponse | null>(null)
+  const [optimizationRollout, setOptimizationRollout] =
+    useState<OptimizationRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1141,6 +1154,8 @@ function App() {
     useState<TraceabilityAdminSummaryResponse | null>(null)
   const [efficiencyAdminSummary, setEfficiencyAdminSummary] =
     useState<EfficiencyAdminSummaryResponse | null>(null)
+  const [optimizationAdminSummary, setOptimizationAdminSummary] =
+    useState<OptimizationAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1235,6 +1250,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [efficiencyAdminAction, setEfficiencyAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [optimizationAdminAction, setOptimizationAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1737,6 +1755,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setEfficiencyRollout(null)
+        }
+      })
+
+    fetchOptimizationRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setOptimizationRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setOptimizationRollout(null)
         }
       })
 
@@ -2650,6 +2680,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setEfficiencyAdminSummary(efficiencyAdmin)
+
+      const optimizationAdmin = await fetchOptimizationAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setOptimizationAdminSummary(optimizationAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -3650,6 +3687,35 @@ function App() {
       )
     } finally {
       setEfficiencyAdminAction('idle')
+    }
+  }
+
+  async function handleOptimizationAdminAction(
+    action: 'refresh_optimization_summary',
+  ) {
+    setOptimizationAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeOptimizationAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchOptimizationRollout(apiBaseUrl)
+      setOptimizationRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run optimization admin action.',
+      )
+    } finally {
+      setOptimizationAdminAction('idle')
     }
   }
 
@@ -5255,6 +5321,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {efficiencyRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {optimizationRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production optimization rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${optimizationRollout.status}`}
+              >
+                {formatOptimizationRolloutStatus(optimizationRollout.status)}
+              </strong>
+            </div>
+            <p>{optimizationRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {optimizationRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatOptimizationRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {optimizationRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -7668,6 +7763,71 @@ function App() {
                 }
               >
                 {formatEfficiencyAdminAction('refresh_efficiency_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {optimizationAdminSummary ? (
+          <div className="billing-admin workspace-optimization-admin">
+            <div className="billing-admin__header">
+              <span>Optimization admin</span>
+              <strong>{optimizationAdminSummary.role}</strong>
+            </div>
+            <p>{optimizationAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Model health optimization</span>
+                <strong>
+                  {optimizationAdminSummary.stats.optimizationPercent}%
+                </strong>
+                <small>
+                  {optimizationAdminSummary.stats.coveredDomains}/
+                  {optimizationAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Optimization signals</span>
+                <strong>{optimizationAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {optimizationAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, usage events, and model health'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-optimization-list">
+              {optimizationAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-optimization-card workspace-optimization-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatOptimizationDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {optimizationAdminSummary.availableActions.includes(
+              'refresh_optimization_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={optimizationAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleOptimizationAdminAction(
+                    'refresh_optimization_summary',
+                  )
+                }
+              >
+                {formatOptimizationAdminAction('refresh_optimization_summary')}
               </button>
             ) : null}
           </div>

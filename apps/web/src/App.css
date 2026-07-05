@@ -1543,6 +1543,31 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-optimization-list {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.workspace-optimization-card {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+}
+
+.workspace-optimization-card p,
+.workspace-optimization-card small {
+  margin: 0.2rem 0 0;
+  color: var(--muted);
+}
+
+.workspace-optimization-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-optimization-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

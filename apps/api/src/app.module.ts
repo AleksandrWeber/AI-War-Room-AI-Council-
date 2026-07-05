@@ -24,6 +24,7 @@ import { MaintainabilityModule } from './maintainability/maintainability.module.
 import { ScalabilityModule } from './scalability/scalability.module.js'
 import { TraceabilityModule } from './traceability/traceability.module.js'
 import { EfficiencyModule } from './efficiency/efficiency.module.js'
+import { OptimizationModule } from './optimization/optimization.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -67,6 +68,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     ScalabilityModule,
     TraceabilityModule,
     EfficiencyModule,
+    OptimizationModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,
