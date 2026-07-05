@@ -32,6 +32,11 @@ import { OversightModule } from './oversight/oversight.module.js'
 import { AssuranceModule } from './assurance/assurance.module.js'
 import { AccountabilityModule } from './accountability/accountability.module.js'
 import { TransparencyModule } from './transparency/transparency.module.js'
+import { AttestationModule } from './attestation/attestation.module.js'
+import { AuthenticityModule } from './authenticity/authenticity.module.js'
+import { ProvenanceModule } from './provenance/provenance.module.js'
+import { VerifiabilityModule } from './verifiability/verifiability.module.js'
+import { ConfirmabilityModule } from './confirmability/confirmability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -83,6 +88,11 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     AssuranceModule,
     AccountabilityModule,
     TransparencyModule,
+    AttestationModule,
+    AuthenticityModule,
+    ProvenanceModule,
+    VerifiabilityModule,
+    ConfirmabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

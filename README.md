@@ -796,6 +796,36 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.65` behavior:
+
+- Production confirmability rollout readiness validates confirmability coverage and readiness through `GET /api/confirmability/readiness`.
+- Workspace owners and admins can inspect workspace confirmability metrics from `GET /api/confirmability/workspace/:workspaceId/admin`.
+- The web billing panel shows confirmability rollout checks and workspace confirmability admin tools.
+
+Current `v5.64` behavior:
+
+- Production verifiability rollout readiness validates verifiability coverage and readiness through `GET /api/verifiability/readiness`.
+- Workspace owners and admins can inspect workspace verifiability metrics from `GET /api/verifiability/workspace/:workspaceId/admin`.
+- The web billing panel shows verifiability rollout checks and workspace verifiability admin tools.
+
+Current `v5.63` behavior:
+
+- Production provenance rollout readiness validates provenance coverage and readiness through `GET /api/provenance/readiness`.
+- Workspace owners and admins can inspect workspace provenance metrics from `GET /api/provenance/workspace/:workspaceId/admin`.
+- The web billing panel shows provenance rollout checks and workspace provenance admin tools.
+
+Current `v5.62` behavior:
+
+- Production authenticity rollout readiness validates authenticity coverage and readiness through `GET /api/authenticity/readiness`.
+- Workspace owners and admins can inspect workspace authenticity metrics from `GET /api/authenticity/workspace/:workspaceId/admin`.
+- The web billing panel shows authenticity rollout checks and workspace authenticity admin tools.
+
+Current `v5.61` behavior:
+
+- Production attestation rollout readiness validates attestation coverage and readiness through `GET /api/attestation/readiness`.
+- Workspace owners and admins can inspect workspace attestation metrics from `GET /api/attestation/workspace/:workspaceId/admin`.
+- The web billing panel shows attestation rollout checks and workspace attestation admin tools.
+
 Current `v5.60` behavior:
 
 - Production transparency rollout readiness validates transparency coverage and disclosure readiness through `GET /api/transparency/readiness`.

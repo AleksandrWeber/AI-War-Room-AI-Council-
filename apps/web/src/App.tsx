@@ -94,6 +94,16 @@ import type {
   AccountabilityAdminSummaryResponse,
   TransparencyRolloutResponse,
   TransparencyAdminSummaryResponse,
+  AttestationRolloutResponse,
+  AttestationAdminSummaryResponse,
+  AuthenticityRolloutResponse,
+  AuthenticityAdminSummaryResponse,
+  ProvenanceRolloutResponse,
+  ProvenanceAdminSummaryResponse,
+  VerifiabilityRolloutResponse,
+  VerifiabilityAdminSummaryResponse,
+  ConfirmabilityRolloutResponse,
+  ConfirmabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -475,6 +485,51 @@ import {
   formatTransparencyRolloutCheckStatus,
   formatTransparencyRolloutStatus,
 } from './transparency-ui'
+import {
+  executeAttestationAdminAction,
+  fetchAttestationAdminSummary,
+  fetchAttestationRollout,
+  formatAttestationAdminAction,
+  formatAttestationDomain,
+  formatAttestationRolloutCheckStatus,
+  formatAttestationRolloutStatus,
+} from './attestation-ui'
+import {
+  executeAuthenticityAdminAction,
+  fetchAuthenticityAdminSummary,
+  fetchAuthenticityRollout,
+  formatAuthenticityAdminAction,
+  formatAuthenticityDomain,
+  formatAuthenticityRolloutCheckStatus,
+  formatAuthenticityRolloutStatus,
+} from './authenticity-ui'
+import {
+  executeProvenanceAdminAction,
+  fetchProvenanceAdminSummary,
+  fetchProvenanceRollout,
+  formatProvenanceAdminAction,
+  formatProvenanceDomain,
+  formatProvenanceRolloutCheckStatus,
+  formatProvenanceRolloutStatus,
+} from './provenance-ui'
+import {
+  executeVerifiabilityAdminAction,
+  fetchVerifiabilityAdminSummary,
+  fetchVerifiabilityRollout,
+  formatVerifiabilityAdminAction,
+  formatVerifiabilityDomain,
+  formatVerifiabilityRolloutCheckStatus,
+  formatVerifiabilityRolloutStatus,
+} from './verifiability-ui'
+import {
+  executeConfirmabilityAdminAction,
+  fetchConfirmabilityAdminSummary,
+  fetchConfirmabilityRollout,
+  formatConfirmabilityAdminAction,
+  formatConfirmabilityDomain,
+  formatConfirmabilityRolloutCheckStatus,
+  formatConfirmabilityRolloutStatus,
+} from './confirmability-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -1104,6 +1159,16 @@ function App() {
     useState<AccountabilityRolloutResponse | null>(null)
   const [transparencyRollout, setTransparencyRollout] =
     useState<TransparencyRolloutResponse | null>(null)
+  const [attestationRollout, setAttestationRollout] =
+    useState<AttestationRolloutResponse | null>(null)
+  const [authenticityRollout, setAuthenticityRollout] =
+    useState<AuthenticityRolloutResponse | null>(null)
+  const [provenanceRollout, setProvenanceRollout] =
+    useState<ProvenanceRolloutResponse | null>(null)
+  const [verifiabilityRollout, setVerifiabilityRollout] =
+    useState<VerifiabilityRolloutResponse | null>(null)
+  const [confirmabilityRollout, setConfirmabilityRollout] =
+    useState<ConfirmabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1261,6 +1326,16 @@ function App() {
     useState<AccountabilityAdminSummaryResponse | null>(null)
   const [transparencyAdminSummary, setTransparencyAdminSummary] =
     useState<TransparencyAdminSummaryResponse | null>(null)
+  const [attestationAdminSummary, setAttestationAdminSummary] =
+    useState<AttestationAdminSummaryResponse | null>(null)
+  const [authenticityAdminSummary, setAuthenticityAdminSummary] =
+    useState<AuthenticityAdminSummaryResponse | null>(null)
+  const [provenanceAdminSummary, setProvenanceAdminSummary] =
+    useState<ProvenanceAdminSummaryResponse | null>(null)
+  const [verifiabilityAdminSummary, setVerifiabilityAdminSummary] =
+    useState<VerifiabilityAdminSummaryResponse | null>(null)
+  const [confirmabilityAdminSummary, setConfirmabilityAdminSummary] =
+    useState<ConfirmabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1379,6 +1454,21 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [transparencyAdminAction, setTransparencyAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [attestationAdminAction, setAttestationAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [authenticityAdminAction, setAuthenticityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [provenanceAdminAction, setProvenanceAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [verifiabilityAdminAction, setVerifiabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [confirmabilityAdminAction, setConfirmabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1977,6 +2067,66 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setTransparencyRollout(null)
+        }
+      })
+
+    fetchAttestationRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAttestationRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAttestationRollout(null)
+        }
+      })
+
+    fetchAuthenticityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAuthenticityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAuthenticityRollout(null)
+        }
+      })
+
+    fetchProvenanceRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setProvenanceRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setProvenanceRollout(null)
+        }
+      })
+
+    fetchVerifiabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setVerifiabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setVerifiabilityRollout(null)
+        }
+      })
+
+    fetchConfirmabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setConfirmabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setConfirmabilityRollout(null)
         }
       })
 
@@ -2946,6 +3096,41 @@ function App() {
         workspaceAuthHeaders,
       )
       setTransparencyAdminSummary(transparencyAdmin)
+
+      const attestationAdmin = await fetchAttestationAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAttestationAdminSummary(attestationAdmin)
+
+      const authenticityAdmin = await fetchAuthenticityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuthenticityAdminSummary(authenticityAdmin)
+
+      const provenanceAdmin = await fetchProvenanceAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProvenanceAdminSummary(provenanceAdmin)
+
+      const verifiabilityAdmin = await fetchVerifiabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setVerifiabilityAdminSummary(verifiabilityAdmin)
+
+      const confirmabilityAdmin = await fetchConfirmabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConfirmabilityAdminSummary(confirmabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -4178,6 +4363,151 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleConfirmabilityAdminAction(
+    action: 'refresh_confirmability_summary',
+  ) {
+    setConfirmabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeConfirmabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchConfirmabilityRollout(apiBaseUrl)
+      setConfirmabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run confirmability admin action.',
+      )
+    } finally {
+      setConfirmabilityAdminAction('idle')
+    }
+  }
+
+  async function handleVerifiabilityAdminAction(
+    action: 'refresh_verifiability_summary',
+  ) {
+    setVerifiabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeVerifiabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchVerifiabilityRollout(apiBaseUrl)
+      setVerifiabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run verifiability admin action.',
+      )
+    } finally {
+      setVerifiabilityAdminAction('idle')
+    }
+  }
+
+  async function handleProvenanceAdminAction(
+    action: 'refresh_provenance_summary',
+  ) {
+    setProvenanceAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeProvenanceAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchProvenanceRollout(apiBaseUrl)
+      setProvenanceRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run provenance admin action.',
+      )
+    } finally {
+      setProvenanceAdminAction('idle')
+    }
+  }
+
+  async function handleAuthenticityAdminAction(
+    action: 'refresh_authenticity_summary',
+  ) {
+    setAuthenticityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAuthenticityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAuthenticityRollout(apiBaseUrl)
+      setAuthenticityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run authenticity admin action.',
+      )
+    } finally {
+      setAuthenticityAdminAction('idle')
+    }
+  }
+
+  async function handleAttestationAdminAction(
+    action: 'refresh_attestation_summary',
+  ) {
+    setAttestationAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAttestationAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAttestationRollout(apiBaseUrl)
+      setAttestationRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run attestation admin action.',
+      )
+    } finally {
+      setAttestationAdminAction('idle')
     }
   }
 
@@ -6015,6 +6345,151 @@ function App() {
               ))}
             </div>
             <small>Checked at {transparencyRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {confirmabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production confirmability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${confirmabilityRollout.status}`}
+              >
+                {formatConfirmabilityRolloutStatus(confirmabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{confirmabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {confirmabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatConfirmabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {confirmabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {verifiabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production verifiability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${verifiabilityRollout.status}`}
+              >
+                {formatVerifiabilityRolloutStatus(verifiabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{verifiabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {verifiabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatVerifiabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {verifiabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {provenanceRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production provenance rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${provenanceRollout.status}`}
+              >
+                {formatProvenanceRolloutStatus(provenanceRollout.status)}
+              </strong>
+            </div>
+            <p>{provenanceRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {provenanceRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatProvenanceRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {provenanceRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {authenticityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production authenticity rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${authenticityRollout.status}`}
+              >
+                {formatAuthenticityRolloutStatus(authenticityRollout.status)}
+              </strong>
+            </div>
+            <p>{authenticityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {authenticityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAuthenticityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {authenticityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {attestationRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production attestation rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${attestationRollout.status}`}
+              >
+                {formatAttestationRolloutStatus(attestationRollout.status)}
+              </strong>
+            </div>
+            <p>{attestationRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {attestationRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAttestationRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {attestationRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -8952,6 +9427,331 @@ function App() {
                 }
               >
                 {formatTransparencyAdminAction('refresh_transparency_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {confirmabilityAdminSummary ? (
+          <div className="billing-admin workspace-confirmability-admin">
+            <div className="billing-admin__header">
+              <span>Confirmability admin</span>
+              <strong>{confirmabilityAdminSummary.role}</strong>
+            </div>
+            <p>{confirmabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification confirmability</span>
+                <strong>
+                  {confirmabilityAdminSummary.stats.confirmabilityPercent}%
+                </strong>
+                <small>
+                  {confirmabilityAdminSummary.stats.coveredDomains}/
+                  {confirmabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Confirmability signals</span>
+                <strong>{confirmabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {confirmabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and usage limits'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-confirmability-list">
+              {confirmabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-confirmability-card workspace-confirmability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatConfirmabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {confirmabilityAdminSummary.availableActions.includes(
+              'refresh_confirmability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={confirmabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleConfirmabilityAdminAction(
+                    'refresh_confirmability_summary',
+                  )
+                }
+              >
+                {formatConfirmabilityAdminAction('refresh_confirmability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {verifiabilityAdminSummary ? (
+          <div className="billing-admin workspace-verifiability-admin">
+            <div className="billing-admin__header">
+              <span>Verifiability admin</span>
+              <strong>{verifiabilityAdminSummary.role}</strong>
+            </div>
+            <p>{verifiabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice verifiability</span>
+                <strong>
+                  {verifiabilityAdminSummary.stats.verifiabilityPercent}%
+                </strong>
+                <small>
+                  {verifiabilityAdminSummary.stats.coveredDomains}/
+                  {verifiabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Verifiability signals</span>
+                <strong>{verifiabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {verifiabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-verifiability-list">
+              {verifiabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-verifiability-card workspace-verifiability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatVerifiabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {verifiabilityAdminSummary.availableActions.includes(
+              'refresh_verifiability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={verifiabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleVerifiabilityAdminAction(
+                    'refresh_verifiability_summary',
+                  )
+                }
+              >
+                {formatVerifiabilityAdminAction('refresh_verifiability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {provenanceAdminSummary ? (
+          <div className="billing-admin workspace-provenance-admin">
+            <div className="billing-admin__header">
+              <span>Provenance admin</span>
+              <strong>{provenanceAdminSummary.role}</strong>
+            </div>
+            <p>{provenanceAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Usage provenance</span>
+                <strong>
+                  {provenanceAdminSummary.stats.provenancePercent}%
+                </strong>
+                <small>
+                  {provenanceAdminSummary.stats.coveredDomains}/
+                  {provenanceAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Provenance signals</span>
+                <strong>{provenanceAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {provenanceAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, usage events, and artifacts'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-provenance-list">
+              {provenanceAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-provenance-card workspace-provenance-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatProvenanceDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {provenanceAdminSummary.availableActions.includes(
+              'refresh_provenance_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={provenanceAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleProvenanceAdminAction(
+                    'refresh_provenance_summary',
+                  )
+                }
+              >
+                {formatProvenanceAdminAction('refresh_provenance_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {authenticityAdminSummary ? (
+          <div className="billing-admin workspace-authenticity-admin">
+            <div className="billing-admin__header">
+              <span>Authenticity admin</span>
+              <strong>{authenticityAdminSummary.role}</strong>
+            </div>
+            <p>{authenticityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Moderator synthesis authenticity</span>
+                <strong>
+                  {authenticityAdminSummary.stats.authenticityPercent}%
+                </strong>
+                <small>
+                  {authenticityAdminSummary.stats.coveredDomains}/
+                  {authenticityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Authenticity signals</span>
+                <strong>{authenticityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {authenticityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, moderator syntheses, and artifacts'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-authenticity-list">
+              {authenticityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-authenticity-card workspace-authenticity-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAuthenticityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {authenticityAdminSummary.availableActions.includes(
+              'refresh_authenticity_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={authenticityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAuthenticityAdminAction(
+                    'refresh_authenticity_summary',
+                  )
+                }
+              >
+                {formatAuthenticityAdminAction('refresh_authenticity_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {attestationAdminSummary ? (
+          <div className="billing-admin workspace-attestation-admin">
+            <div className="billing-admin__header">
+              <span>Attestation admin</span>
+              <strong>{attestationAdminSummary.role}</strong>
+            </div>
+            <p>{attestationAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Provider credential attestation</span>
+                <strong>
+                  {attestationAdminSummary.stats.attestationPercent}%
+                </strong>
+                <small>
+                  {attestationAdminSummary.stats.coveredDomains}/
+                  {attestationAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Attestation signals</span>
+                <strong>{attestationAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {attestationAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, provider credentials, and model registry entries'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-attestation-list">
+              {attestationAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-attestation-card workspace-attestation-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAttestationDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {attestationAdminSummary.availableActions.includes(
+              'refresh_attestation_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={attestationAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAttestationAdminAction(
+                    'refresh_attestation_summary',
+                  )
+                }
+              >
+                {formatAttestationAdminAction('refresh_attestation_summary')}
               </button>
             ) : null}
           </div>

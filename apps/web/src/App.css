@@ -1745,6 +1745,136 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-attestation-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-attestation-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-attestation-card p,
+.workspace-attestation-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-attestation-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-attestation-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-authenticity-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-authenticity-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-authenticity-card p,
+.workspace-authenticity-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-authenticity-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-authenticity-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-provenance-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-provenance-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-provenance-card p,
+.workspace-provenance-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-provenance-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-provenance-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-verifiability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-verifiability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-verifiability-card p,
+.workspace-verifiability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-verifiability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-verifiability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-confirmability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-confirmability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-confirmability-card p,
+.workspace-confirmability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-confirmability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-confirmability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;
