@@ -72,6 +72,8 @@ import type {
   RecoverabilityAdminSummaryResponse,
   MaintainabilityRolloutResponse,
   MaintainabilityAdminSummaryResponse,
+  ScalabilityRolloutResponse,
+  ScalabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -354,6 +356,15 @@ import {
   formatMaintainabilityRolloutCheckStatus,
   formatMaintainabilityRolloutStatus,
 } from './maintainability-ui'
+import {
+  executeScalabilityAdminAction,
+  fetchScalabilityAdminSummary,
+  fetchScalabilityRollout,
+  formatScalabilityAdminAction,
+  formatScalabilityDomain,
+  formatScalabilityRolloutCheckStatus,
+  formatScalabilityRolloutStatus,
+} from './scalability-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -961,6 +972,8 @@ function App() {
     useState<RecoverabilityRolloutResponse | null>(null)
   const [maintainabilityRollout, setMaintainabilityRollout] =
     useState<MaintainabilityRolloutResponse | null>(null)
+  const [scalabilityRollout, setScalabilityRollout] =
+    useState<ScalabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1096,6 +1109,8 @@ function App() {
     useState<RecoverabilityAdminSummaryResponse | null>(null)
   const [maintainabilityAdminSummary, setMaintainabilityAdminSummary] =
     useState<MaintainabilityAdminSummaryResponse | null>(null)
+  const [scalabilityAdminSummary, setScalabilityAdminSummary] =
+    useState<ScalabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1181,6 +1196,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [maintainabilityAdminAction, setMaintainabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [scalabilityAdminAction, setScalabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1647,6 +1665,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setMaintainabilityRollout(null)
+        }
+      })
+
+    fetchScalabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setScalabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setScalabilityRollout(null)
         }
       })
 
@@ -2539,6 +2569,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setMaintainabilityAdminSummary(maintainabilityAdmin)
+
+      const scalabilityAdmin = await fetchScalabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setScalabilityAdminSummary(scalabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -3452,6 +3489,35 @@ function App() {
       )
     } finally {
       setMaintainabilityAdminAction('idle')
+    }
+  }
+
+  async function handleScalabilityAdminAction(
+    action: 'refresh_scalability_summary',
+  ) {
+    setScalabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeScalabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchScalabilityRollout(apiBaseUrl)
+      setScalabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run scalability admin action.',
+      )
+    } finally {
+      setScalabilityAdminAction('idle')
     }
   }
 
@@ -4970,6 +5036,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {maintainabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {scalabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production scalability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${scalabilityRollout.status}`}
+              >
+                {formatScalabilityRolloutStatus(scalabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{scalabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {scalabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatScalabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {scalabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -7190,6 +7285,69 @@ function App() {
                 {formatMaintainabilityAdminAction(
                   'refresh_maintainability_summary',
                 )}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {scalabilityAdminSummary ? (
+          <div className="billing-admin workspace-scalability-admin">
+            <div className="billing-admin__header">
+              <span>Scalability admin</span>
+              <strong>{scalabilityAdminSummary.role}</strong>
+            </div>
+            <p>{scalabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Run scalability</span>
+                <strong>
+                  {scalabilityAdminSummary.stats.scalabilityPercent}%
+                </strong>
+                <small>
+                  {scalabilityAdminSummary.stats.coveredDomains}/
+                  {scalabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Scalability signals</span>
+                <strong>{scalabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {scalabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run load, usage events, and membership growth'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-scalability-list">
+              {scalabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-scalability-card workspace-scalability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatScalabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {scalabilityAdminSummary.availableActions.includes(
+              'refresh_scalability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={scalabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleScalabilityAdminAction('refresh_scalability_summary')
+                }
+              >
+                {formatScalabilityAdminAction('refresh_scalability_summary')}
               </button>
             ) : null}
           </div>

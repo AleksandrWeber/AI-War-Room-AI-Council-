@@ -770,6 +770,25 @@ Workspace maintainability admin tools:
 - Only workspace owners and admins can access maintainability admin endpoints.
 - The web billing panel shows maintainability admin tools for authorized roles.
 
+Production scalability rollout readiness:
+
+- `GET /api/scalability/readiness` returns operator-facing production scalability checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, scalability signal table coverage, usage limit scalability, workspace growth signals, and growth readiness signals.
+- The web billing panel shows scalability rollout status and per-check guidance.
+
+Workspace scalability admin tools:
+
+- `GET /api/scalability/workspace/:workspaceId/admin` returns owner/admin scalability summary with workspace run load and membership domains.
+- `POST /api/scalability/workspace/:workspaceId/admin/actions` runs scalability admin actions such as refreshing the summary.
+- Only workspace owners and admins can access scalability admin endpoints.
+- The web billing panel shows scalability admin tools for authorized roles.
+
+Current `v5.50` behavior:
+
+- Production scalability rollout readiness validates scalability coverage and growth readiness through `GET /api/scalability/readiness`.
+- Workspace owners and admins can inspect workspace scalability metrics from `GET /api/scalability/workspace/:workspaceId/admin`.
+- The web billing panel shows scalability rollout checks and workspace scalability admin tools.
+
 Current `v5.49` behavior:
 
 - Production maintainability rollout readiness validates maintainability coverage and operability readiness through `GET /api/maintainability/readiness`.
