@@ -192,6 +192,16 @@ import { HierarchizabilityModule } from './hierarchizability/hierarchizability.m
 import { SegmentizabilityModule } from './segmentizability/segmentizability.module.js'
 import { ClusterizabilityModule } from './clusterizability/clusterizability.module.js'
 import { NomenclatizabilityModule } from './nomenclatizability/nomenclatizability.module.js'
+import { CatalogizabilityModule } from './catalogizability/catalogizability.module.js'
+import { IndexizabilityModule } from './indexizability/indexizability.module.js'
+import { DirectoryizabilityModule } from './directoryizability/directoryizability.module.js'
+import { InventoryizabilityModule } from './inventoryizability/inventoryizability.module.js'
+import { RegistryizabilityModule } from './registryizability/registryizability.module.js'
+import { ArchivizabilityModule } from './archivizability/archivizability.module.js'
+import { CuratizabilityModule } from './curatizability/curatizability.module.js'
+import { CollectizabilityModule } from './collectizability/collectizability.module.js'
+import { AggregatizabilityModule } from './aggregatizability/aggregatizability.module.js'
+import { CompilatizabilityModule } from './compilatizability/compilatizability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -403,6 +413,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     SegmentizabilityModule,
     ClusterizabilityModule,
     NomenclatizabilityModule,
+    CatalogizabilityModule,
+    IndexizabilityModule,
+    DirectoryizabilityModule,
+    InventoryizabilityModule,
+    RegistryizabilityModule,
+    ArchivizabilityModule,
+    CuratizabilityModule,
+    CollectizabilityModule,
+    AggregatizabilityModule,
+    CompilatizabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

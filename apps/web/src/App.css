@@ -5905,6 +5905,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-catalogizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-catalogizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-catalogizability-card p,
+.workspace-catalogizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-catalogizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-catalogizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-indexizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-indexizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-indexizability-card p,
+.workspace-indexizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-indexizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-indexizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-directoryizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-directoryizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-directoryizability-card p,
+.workspace-directoryizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-directoryizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-directoryizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-inventoryizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-inventoryizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-inventoryizability-card p,
+.workspace-inventoryizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-inventoryizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-inventoryizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-registryizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-registryizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-registryizability-card p,
+.workspace-registryizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-registryizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-registryizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-archivizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-archivizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-archivizability-card p,
+.workspace-archivizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-archivizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-archivizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-curatizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-curatizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-curatizability-card p,
+.workspace-curatizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-curatizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-curatizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-collectizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-collectizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-collectizability-card p,
+.workspace-collectizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-collectizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-collectizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-aggregatizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-aggregatizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-aggregatizability-card p,
+.workspace-aggregatizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-aggregatizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-aggregatizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-compilatizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-compilatizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-compilatizability-card p,
+.workspace-compilatizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-compilatizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-compilatizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

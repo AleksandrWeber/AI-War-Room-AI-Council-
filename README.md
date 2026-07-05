@@ -796,6 +796,66 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.230` behavior:
+
+- Production compilatizability rollout readiness validates compilatizability coverage and readiness through `GET /api/compilatizability/readiness`.
+- Workspace owners and admins can inspect workspace compilatizability metrics from `GET /api/compilatizability/workspace/:workspaceId/admin`.
+- The web billing panel shows compilatizability rollout checks and workspace compilatizability admin tools.
+
+Current `v5.229` behavior:
+
+- Production aggregatizability rollout readiness validates aggregatizability coverage and readiness through `GET /api/aggregatizability/readiness`.
+- Workspace owners and admins can inspect workspace aggregatizability metrics from `GET /api/aggregatizability/workspace/:workspaceId/admin`.
+- The web billing panel shows aggregatizability rollout checks and workspace aggregatizability admin tools.
+
+Current `v5.228` behavior:
+
+- Production collectizability rollout readiness validates collectizability coverage and readiness through `GET /api/collectizability/readiness`.
+- Workspace owners and admins can inspect workspace collectizability metrics from `GET /api/collectizability/workspace/:workspaceId/admin`.
+- The web billing panel shows collectizability rollout checks and workspace collectizability admin tools.
+
+Current `v5.227` behavior:
+
+- Production curatizability rollout readiness validates curatizability coverage and readiness through `GET /api/curatizability/readiness`.
+- Workspace owners and admins can inspect workspace curatizability metrics from `GET /api/curatizability/workspace/:workspaceId/admin`.
+- The web billing panel shows curatizability rollout checks and workspace curatizability admin tools.
+
+Current `v5.226` behavior:
+
+- Production archivizability rollout readiness validates archivizability coverage and readiness through `GET /api/archivizability/readiness`.
+- Workspace owners and admins can inspect workspace archivizability metrics from `GET /api/archivizability/workspace/:workspaceId/admin`.
+- The web billing panel shows archivizability rollout checks and workspace archivizability admin tools.
+
+Current `v5.225` behavior:
+
+- Production registryizability rollout readiness validates registryizability coverage and readiness through `GET /api/registryizability/readiness`.
+- Workspace owners and admins can inspect workspace registryizability metrics from `GET /api/registryizability/workspace/:workspaceId/admin`.
+- The web billing panel shows registryizability rollout checks and workspace registryizability admin tools.
+
+Current `v5.224` behavior:
+
+- Production inventoryizability rollout readiness validates inventoryizability coverage and readiness through `GET /api/inventoryizability/readiness`.
+- Workspace owners and admins can inspect workspace inventoryizability metrics from `GET /api/inventoryizability/workspace/:workspaceId/admin`.
+- The web billing panel shows inventoryizability rollout checks and workspace inventoryizability admin tools.
+
+Current `v5.223` behavior:
+
+- Production directoryizability rollout readiness validates directoryizability coverage and readiness through `GET /api/directoryizability/readiness`.
+- Workspace owners and admins can inspect workspace directoryizability metrics from `GET /api/directoryizability/workspace/:workspaceId/admin`.
+- The web billing panel shows directoryizability rollout checks and workspace directoryizability admin tools.
+
+Current `v5.222` behavior:
+
+- Production indexizability rollout readiness validates indexizability coverage and readiness through `GET /api/indexizability/readiness`.
+- Workspace owners and admins can inspect workspace indexizability metrics from `GET /api/indexizability/workspace/:workspaceId/admin`.
+- The web billing panel shows indexizability rollout checks and workspace indexizability admin tools.
+
+Current `v5.221` behavior:
+
+- Production catalogizability rollout readiness validates catalogizability coverage and readiness through `GET /api/catalogizability/readiness`.
+- Workspace owners and admins can inspect workspace catalogizability metrics from `GET /api/catalogizability/workspace/:workspaceId/admin`.
+- The web billing panel shows catalogizability rollout checks and workspace catalogizability admin tools.
+
 Current `v5.220` behavior:
 
 - Production nomenclatizability rollout readiness validates nomenclatizability coverage and readiness through `GET /api/nomenclatizability/readiness`.
