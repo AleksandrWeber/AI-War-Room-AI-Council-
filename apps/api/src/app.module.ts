@@ -202,6 +202,16 @@ import { CuratizabilityModule } from './curatizability/curatizability.module.js'
 import { CollectizabilityModule } from './collectizability/collectizability.module.js'
 import { AggregatizabilityModule } from './aggregatizability/aggregatizability.module.js'
 import { CompilatizabilityModule } from './compilatizability/compilatizability.module.js'
+import { BibliographizabilityModule } from './bibliographizability/bibliographizability.module.js'
+import { ReferencizabilityModule } from './referencizability/referencizability.module.js'
+import { DocumentizabilityModule } from './documentizability/documentizability.module.js'
+import { AnnotationizabilityModule } from './annotationizability/annotationizability.module.js'
+import { CitationizabilityModule } from './citationizability/citationizability.module.js'
+import { ConsolidatizabilityModule } from './consolidatizability/consolidatizability.module.js'
+import { HarmonizabilityModule } from './harmonizability/harmonizability.module.js'
+import { ParametrizabilityModule } from './parametrizability/parametrizability.module.js'
+import { SerializabilityModule } from './serializability/serializability.module.js'
+import { NormalizabilityModule } from './normalizability/normalizability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -423,6 +433,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     CollectizabilityModule,
     AggregatizabilityModule,
     CompilatizabilityModule,
+    BibliographizabilityModule,
+    ReferencizabilityModule,
+    DocumentizabilityModule,
+    AnnotationizabilityModule,
+    CitationizabilityModule,
+    ConsolidatizabilityModule,
+    HarmonizabilityModule,
+    ParametrizabilityModule,
+    SerializabilityModule,
+    NormalizabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,
