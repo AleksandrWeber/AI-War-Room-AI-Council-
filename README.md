@@ -614,6 +614,25 @@ Workspace release admin tools:
 - Only workspace owners and admins can access release admin endpoints.
 - The web billing panel shows release admin tools for authorized roles.
 
+Production SLO rollout readiness:
+
+- `GET /api/slo/readiness` returns operator-facing production SLO checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, SLO signal table coverage, observability SLO buffer capacity, model health SLO signals, and target readiness signals.
+- The web billing panel shows SLO rollout status and per-check guidance.
+
+Workspace SLO admin tools:
+
+- `GET /api/slo/workspace/:workspaceId/admin` returns owner/admin SLO summary with workspace SLO signal domains.
+- `POST /api/slo/workspace/:workspaceId/admin/actions` runs SLO admin actions such as refreshing the summary.
+- Only workspace owners and admins can access SLO admin endpoints.
+- The web billing panel shows SLO admin tools for authorized roles.
+
+Current `v5.38` behavior:
+
+- Production SLO rollout readiness validates SLO coverage and target readiness through `GET /api/slo/readiness`.
+- Workspace owners and admins can inspect workspace SLO metrics from `GET /api/slo/workspace/:workspaceId/admin`.
+- The web billing panel shows SLO rollout checks and workspace SLO admin tools.
+
 Current `v5.37` behavior:
 
 - Production release rollout readiness validates release coverage and rollout readiness through `GET /api/releases/readiness`.

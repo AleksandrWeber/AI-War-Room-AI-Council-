@@ -48,6 +48,8 @@ import type {
   IncidentAdminSummaryResponse,
   ReleaseRolloutResponse,
   ReleaseAdminSummaryResponse,
+  SloRolloutResponse,
+  SloAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -222,6 +224,15 @@ import {
   formatReleaseRolloutCheckStatus,
   formatReleaseRolloutStatus,
 } from './release-ui'
+import {
+  executeSloAdminAction,
+  fetchSloAdminSummary,
+  fetchSloRollout,
+  formatSloAdminAction,
+  formatSloDomain,
+  formatSloRolloutCheckStatus,
+  formatSloRolloutStatus,
+} from './slo-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -806,6 +817,7 @@ function App() {
     useState<IncidentResponseRolloutResponse | null>(null)
   const [releaseRollout, setReleaseRollout] =
     useState<ReleaseRolloutResponse | null>(null)
+  const [sloRollout, setSloRollout] = useState<SloRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -917,6 +929,8 @@ function App() {
     useState<IncidentAdminSummaryResponse | null>(null)
   const [releaseAdminSummary, setReleaseAdminSummary] =
     useState<ReleaseAdminSummaryResponse | null>(null)
+  const [sloAdminSummary, setSloAdminSummary] =
+    useState<SloAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -968,6 +982,9 @@ function App() {
   const [releaseAdminAction, setReleaseAdminAction] = useState<
     'idle' | 'running'
   >('idle')
+  const [sloAdminAction, setSloAdminAction] = useState<'idle' | 'running'>(
+    'idle',
+  )
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
   const [memberAdminAction, setMemberAdminAction] = useState<
     'idle' | 'running'
@@ -1288,6 +1305,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setReleaseRollout(null)
+        }
+      })
+
+    fetchSloRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setSloRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setSloRollout(null)
         }
       })
 
@@ -2096,6 +2125,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setReleaseAdminSummary(releaseAdmin)
+
+      const sloAdmin = await fetchSloAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSloAdminSummary(sloAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -2665,6 +2701,33 @@ function App() {
       )
     } finally {
       setReleaseAdminAction('idle')
+    }
+  }
+
+  async function handleSloAdminAction(action: 'refresh_slo_summary') {
+    setSloAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeSloAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchSloRollout(apiBaseUrl)
+      setSloRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run SLO admin action.',
+      )
+    } finally {
+      setSloAdminAction('idle')
     }
   }
 
@@ -3839,6 +3902,33 @@ function App() {
               ))}
             </div>
             <small>Checked at {releaseRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {sloRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production SLO rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${sloRollout.status}`}
+              >
+                {formatSloRolloutStatus(sloRollout.status)}
+              </strong>
+            </div>
+            <p>{sloRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {sloRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>{formatSloRolloutCheckStatus(check.status)}</span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {sloRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -5309,6 +5399,65 @@ function App() {
                 }
               >
                 {formatReleaseAdminAction('refresh_release_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {sloAdminSummary ? (
+          <div className="billing-admin workspace-slo-admin">
+            <div className="billing-admin__header">
+              <span>SLO admin</span>
+              <strong>{sloAdminSummary.role}</strong>
+            </div>
+            <p>{sloAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Run success rate</span>
+                <strong>{sloAdminSummary.stats.successRatePercent}%</strong>
+                <small>
+                  {sloAdminSummary.stats.coveredDomains}/
+                  {sloAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>SLO signals</span>
+                <strong>{sloAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {sloAdminSummary.stats.postgresConnectivity
+                    ? 'Usage and run outcome signals'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-slo-list">
+              {sloAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-slo-card workspace-slo-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatSloDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {sloAdminSummary.availableActions.includes('refresh_slo_summary') ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={sloAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleSloAdminAction('refresh_slo_summary')
+                }
+              >
+                {formatSloAdminAction('refresh_slo_summary')}
               </button>
             ) : null}
           </div>
