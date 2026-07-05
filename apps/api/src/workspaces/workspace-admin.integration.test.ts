@@ -854,3 +854,71 @@ describe('deployment rollout integration', () => {
       .expect(403)
   })
 })
+
+describe('migration rollout integration', () => {
+  let app: NestFastifyApplication | undefined
+
+  beforeAll(async () => {
+    const { AppModule } = await import('../app.module.js')
+
+    const moduleRef: TestingModule = await Test.createTestingModule({
+      imports: [AppModule],
+    }).compile()
+
+    app = moduleRef.createNestApplication<NestFastifyApplication>(
+      new FastifyAdapter(),
+    )
+    app.setGlobalPrefix('api')
+    await app.init()
+    await app.getHttpAdapter().getInstance().ready()
+  })
+
+  afterAll(async () => {
+    await app?.close()
+  })
+
+  it('reports migration capabilities and rollout readiness', async () => {
+    const capabilities = await request(app!.getHttpServer())
+      .get('/api/migrations/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsMigrationRollout: true,
+      supportsMigrationAdminTools: true,
+      supportsSchemaMigrationsTable: true,
+    })
+
+    const rollout = await request(app!.getHttpServer())
+      .get('/api/migrations/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns migration admin summary for owners', async () => {
+    const response = await request(app!.getHttpServer())
+      .get('/api/migrations/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalMigrations: expect.any(Number),
+        appliedCount: expect.any(Number),
+        pendingCount: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects migration admin tools for members', async () => {
+    await request(app!.getHttpServer())
+      .get('/api/migrations/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})

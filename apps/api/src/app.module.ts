@@ -4,6 +4,7 @@ import { validateEnv } from './config/env.js'
 import { AuthModule } from './auth/auth.module.js'
 import { BillingModule } from './billing/billing.module.js'
 import { DeploymentModule } from './deployment/deployment.module.js'
+import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
 import { IdempotencyModule } from './idempotency/idempotency.module.js'
@@ -26,6 +27,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     AuthModule,
     BillingModule,
     DeploymentModule,
+    MigrationsModule,
     EvaluationModule,
     IdempotencyModule,
     WorkspacesModule,

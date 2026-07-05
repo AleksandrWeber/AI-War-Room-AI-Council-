@@ -536,6 +536,25 @@ Workspace deployment admin tools:
 - Only workspace owners and admins can access deployment admin endpoints.
 - The web billing panel shows deployment admin tools for authorized roles.
 
+Database migration rollout readiness:
+
+- `GET /api/migrations/readiness` returns operator-facing production database migration checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, schema_migrations table, migration file inventory, and pending migration coverage.
+- The web billing panel shows migration rollout status and per-check guidance.
+
+Workspace migration admin tools:
+
+- `GET /api/migrations/workspace/:workspaceId/admin` returns owner/admin migration summary with applied and pending SQL migrations.
+- `POST /api/migrations/workspace/:workspaceId/admin/actions` runs migration admin actions such as refreshing the summary.
+- Only workspace owners and admins can access migration admin endpoints.
+- The web billing panel shows migration admin tools for authorized roles.
+
+Current `v5.32` behavior:
+
+- Database migration rollout readiness validates schema migration coverage through `GET /api/migrations/readiness`.
+- Workspace owners and admins can inspect applied and pending migrations from `GET /api/migrations/workspace/:workspaceId/admin`.
+- The web billing panel shows migration rollout checks and workspace migration admin tools.
+
 Current `v5.31` behavior:
 
 - Deployment health rollout readiness validates API readiness and dependency health through `GET /api/deployment/readiness`.

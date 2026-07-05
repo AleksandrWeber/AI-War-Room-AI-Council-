@@ -36,6 +36,8 @@ import type {
   QuotaAdminSummaryResponse,
   DeploymentRolloutResponse,
   DeploymentAdminSummaryResponse,
+  MigrationRolloutResponse,
+  MigrationAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -156,6 +158,15 @@ import {
   formatDependencyName,
   formatDependencyStatus,
 } from './deployment-ui'
+import {
+  executeMigrationAdminAction,
+  fetchMigrationAdminSummary,
+  fetchMigrationRollout,
+  formatMigrationAdminAction,
+  formatMigrationRolloutCheckStatus,
+  formatMigrationRolloutStatus,
+  formatMigrationStatus,
+} from './migrations-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -728,6 +739,8 @@ function App() {
     useState<UsageLimitsRolloutResponse | null>(null)
   const [deploymentRollout, setDeploymentRollout] =
     useState<DeploymentRolloutResponse | null>(null)
+  const [migrationRollout, setMigrationRollout] =
+    useState<MigrationRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -827,6 +840,8 @@ function App() {
     useState<QuotaAdminSummaryResponse | null>(null)
   const [deploymentAdminSummary, setDeploymentAdminSummary] =
     useState<DeploymentAdminSummaryResponse | null>(null)
+  const [migrationAdminSummary, setMigrationAdminSummary] =
+    useState<MigrationAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -858,6 +873,9 @@ function App() {
     'idle',
   )
   const [deploymentAdminAction, setDeploymentAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [migrationAdminAction, setMigrationAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1108,6 +1126,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setDeploymentRollout(null)
+        }
+      })
+
+    fetchMigrationRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setMigrationRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setMigrationRollout(null)
         }
       })
 
@@ -1874,6 +1904,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setDeploymentAdminSummary(deploymentAdmin)
+
+      const migrationAdmin = await fetchMigrationAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMigrationAdminSummary(migrationAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -2281,6 +2318,33 @@ function App() {
       )
     } finally {
       setDeploymentAdminAction('idle')
+    }
+  }
+
+  async function handleMigrationAdminAction(action: 'refresh_migration_summary') {
+    setMigrationAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeMigrationAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchMigrationRollout(apiBaseUrl)
+      setMigrationRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run migration admin action.',
+      )
+    } finally {
+      setMigrationAdminAction('idle')
     }
   }
 
@@ -3283,6 +3347,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {deploymentRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {migrationRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Database migration rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${migrationRollout.status}`}
+              >
+                {formatMigrationRolloutStatus(migrationRollout.status)}
+              </strong>
+            </div>
+            <p>{migrationRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {migrationRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatMigrationRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {migrationRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -4373,6 +4466,71 @@ function App() {
                 }
               >
                 {formatDeploymentAdminAction('refresh_deployment_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {migrationAdminSummary ? (
+          <div className="billing-admin workspace-migration-admin">
+            <div className="billing-admin__header">
+              <span>Migration admin</span>
+              <strong>{migrationAdminSummary.role}</strong>
+            </div>
+            <p>{migrationAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Applied</span>
+                <strong>{migrationAdminSummary.stats.appliedCount}</strong>
+                <small>
+                  {migrationAdminSummary.stats.pendingCount} pending of{' '}
+                  {migrationAdminSummary.stats.totalMigrations}
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Schema table</span>
+                <strong>
+                  {migrationAdminSummary.stats.schemaMigrationsTableExists
+                    ? 'Ready'
+                    : 'Missing'}
+                </strong>
+                <small>schema_migrations tracking</small>
+              </article>
+            </div>
+            <div className="workspace-migration-list">
+              {migrationAdminSummary.records.length ? (
+                migrationAdminSummary.records.map((record) => (
+                  <article
+                    className={`workspace-migration-card workspace-migration-card--${record.status}`}
+                    key={record.version}
+                  >
+                    <div>
+                      <strong>{record.version}</strong>
+                      <p>{formatMigrationStatus(record.status)}</p>
+                      {record.appliedAt ? (
+                        <small>
+                          {record.appliedAt.slice(0, 19).replace('T', ' ')}
+                        </small>
+                      ) : null}
+                    </div>
+                  </article>
+                ))
+              ) : (
+                <p className="clear-copy">No migration files discovered yet.</p>
+              )}
+            </div>
+            {migrationAdminSummary.availableActions.includes(
+              'refresh_migration_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={migrationAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleMigrationAdminAction('refresh_migration_summary')
+                }
+              >
+                {formatMigrationAdminAction('refresh_migration_summary')}
               </button>
             ) : null}
           </div>
