@@ -37,6 +37,11 @@ import { AuthenticityModule } from './authenticity/authenticity.module.js'
 import { ProvenanceModule } from './provenance/provenance.module.js'
 import { VerifiabilityModule } from './verifiability/verifiability.module.js'
 import { ConfirmabilityModule } from './confirmability/confirmability.module.js'
+import { ValidityModule } from './validity/validity.module.js'
+import { CredibilityModule } from './credibility/credibility.module.js'
+import { ReproducibilityModule } from './reproducibility/reproducibility.module.js'
+import { DefensibilityModule } from './defensibility/defensibility.module.js'
+import { AuditabilityModule } from './auditability/auditability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -93,6 +98,11 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     ProvenanceModule,
     VerifiabilityModule,
     ConfirmabilityModule,
+    ValidityModule,
+    CredibilityModule,
+    ReproducibilityModule,
+    DefensibilityModule,
+    AuditabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

@@ -104,6 +104,16 @@ import type {
   VerifiabilityAdminSummaryResponse,
   ConfirmabilityRolloutResponse,
   ConfirmabilityAdminSummaryResponse,
+  ValidityRolloutResponse,
+  ValidityAdminSummaryResponse,
+  CredibilityRolloutResponse,
+  CredibilityAdminSummaryResponse,
+  ReproducibilityRolloutResponse,
+  ReproducibilityAdminSummaryResponse,
+  DefensibilityRolloutResponse,
+  DefensibilityAdminSummaryResponse,
+  AuditabilityRolloutResponse,
+  AuditabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -530,6 +540,51 @@ import {
   formatConfirmabilityRolloutCheckStatus,
   formatConfirmabilityRolloutStatus,
 } from './confirmability-ui'
+import {
+  executeValidityAdminAction,
+  fetchValidityAdminSummary,
+  fetchValidityRollout,
+  formatValidityAdminAction,
+  formatValidityDomain,
+  formatValidityRolloutCheckStatus,
+  formatValidityRolloutStatus,
+} from './validity-ui'
+import {
+  executeCredibilityAdminAction,
+  fetchCredibilityAdminSummary,
+  fetchCredibilityRollout,
+  formatCredibilityAdminAction,
+  formatCredibilityDomain,
+  formatCredibilityRolloutCheckStatus,
+  formatCredibilityRolloutStatus,
+} from './credibility-ui'
+import {
+  executeReproducibilityAdminAction,
+  fetchReproducibilityAdminSummary,
+  fetchReproducibilityRollout,
+  formatReproducibilityAdminAction,
+  formatReproducibilityDomain,
+  formatReproducibilityRolloutCheckStatus,
+  formatReproducibilityRolloutStatus,
+} from './reproducibility-ui'
+import {
+  executeDefensibilityAdminAction,
+  fetchDefensibilityAdminSummary,
+  fetchDefensibilityRollout,
+  formatDefensibilityAdminAction,
+  formatDefensibilityDomain,
+  formatDefensibilityRolloutCheckStatus,
+  formatDefensibilityRolloutStatus,
+} from './defensibility-ui'
+import {
+  executeAuditabilityAdminAction,
+  fetchAuditabilityAdminSummary,
+  fetchAuditabilityRollout,
+  formatAuditabilityAdminAction,
+  formatAuditabilityDomain,
+  formatAuditabilityRolloutCheckStatus,
+  formatAuditabilityRolloutStatus,
+} from './auditability-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -1169,6 +1224,16 @@ function App() {
     useState<VerifiabilityRolloutResponse | null>(null)
   const [confirmabilityRollout, setConfirmabilityRollout] =
     useState<ConfirmabilityRolloutResponse | null>(null)
+  const [validityRollout, setValidityRollout] =
+    useState<ValidityRolloutResponse | null>(null)
+  const [credibilityRollout, setCredibilityRollout] =
+    useState<CredibilityRolloutResponse | null>(null)
+  const [reproducibilityRollout, setReproducibilityRollout] =
+    useState<ReproducibilityRolloutResponse | null>(null)
+  const [defensibilityRollout, setDefensibilityRollout] =
+    useState<DefensibilityRolloutResponse | null>(null)
+  const [auditabilityRollout, setAuditabilityRollout] =
+    useState<AuditabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1336,6 +1401,16 @@ function App() {
     useState<VerifiabilityAdminSummaryResponse | null>(null)
   const [confirmabilityAdminSummary, setConfirmabilityAdminSummary] =
     useState<ConfirmabilityAdminSummaryResponse | null>(null)
+  const [validityAdminSummary, setValidityAdminSummary] =
+    useState<ValidityAdminSummaryResponse | null>(null)
+  const [credibilityAdminSummary, setCredibilityAdminSummary] =
+    useState<CredibilityAdminSummaryResponse | null>(null)
+  const [reproducibilityAdminSummary, setReproducibilityAdminSummary] =
+    useState<ReproducibilityAdminSummaryResponse | null>(null)
+  const [defensibilityAdminSummary, setDefensibilityAdminSummary] =
+    useState<DefensibilityAdminSummaryResponse | null>(null)
+  const [auditabilityAdminSummary, setAuditabilityAdminSummary] =
+    useState<AuditabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1469,6 +1544,21 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [confirmabilityAdminAction, setConfirmabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [validityAdminAction, setValidityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [credibilityAdminAction, setCredibilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [reproducibilityAdminAction, setReproducibilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [defensibilityAdminAction, setDefensibilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [auditabilityAdminAction, setAuditabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -2127,6 +2217,66 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setConfirmabilityRollout(null)
+        }
+      })
+
+    fetchValidityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setValidityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setValidityRollout(null)
+        }
+      })
+
+    fetchCredibilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setCredibilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setCredibilityRollout(null)
+        }
+      })
+
+    fetchReproducibilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setReproducibilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setReproducibilityRollout(null)
+        }
+      })
+
+    fetchDefensibilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setDefensibilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDefensibilityRollout(null)
+        }
+      })
+
+    fetchAuditabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAuditabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAuditabilityRollout(null)
         }
       })
 
@@ -3131,6 +3281,41 @@ function App() {
         workspaceAuthHeaders,
       )
       setConfirmabilityAdminSummary(confirmabilityAdmin)
+
+      const validityAdmin = await fetchValidityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setValidityAdminSummary(validityAdmin)
+
+      const credibilityAdmin = await fetchCredibilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCredibilityAdminSummary(credibilityAdmin)
+
+      const reproducibilityAdmin = await fetchReproducibilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReproducibilityAdminSummary(reproducibilityAdmin)
+
+      const defensibilityAdmin = await fetchDefensibilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDefensibilityAdminSummary(defensibilityAdmin)
+
+      const auditabilityAdmin = await fetchAuditabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuditabilityAdminSummary(auditabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -4363,6 +4548,151 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleAuditabilityAdminAction(
+    action: 'refresh_auditability_summary',
+  ) {
+    setAuditabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAuditabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAuditabilityRollout(apiBaseUrl)
+      setAuditabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run auditability admin action.',
+      )
+    } finally {
+      setAuditabilityAdminAction('idle')
+    }
+  }
+
+  async function handleDefensibilityAdminAction(
+    action: 'refresh_defensibility_summary',
+  ) {
+    setDefensibilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeDefensibilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchDefensibilityRollout(apiBaseUrl)
+      setDefensibilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run defensibility admin action.',
+      )
+    } finally {
+      setDefensibilityAdminAction('idle')
+    }
+  }
+
+  async function handleReproducibilityAdminAction(
+    action: 'refresh_reproducibility_summary',
+  ) {
+    setReproducibilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeReproducibilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchReproducibilityRollout(apiBaseUrl)
+      setReproducibilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run reproducibility admin action.',
+      )
+    } finally {
+      setReproducibilityAdminAction('idle')
+    }
+  }
+
+  async function handleCredibilityAdminAction(
+    action: 'refresh_credibility_summary',
+  ) {
+    setCredibilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeCredibilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchCredibilityRollout(apiBaseUrl)
+      setCredibilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run credibility admin action.',
+      )
+    } finally {
+      setCredibilityAdminAction('idle')
+    }
+  }
+
+  async function handleValidityAdminAction(
+    action: 'refresh_validity_summary',
+  ) {
+    setValidityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeValidityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchValidityRollout(apiBaseUrl)
+      setValidityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run validity admin action.',
+      )
+    } finally {
+      setValidityAdminAction('idle')
     }
   }
 
@@ -6490,6 +6820,151 @@ function App() {
               ))}
             </div>
             <small>Checked at {attestationRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {auditabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production auditability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${auditabilityRollout.status}`}
+              >
+                {formatAuditabilityRolloutStatus(auditabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{auditabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {auditabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAuditabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {auditabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {defensibilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production defensibility rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${defensibilityRollout.status}`}
+              >
+                {formatDefensibilityRolloutStatus(defensibilityRollout.status)}
+              </strong>
+            </div>
+            <p>{defensibilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {defensibilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatDefensibilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {defensibilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {reproducibilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production reproducibility rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${reproducibilityRollout.status}`}
+              >
+                {formatReproducibilityRolloutStatus(reproducibilityRollout.status)}
+              </strong>
+            </div>
+            <p>{reproducibilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {reproducibilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatReproducibilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {reproducibilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {credibilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production credibility rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${credibilityRollout.status}`}
+              >
+                {formatCredibilityRolloutStatus(credibilityRollout.status)}
+              </strong>
+            </div>
+            <p>{credibilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {credibilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatCredibilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {credibilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {validityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production validity rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${validityRollout.status}`}
+              >
+                {formatValidityRolloutStatus(validityRollout.status)}
+              </strong>
+            </div>
+            <p>{validityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {validityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatValidityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {validityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -9752,6 +10227,331 @@ function App() {
                 }
               >
                 {formatAttestationAdminAction('refresh_attestation_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {auditabilityAdminSummary ? (
+          <div className="billing-admin workspace-auditability-admin">
+            <div className="billing-admin__header">
+              <span>Auditability admin</span>
+              <strong>{auditabilityAdminSummary.role}</strong>
+            </div>
+            <p>{auditabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Usage auditability</span>
+                <strong>
+                  {auditabilityAdminSummary.stats.auditabilityPercent}%
+                </strong>
+                <small>
+                  {auditabilityAdminSummary.stats.coveredDomains}/
+                  {auditabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Auditability signals</span>
+                <strong>{auditabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {auditabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, usage events, and webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-auditability-list">
+              {auditabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-auditability-card workspace-auditability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAuditabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {auditabilityAdminSummary.availableActions.includes(
+              'refresh_auditability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={auditabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAuditabilityAdminAction(
+                    'refresh_auditability_summary',
+                  )
+                }
+              >
+                {formatAuditabilityAdminAction('refresh_auditability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {defensibilityAdminSummary ? (
+          <div className="billing-admin workspace-defensibility-admin">
+            <div className="billing-admin__header">
+              <span>Defensibility admin</span>
+              <strong>{defensibilityAdminSummary.role}</strong>
+            </div>
+            <p>{defensibilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield review defensibility</span>
+                <strong>
+                  {defensibilityAdminSummary.stats.defensibilityPercent}%
+                </strong>
+                <small>
+                  {defensibilityAdminSummary.stats.coveredDomains}/
+                  {defensibilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Defensibility signals</span>
+                <strong>{defensibilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {defensibilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield reviews, and artifacts'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-defensibility-list">
+              {defensibilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-defensibility-card workspace-defensibility-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatDefensibilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {defensibilityAdminSummary.availableActions.includes(
+              'refresh_defensibility_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={defensibilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleDefensibilityAdminAction(
+                    'refresh_defensibility_summary',
+                  )
+                }
+              >
+                {formatDefensibilityAdminAction('refresh_defensibility_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {reproducibilityAdminSummary ? (
+          <div className="billing-admin workspace-reproducibility-admin">
+            <div className="billing-admin__header">
+              <span>Reproducibility admin</span>
+              <strong>{reproducibilityAdminSummary.role}</strong>
+            </div>
+            <p>{reproducibilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency reproducibility</span>
+                <strong>
+                  {reproducibilityAdminSummary.stats.reproducibilityPercent}%
+                </strong>
+                <small>
+                  {reproducibilityAdminSummary.stats.coveredDomains}/
+                  {reproducibilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Reproducibility signals</span>
+                <strong>{reproducibilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {reproducibilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and run workflows'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-reproducibility-list">
+              {reproducibilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-reproducibility-card workspace-reproducibility-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatReproducibilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {reproducibilityAdminSummary.availableActions.includes(
+              'refresh_reproducibility_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={reproducibilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleReproducibilityAdminAction(
+                    'refresh_reproducibility_summary',
+                  )
+                }
+              >
+                {formatReproducibilityAdminAction('refresh_reproducibility_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {credibilityAdminSummary ? (
+          <div className="billing-admin workspace-credibility-admin">
+            <div className="billing-admin__header">
+              <span>Credibility admin</span>
+              <strong>{credibilityAdminSummary.role}</strong>
+            </div>
+            <p>{credibilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice credibility</span>
+                <strong>
+                  {credibilityAdminSummary.stats.credibilityPercent}%
+                </strong>
+                <small>
+                  {credibilityAdminSummary.stats.coveredDomains}/
+                  {credibilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Credibility signals</span>
+                <strong>{credibilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {credibilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-credibility-list">
+              {credibilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-credibility-card workspace-credibility-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatCredibilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {credibilityAdminSummary.availableActions.includes(
+              'refresh_credibility_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={credibilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleCredibilityAdminAction(
+                    'refresh_credibility_summary',
+                  )
+                }
+              >
+                {formatCredibilityAdminAction('refresh_credibility_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {validityAdminSummary ? (
+          <div className="billing-admin workspace-validity-admin">
+            <div className="billing-admin__header">
+              <span>Validity admin</span>
+              <strong>{validityAdminSummary.role}</strong>
+            </div>
+            <p>{validityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Agent output validity</span>
+                <strong>
+                  {validityAdminSummary.stats.validityPercent}%
+                </strong>
+                <small>
+                  {validityAdminSummary.stats.coveredDomains}/
+                  {validityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Validity signals</span>
+                <strong>{validityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {validityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, agent outputs, and artifacts'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-validity-list">
+              {validityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-validity-card workspace-validity-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatValidityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {validityAdminSummary.availableActions.includes(
+              'refresh_validity_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={validityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleValidityAdminAction(
+                    'refresh_validity_summary',
+                  )
+                }
+              >
+                {formatValidityAdminAction('refresh_validity_summary')}
               </button>
             ) : null}
           </div>

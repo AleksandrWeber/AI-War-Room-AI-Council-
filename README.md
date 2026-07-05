@@ -796,6 +796,36 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.70` behavior:
+
+- Production auditability rollout readiness validates auditability coverage and readiness through `GET /api/auditability/readiness`.
+- Workspace owners and admins can inspect workspace auditability metrics from `GET /api/auditability/workspace/:workspaceId/admin`.
+- The web billing panel shows auditability rollout checks and workspace auditability admin tools.
+
+Current `v5.69` behavior:
+
+- Production defensibility rollout readiness validates defensibility coverage and readiness through `GET /api/defensibility/readiness`.
+- Workspace owners and admins can inspect workspace defensibility metrics from `GET /api/defensibility/workspace/:workspaceId/admin`.
+- The web billing panel shows defensibility rollout checks and workspace defensibility admin tools.
+
+Current `v5.68` behavior:
+
+- Production reproducibility rollout readiness validates reproducibility coverage and readiness through `GET /api/reproducibility/readiness`.
+- Workspace owners and admins can inspect workspace reproducibility metrics from `GET /api/reproducibility/workspace/:workspaceId/admin`.
+- The web billing panel shows reproducibility rollout checks and workspace reproducibility admin tools.
+
+Current `v5.67` behavior:
+
+- Production credibility rollout readiness validates credibility coverage and readiness through `GET /api/credibility/readiness`.
+- Workspace owners and admins can inspect workspace credibility metrics from `GET /api/credibility/workspace/:workspaceId/admin`.
+- The web billing panel shows credibility rollout checks and workspace credibility admin tools.
+
+Current `v5.66` behavior:
+
+- Production validity rollout readiness validates validity coverage and readiness through `GET /api/validity/readiness`.
+- Workspace owners and admins can inspect workspace validity metrics from `GET /api/validity/workspace/:workspaceId/admin`.
+- The web billing panel shows validity rollout checks and workspace validity admin tools.
+
 Current `v5.65` behavior:
 
 - Production confirmability rollout readiness validates confirmability coverage and readiness through `GET /api/confirmability/readiness`.

@@ -1875,6 +1875,136 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-validity-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-validity-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-validity-card p,
+.workspace-validity-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-validity-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-validity-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-credibility-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-credibility-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-credibility-card p,
+.workspace-credibility-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-credibility-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-credibility-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-reproducibility-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-reproducibility-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-reproducibility-card p,
+.workspace-reproducibility-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-reproducibility-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-reproducibility-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-defensibility-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-defensibility-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-defensibility-card p,
+.workspace-defensibility-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-defensibility-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-defensibility-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-auditability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-auditability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-auditability-card p,
+.workspace-auditability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-auditability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-auditability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;
