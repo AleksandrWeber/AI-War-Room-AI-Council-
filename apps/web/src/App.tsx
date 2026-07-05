@@ -114,6 +114,16 @@ import type {
   DefensibilityAdminSummaryResponse,
   AuditabilityRolloutResponse,
   AuditabilityAdminSummaryResponse,
+  InspectabilityRolloutResponse,
+  InspectabilityAdminSummaryResponse,
+  ExplainabilityRolloutResponse,
+  ExplainabilityAdminSummaryResponse,
+  DemonstrabilityRolloutResponse,
+  DemonstrabilityAdminSummaryResponse,
+  JustifiabilityRolloutResponse,
+  JustifiabilityAdminSummaryResponse,
+  ReviewabilityRolloutResponse,
+  ReviewabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -585,6 +595,51 @@ import {
   formatAuditabilityRolloutCheckStatus,
   formatAuditabilityRolloutStatus,
 } from './auditability-ui'
+import {
+  executeInspectabilityAdminAction,
+  fetchInspectabilityAdminSummary,
+  fetchInspectabilityRollout,
+  formatInspectabilityAdminAction,
+  formatInspectabilityDomain,
+  formatInspectabilityRolloutCheckStatus,
+  formatInspectabilityRolloutStatus,
+} from './inspectability-ui'
+import {
+  executeExplainabilityAdminAction,
+  fetchExplainabilityAdminSummary,
+  fetchExplainabilityRollout,
+  formatExplainabilityAdminAction,
+  formatExplainabilityDomain,
+  formatExplainabilityRolloutCheckStatus,
+  formatExplainabilityRolloutStatus,
+} from './explainability-ui'
+import {
+  executeDemonstrabilityAdminAction,
+  fetchDemonstrabilityAdminSummary,
+  fetchDemonstrabilityRollout,
+  formatDemonstrabilityAdminAction,
+  formatDemonstrabilityDomain,
+  formatDemonstrabilityRolloutCheckStatus,
+  formatDemonstrabilityRolloutStatus,
+} from './demonstrability-ui'
+import {
+  executeJustifiabilityAdminAction,
+  fetchJustifiabilityAdminSummary,
+  fetchJustifiabilityRollout,
+  formatJustifiabilityAdminAction,
+  formatJustifiabilityDomain,
+  formatJustifiabilityRolloutCheckStatus,
+  formatJustifiabilityRolloutStatus,
+} from './justifiability-ui'
+import {
+  executeReviewabilityAdminAction,
+  fetchReviewabilityAdminSummary,
+  fetchReviewabilityRollout,
+  formatReviewabilityAdminAction,
+  formatReviewabilityDomain,
+  formatReviewabilityRolloutCheckStatus,
+  formatReviewabilityRolloutStatus,
+} from './reviewability-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -1234,6 +1289,16 @@ function App() {
     useState<DefensibilityRolloutResponse | null>(null)
   const [auditabilityRollout, setAuditabilityRollout] =
     useState<AuditabilityRolloutResponse | null>(null)
+  const [inspectabilityRollout, setInspectabilityRollout] =
+    useState<InspectabilityRolloutResponse | null>(null)
+  const [explainabilityRollout, setExplainabilityRollout] =
+    useState<ExplainabilityRolloutResponse | null>(null)
+  const [demonstrabilityRollout, setDemonstrabilityRollout] =
+    useState<DemonstrabilityRolloutResponse | null>(null)
+  const [justifiabilityRollout, setJustifiabilityRollout] =
+    useState<JustifiabilityRolloutResponse | null>(null)
+  const [reviewabilityRollout, setReviewabilityRollout] =
+    useState<ReviewabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1411,6 +1476,16 @@ function App() {
     useState<DefensibilityAdminSummaryResponse | null>(null)
   const [auditabilityAdminSummary, setAuditabilityAdminSummary] =
     useState<AuditabilityAdminSummaryResponse | null>(null)
+  const [inspectabilityAdminSummary, setInspectabilityAdminSummary] =
+    useState<InspectabilityAdminSummaryResponse | null>(null)
+  const [explainabilityAdminSummary, setExplainabilityAdminSummary] =
+    useState<ExplainabilityAdminSummaryResponse | null>(null)
+  const [demonstrabilityAdminSummary, setDemonstrabilityAdminSummary] =
+    useState<DemonstrabilityAdminSummaryResponse | null>(null)
+  const [justifiabilityAdminSummary, setJustifiabilityAdminSummary] =
+    useState<JustifiabilityAdminSummaryResponse | null>(null)
+  const [reviewabilityAdminSummary, setReviewabilityAdminSummary] =
+    useState<ReviewabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1559,6 +1634,21 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [auditabilityAdminAction, setAuditabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [inspectabilityAdminAction, setInspectabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [explainabilityAdminAction, setExplainabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [demonstrabilityAdminAction, setDemonstrabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [justifiabilityAdminAction, setJustifiabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [reviewabilityAdminAction, setReviewabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -2277,6 +2367,66 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setAuditabilityRollout(null)
+        }
+      })
+
+    fetchInspectabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setInspectabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setInspectabilityRollout(null)
+        }
+      })
+
+    fetchExplainabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setExplainabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setExplainabilityRollout(null)
+        }
+      })
+
+    fetchDemonstrabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setDemonstrabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDemonstrabilityRollout(null)
+        }
+      })
+
+    fetchJustifiabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setJustifiabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setJustifiabilityRollout(null)
+        }
+      })
+
+    fetchReviewabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setReviewabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setReviewabilityRollout(null)
         }
       })
 
@@ -3316,6 +3466,41 @@ function App() {
         workspaceAuthHeaders,
       )
       setAuditabilityAdminSummary(auditabilityAdmin)
+
+      const inspectabilityAdmin = await fetchInspectabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setInspectabilityAdminSummary(inspectabilityAdmin)
+
+      const explainabilityAdmin = await fetchExplainabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setExplainabilityAdminSummary(explainabilityAdmin)
+
+      const demonstrabilityAdmin = await fetchDemonstrabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDemonstrabilityAdminSummary(demonstrabilityAdmin)
+
+      const justifiabilityAdmin = await fetchJustifiabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setJustifiabilityAdminSummary(justifiabilityAdmin)
+
+      const reviewabilityAdmin = await fetchReviewabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReviewabilityAdminSummary(reviewabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -4548,6 +4733,151 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleReviewabilityAdminAction(
+    action: 'refresh_reviewability_summary',
+  ) {
+    setReviewabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeReviewabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchReviewabilityRollout(apiBaseUrl)
+      setReviewabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run reviewability admin action.',
+      )
+    } finally {
+      setReviewabilityAdminAction('idle')
+    }
+  }
+
+  async function handleJustifiabilityAdminAction(
+    action: 'refresh_justifiability_summary',
+  ) {
+    setJustifiabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeJustifiabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchJustifiabilityRollout(apiBaseUrl)
+      setJustifiabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run justifiability admin action.',
+      )
+    } finally {
+      setJustifiabilityAdminAction('idle')
+    }
+  }
+
+  async function handleDemonstrabilityAdminAction(
+    action: 'refresh_demonstrability_summary',
+  ) {
+    setDemonstrabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeDemonstrabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchDemonstrabilityRollout(apiBaseUrl)
+      setDemonstrabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run demonstrability admin action.',
+      )
+    } finally {
+      setDemonstrabilityAdminAction('idle')
+    }
+  }
+
+  async function handleExplainabilityAdminAction(
+    action: 'refresh_explainability_summary',
+  ) {
+    setExplainabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeExplainabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchExplainabilityRollout(apiBaseUrl)
+      setExplainabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run explainability admin action.',
+      )
+    } finally {
+      setExplainabilityAdminAction('idle')
+    }
+  }
+
+  async function handleInspectabilityAdminAction(
+    action: 'refresh_inspectability_summary',
+  ) {
+    setInspectabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeInspectabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchInspectabilityRollout(apiBaseUrl)
+      setInspectabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run inspectability admin action.',
+      )
+    } finally {
+      setInspectabilityAdminAction('idle')
     }
   }
 
@@ -6965,6 +7295,151 @@ function App() {
               ))}
             </div>
             <small>Checked at {validityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {reviewabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production reviewability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${reviewabilityRollout.status}`}
+              >
+                {formatReviewabilityRolloutStatus(reviewabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{reviewabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {reviewabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatReviewabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {reviewabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {justifiabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production justifiability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${justifiabilityRollout.status}`}
+              >
+                {formatJustifiabilityRolloutStatus(justifiabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{justifiabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {justifiabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatJustifiabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {justifiabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {demonstrabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production demonstrability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${demonstrabilityRollout.status}`}
+              >
+                {formatDemonstrabilityRolloutStatus(demonstrabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{demonstrabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {demonstrabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatDemonstrabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {demonstrabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {explainabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production explainability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${explainabilityRollout.status}`}
+              >
+                {formatExplainabilityRolloutStatus(explainabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{explainabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {explainabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatExplainabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {explainabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {inspectabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production inspectability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${inspectabilityRollout.status}`}
+              >
+                {formatInspectabilityRolloutStatus(inspectabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{inspectabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {inspectabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatInspectabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {inspectabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -10552,6 +11027,331 @@ function App() {
                 }
               >
                 {formatValidityAdminAction('refresh_validity_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {reviewabilityAdminSummary ? (
+          <div className="billing-admin workspace-reviewability-admin">
+            <div className="billing-admin__header">
+              <span>Reviewability admin</span>
+              <strong>{reviewabilityAdminSummary.role}</strong>
+            </div>
+            <p>{reviewabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Artifact reviewability</span>
+                <strong>
+                  {reviewabilityAdminSummary.stats.reviewabilityPercent}%
+                </strong>
+                <small>
+                  {reviewabilityAdminSummary.stats.coveredDomains}/
+                  {reviewabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Reviewability signals</span>
+                <strong>{reviewabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {reviewabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, artifacts, and billing invoices'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-reviewability-list">
+              {reviewabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-reviewability-card workspace-reviewability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatReviewabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {reviewabilityAdminSummary.availableActions.includes(
+              'refresh_reviewability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={reviewabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleReviewabilityAdminAction(
+                    'refresh_reviewability_summary',
+                  )
+                }
+              >
+                {formatReviewabilityAdminAction('refresh_reviewability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {justifiabilityAdminSummary ? (
+          <div className="billing-admin workspace-justifiability-admin">
+            <div className="billing-admin__header">
+              <span>Justifiability admin</span>
+              <strong>{justifiabilityAdminSummary.role}</strong>
+            </div>
+            <p>{justifiabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield review justifiability</span>
+                <strong>
+                  {justifiabilityAdminSummary.stats.justifiabilityPercent}%
+                </strong>
+                <small>
+                  {justifiabilityAdminSummary.stats.coveredDomains}/
+                  {justifiabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Justifiability signals</span>
+                <strong>{justifiabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {justifiabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield reviews, and idempotency keys'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-justifiability-list">
+              {justifiabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-justifiability-card workspace-justifiability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatJustifiabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {justifiabilityAdminSummary.availableActions.includes(
+              'refresh_justifiability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={justifiabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleJustifiabilityAdminAction(
+                    'refresh_justifiability_summary',
+                  )
+                }
+              >
+                {formatJustifiabilityAdminAction('refresh_justifiability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {demonstrabilityAdminSummary ? (
+          <div className="billing-admin workspace-demonstrability-admin">
+            <div className="billing-admin__header">
+              <span>Demonstrability admin</span>
+              <strong>{demonstrabilityAdminSummary.role}</strong>
+            </div>
+            <p>{demonstrabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workflow demonstrability</span>
+                <strong>
+                  {demonstrabilityAdminSummary.stats.demonstrabilityPercent}%
+                </strong>
+                <small>
+                  {demonstrabilityAdminSummary.stats.coveredDomains}/
+                  {demonstrabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Demonstrability signals</span>
+                <strong>{demonstrabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {demonstrabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, run workflows, and billing notifications'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-demonstrability-list">
+              {demonstrabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-demonstrability-card workspace-demonstrability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatDemonstrabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {demonstrabilityAdminSummary.availableActions.includes(
+              'refresh_demonstrability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={demonstrabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleDemonstrabilityAdminAction(
+                    'refresh_demonstrability_summary',
+                  )
+                }
+              >
+                {formatDemonstrabilityAdminAction('refresh_demonstrability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {explainabilityAdminSummary ? (
+          <div className="billing-admin workspace-explainability-admin">
+            <div className="billing-admin__header">
+              <span>Explainability admin</span>
+              <strong>{explainabilityAdminSummary.role}</strong>
+            </div>
+            <p>{explainabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Moderator synthesis explainability</span>
+                <strong>
+                  {explainabilityAdminSummary.stats.explainabilityPercent}%
+                </strong>
+                <small>
+                  {explainabilityAdminSummary.stats.coveredDomains}/
+                  {explainabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Explainability signals</span>
+                <strong>{explainabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {explainabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, moderator syntheses, and artifacts'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-explainability-list">
+              {explainabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-explainability-card workspace-explainability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatExplainabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {explainabilityAdminSummary.availableActions.includes(
+              'refresh_explainability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={explainabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleExplainabilityAdminAction(
+                    'refresh_explainability_summary',
+                  )
+                }
+              >
+                {formatExplainabilityAdminAction('refresh_explainability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {inspectabilityAdminSummary ? (
+          <div className="billing-admin workspace-inspectability-admin">
+            <div className="billing-admin__header">
+              <span>Inspectability admin</span>
+              <strong>{inspectabilityAdminSummary.role}</strong>
+            </div>
+            <p>{inspectabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Usage inspectability</span>
+                <strong>
+                  {inspectabilityAdminSummary.stats.inspectabilityPercent}%
+                </strong>
+                <small>
+                  {inspectabilityAdminSummary.stats.coveredDomains}/
+                  {inspectabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Inspectability signals</span>
+                <strong>{inspectabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {inspectabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, usage events, and meter usage reports'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-inspectability-list">
+              {inspectabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-inspectability-card workspace-inspectability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatInspectabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {inspectabilityAdminSummary.availableActions.includes(
+              'refresh_inspectability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={inspectabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleInspectabilityAdminAction(
+                    'refresh_inspectability_summary',
+                  )
+                }
+              >
+                {formatInspectabilityAdminAction('refresh_inspectability_summary')}
               </button>
             ) : null}
           </div>

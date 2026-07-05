@@ -42,6 +42,11 @@ import { CredibilityModule } from './credibility/credibility.module.js'
 import { ReproducibilityModule } from './reproducibility/reproducibility.module.js'
 import { DefensibilityModule } from './defensibility/defensibility.module.js'
 import { AuditabilityModule } from './auditability/auditability.module.js'
+import { InspectabilityModule } from './inspectability/inspectability.module.js'
+import { ExplainabilityModule } from './explainability/explainability.module.js'
+import { DemonstrabilityModule } from './demonstrability/demonstrability.module.js'
+import { JustifiabilityModule } from './justifiability/justifiability.module.js'
+import { ReviewabilityModule } from './reviewability/reviewability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -103,6 +108,11 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     ReproducibilityModule,
     DefensibilityModule,
     AuditabilityModule,
+    InspectabilityModule,
+    ExplainabilityModule,
+    DemonstrabilityModule,
+    JustifiabilityModule,
+    ReviewabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,
