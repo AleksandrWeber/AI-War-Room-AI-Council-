@@ -17,6 +17,7 @@ import { AvailabilityModule } from './availability/availability.module.js'
 import { ReliabilityModule } from './reliability/reliability.module.js'
 import { StabilityModule } from './stability/stability.module.js'
 import { ConsistencyModule } from './consistency/consistency.module.js'
+import { IntegrityModule } from './integrity/integrity.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -53,6 +54,7 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     ReliabilityModule,
     StabilityModule,
     ConsistencyModule,
+    IntegrityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

@@ -718,6 +718,25 @@ Workspace consistency admin tools:
 - Only workspace owners and admins can access consistency admin endpoints.
 - The web billing panel shows consistency admin tools for authorized roles.
 
+Production integrity rollout readiness:
+
+- `GET /api/integrity/readiness` returns operator-facing production integrity checklist results (`ready` or `not_ready`).
+- Checks cover PostgreSQL connectivity, integrity signal table coverage, artifact content integrity, shield scan integrity, and verification readiness signals.
+- The web billing panel shows integrity rollout status and per-check guidance.
+
+Workspace integrity admin tools:
+
+- `GET /api/integrity/workspace/:workspaceId/admin` returns owner/admin integrity summary with workspace artifact and shield scan domains.
+- `POST /api/integrity/workspace/:workspaceId/admin/actions` runs integrity admin actions such as refreshing the summary.
+- Only workspace owners and admins can access integrity admin endpoints.
+- The web billing panel shows integrity admin tools for authorized roles.
+
+Current `v5.46` behavior:
+
+- Production integrity rollout readiness validates integrity coverage and verification readiness through `GET /api/integrity/readiness`.
+- Workspace owners and admins can inspect workspace integrity metrics from `GET /api/integrity/workspace/:workspaceId/admin`.
+- The web billing panel shows integrity rollout checks and workspace integrity admin tools.
+
 Current `v5.45` behavior:
 
 - Production consistency rollout readiness validates consistency coverage and alignment readiness through `GET /api/consistency/readiness`.

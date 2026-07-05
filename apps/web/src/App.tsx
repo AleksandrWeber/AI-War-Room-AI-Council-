@@ -64,6 +64,8 @@ import type {
   StabilityAdminSummaryResponse,
   ConsistencyRolloutResponse,
   ConsistencyAdminSummaryResponse,
+  IntegrityRolloutResponse,
+  IntegrityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -310,6 +312,15 @@ import {
   formatConsistencyRolloutCheckStatus,
   formatConsistencyRolloutStatus,
 } from './consistency-ui'
+import {
+  executeIntegrityAdminAction,
+  fetchIntegrityAdminSummary,
+  fetchIntegrityRollout,
+  formatIntegrityAdminAction,
+  formatIntegrityDomain,
+  formatIntegrityRolloutCheckStatus,
+  formatIntegrityRolloutStatus,
+} from './integrity-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -909,6 +920,8 @@ function App() {
     useState<StabilityRolloutResponse | null>(null)
   const [consistencyRollout, setConsistencyRollout] =
     useState<ConsistencyRolloutResponse | null>(null)
+  const [integrityRollout, setIntegrityRollout] =
+    useState<IntegrityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -1036,6 +1049,8 @@ function App() {
     useState<StabilityAdminSummaryResponse | null>(null)
   const [consistencyAdminSummary, setConsistencyAdminSummary] =
     useState<ConsistencyAdminSummaryResponse | null>(null)
+  const [integrityAdminSummary, setIntegrityAdminSummary] =
+    useState<IntegrityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -1109,6 +1124,9 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [consistencyAdminAction, setConsistencyAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [integrityAdminAction, setIntegrityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -1527,6 +1545,18 @@ function App() {
       .catch(() => {
         if (!controller.signal.aborted) {
           setConsistencyRollout(null)
+        }
+      })
+
+    fetchIntegrityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setIntegrityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setIntegrityRollout(null)
         }
       })
 
@@ -2391,6 +2421,13 @@ function App() {
         workspaceAuthHeaders,
       )
       setConsistencyAdminSummary(consistencyAdmin)
+
+      const integrityAdmin = await fetchIntegrityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIntegrityAdminSummary(integrityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -3188,6 +3225,35 @@ function App() {
       )
     } finally {
       setConsistencyAdminAction('idle')
+    }
+  }
+
+  async function handleIntegrityAdminAction(
+    action: 'refresh_integrity_summary',
+  ) {
+    setIntegrityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeIntegrityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchIntegrityRollout(apiBaseUrl)
+      setIntegrityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run integrity admin action.',
+      )
+    } finally {
+      setIntegrityAdminAction('idle')
     }
   }
 
@@ -4590,6 +4656,35 @@ function App() {
               ))}
             </div>
             <small>Checked at {consistencyRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {integrityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production integrity rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${integrityRollout.status}`}
+              >
+                {formatIntegrityRolloutStatus(integrityRollout.status)}
+              </strong>
+            </div>
+            <p>{integrityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {integrityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatIntegrityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {integrityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -6552,6 +6647,67 @@ function App() {
                 }
               >
                 {formatConsistencyAdminAction('refresh_consistency_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {integrityAdminSummary ? (
+          <div className="billing-admin workspace-integrity-admin">
+            <div className="billing-admin__header">
+              <span>Integrity admin</span>
+              <strong>{integrityAdminSummary.role}</strong>
+            </div>
+            <p>{integrityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Run integrity</span>
+                <strong>{integrityAdminSummary.stats.integrityPercent}%</strong>
+                <small>
+                  {integrityAdminSummary.stats.coveredDomains}/
+                  {integrityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Integrity signals</span>
+                <strong>{integrityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {integrityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, artifacts, and shield scan signals'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-integrity-list">
+              {integrityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-integrity-card workspace-integrity-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatIntegrityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {integrityAdminSummary.availableActions.includes(
+              'refresh_integrity_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={integrityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleIntegrityAdminAction('refresh_integrity_summary')
+                }
+              >
+                {formatIntegrityAdminAction('refresh_integrity_summary')}
               </button>
             ) : null}
           </div>
