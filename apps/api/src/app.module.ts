@@ -162,6 +162,16 @@ import { ParabolizabilityModule } from './parabolizability/parabolizability.modu
 import { ArchetypizabilityModule } from './archetypizability/archetypizability.module.js'
 import { CaracterizabilityModule } from './caracterizability/caracterizability.module.js'
 import { MythicizabilityModule } from './mythicizability/mythicizability.module.js'
+import { SemiotizabilityModule } from './semiotizability/semiotizability.module.js'
+import { HermeneutizabilityModule } from './hermeneutizability/hermeneutizability.module.js'
+import { LexicalizabilityModule } from './lexicalizability/lexicalizability.module.js'
+import { SemanticizabilityModule } from './semanticizability/semanticizability.module.js'
+import { PragmatizabilityModule } from './pragmatizability/pragmatizability.module.js'
+import { SyntacticizabilityModule } from './syntacticizability/syntacticizability.module.js'
+import { RhetorizabilityModule } from './rhetorizability/rhetorizability.module.js'
+import { MorphizabilityModule } from './morphizability/morphizability.module.js'
+import { CodifiabilityModule } from './codifiability/codifiability.module.js'
+import { HermeticizabilityModule } from './hermeticizability/hermeticizability.module.js'
 import { MigrationsModule } from './migrations/migrations.module.js'
 import { EvaluationModule } from './evaluation/evaluation.module.js'
 import { HealthModule } from './health/health.module.js'
@@ -343,6 +353,16 @@ import { WorkspacesModule } from './workspaces/workspaces.module.js'
     ArchetypizabilityModule,
     CaracterizabilityModule,
     MythicizabilityModule,
+    SemiotizabilityModule,
+    HermeneutizabilityModule,
+    LexicalizabilityModule,
+    SemanticizabilityModule,
+    PragmatizabilityModule,
+    SyntacticizabilityModule,
+    RhetorizabilityModule,
+    MorphizabilityModule,
+    CodifiabilityModule,
+    HermeticizabilityModule,
     MigrationsModule,
     EvaluationModule,
     IdempotencyModule,

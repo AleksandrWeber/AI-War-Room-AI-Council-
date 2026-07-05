@@ -354,6 +354,26 @@ import type {
   CaracterizabilityAdminSummaryResponse,
   MythicizabilityRolloutResponse,
   MythicizabilityAdminSummaryResponse,
+  SemiotizabilityRolloutResponse,
+  SemiotizabilityAdminSummaryResponse,
+  HermeneutizabilityRolloutResponse,
+  HermeneutizabilityAdminSummaryResponse,
+  LexicalizabilityRolloutResponse,
+  LexicalizabilityAdminSummaryResponse,
+  SemanticizabilityRolloutResponse,
+  SemanticizabilityAdminSummaryResponse,
+  PragmatizabilityRolloutResponse,
+  PragmatizabilityAdminSummaryResponse,
+  SyntacticizabilityRolloutResponse,
+  SyntacticizabilityAdminSummaryResponse,
+  RhetorizabilityRolloutResponse,
+  RhetorizabilityAdminSummaryResponse,
+  MorphizabilityRolloutResponse,
+  MorphizabilityAdminSummaryResponse,
+  CodifiabilityRolloutResponse,
+  CodifiabilityAdminSummaryResponse,
+  HermeticizabilityRolloutResponse,
+  HermeticizabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -1906,6 +1926,96 @@ import {
   formatMythicizabilityRolloutStatus,
 } from './mythicizability-ui'
 import {
+  executeSemiotizabilityAdminAction,
+  fetchSemiotizabilityAdminSummary,
+  fetchSemiotizabilityRollout,
+  formatSemiotizabilityAdminAction,
+  formatSemiotizabilityDomain,
+  formatSemiotizabilityRolloutCheckStatus,
+  formatSemiotizabilityRolloutStatus,
+} from './semiotizability-ui'
+import {
+  executeHermeneutizabilityAdminAction,
+  fetchHermeneutizabilityAdminSummary,
+  fetchHermeneutizabilityRollout,
+  formatHermeneutizabilityAdminAction,
+  formatHermeneutizabilityDomain,
+  formatHermeneutizabilityRolloutCheckStatus,
+  formatHermeneutizabilityRolloutStatus,
+} from './hermeneutizability-ui'
+import {
+  executeLexicalizabilityAdminAction,
+  fetchLexicalizabilityAdminSummary,
+  fetchLexicalizabilityRollout,
+  formatLexicalizabilityAdminAction,
+  formatLexicalizabilityDomain,
+  formatLexicalizabilityRolloutCheckStatus,
+  formatLexicalizabilityRolloutStatus,
+} from './lexicalizability-ui'
+import {
+  executeSemanticizabilityAdminAction,
+  fetchSemanticizabilityAdminSummary,
+  fetchSemanticizabilityRollout,
+  formatSemanticizabilityAdminAction,
+  formatSemanticizabilityDomain,
+  formatSemanticizabilityRolloutCheckStatus,
+  formatSemanticizabilityRolloutStatus,
+} from './semanticizability-ui'
+import {
+  executePragmatizabilityAdminAction,
+  fetchPragmatizabilityAdminSummary,
+  fetchPragmatizabilityRollout,
+  formatPragmatizabilityAdminAction,
+  formatPragmatizabilityDomain,
+  formatPragmatizabilityRolloutCheckStatus,
+  formatPragmatizabilityRolloutStatus,
+} from './pragmatizability-ui'
+import {
+  executeSyntacticizabilityAdminAction,
+  fetchSyntacticizabilityAdminSummary,
+  fetchSyntacticizabilityRollout,
+  formatSyntacticizabilityAdminAction,
+  formatSyntacticizabilityDomain,
+  formatSyntacticizabilityRolloutCheckStatus,
+  formatSyntacticizabilityRolloutStatus,
+} from './syntacticizability-ui'
+import {
+  executeRhetorizabilityAdminAction,
+  fetchRhetorizabilityAdminSummary,
+  fetchRhetorizabilityRollout,
+  formatRhetorizabilityAdminAction,
+  formatRhetorizabilityDomain,
+  formatRhetorizabilityRolloutCheckStatus,
+  formatRhetorizabilityRolloutStatus,
+} from './rhetorizability-ui'
+import {
+  executeMorphizabilityAdminAction,
+  fetchMorphizabilityAdminSummary,
+  fetchMorphizabilityRollout,
+  formatMorphizabilityAdminAction,
+  formatMorphizabilityDomain,
+  formatMorphizabilityRolloutCheckStatus,
+  formatMorphizabilityRolloutStatus,
+} from './morphizability-ui'
+import {
+  executeCodifiabilityAdminAction,
+  fetchCodifiabilityAdminSummary,
+  fetchCodifiabilityRollout,
+  formatCodifiabilityAdminAction,
+  formatCodifiabilityDomain,
+  formatCodifiabilityRolloutCheckStatus,
+  formatCodifiabilityRolloutStatus,
+} from './codifiability-ui'
+import {
+  executeHermeticizabilityAdminAction,
+  fetchHermeticizabilityAdminSummary,
+  fetchHermeticizabilityRollout,
+  formatHermeticizabilityAdminAction,
+  formatHermeticizabilityDomain,
+  formatHermeticizabilityRolloutCheckStatus,
+  formatHermeticizabilityRolloutStatus,
+} from './hermeticizability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -2794,6 +2904,26 @@ function App() {
     useState<CaracterizabilityRolloutResponse | null>(null)
   const [mythicizabilityRollout, setMythicizabilityRollout] =
     useState<MythicizabilityRolloutResponse | null>(null)
+  const [semiotizabilityRollout, setSemiotizabilityRollout] =
+    useState<SemiotizabilityRolloutResponse | null>(null)
+  const [hermeneutizabilityRollout, setHermeneutizabilityRollout] =
+    useState<HermeneutizabilityRolloutResponse | null>(null)
+  const [lexicalizabilityRollout, setLexicalizabilityRollout] =
+    useState<LexicalizabilityRolloutResponse | null>(null)
+  const [semanticizabilityRollout, setSemanticizabilityRollout] =
+    useState<SemanticizabilityRolloutResponse | null>(null)
+  const [pragmatizabilityRollout, setPragmatizabilityRollout] =
+    useState<PragmatizabilityRolloutResponse | null>(null)
+  const [syntacticizabilityRollout, setSyntacticizabilityRollout] =
+    useState<SyntacticizabilityRolloutResponse | null>(null)
+  const [rhetorizabilityRollout, setRhetorizabilityRollout] =
+    useState<RhetorizabilityRolloutResponse | null>(null)
+  const [morphizabilityRollout, setMorphizabilityRollout] =
+    useState<MorphizabilityRolloutResponse | null>(null)
+  const [codifiabilityRollout, setCodifiabilityRollout] =
+    useState<CodifiabilityRolloutResponse | null>(null)
+  const [hermeticizabilityRollout, setHermeticizabilityRollout] =
+    useState<HermeticizabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -3211,6 +3341,26 @@ function App() {
     useState<CaracterizabilityAdminSummaryResponse | null>(null)
   const [mythicizabilityAdminSummary, setMythicizabilityAdminSummary] =
     useState<MythicizabilityAdminSummaryResponse | null>(null)
+  const [semiotizabilityAdminSummary, setSemiotizabilityAdminSummary] =
+    useState<SemiotizabilityAdminSummaryResponse | null>(null)
+  const [hermeneutizabilityAdminSummary, setHermeneutizabilityAdminSummary] =
+    useState<HermeneutizabilityAdminSummaryResponse | null>(null)
+  const [lexicalizabilityAdminSummary, setLexicalizabilityAdminSummary] =
+    useState<LexicalizabilityAdminSummaryResponse | null>(null)
+  const [semanticizabilityAdminSummary, setSemanticizabilityAdminSummary] =
+    useState<SemanticizabilityAdminSummaryResponse | null>(null)
+  const [pragmatizabilityAdminSummary, setPragmatizabilityAdminSummary] =
+    useState<PragmatizabilityAdminSummaryResponse | null>(null)
+  const [syntacticizabilityAdminSummary, setSyntacticizabilityAdminSummary] =
+    useState<SyntacticizabilityAdminSummaryResponse | null>(null)
+  const [rhetorizabilityAdminSummary, setRhetorizabilityAdminSummary] =
+    useState<RhetorizabilityAdminSummaryResponse | null>(null)
+  const [morphizabilityAdminSummary, setMorphizabilityAdminSummary] =
+    useState<MorphizabilityAdminSummaryResponse | null>(null)
+  const [codifiabilityAdminSummary, setCodifiabilityAdminSummary] =
+    useState<CodifiabilityAdminSummaryResponse | null>(null)
+  const [hermeticizabilityAdminSummary, setHermeticizabilityAdminSummary] =
+    useState<HermeticizabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -3719,6 +3869,36 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [mythicizabilityAdminAction, setMythicizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [semiotizabilityAdminAction, setSemiotizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [hermeneutizabilityAdminAction, setHermeneutizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [lexicalizabilityAdminAction, setLexicalizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [semanticizabilityAdminAction, setSemanticizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [pragmatizabilityAdminAction, setPragmatizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [syntacticizabilityAdminAction, setSyntacticizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [rhetorizabilityAdminAction, setRhetorizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [morphizabilityAdminAction, setMorphizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [codifiabilityAdminAction, setCodifiabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [hermeticizabilityAdminAction, setHermeticizabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -5880,6 +6060,126 @@ function App() {
         }
       })
 
+    fetchSemiotizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setSemiotizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setSemiotizabilityRollout(null)
+        }
+      })
+
+    fetchHermeneutizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setHermeneutizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setHermeneutizabilityRollout(null)
+        }
+      })
+
+    fetchLexicalizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setLexicalizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setLexicalizabilityRollout(null)
+        }
+      })
+
+    fetchSemanticizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setSemanticizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setSemanticizabilityRollout(null)
+        }
+      })
+
+    fetchPragmatizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setPragmatizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setPragmatizabilityRollout(null)
+        }
+      })
+
+    fetchSyntacticizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setSyntacticizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setSyntacticizabilityRollout(null)
+        }
+      })
+
+    fetchRhetorizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setRhetorizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setRhetorizabilityRollout(null)
+        }
+      })
+
+    fetchMorphizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setMorphizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setMorphizabilityRollout(null)
+        }
+      })
+
+    fetchCodifiabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setCodifiabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setCodifiabilityRollout(null)
+        }
+      })
+
+    fetchHermeticizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setHermeticizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setHermeticizabilityRollout(null)
+        }
+      })
+
     fetchUsageCapabilities(apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
@@ -7756,6 +8056,76 @@ function App() {
         workspaceAuthHeaders,
       )
       setMythicizabilityAdminSummary(mythicizabilityAdmin)
+
+      const semiotizabilityAdmin = await fetchSemiotizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSemiotizabilityAdminSummary(semiotizabilityAdmin)
+
+      const hermeneutizabilityAdmin = await fetchHermeneutizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setHermeneutizabilityAdminSummary(hermeneutizabilityAdmin)
+
+      const lexicalizabilityAdmin = await fetchLexicalizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setLexicalizabilityAdminSummary(lexicalizabilityAdmin)
+
+      const semanticizabilityAdmin = await fetchSemanticizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSemanticizabilityAdminSummary(semanticizabilityAdmin)
+
+      const pragmatizabilityAdmin = await fetchPragmatizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPragmatizabilityAdminSummary(pragmatizabilityAdmin)
+
+      const syntacticizabilityAdmin = await fetchSyntacticizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSyntacticizabilityAdminSummary(syntacticizabilityAdmin)
+
+      const rhetorizabilityAdmin = await fetchRhetorizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRhetorizabilityAdminSummary(rhetorizabilityAdmin)
+
+      const morphizabilityAdmin = await fetchMorphizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMorphizabilityAdminSummary(morphizabilityAdmin)
+
+      const codifiabilityAdmin = await fetchCodifiabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCodifiabilityAdminSummary(codifiabilityAdmin)
+
+      const hermeticizabilityAdmin = await fetchHermeticizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setHermeticizabilityAdminSummary(hermeticizabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -8988,6 +9358,296 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleHermeticizabilityAdminAction(
+    action: 'refresh_hermeticizability_summary',
+  ) {
+    setHermeticizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeHermeticizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchHermeticizabilityRollout(apiBaseUrl)
+      setHermeticizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run hermeticizability admin action.',
+      )
+    } finally {
+      setHermeticizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleCodifiabilityAdminAction(
+    action: 'refresh_codifiability_summary',
+  ) {
+    setCodifiabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeCodifiabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchCodifiabilityRollout(apiBaseUrl)
+      setCodifiabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run codifiability admin action.',
+      )
+    } finally {
+      setCodifiabilityAdminAction('idle')
+    }
+  }
+
+  async function handleMorphizabilityAdminAction(
+    action: 'refresh_morphizability_summary',
+  ) {
+    setMorphizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeMorphizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchMorphizabilityRollout(apiBaseUrl)
+      setMorphizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run morphizability admin action.',
+      )
+    } finally {
+      setMorphizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleRhetorizabilityAdminAction(
+    action: 'refresh_rhetorizability_summary',
+  ) {
+    setRhetorizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeRhetorizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchRhetorizabilityRollout(apiBaseUrl)
+      setRhetorizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run rhetorizability admin action.',
+      )
+    } finally {
+      setRhetorizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleSyntacticizabilityAdminAction(
+    action: 'refresh_syntacticizability_summary',
+  ) {
+    setSyntacticizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeSyntacticizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchSyntacticizabilityRollout(apiBaseUrl)
+      setSyntacticizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run syntacticizability admin action.',
+      )
+    } finally {
+      setSyntacticizabilityAdminAction('idle')
+    }
+  }
+
+  async function handlePragmatizabilityAdminAction(
+    action: 'refresh_pragmatizability_summary',
+  ) {
+    setPragmatizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executePragmatizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchPragmatizabilityRollout(apiBaseUrl)
+      setPragmatizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run pragmatizability admin action.',
+      )
+    } finally {
+      setPragmatizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleSemanticizabilityAdminAction(
+    action: 'refresh_semanticizability_summary',
+  ) {
+    setSemanticizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeSemanticizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchSemanticizabilityRollout(apiBaseUrl)
+      setSemanticizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run semanticizability admin action.',
+      )
+    } finally {
+      setSemanticizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleLexicalizabilityAdminAction(
+    action: 'refresh_lexicalizability_summary',
+  ) {
+    setLexicalizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeLexicalizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchLexicalizabilityRollout(apiBaseUrl)
+      setLexicalizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run lexicalizability admin action.',
+      )
+    } finally {
+      setLexicalizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleHermeneutizabilityAdminAction(
+    action: 'refresh_hermeneutizability_summary',
+  ) {
+    setHermeneutizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeHermeneutizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchHermeneutizabilityRollout(apiBaseUrl)
+      setHermeneutizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run hermeneutizability admin action.',
+      )
+    } finally {
+      setHermeneutizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleSemiotizabilityAdminAction(
+    action: 'refresh_semiotizability_summary',
+  ) {
+    setSemiotizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeSemiotizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchSemiotizabilityRollout(apiBaseUrl)
+      setSemiotizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run semiotizability admin action.',
+      )
+    } finally {
+      setSemiotizabilityAdminAction('idle')
     }
   }
 
@@ -18365,6 +19025,296 @@ function App() {
               ))}
             </div>
             <small>Checked at {analogizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {pragmatizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production pragmatizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${pragmatizabilityRollout.status}`}
+              >
+                {formatPragmatizabilityRolloutStatus(pragmatizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{pragmatizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {pragmatizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatPragmatizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {pragmatizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {semanticizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production semanticizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${semanticizabilityRollout.status}`}
+              >
+                {formatSemanticizabilityRolloutStatus(semanticizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{semanticizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {semanticizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatSemanticizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {semanticizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {lexicalizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production lexicalizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${lexicalizabilityRollout.status}`}
+              >
+                {formatLexicalizabilityRolloutStatus(lexicalizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{lexicalizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {lexicalizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatLexicalizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {lexicalizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {hermeneutizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production hermeneutizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${hermeneutizabilityRollout.status}`}
+              >
+                {formatHermeneutizabilityRolloutStatus(hermeneutizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{hermeneutizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {hermeneutizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatHermeneutizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {hermeneutizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {semiotizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production semiotizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${semiotizabilityRollout.status}`}
+              >
+                {formatSemiotizabilityRolloutStatus(semiotizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{semiotizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {semiotizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatSemiotizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {semiotizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {hermeticizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production hermeticizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${hermeticizabilityRollout.status}`}
+              >
+                {formatHermeticizabilityRolloutStatus(hermeticizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{hermeticizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {hermeticizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatHermeticizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {hermeticizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {codifiabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production codifiability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${codifiabilityRollout.status}`}
+              >
+                {formatCodifiabilityRolloutStatus(codifiabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{codifiabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {codifiabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatCodifiabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {codifiabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {morphizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production morphizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${morphizabilityRollout.status}`}
+              >
+                {formatMorphizabilityRolloutStatus(morphizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{morphizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {morphizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatMorphizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {morphizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {rhetorizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production rhetorizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${rhetorizabilityRollout.status}`}
+              >
+                {formatRhetorizabilityRolloutStatus(rhetorizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{rhetorizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {rhetorizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatRhetorizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {rhetorizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {syntacticizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production syntacticizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${syntacticizabilityRollout.status}`}
+              >
+                {formatSyntacticizabilityRolloutStatus(syntacticizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{syntacticizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {syntacticizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatSyntacticizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {syntacticizabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -29752,6 +30702,656 @@ function App() {
                 }
               >
                 {formatAnalogizabilityAdminAction('refresh_analogizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {pragmatizabilityAdminSummary ? (
+          <div className="billing-admin workspace-pragmatizability-admin">
+            <div className="billing-admin__header">
+              <span>Pragmatizability admin</span>
+              <strong>{pragmatizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{pragmatizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification pragmatizability</span>
+                <strong>
+                  {pragmatizabilityAdminSummary.stats.pragmatizabilityPercent}%
+                </strong>
+                <small>
+                  {pragmatizabilityAdminSummary.stats.coveredDomains}/
+                  {pragmatizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Pragmatizability signals</span>
+                <strong>{pragmatizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {pragmatizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-pragmatizability-list">
+              {pragmatizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-pragmatizability-card workspace-pragmatizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatPragmatizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {pragmatizabilityAdminSummary.availableActions.includes(
+              'refresh_pragmatizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={pragmatizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handlePragmatizabilityAdminAction(
+                    'refresh_pragmatizability_summary',
+                  )
+                }
+              >
+                {formatPragmatizabilityAdminAction('refresh_pragmatizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {semanticizabilityAdminSummary ? (
+          <div className="billing-admin workspace-semanticizability-admin">
+            <div className="billing-admin__header">
+              <span>Semanticizability admin</span>
+              <strong>{semanticizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{semanticizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice semanticizability</span>
+                <strong>
+                  {semanticizabilityAdminSummary.stats.semanticizabilityPercent}%
+                </strong>
+                <small>
+                  {semanticizabilityAdminSummary.stats.coveredDomains}/
+                  {semanticizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Semanticizability signals</span>
+                <strong>{semanticizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {semanticizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-semanticizability-list">
+              {semanticizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-semanticizability-card workspace-semanticizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatSemanticizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {semanticizabilityAdminSummary.availableActions.includes(
+              'refresh_semanticizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={semanticizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleSemanticizabilityAdminAction(
+                    'refresh_semanticizability_summary',
+                  )
+                }
+              >
+                {formatSemanticizabilityAdminAction('refresh_semanticizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {lexicalizabilityAdminSummary ? (
+          <div className="billing-admin workspace-lexicalizability-admin">
+            <div className="billing-admin__header">
+              <span>Lexicalizability admin</span>
+              <strong>{lexicalizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{lexicalizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership lexicalizability</span>
+                <strong>
+                  {lexicalizabilityAdminSummary.stats.lexicalizabilityPercent}%
+                </strong>
+                <small>
+                  {lexicalizabilityAdminSummary.stats.coveredDomains}/
+                  {lexicalizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Lexicalizability signals</span>
+                <strong>{lexicalizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {lexicalizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-lexicalizability-list">
+              {lexicalizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-lexicalizability-card workspace-lexicalizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatLexicalizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {lexicalizabilityAdminSummary.availableActions.includes(
+              'refresh_lexicalizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={lexicalizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleLexicalizabilityAdminAction(
+                    'refresh_lexicalizability_summary',
+                  )
+                }
+              >
+                {formatLexicalizabilityAdminAction('refresh_lexicalizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {hermeneutizabilityAdminSummary ? (
+          <div className="billing-admin workspace-hermeneutizability-admin">
+            <div className="billing-admin__header">
+              <span>Hermeneutizability admin</span>
+              <strong>{hermeneutizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{hermeneutizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key hermeneutizability</span>
+                <strong>
+                  {hermeneutizabilityAdminSummary.stats.hermeneutizabilityPercent}%
+                </strong>
+                <small>
+                  {hermeneutizabilityAdminSummary.stats.coveredDomains}/
+                  {hermeneutizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Hermeneutizability signals</span>
+                <strong>{hermeneutizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {hermeneutizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-hermeneutizability-list">
+              {hermeneutizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-hermeneutizability-card workspace-hermeneutizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatHermeneutizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {hermeneutizabilityAdminSummary.availableActions.includes(
+              'refresh_hermeneutizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={hermeneutizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleHermeneutizabilityAdminAction(
+                    'refresh_hermeneutizability_summary',
+                  )
+                }
+              >
+                {formatHermeneutizabilityAdminAction('refresh_hermeneutizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {semiotizabilityAdminSummary ? (
+          <div className="billing-admin workspace-semiotizability-admin">
+            <div className="billing-admin__header">
+              <span>Semiotizability admin</span>
+              <strong>{semiotizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{semiotizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan semiotizability</span>
+                <strong>
+                  {semiotizabilityAdminSummary.stats.semiotizabilityPercent}%
+                </strong>
+                <small>
+                  {semiotizabilityAdminSummary.stats.coveredDomains}/
+                  {semiotizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Semiotizability signals</span>
+                <strong>{semiotizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {semiotizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-semiotizability-list">
+              {semiotizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-semiotizability-card workspace-semiotizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatSemiotizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {semiotizabilityAdminSummary.availableActions.includes(
+              'refresh_semiotizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={semiotizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleSemiotizabilityAdminAction(
+                    'refresh_semiotizability_summary',
+                  )
+                }
+              >
+                {formatSemiotizabilityAdminAction('refresh_semiotizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {hermeticizabilityAdminSummary ? (
+          <div className="billing-admin workspace-hermeticizability-admin">
+            <div className="billing-admin__header">
+              <span>Hermeticizability admin</span>
+              <strong>{hermeticizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{hermeticizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Model health hermeticizability</span>
+                <strong>
+                  {hermeticizabilityAdminSummary.stats.hermeticizabilityPercent}%
+                </strong>
+                <small>
+                  {hermeticizabilityAdminSummary.stats.coveredDomains}/
+                  {hermeticizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Hermeticizability signals</span>
+                <strong>{hermeticizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {hermeticizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, model health events, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-hermeticizability-list">
+              {hermeticizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-hermeticizability-card workspace-hermeticizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatHermeticizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {hermeticizabilityAdminSummary.availableActions.includes(
+              'refresh_hermeticizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={hermeticizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleHermeticizabilityAdminAction(
+                    'refresh_hermeticizability_summary',
+                  )
+                }
+              >
+                {formatHermeticizabilityAdminAction('refresh_hermeticizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {codifiabilityAdminSummary ? (
+          <div className="billing-admin workspace-codifiability-admin">
+            <div className="billing-admin__header">
+              <span>Codifiability admin</span>
+              <strong>{codifiabilityAdminSummary.role}</strong>
+            </div>
+            <p>{codifiabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Provider credential codifiability</span>
+                <strong>
+                  {codifiabilityAdminSummary.stats.codifiabilityPercent}%
+                </strong>
+                <small>
+                  {codifiabilityAdminSummary.stats.coveredDomains}/
+                  {codifiabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Codifiability signals</span>
+                <strong>{codifiabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {codifiabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, provider credentials, and model registry entries'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-codifiability-list">
+              {codifiabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-codifiability-card workspace-codifiability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatCodifiabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {codifiabilityAdminSummary.availableActions.includes(
+              'refresh_codifiability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={codifiabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleCodifiabilityAdminAction(
+                    'refresh_codifiability_summary',
+                  )
+                }
+              >
+                {formatCodifiabilityAdminAction('refresh_codifiability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {morphizabilityAdminSummary ? (
+          <div className="billing-admin workspace-morphizability-admin">
+            <div className="billing-admin__header">
+              <span>Morphizability admin</span>
+              <strong>{morphizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{morphizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Workspace limit morphizability</span>
+                <strong>
+                  {morphizabilityAdminSummary.stats.morphizabilityPercent}%
+                </strong>
+                <small>
+                  {morphizabilityAdminSummary.stats.coveredDomains}/
+                  {morphizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Morphizability signals</span>
+                <strong>{morphizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {morphizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace usage limits, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-morphizability-list">
+              {morphizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-morphizability-card workspace-morphizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatMorphizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {morphizabilityAdminSummary.availableActions.includes(
+              'refresh_morphizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={morphizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleMorphizabilityAdminAction(
+                    'refresh_morphizability_summary',
+                  )
+                }
+              >
+                {formatMorphizabilityAdminAction('refresh_morphizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {rhetorizabilityAdminSummary ? (
+          <div className="billing-admin workspace-rhetorizability-admin">
+            <div className="billing-admin__header">
+              <span>Rhetorizability admin</span>
+              <strong>{rhetorizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{rhetorizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Meter usage rhetorizability</span>
+                <strong>
+                  {rhetorizabilityAdminSummary.stats.rhetorizabilityPercent}%
+                </strong>
+                <small>
+                  {rhetorizabilityAdminSummary.stats.coveredDomains}/
+                  {rhetorizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Rhetorizability signals</span>
+                <strong>{rhetorizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {rhetorizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, meter usage reports, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-rhetorizability-list">
+              {rhetorizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-rhetorizability-card workspace-rhetorizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatRhetorizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {rhetorizabilityAdminSummary.availableActions.includes(
+              'refresh_rhetorizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={rhetorizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleRhetorizabilityAdminAction(
+                    'refresh_rhetorizability_summary',
+                  )
+                }
+              >
+                {formatRhetorizabilityAdminAction('refresh_rhetorizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {syntacticizabilityAdminSummary ? (
+          <div className="billing-admin workspace-syntacticizability-admin">
+            <div className="billing-admin__header">
+              <span>Syntacticizability admin</span>
+              <strong>{syntacticizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{syntacticizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing webhook syntacticizability</span>
+                <strong>
+                  {syntacticizabilityAdminSummary.stats.syntacticizabilityPercent}%
+                </strong>
+                <small>
+                  {syntacticizabilityAdminSummary.stats.coveredDomains}/
+                  {syntacticizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Syntacticizability signals</span>
+                <strong>{syntacticizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {syntacticizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing webhook events, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-syntacticizability-list">
+              {syntacticizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-syntacticizability-card workspace-syntacticizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatSyntacticizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {syntacticizabilityAdminSummary.availableActions.includes(
+              'refresh_syntacticizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={syntacticizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleSyntacticizabilityAdminAction(
+                    'refresh_syntacticizability_summary',
+                  )
+                }
+              >
+                {formatSyntacticizabilityAdminAction('refresh_syntacticizability_summary')}
               </button>
             ) : null}
           </div>

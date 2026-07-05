@@ -796,6 +796,66 @@ Workspace traceability admin tools:
 - Only workspace owners and admins can access traceability admin endpoints.
 - The web billing panel shows traceability admin tools for authorized roles.
 
+Current `v5.200` behavior:
+
+- Production hermeticizability rollout readiness validates hermeticizability coverage and readiness through `GET /api/hermeticizability/readiness`.
+- Workspace owners and admins can inspect workspace hermeticizability metrics from `GET /api/hermeticizability/workspace/:workspaceId/admin`.
+- The web billing panel shows hermeticizability rollout checks and workspace hermeticizability admin tools.
+
+Current `v5.199` behavior:
+
+- Production codifiability rollout readiness validates codifiability coverage and readiness through `GET /api/codifiability/readiness`.
+- Workspace owners and admins can inspect workspace codifiability metrics from `GET /api/codifiability/workspace/:workspaceId/admin`.
+- The web billing panel shows codifiability rollout checks and workspace codifiability admin tools.
+
+Current `v5.198` behavior:
+
+- Production morphizability rollout readiness validates morphizability coverage and readiness through `GET /api/morphizability/readiness`.
+- Workspace owners and admins can inspect workspace morphizability metrics from `GET /api/morphizability/workspace/:workspaceId/admin`.
+- The web billing panel shows morphizability rollout checks and workspace morphizability admin tools.
+
+Current `v5.197` behavior:
+
+- Production rhetorizability rollout readiness validates rhetorizability coverage and readiness through `GET /api/rhetorizability/readiness`.
+- Workspace owners and admins can inspect workspace rhetorizability metrics from `GET /api/rhetorizability/workspace/:workspaceId/admin`.
+- The web billing panel shows rhetorizability rollout checks and workspace rhetorizability admin tools.
+
+Current `v5.196` behavior:
+
+- Production syntacticizability rollout readiness validates syntacticizability coverage and readiness through `GET /api/syntacticizability/readiness`.
+- Workspace owners and admins can inspect workspace syntacticizability metrics from `GET /api/syntacticizability/workspace/:workspaceId/admin`.
+- The web billing panel shows syntacticizability rollout checks and workspace syntacticizability admin tools.
+
+Current `v5.195` behavior:
+
+- Production pragmatizability rollout readiness validates pragmatizability coverage and readiness through `GET /api/pragmatizability/readiness`.
+- Workspace owners and admins can inspect workspace pragmatizability metrics from `GET /api/pragmatizability/workspace/:workspaceId/admin`.
+- The web billing panel shows pragmatizability rollout checks and workspace pragmatizability admin tools.
+
+Current `v5.194` behavior:
+
+- Production semanticizability rollout readiness validates semanticizability coverage and readiness through `GET /api/semanticizability/readiness`.
+- Workspace owners and admins can inspect workspace semanticizability metrics from `GET /api/semanticizability/workspace/:workspaceId/admin`.
+- The web billing panel shows semanticizability rollout checks and workspace semanticizability admin tools.
+
+Current `v5.193` behavior:
+
+- Production lexicalizability rollout readiness validates lexicalizability coverage and readiness through `GET /api/lexicalizability/readiness`.
+- Workspace owners and admins can inspect workspace lexicalizability metrics from `GET /api/lexicalizability/workspace/:workspaceId/admin`.
+- The web billing panel shows lexicalizability rollout checks and workspace lexicalizability admin tools.
+
+Current `v5.192` behavior:
+
+- Production hermeneutizability rollout readiness validates hermeneutizability coverage and readiness through `GET /api/hermeneutizability/readiness`.
+- Workspace owners and admins can inspect workspace hermeneutizability metrics from `GET /api/hermeneutizability/workspace/:workspaceId/admin`.
+- The web billing panel shows hermeneutizability rollout checks and workspace hermeneutizability admin tools.
+
+Current `v5.191` behavior:
+
+- Production semiotizability rollout readiness validates semiotizability coverage and readiness through `GET /api/semiotizability/readiness`.
+- Workspace owners and admins can inspect workspace semiotizability metrics from `GET /api/semiotizability/workspace/:workspaceId/admin`.
+- The web billing panel shows semiotizability rollout checks and workspace semiotizability admin tools.
+
 Current `v5.190` behavior:
 
 - Production mythicizability rollout readiness validates mythicizability coverage and readiness through `GET /api/mythicizability/readiness`.
