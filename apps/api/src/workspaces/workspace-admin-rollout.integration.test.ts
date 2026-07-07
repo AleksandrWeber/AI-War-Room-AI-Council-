@@ -24531,3 +24531,479 @@ describe('witnessproofizability rollout integration', () => {
       .expect(403)
   })
 })
+describe('complianceledgerizability rollout integration', () => {
+  it('reports complianceledgerizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/complianceledgerizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsComplianceledgerizabilityRollout: true,
+      supportsComplianceledgerizabilityAdminTools: true,
+      supportsBillingInvoiceComplianceledgerizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/complianceledgerizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns complianceledgerizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/complianceledgerizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        complianceledgerizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects complianceledgerizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/complianceledgerizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('notarledgerizability rollout integration', () => {
+  it('reports notarledgerizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/notarledgerizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsNotarledgerizabilityRollout: true,
+      supportsNotarledgerizabilityAdminTools: true,
+      supportsMembershipNotarledgerizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/notarledgerizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns notarledgerizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/notarledgerizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        notarledgerizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects notarledgerizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/notarledgerizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('witnessledgerizability rollout integration', () => {
+  it('reports witnessledgerizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/witnessledgerizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsWitnessledgerizabilityRollout: true,
+      supportsWitnessledgerizabilityAdminTools: true,
+      supportsIdempotencyKeyWitnessledgerizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/witnessledgerizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns witnessledgerizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/witnessledgerizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        witnessledgerizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects witnessledgerizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/witnessledgerizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('proofregistryizability rollout integration', () => {
+  it('reports proofregistryizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/proofregistryizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsProofregistryizabilityRollout: true,
+      supportsProofregistryizabilityAdminTools: true,
+      supportsShieldScanProofregistryizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/proofregistryizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns proofregistryizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/proofregistryizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        proofregistryizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects proofregistryizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/proofregistryizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('auditregistryizability rollout integration', () => {
+  it('reports auditregistryizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/auditregistryizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsAuditregistryizabilityRollout: true,
+      supportsAuditregistryizabilityAdminTools: true,
+      supportsBillingNotificationAuditregistryizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/auditregistryizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns auditregistryizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/auditregistryizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        auditregistryizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects auditregistryizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/auditregistryizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+describe('compliancejournalizability rollout integration', () => {
+  it('reports compliancejournalizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/compliancejournalizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsCompliancejournalizabilityRollout: true,
+      supportsCompliancejournalizabilityAdminTools: true,
+      supportsBillingInvoiceCompliancejournalizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/compliancejournalizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns compliancejournalizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/compliancejournalizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        compliancejournalizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects compliancejournalizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/compliancejournalizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('notarjournalizability rollout integration', () => {
+  it('reports notarjournalizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/notarjournalizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsNotarjournalizabilityRollout: true,
+      supportsNotarjournalizabilityAdminTools: true,
+      supportsMembershipNotarjournalizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/notarjournalizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns notarjournalizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/notarjournalizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        notarjournalizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects notarjournalizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/notarjournalizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('witnessjournalizability rollout integration', () => {
+  it('reports witnessjournalizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/witnessjournalizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsWitnessjournalizabilityRollout: true,
+      supportsWitnessjournalizabilityAdminTools: true,
+      supportsIdempotencyKeyWitnessjournalizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/witnessjournalizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns witnessjournalizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/witnessjournalizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        witnessjournalizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects witnessjournalizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/witnessjournalizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('proofjournalizability rollout integration', () => {
+  it('reports proofjournalizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/proofjournalizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsProofjournalizabilityRollout: true,
+      supportsProofjournalizabilityAdminTools: true,
+      supportsShieldScanProofjournalizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/proofjournalizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns proofjournalizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/proofjournalizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        proofjournalizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects proofjournalizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/proofjournalizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('auditjournalizability rollout integration', () => {
+  it('reports auditjournalizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/auditjournalizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsAuditjournalizabilityRollout: true,
+      supportsAuditjournalizabilityAdminTools: true,
+      supportsBillingNotificationAuditjournalizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/auditjournalizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns auditjournalizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/auditjournalizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        auditjournalizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects auditjournalizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/auditjournalizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})

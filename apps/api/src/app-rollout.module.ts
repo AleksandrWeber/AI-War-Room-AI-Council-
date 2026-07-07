@@ -353,6 +353,16 @@ import { TraceledgerizabilityModule } from './traceledgerizability/traceledgeriz
 import { DisclosureproofizabilityModule } from './disclosureproofizability/disclosureproofizability.module.js'
 import { RegistrarproofizabilityModule } from './registrarproofizability/registrarproofizability.module.js'
 import { WitnessproofizabilityModule } from './witnessproofizability/witnessproofizability.module.js'
+import { ComplianceledgerizabilityModule } from './complianceledgerizability/complianceledgerizability.module.js'
+import { NotarledgerizabilityModule } from './notarledgerizability/notarledgerizability.module.js'
+import { WitnessledgerizabilityModule } from './witnessledgerizability/witnessledgerizability.module.js'
+import { ProofregistryizabilityModule } from './proofregistryizability/proofregistryizability.module.js'
+import { AuditregistryizabilityModule } from './auditregistryizability/auditregistryizability.module.js'
+import { CompliancejournalizabilityModule } from './compliancejournalizability/compliancejournalizability.module.js'
+import { NotarjournalizabilityModule } from './notarjournalizability/notarjournalizability.module.js'
+import { WitnessjournalizabilityModule } from './witnessjournalizability/witnessjournalizability.module.js'
+import { ProofjournalizabilityModule } from './proofjournalizability/proofjournalizability.module.js'
+import { AuditjournalizabilityModule } from './auditjournalizability/auditjournalizability.module.js'
 
 @Module({
   imports: [
@@ -710,6 +720,16 @@ import { WitnessproofizabilityModule } from './witnessproofizability/witnessproo
     DisclosureproofizabilityModule,
     RegistrarproofizabilityModule,
     WitnessproofizabilityModule,
+    ComplianceledgerizabilityModule,
+    NotarledgerizabilityModule,
+    WitnessledgerizabilityModule,
+    ProofregistryizabilityModule,
+    AuditregistryizabilityModule,
+    CompliancejournalizabilityModule,
+    NotarjournalizabilityModule,
+    WitnessjournalizabilityModule,
+    ProofjournalizabilityModule,
+    AuditjournalizabilityModule,
   ],
   exports: [
     CustomizabilityModule,

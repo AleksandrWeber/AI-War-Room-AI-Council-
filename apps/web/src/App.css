@@ -13965,6 +13965,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-complianceledgerizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-complianceledgerizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-complianceledgerizability-card p,
+.workspace-complianceledgerizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-complianceledgerizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-complianceledgerizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-notarledgerizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-notarledgerizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-notarledgerizability-card p,
+.workspace-notarledgerizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-notarledgerizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-notarledgerizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-witnessledgerizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-witnessledgerizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-witnessledgerizability-card p,
+.workspace-witnessledgerizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-witnessledgerizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-witnessledgerizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-proofregistryizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-proofregistryizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-proofregistryizability-card p,
+.workspace-proofregistryizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-proofregistryizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-proofregistryizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-auditregistryizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-auditregistryizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-auditregistryizability-card p,
+.workspace-auditregistryizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-auditregistryizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-auditregistryizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-compliancejournalizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-compliancejournalizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-compliancejournalizability-card p,
+.workspace-compliancejournalizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-compliancejournalizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-compliancejournalizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-notarjournalizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-notarjournalizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-notarjournalizability-card p,
+.workspace-notarjournalizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-notarjournalizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-notarjournalizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-witnessjournalizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-witnessjournalizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-witnessjournalizability-card p,
+.workspace-witnessjournalizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-witnessjournalizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-witnessjournalizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-proofjournalizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-proofjournalizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-proofjournalizability-card p,
+.workspace-proofjournalizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-proofjournalizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-proofjournalizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-auditjournalizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-auditjournalizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-auditjournalizability-card p,
+.workspace-auditjournalizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-auditjournalizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-auditjournalizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;
