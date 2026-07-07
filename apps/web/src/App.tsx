@@ -914,6 +914,26 @@ import type {
   InstrumentationizabilityAdminSummaryResponse,
   TelemetryizabilityRolloutResponse,
   TelemetryizabilityAdminSummaryResponse,
+  AuditingizabilityRolloutResponse,
+  AuditingizabilityAdminSummaryResponse,
+  AccountabilityizabilityRolloutResponse,
+  AccountabilityizabilityAdminSummaryResponse,
+  TransparencyizabilityRolloutResponse,
+  TransparencyizabilityAdminSummaryResponse,
+  OversightizabilityRolloutResponse,
+  OversightizabilityAdminSummaryResponse,
+  ControlizabilityRolloutResponse,
+  ControlizabilityAdminSummaryResponse,
+  EntitlementizabilityRolloutResponse,
+  EntitlementizabilityAdminSummaryResponse,
+  PermissionizabilityRolloutResponse,
+  PermissionizabilityAdminSummaryResponse,
+  AuthorizationizabilityRolloutResponse,
+  AuthorizationizabilityAdminSummaryResponse,
+  AuthenticationizabilityRolloutResponse,
+  AuthenticationizabilityAdminSummaryResponse,
+  IdentityizabilityRolloutResponse,
+  IdentityizabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -4986,6 +5006,96 @@ import {
   formatTelemetryizabilityRolloutStatus,
 } from './telemetryizability-ui'
 import {
+  executeAuditingizabilityAdminAction,
+  fetchAuditingizabilityAdminSummary,
+  fetchAuditingizabilityRollout,
+  formatAuditingizabilityAdminAction,
+  formatAuditingizabilityDomain,
+  formatAuditingizabilityRolloutCheckStatus,
+  formatAuditingizabilityRolloutStatus,
+} from './auditingizability-ui'
+import {
+  executeAccountabilityizabilityAdminAction,
+  fetchAccountabilityizabilityAdminSummary,
+  fetchAccountabilityizabilityRollout,
+  formatAccountabilityizabilityAdminAction,
+  formatAccountabilityizabilityDomain,
+  formatAccountabilityizabilityRolloutCheckStatus,
+  formatAccountabilityizabilityRolloutStatus,
+} from './accountabilityizability-ui'
+import {
+  executeTransparencyizabilityAdminAction,
+  fetchTransparencyizabilityAdminSummary,
+  fetchTransparencyizabilityRollout,
+  formatTransparencyizabilityAdminAction,
+  formatTransparencyizabilityDomain,
+  formatTransparencyizabilityRolloutCheckStatus,
+  formatTransparencyizabilityRolloutStatus,
+} from './transparencyizability-ui'
+import {
+  executeOversightizabilityAdminAction,
+  fetchOversightizabilityAdminSummary,
+  fetchOversightizabilityRollout,
+  formatOversightizabilityAdminAction,
+  formatOversightizabilityDomain,
+  formatOversightizabilityRolloutCheckStatus,
+  formatOversightizabilityRolloutStatus,
+} from './oversightizability-ui'
+import {
+  executeControlizabilityAdminAction,
+  fetchControlizabilityAdminSummary,
+  fetchControlizabilityRollout,
+  formatControlizabilityAdminAction,
+  formatControlizabilityDomain,
+  formatControlizabilityRolloutCheckStatus,
+  formatControlizabilityRolloutStatus,
+} from './controlizability-ui'
+import {
+  executeEntitlementizabilityAdminAction,
+  fetchEntitlementizabilityAdminSummary,
+  fetchEntitlementizabilityRollout,
+  formatEntitlementizabilityAdminAction,
+  formatEntitlementizabilityDomain,
+  formatEntitlementizabilityRolloutCheckStatus,
+  formatEntitlementizabilityRolloutStatus,
+} from './entitlementizability-ui'
+import {
+  executePermissionizabilityAdminAction,
+  fetchPermissionizabilityAdminSummary,
+  fetchPermissionizabilityRollout,
+  formatPermissionizabilityAdminAction,
+  formatPermissionizabilityDomain,
+  formatPermissionizabilityRolloutCheckStatus,
+  formatPermissionizabilityRolloutStatus,
+} from './permissionizability-ui'
+import {
+  executeAuthorizationizabilityAdminAction,
+  fetchAuthorizationizabilityAdminSummary,
+  fetchAuthorizationizabilityRollout,
+  formatAuthorizationizabilityAdminAction,
+  formatAuthorizationizabilityDomain,
+  formatAuthorizationizabilityRolloutCheckStatus,
+  formatAuthorizationizabilityRolloutStatus,
+} from './authorizationizability-ui'
+import {
+  executeAuthenticationizabilityAdminAction,
+  fetchAuthenticationizabilityAdminSummary,
+  fetchAuthenticationizabilityRollout,
+  formatAuthenticationizabilityAdminAction,
+  formatAuthenticationizabilityDomain,
+  formatAuthenticationizabilityRolloutCheckStatus,
+  formatAuthenticationizabilityRolloutStatus,
+} from './authenticationizability-ui'
+import {
+  executeIdentityizabilityAdminAction,
+  fetchIdentityizabilityAdminSummary,
+  fetchIdentityizabilityRollout,
+  formatIdentityizabilityAdminAction,
+  formatIdentityizabilityDomain,
+  formatIdentityizabilityRolloutCheckStatus,
+  formatIdentityizabilityRolloutStatus,
+} from './identityizability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -6434,6 +6544,26 @@ function App() {
     useState<InstrumentationizabilityRolloutResponse | null>(null)
   const [telemetryizabilityRollout, setTelemetryizabilityRollout] =
     useState<TelemetryizabilityRolloutResponse | null>(null)
+  const [auditingizabilityRollout, setAuditingizabilityRollout] =
+    useState<AuditingizabilityRolloutResponse | null>(null)
+  const [accountabilityizabilityRollout, setAccountabilityizabilityRollout] =
+    useState<AccountabilityizabilityRolloutResponse | null>(null)
+  const [transparencyizabilityRollout, setTransparencyizabilityRollout] =
+    useState<TransparencyizabilityRolloutResponse | null>(null)
+  const [oversightizabilityRollout, setOversightizabilityRollout] =
+    useState<OversightizabilityRolloutResponse | null>(null)
+  const [controlizabilityRollout, setControlizabilityRollout] =
+    useState<ControlizabilityRolloutResponse | null>(null)
+  const [entitlementizabilityRollout, setEntitlementizabilityRollout] =
+    useState<EntitlementizabilityRolloutResponse | null>(null)
+  const [permissionizabilityRollout, setPermissionizabilityRollout] =
+    useState<PermissionizabilityRolloutResponse | null>(null)
+  const [authorizationizabilityRollout, setAuthorizationizabilityRollout] =
+    useState<AuthorizationizabilityRolloutResponse | null>(null)
+  const [authenticationizabilityRollout, setAuthenticationizabilityRollout] =
+    useState<AuthenticationizabilityRolloutResponse | null>(null)
+  const [identityizabilityRollout, setIdentityizabilityRollout] =
+    useState<IdentityizabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -7411,6 +7541,26 @@ function App() {
     useState<InstrumentationizabilityAdminSummaryResponse | null>(null)
   const [telemetryizabilityAdminSummary, setTelemetryizabilityAdminSummary] =
     useState<TelemetryizabilityAdminSummaryResponse | null>(null)
+  const [auditingizabilityAdminSummary, setAuditingizabilityAdminSummary] =
+    useState<AuditingizabilityAdminSummaryResponse | null>(null)
+  const [accountabilityizabilityAdminSummary, setAccountabilityizabilityAdminSummary] =
+    useState<AccountabilityizabilityAdminSummaryResponse | null>(null)
+  const [transparencyizabilityAdminSummary, setTransparencyizabilityAdminSummary] =
+    useState<TransparencyizabilityAdminSummaryResponse | null>(null)
+  const [oversightizabilityAdminSummary, setOversightizabilityAdminSummary] =
+    useState<OversightizabilityAdminSummaryResponse | null>(null)
+  const [controlizabilityAdminSummary, setControlizabilityAdminSummary] =
+    useState<ControlizabilityAdminSummaryResponse | null>(null)
+  const [entitlementizabilityAdminSummary, setEntitlementizabilityAdminSummary] =
+    useState<EntitlementizabilityAdminSummaryResponse | null>(null)
+  const [permissionizabilityAdminSummary, setPermissionizabilityAdminSummary] =
+    useState<PermissionizabilityAdminSummaryResponse | null>(null)
+  const [authorizationizabilityAdminSummary, setAuthorizationizabilityAdminSummary] =
+    useState<AuthorizationizabilityAdminSummaryResponse | null>(null)
+  const [authenticationizabilityAdminSummary, setAuthenticationizabilityAdminSummary] =
+    useState<AuthenticationizabilityAdminSummaryResponse | null>(null)
+  const [identityizabilityAdminSummary, setIdentityizabilityAdminSummary] =
+    useState<IdentityizabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -8759,6 +8909,36 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [telemetryizabilityAdminAction, setTelemetryizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [auditingizabilityAdminAction, setAuditingizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [accountabilityizabilityAdminAction, setAccountabilityizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [transparencyizabilityAdminAction, setTransparencyizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [oversightizabilityAdminAction, setOversightizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [controlizabilityAdminAction, setControlizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [entitlementizabilityAdminAction, setEntitlementizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [permissionizabilityAdminAction, setPermissionizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [authorizationizabilityAdminAction, setAuthorizationizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [authenticationizabilityAdminAction, setAuthenticationizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [identityizabilityAdminAction, setIdentityizabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -14280,6 +14460,126 @@ function App() {
         }
       })
 
+    fetchAuditingizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAuditingizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAuditingizabilityRollout(null)
+        }
+      })
+
+    fetchAccountabilityizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAccountabilityizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAccountabilityizabilityRollout(null)
+        }
+      })
+
+    fetchTransparencyizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setTransparencyizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTransparencyizabilityRollout(null)
+        }
+      })
+
+    fetchOversightizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setOversightizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setOversightizabilityRollout(null)
+        }
+      })
+
+    fetchControlizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setControlizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setControlizabilityRollout(null)
+        }
+      })
+
+    fetchEntitlementizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setEntitlementizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setEntitlementizabilityRollout(null)
+        }
+      })
+
+    fetchPermissionizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setPermissionizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setPermissionizabilityRollout(null)
+        }
+      })
+
+    fetchAuthorizationizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAuthorizationizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAuthorizationizabilityRollout(null)
+        }
+      })
+
+    fetchAuthenticationizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAuthenticationizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAuthenticationizabilityRollout(null)
+        }
+      })
+
+    fetchIdentityizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setIdentityizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setIdentityizabilityRollout(null)
+        }
+      })
+
     fetchUsageCapabilities(apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
@@ -18116,6 +18416,76 @@ function App() {
         workspaceAuthHeaders,
       )
       setTelemetryizabilityAdminSummary(telemetryizabilityAdmin)
+
+      const auditingizabilityAdmin = await fetchAuditingizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuditingizabilityAdminSummary(auditingizabilityAdmin)
+
+      const accountabilityizabilityAdmin = await fetchAccountabilityizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAccountabilityizabilityAdminSummary(accountabilityizabilityAdmin)
+
+      const transparencyizabilityAdmin = await fetchTransparencyizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTransparencyizabilityAdminSummary(transparencyizabilityAdmin)
+
+      const oversightizabilityAdmin = await fetchOversightizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setOversightizabilityAdminSummary(oversightizabilityAdmin)
+
+      const controlizabilityAdmin = await fetchControlizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setControlizabilityAdminSummary(controlizabilityAdmin)
+
+      const entitlementizabilityAdmin = await fetchEntitlementizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEntitlementizabilityAdminSummary(entitlementizabilityAdmin)
+
+      const permissionizabilityAdmin = await fetchPermissionizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPermissionizabilityAdminSummary(permissionizabilityAdmin)
+
+      const authorizationizabilityAdmin = await fetchAuthorizationizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuthorizationizabilityAdminSummary(authorizationizabilityAdmin)
+
+      const authenticationizabilityAdmin = await fetchAuthenticationizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuthenticationizabilityAdminSummary(authenticationizabilityAdmin)
+
+      const identityizabilityAdmin = await fetchIdentityizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIdentityizabilityAdminSummary(identityizabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -19348,6 +19718,296 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleIdentityizabilityAdminAction(
+    action: 'refresh_identityizability_summary',
+  ) {
+    setIdentityizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeIdentityizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchIdentityizabilityRollout(apiBaseUrl)
+      setIdentityizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run identityizability admin action.',
+      )
+    } finally {
+      setIdentityizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAuthenticationizabilityAdminAction(
+    action: 'refresh_authenticationizability_summary',
+  ) {
+    setAuthenticationizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAuthenticationizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAuthenticationizabilityRollout(apiBaseUrl)
+      setAuthenticationizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run authenticationizability admin action.',
+      )
+    } finally {
+      setAuthenticationizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAuthorizationizabilityAdminAction(
+    action: 'refresh_authorizationizability_summary',
+  ) {
+    setAuthorizationizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAuthorizationizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAuthorizationizabilityRollout(apiBaseUrl)
+      setAuthorizationizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run authorizationizability admin action.',
+      )
+    } finally {
+      setAuthorizationizabilityAdminAction('idle')
+    }
+  }
+
+  async function handlePermissionizabilityAdminAction(
+    action: 'refresh_permissionizability_summary',
+  ) {
+    setPermissionizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executePermissionizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchPermissionizabilityRollout(apiBaseUrl)
+      setPermissionizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run permissionizability admin action.',
+      )
+    } finally {
+      setPermissionizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleEntitlementizabilityAdminAction(
+    action: 'refresh_entitlementizability_summary',
+  ) {
+    setEntitlementizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeEntitlementizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchEntitlementizabilityRollout(apiBaseUrl)
+      setEntitlementizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run entitlementizability admin action.',
+      )
+    } finally {
+      setEntitlementizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleControlizabilityAdminAction(
+    action: 'refresh_controlizability_summary',
+  ) {
+    setControlizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeControlizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchControlizabilityRollout(apiBaseUrl)
+      setControlizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run controlizability admin action.',
+      )
+    } finally {
+      setControlizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleOversightizabilityAdminAction(
+    action: 'refresh_oversightizability_summary',
+  ) {
+    setOversightizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeOversightizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchOversightizabilityRollout(apiBaseUrl)
+      setOversightizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run oversightizability admin action.',
+      )
+    } finally {
+      setOversightizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleTransparencyizabilityAdminAction(
+    action: 'refresh_transparencyizability_summary',
+  ) {
+    setTransparencyizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeTransparencyizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchTransparencyizabilityRollout(apiBaseUrl)
+      setTransparencyizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run transparencyizability admin action.',
+      )
+    } finally {
+      setTransparencyizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAccountabilityizabilityAdminAction(
+    action: 'refresh_accountabilityizability_summary',
+  ) {
+    setAccountabilityizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAccountabilityizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAccountabilityizabilityRollout(apiBaseUrl)
+      setAccountabilityizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run accountabilityizability admin action.',
+      )
+    } finally {
+      setAccountabilityizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAuditingizabilityAdminAction(
+    action: 'refresh_auditingizability_summary',
+  ) {
+    setAuditingizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAuditingizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAuditingizabilityRollout(apiBaseUrl)
+      setAuditingizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run auditingizability admin action.',
+      )
+    } finally {
+      setAuditingizabilityAdminAction('idle')
     }
   }
 
@@ -44965,6 +45625,296 @@ function App() {
               ))}
             </div>
             <small>Checked at {certificationizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {controlizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production controlizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${controlizabilityRollout.status}`}
+              >
+                {formatControlizabilityRolloutStatus(controlizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{controlizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {controlizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatControlizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {controlizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {oversightizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production oversightizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${oversightizabilityRollout.status}`}
+              >
+                {formatOversightizabilityRolloutStatus(oversightizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{oversightizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {oversightizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatOversightizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {oversightizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {transparencyizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production transparencyizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${transparencyizabilityRollout.status}`}
+              >
+                {formatTransparencyizabilityRolloutStatus(transparencyizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{transparencyizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {transparencyizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatTransparencyizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {transparencyizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {accountabilityizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production accountabilityizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${accountabilityizabilityRollout.status}`}
+              >
+                {formatAccountabilityizabilityRolloutStatus(accountabilityizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{accountabilityizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {accountabilityizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAccountabilityizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {accountabilityizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {auditingizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production auditingizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${auditingizabilityRollout.status}`}
+              >
+                {formatAuditingizabilityRolloutStatus(auditingizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{auditingizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {auditingizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAuditingizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {auditingizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {identityizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production identityizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${identityizabilityRollout.status}`}
+              >
+                {formatIdentityizabilityRolloutStatus(identityizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{identityizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {identityizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatIdentityizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {identityizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {authenticationizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production authenticationizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${authenticationizabilityRollout.status}`}
+              >
+                {formatAuthenticationizabilityRolloutStatus(authenticationizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{authenticationizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {authenticationizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAuthenticationizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {authenticationizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {authorizationizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production authorizationizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${authorizationizabilityRollout.status}`}
+              >
+                {formatAuthorizationizabilityRolloutStatus(authorizationizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{authorizationizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {authorizationizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAuthorizationizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {authorizationizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {permissionizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production permissionizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${permissionizabilityRollout.status}`}
+              >
+                {formatPermissionizabilityRolloutStatus(permissionizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{permissionizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {permissionizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatPermissionizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {permissionizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {entitlementizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production entitlementizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${entitlementizabilityRollout.status}`}
+              >
+                {formatEntitlementizabilityRolloutStatus(entitlementizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{entitlementizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {entitlementizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatEntitlementizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {entitlementizabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -74552,6 +75502,656 @@ function App() {
                 }
               >
                 {formatCertificationizabilityAdminAction('refresh_certificationizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {controlizabilityAdminSummary ? (
+          <div className="billing-admin workspace-controlizability-admin">
+            <div className="billing-admin__header">
+              <span>Controlizability admin</span>
+              <strong>{controlizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{controlizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification controlizability</span>
+                <strong>
+                  {controlizabilityAdminSummary.stats.controlizabilityPercent}%
+                </strong>
+                <small>
+                  {controlizabilityAdminSummary.stats.coveredDomains}/
+                  {controlizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Controlizability signals</span>
+                <strong>{controlizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {controlizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-controlizability-list">
+              {controlizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-controlizability-card workspace-controlizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatControlizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {controlizabilityAdminSummary.availableActions.includes(
+              'refresh_controlizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={controlizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleControlizabilityAdminAction(
+                    'refresh_controlizability_summary',
+                  )
+                }
+              >
+                {formatControlizabilityAdminAction('refresh_controlizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {oversightizabilityAdminSummary ? (
+          <div className="billing-admin workspace-oversightizability-admin">
+            <div className="billing-admin__header">
+              <span>Oversightizability admin</span>
+              <strong>{oversightizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{oversightizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan oversightizability</span>
+                <strong>
+                  {oversightizabilityAdminSummary.stats.oversightizabilityPercent}%
+                </strong>
+                <small>
+                  {oversightizabilityAdminSummary.stats.coveredDomains}/
+                  {oversightizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Oversightizability signals</span>
+                <strong>{oversightizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {oversightizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-oversightizability-list">
+              {oversightizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-oversightizability-card workspace-oversightizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatOversightizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {oversightizabilityAdminSummary.availableActions.includes(
+              'refresh_oversightizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={oversightizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleOversightizabilityAdminAction(
+                    'refresh_oversightizability_summary',
+                  )
+                }
+              >
+                {formatOversightizabilityAdminAction('refresh_oversightizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {transparencyizabilityAdminSummary ? (
+          <div className="billing-admin workspace-transparencyizability-admin">
+            <div className="billing-admin__header">
+              <span>Transparencyizability admin</span>
+              <strong>{transparencyizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{transparencyizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key transparencyizability</span>
+                <strong>
+                  {transparencyizabilityAdminSummary.stats.transparencyizabilityPercent}%
+                </strong>
+                <small>
+                  {transparencyizabilityAdminSummary.stats.coveredDomains}/
+                  {transparencyizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Transparencyizability signals</span>
+                <strong>{transparencyizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {transparencyizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-transparencyizability-list">
+              {transparencyizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-transparencyizability-card workspace-transparencyizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatTransparencyizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {transparencyizabilityAdminSummary.availableActions.includes(
+              'refresh_transparencyizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={transparencyizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleTransparencyizabilityAdminAction(
+                    'refresh_transparencyizability_summary',
+                  )
+                }
+              >
+                {formatTransparencyizabilityAdminAction('refresh_transparencyizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {accountabilityizabilityAdminSummary ? (
+          <div className="billing-admin workspace-accountabilityizability-admin">
+            <div className="billing-admin__header">
+              <span>Accountabilityizability admin</span>
+              <strong>{accountabilityizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{accountabilityizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership accountabilityizability</span>
+                <strong>
+                  {accountabilityizabilityAdminSummary.stats.accountabilityizabilityPercent}%
+                </strong>
+                <small>
+                  {accountabilityizabilityAdminSummary.stats.coveredDomains}/
+                  {accountabilityizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Accountabilityizability signals</span>
+                <strong>{accountabilityizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {accountabilityizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-accountabilityizability-list">
+              {accountabilityizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-accountabilityizability-card workspace-accountabilityizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAccountabilityizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {accountabilityizabilityAdminSummary.availableActions.includes(
+              'refresh_accountabilityizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={accountabilityizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAccountabilityizabilityAdminAction(
+                    'refresh_accountabilityizability_summary',
+                  )
+                }
+              >
+                {formatAccountabilityizabilityAdminAction('refresh_accountabilityizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {auditingizabilityAdminSummary ? (
+          <div className="billing-admin workspace-auditingizability-admin">
+            <div className="billing-admin__header">
+              <span>Auditingizability admin</span>
+              <strong>{auditingizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{auditingizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice auditingizability</span>
+                <strong>
+                  {auditingizabilityAdminSummary.stats.auditingizabilityPercent}%
+                </strong>
+                <small>
+                  {auditingizabilityAdminSummary.stats.coveredDomains}/
+                  {auditingizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Auditingizability signals</span>
+                <strong>{auditingizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {auditingizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-auditingizability-list">
+              {auditingizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-auditingizability-card workspace-auditingizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAuditingizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {auditingizabilityAdminSummary.availableActions.includes(
+              'refresh_auditingizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={auditingizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAuditingizabilityAdminAction(
+                    'refresh_auditingizability_summary',
+                  )
+                }
+              >
+                {formatAuditingizabilityAdminAction('refresh_auditingizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {identityizabilityAdminSummary ? (
+          <div className="billing-admin workspace-identityizability-admin">
+            <div className="billing-admin__header">
+              <span>Identityizability admin</span>
+              <strong>{identityizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{identityizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification identityizability</span>
+                <strong>
+                  {identityizabilityAdminSummary.stats.identityizabilityPercent}%
+                </strong>
+                <small>
+                  {identityizabilityAdminSummary.stats.coveredDomains}/
+                  {identityizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Identityizability signals</span>
+                <strong>{identityizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {identityizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-identityizability-list">
+              {identityizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-identityizability-card workspace-identityizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatIdentityizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {identityizabilityAdminSummary.availableActions.includes(
+              'refresh_identityizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={identityizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleIdentityizabilityAdminAction(
+                    'refresh_identityizability_summary',
+                  )
+                }
+              >
+                {formatIdentityizabilityAdminAction('refresh_identityizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {authenticationizabilityAdminSummary ? (
+          <div className="billing-admin workspace-authenticationizability-admin">
+            <div className="billing-admin__header">
+              <span>Authenticationizability admin</span>
+              <strong>{authenticationizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{authenticationizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan authenticationizability</span>
+                <strong>
+                  {authenticationizabilityAdminSummary.stats.authenticationizabilityPercent}%
+                </strong>
+                <small>
+                  {authenticationizabilityAdminSummary.stats.coveredDomains}/
+                  {authenticationizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Authenticationizability signals</span>
+                <strong>{authenticationizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {authenticationizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-authenticationizability-list">
+              {authenticationizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-authenticationizability-card workspace-authenticationizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAuthenticationizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {authenticationizabilityAdminSummary.availableActions.includes(
+              'refresh_authenticationizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={authenticationizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAuthenticationizabilityAdminAction(
+                    'refresh_authenticationizability_summary',
+                  )
+                }
+              >
+                {formatAuthenticationizabilityAdminAction('refresh_authenticationizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {authorizationizabilityAdminSummary ? (
+          <div className="billing-admin workspace-authorizationizability-admin">
+            <div className="billing-admin__header">
+              <span>Authorizationizability admin</span>
+              <strong>{authorizationizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{authorizationizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key authorizationizability</span>
+                <strong>
+                  {authorizationizabilityAdminSummary.stats.authorizationizabilityPercent}%
+                </strong>
+                <small>
+                  {authorizationizabilityAdminSummary.stats.coveredDomains}/
+                  {authorizationizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Authorizationizability signals</span>
+                <strong>{authorizationizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {authorizationizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-authorizationizability-list">
+              {authorizationizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-authorizationizability-card workspace-authorizationizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAuthorizationizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {authorizationizabilityAdminSummary.availableActions.includes(
+              'refresh_authorizationizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={authorizationizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAuthorizationizabilityAdminAction(
+                    'refresh_authorizationizability_summary',
+                  )
+                }
+              >
+                {formatAuthorizationizabilityAdminAction('refresh_authorizationizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {permissionizabilityAdminSummary ? (
+          <div className="billing-admin workspace-permissionizability-admin">
+            <div className="billing-admin__header">
+              <span>Permissionizability admin</span>
+              <strong>{permissionizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{permissionizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership permissionizability</span>
+                <strong>
+                  {permissionizabilityAdminSummary.stats.permissionizabilityPercent}%
+                </strong>
+                <small>
+                  {permissionizabilityAdminSummary.stats.coveredDomains}/
+                  {permissionizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Permissionizability signals</span>
+                <strong>{permissionizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {permissionizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-permissionizability-list">
+              {permissionizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-permissionizability-card workspace-permissionizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatPermissionizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {permissionizabilityAdminSummary.availableActions.includes(
+              'refresh_permissionizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={permissionizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handlePermissionizabilityAdminAction(
+                    'refresh_permissionizability_summary',
+                  )
+                }
+              >
+                {formatPermissionizabilityAdminAction('refresh_permissionizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {entitlementizabilityAdminSummary ? (
+          <div className="billing-admin workspace-entitlementizability-admin">
+            <div className="billing-admin__header">
+              <span>Entitlementizability admin</span>
+              <strong>{entitlementizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{entitlementizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice entitlementizability</span>
+                <strong>
+                  {entitlementizabilityAdminSummary.stats.entitlementizabilityPercent}%
+                </strong>
+                <small>
+                  {entitlementizabilityAdminSummary.stats.coveredDomains}/
+                  {entitlementizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Entitlementizability signals</span>
+                <strong>{entitlementizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {entitlementizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-entitlementizability-list">
+              {entitlementizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-entitlementizability-card workspace-entitlementizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatEntitlementizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {entitlementizabilityAdminSummary.availableActions.includes(
+              'refresh_entitlementizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={entitlementizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleEntitlementizabilityAdminAction(
+                    'refresh_entitlementizability_summary',
+                  )
+                }
+              >
+                {formatEntitlementizabilityAdminAction('refresh_entitlementizability_summary')}
               </button>
             ) : null}
           </div>

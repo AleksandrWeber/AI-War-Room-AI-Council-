@@ -293,6 +293,16 @@ import { AccreditationizabilityModule } from './accreditationizability/accredita
 import { SpecificationizabilityModule } from './specificationizability/specificationizability.module.js'
 import { InstrumentationizabilityModule } from './instrumentationizability/instrumentationizability.module.js'
 import { TelemetryizabilityModule } from './telemetryizability/telemetryizability.module.js'
+import { AuditingizabilityModule } from './auditingizability/auditingizability.module.js'
+import { AccountabilityizabilityModule } from './accountabilityizability/accountabilityizability.module.js'
+import { TransparencyizabilityModule } from './transparencyizability/transparencyizability.module.js'
+import { OversightizabilityModule } from './oversightizability/oversightizability.module.js'
+import { ControlizabilityModule } from './controlizability/controlizability.module.js'
+import { EntitlementizabilityModule } from './entitlementizability/entitlementizability.module.js'
+import { PermissionizabilityModule } from './permissionizability/permissionizability.module.js'
+import { AuthorizationizabilityModule } from './authorizationizability/authorizationizability.module.js'
+import { AuthenticationizabilityModule } from './authenticationizability/authenticationizability.module.js'
+import { IdentityizabilityModule } from './identityizability/identityizability.module.js'
 
 @Module({
   imports: [
@@ -590,6 +600,16 @@ import { TelemetryizabilityModule } from './telemetryizability/telemetryizabilit
     SpecificationizabilityModule,
     InstrumentationizabilityModule,
     TelemetryizabilityModule,
+    AuditingizabilityModule,
+    AccountabilityizabilityModule,
+    TransparencyizabilityModule,
+    OversightizabilityModule,
+    ControlizabilityModule,
+    EntitlementizabilityModule,
+    PermissionizabilityModule,
+    AuthorizationizabilityModule,
+    AuthenticationizabilityModule,
+    IdentityizabilityModule,
   ],
   exports: [
     CustomizabilityModule,
