@@ -114,6 +114,13 @@ VITE_API_URL=http://127.0.0.1:3006/api npm run dev --workspace @ai-war-room/web 
 npm run quality:gate
 ```
 
+`quality:gate` now runs the API reliability gate (`test:gate`) with retry-aware checks.
+You can tune the API test duration budget with `API_TEST_MAX_MS`:
+
+```bash
+API_TEST_MAX_MS=90000 npm run test:gate --workspace @ai-war-room/api
+```
+
 Run the local persistence gate:
 
 ```bash
