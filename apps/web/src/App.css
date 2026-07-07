@@ -15005,6 +15005,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-attributabilityvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-attributabilityvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-attributabilityvaultizability-card p,
+.workspace-attributabilityvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-attributabilityvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-attributabilityvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-identifiabilityvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-identifiabilityvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-identifiabilityvaultizability-card p,
+.workspace-identifiabilityvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-identifiabilityvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-identifiabilityvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-comparabilityvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-comparabilityvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-comparabilityvaultizability-card p,
+.workspace-comparabilityvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-comparabilityvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-comparabilityvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-distinguishabilityvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-distinguishabilityvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-distinguishabilityvaultizability-card p,
+.workspace-distinguishabilityvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-distinguishabilityvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-distinguishabilityvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-assignabilityvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-assignabilityvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-assignabilityvaultizability-card p,
+.workspace-assignabilityvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-assignabilityvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-assignabilityvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-referencabilityvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-referencabilityvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-referencabilityvaultizability-card p,
+.workspace-referencabilityvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-referencabilityvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-referencabilityvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-locatabilityvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-locatabilityvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-locatabilityvaultizability-card p,
+.workspace-locatabilityvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-locatabilityvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-locatabilityvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-retrievabilityvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-retrievabilityvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-retrievabilityvaultizability-card p,
+.workspace-retrievabilityvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-retrievabilityvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-retrievabilityvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-discoverabilityvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-discoverabilityvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-discoverabilityvaultizability-card p,
+.workspace-discoverabilityvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-discoverabilityvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-discoverabilityvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-navigabilityvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-navigabilityvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-navigabilityvaultizability-card p,
+.workspace-navigabilityvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-navigabilityvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-navigabilityvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

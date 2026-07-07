@@ -1115,6 +1115,26 @@ import type {
   SubstantiabilityvaultizabilityAdminSummaryResponse,
   WarrantabilityvaultizabilityRolloutResponse,
   WarrantabilityvaultizabilityAdminSummaryResponse,
+  AttributabilityvaultizabilityRolloutResponse,
+  AttributabilityvaultizabilityAdminSummaryResponse,
+  IdentifiabilityvaultizabilityRolloutResponse,
+  IdentifiabilityvaultizabilityAdminSummaryResponse,
+  ComparabilityvaultizabilityRolloutResponse,
+  ComparabilityvaultizabilityAdminSummaryResponse,
+  DistinguishabilityvaultizabilityRolloutResponse,
+  DistinguishabilityvaultizabilityAdminSummaryResponse,
+  AssignabilityvaultizabilityRolloutResponse,
+  AssignabilityvaultizabilityAdminSummaryResponse,
+  ReferencabilityvaultizabilityRolloutResponse,
+  ReferencabilityvaultizabilityAdminSummaryResponse,
+  LocatabilityvaultizabilityRolloutResponse,
+  LocatabilityvaultizabilityAdminSummaryResponse,
+  RetrievabilityvaultizabilityRolloutResponse,
+  RetrievabilityvaultizabilityAdminSummaryResponse,
+  DiscoverabilityvaultizabilityRolloutResponse,
+  DiscoverabilityvaultizabilityAdminSummaryResponse,
+  NavigabilityvaultizabilityRolloutResponse,
+  NavigabilityvaultizabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -2755,6 +2775,26 @@ function App() {
     useState<SubstantiabilityvaultizabilityRolloutResponse | null>(null)
   const [warrantabilityvaultizabilityRollout, setWarrantabilityvaultizabilityRollout] =
     useState<WarrantabilityvaultizabilityRolloutResponse | null>(null)
+  const [attributabilityvaultizabilityRollout, setAttributabilityvaultizabilityRollout] =
+    useState<AttributabilityvaultizabilityRolloutResponse | null>(null)
+  const [identifiabilityvaultizabilityRollout, setIdentifiabilityvaultizabilityRollout] =
+    useState<IdentifiabilityvaultizabilityRolloutResponse | null>(null)
+  const [comparabilityvaultizabilityRollout, setComparabilityvaultizabilityRollout] =
+    useState<ComparabilityvaultizabilityRolloutResponse | null>(null)
+  const [distinguishabilityvaultizabilityRollout, setDistinguishabilityvaultizabilityRollout] =
+    useState<DistinguishabilityvaultizabilityRolloutResponse | null>(null)
+  const [assignabilityvaultizabilityRollout, setAssignabilityvaultizabilityRollout] =
+    useState<AssignabilityvaultizabilityRolloutResponse | null>(null)
+  const [referencabilityvaultizabilityRollout, setReferencabilityvaultizabilityRollout] =
+    useState<ReferencabilityvaultizabilityRolloutResponse | null>(null)
+  const [locatabilityvaultizabilityRollout, setLocatabilityvaultizabilityRollout] =
+    useState<LocatabilityvaultizabilityRolloutResponse | null>(null)
+  const [retrievabilityvaultizabilityRollout, setRetrievabilityvaultizabilityRollout] =
+    useState<RetrievabilityvaultizabilityRolloutResponse | null>(null)
+  const [discoverabilityvaultizabilityRollout, setDiscoverabilityvaultizabilityRollout] =
+    useState<DiscoverabilityvaultizabilityRolloutResponse | null>(null)
+  const [navigabilityvaultizabilityRollout, setNavigabilityvaultizabilityRollout] =
+    useState<NavigabilityvaultizabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -3932,6 +3972,26 @@ function App() {
     useState<SubstantiabilityvaultizabilityAdminSummaryResponse | null>(null)
   const [warrantabilityvaultizabilityAdminSummary, setWarrantabilityvaultizabilityAdminSummary] =
     useState<WarrantabilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [attributabilityvaultizabilityAdminSummary, setAttributabilityvaultizabilityAdminSummary] =
+    useState<AttributabilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [identifiabilityvaultizabilityAdminSummary, setIdentifiabilityvaultizabilityAdminSummary] =
+    useState<IdentifiabilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [comparabilityvaultizabilityAdminSummary, setComparabilityvaultizabilityAdminSummary] =
+    useState<ComparabilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [distinguishabilityvaultizabilityAdminSummary, setDistinguishabilityvaultizabilityAdminSummary] =
+    useState<DistinguishabilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [assignabilityvaultizabilityAdminSummary, setAssignabilityvaultizabilityAdminSummary] =
+    useState<AssignabilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [referencabilityvaultizabilityAdminSummary, setReferencabilityvaultizabilityAdminSummary] =
+    useState<ReferencabilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [locatabilityvaultizabilityAdminSummary, setLocatabilityvaultizabilityAdminSummary] =
+    useState<LocatabilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [retrievabilityvaultizabilityAdminSummary, setRetrievabilityvaultizabilityAdminSummary] =
+    useState<RetrievabilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [discoverabilityvaultizabilityAdminSummary, setDiscoverabilityvaultizabilityAdminSummary] =
+    useState<DiscoverabilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [navigabilityvaultizabilityAdminSummary, setNavigabilityvaultizabilityAdminSummary] =
+    useState<NavigabilityvaultizabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -5580,6 +5640,36 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [warrantabilityvaultizabilityAdminAction, setWarrantabilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [attributabilityvaultizabilityAdminAction, setAttributabilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [identifiabilityvaultizabilityAdminAction, setIdentifiabilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [comparabilityvaultizabilityAdminAction, setComparabilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [distinguishabilityvaultizabilityAdminAction, setDistinguishabilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [assignabilityvaultizabilityAdminAction, setAssignabilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [referencabilityvaultizabilityAdminAction, setReferencabilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [locatabilityvaultizabilityAdminAction, setLocatabilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [retrievabilityvaultizabilityAdminAction, setRetrievabilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [discoverabilityvaultizabilityAdminAction, setDiscoverabilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [navigabilityvaultizabilityAdminAction, setNavigabilityvaultizabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -12315,6 +12405,126 @@ function App() {
         }
       })
 
+    callUi('attributabilityvaultizability-ui', 'fetchAttributabilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAttributabilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAttributabilityvaultizabilityRollout(null)
+        }
+      })
+
+    callUi('identifiabilityvaultizability-ui', 'fetchIdentifiabilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setIdentifiabilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setIdentifiabilityvaultizabilityRollout(null)
+        }
+      })
+
+    callUi('comparabilityvaultizability-ui', 'fetchComparabilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setComparabilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setComparabilityvaultizabilityRollout(null)
+        }
+      })
+
+    callUi('distinguishabilityvaultizability-ui', 'fetchDistinguishabilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setDistinguishabilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDistinguishabilityvaultizabilityRollout(null)
+        }
+      })
+
+    callUi('assignabilityvaultizability-ui', 'fetchAssignabilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAssignabilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAssignabilityvaultizabilityRollout(null)
+        }
+      })
+
+    callUi('referencabilityvaultizability-ui', 'fetchReferencabilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setReferencabilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setReferencabilityvaultizabilityRollout(null)
+        }
+      })
+
+    callUi('locatabilityvaultizability-ui', 'fetchLocatabilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setLocatabilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setLocatabilityvaultizabilityRollout(null)
+        }
+      })
+
+    callUi('retrievabilityvaultizability-ui', 'fetchRetrievabilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setRetrievabilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setRetrievabilityvaultizabilityRollout(null)
+        }
+      })
+
+    callUi('discoverabilityvaultizability-ui', 'fetchDiscoverabilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setDiscoverabilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDiscoverabilityvaultizabilityRollout(null)
+        }
+      })
+
+    callUi('navigabilityvaultizability-ui', 'fetchNavigabilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setNavigabilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setNavigabilityvaultizabilityRollout(null)
+        }
+      })
+
     fetchUsageCapabilities(apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
@@ -16777,6 +16987,76 @@ function App() {
         workspaceAuthHeaders,
       )
       setWarrantabilityvaultizabilityAdminSummary(warrantabilityvaultizabilityAdmin)
+
+      const attributabilityvaultizabilityAdmin = await callUi('attributabilityvaultizability-ui', 'fetchAttributabilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAttributabilityvaultizabilityAdminSummary(attributabilityvaultizabilityAdmin)
+
+      const identifiabilityvaultizabilityAdmin = await callUi('identifiabilityvaultizability-ui', 'fetchIdentifiabilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIdentifiabilityvaultizabilityAdminSummary(identifiabilityvaultizabilityAdmin)
+
+      const comparabilityvaultizabilityAdmin = await callUi('comparabilityvaultizability-ui', 'fetchComparabilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setComparabilityvaultizabilityAdminSummary(comparabilityvaultizabilityAdmin)
+
+      const distinguishabilityvaultizabilityAdmin = await callUi('distinguishabilityvaultizability-ui', 'fetchDistinguishabilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDistinguishabilityvaultizabilityAdminSummary(distinguishabilityvaultizabilityAdmin)
+
+      const assignabilityvaultizabilityAdmin = await callUi('assignabilityvaultizability-ui', 'fetchAssignabilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAssignabilityvaultizabilityAdminSummary(assignabilityvaultizabilityAdmin)
+
+      const referencabilityvaultizabilityAdmin = await callUi('referencabilityvaultizability-ui', 'fetchReferencabilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReferencabilityvaultizabilityAdminSummary(referencabilityvaultizabilityAdmin)
+
+      const locatabilityvaultizabilityAdmin = await callUi('locatabilityvaultizability-ui', 'fetchLocatabilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setLocatabilityvaultizabilityAdminSummary(locatabilityvaultizabilityAdmin)
+
+      const retrievabilityvaultizabilityAdmin = await callUi('retrievabilityvaultizability-ui', 'fetchRetrievabilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRetrievabilityvaultizabilityAdminSummary(retrievabilityvaultizabilityAdmin)
+
+      const discoverabilityvaultizabilityAdmin = await callUi('discoverabilityvaultizability-ui', 'fetchDiscoverabilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDiscoverabilityvaultizabilityAdminSummary(discoverabilityvaultizabilityAdmin)
+
+      const navigabilityvaultizabilityAdmin = await callUi('navigabilityvaultizability-ui', 'fetchNavigabilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNavigabilityvaultizabilityAdminSummary(navigabilityvaultizabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -18095,6 +18375,296 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleNavigabilityvaultizabilityAdminAction(
+    action: 'refresh_navigabilityvaultizability_summary',
+  ) {
+    setNavigabilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('navigabilityvaultizability-ui', 'executeNavigabilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('navigabilityvaultizability-ui', 'fetchNavigabilityvaultizabilityRollout', apiBaseUrl)
+      setNavigabilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run navigabilityvaultizability admin action.',
+      )
+    } finally {
+      setNavigabilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleDiscoverabilityvaultizabilityAdminAction(
+    action: 'refresh_discoverabilityvaultizability_summary',
+  ) {
+    setDiscoverabilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('discoverabilityvaultizability-ui', 'executeDiscoverabilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('discoverabilityvaultizability-ui', 'fetchDiscoverabilityvaultizabilityRollout', apiBaseUrl)
+      setDiscoverabilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run discoverabilityvaultizability admin action.',
+      )
+    } finally {
+      setDiscoverabilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleRetrievabilityvaultizabilityAdminAction(
+    action: 'refresh_retrievabilityvaultizability_summary',
+  ) {
+    setRetrievabilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('retrievabilityvaultizability-ui', 'executeRetrievabilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('retrievabilityvaultizability-ui', 'fetchRetrievabilityvaultizabilityRollout', apiBaseUrl)
+      setRetrievabilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run retrievabilityvaultizability admin action.',
+      )
+    } finally {
+      setRetrievabilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleLocatabilityvaultizabilityAdminAction(
+    action: 'refresh_locatabilityvaultizability_summary',
+  ) {
+    setLocatabilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('locatabilityvaultizability-ui', 'executeLocatabilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('locatabilityvaultizability-ui', 'fetchLocatabilityvaultizabilityRollout', apiBaseUrl)
+      setLocatabilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run locatabilityvaultizability admin action.',
+      )
+    } finally {
+      setLocatabilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleReferencabilityvaultizabilityAdminAction(
+    action: 'refresh_referencabilityvaultizability_summary',
+  ) {
+    setReferencabilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('referencabilityvaultizability-ui', 'executeReferencabilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('referencabilityvaultizability-ui', 'fetchReferencabilityvaultizabilityRollout', apiBaseUrl)
+      setReferencabilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run referencabilityvaultizability admin action.',
+      )
+    } finally {
+      setReferencabilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAssignabilityvaultizabilityAdminAction(
+    action: 'refresh_assignabilityvaultizability_summary',
+  ) {
+    setAssignabilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('assignabilityvaultizability-ui', 'executeAssignabilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('assignabilityvaultizability-ui', 'fetchAssignabilityvaultizabilityRollout', apiBaseUrl)
+      setAssignabilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run assignabilityvaultizability admin action.',
+      )
+    } finally {
+      setAssignabilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleDistinguishabilityvaultizabilityAdminAction(
+    action: 'refresh_distinguishabilityvaultizability_summary',
+  ) {
+    setDistinguishabilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('distinguishabilityvaultizability-ui', 'executeDistinguishabilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('distinguishabilityvaultizability-ui', 'fetchDistinguishabilityvaultizabilityRollout', apiBaseUrl)
+      setDistinguishabilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run distinguishabilityvaultizability admin action.',
+      )
+    } finally {
+      setDistinguishabilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleComparabilityvaultizabilityAdminAction(
+    action: 'refresh_comparabilityvaultizability_summary',
+  ) {
+    setComparabilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('comparabilityvaultizability-ui', 'executeComparabilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('comparabilityvaultizability-ui', 'fetchComparabilityvaultizabilityRollout', apiBaseUrl)
+      setComparabilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run comparabilityvaultizability admin action.',
+      )
+    } finally {
+      setComparabilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleIdentifiabilityvaultizabilityAdminAction(
+    action: 'refresh_identifiabilityvaultizability_summary',
+  ) {
+    setIdentifiabilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('identifiabilityvaultizability-ui', 'executeIdentifiabilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('identifiabilityvaultizability-ui', 'fetchIdentifiabilityvaultizabilityRollout', apiBaseUrl)
+      setIdentifiabilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run identifiabilityvaultizability admin action.',
+      )
+    } finally {
+      setIdentifiabilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAttributabilityvaultizabilityAdminAction(
+    action: 'refresh_attributabilityvaultizability_summary',
+  ) {
+    setAttributabilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('attributabilityvaultizability-ui', 'executeAttributabilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('attributabilityvaultizability-ui', 'fetchAttributabilityvaultizabilityRollout', apiBaseUrl)
+      setAttributabilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run attributabilityvaultizability admin action.',
+      )
+    } finally {
+      setAttributabilityvaultizabilityAdminAction('idle')
     }
   }
 
@@ -33540,6 +34110,7 @@ function App() {
             assessabilityRollout,
             assessabilityvaultizabilityRollout,
             assignabilityRollout,
+            assignabilityvaultizabilityRollout,
             assuranceRollout,
             assuranceizabilityRollout,
             assurancevaultizabilityRollout,
@@ -33551,6 +34122,7 @@ function App() {
             attestledgerizabilityRollout,
             attesttrackizabilityRollout,
             attributabilityRollout,
+            attributabilityvaultizabilityRollout,
             auditTrailRollout,
             auditabilityRollout,
             auditabilityvaultizabilityRollout,
@@ -33615,6 +34187,7 @@ function App() {
             compactionizabilityRollout,
             compactizabilityRollout,
             comparabilityRollout,
+            comparabilityvaultizabilityRollout,
             comparizabilityRollout,
             compatibilityRollout,
             compatibilizabilityRollout,
@@ -33688,10 +34261,12 @@ function App() {
             disclosureizabilityRollout,
             disclosureproofizabilityRollout,
             discoverabilityRollout,
+            discoverabilityvaultizabilityRollout,
             discoveryizabilityRollout,
             dispatchizabilityRollout,
             distinctivenessRollout,
             distinguishabilityRollout,
+            distinguishabilityvaultizabilityRollout,
             distributizabilityRollout,
             documentizabilityRollout,
             dramatizabilityRollout,
@@ -33758,6 +34333,7 @@ function App() {
             iconizabilityRollout,
             idempotencyRollout,
             identifiabilityRollout,
+            identifiabilityvaultizabilityRollout,
             identityizabilityRollout,
             identityproofizabilityRollout,
             illustratabilityRollout,
@@ -33801,6 +34377,7 @@ function App() {
             llmRollout,
             loadbalancizabilityRollout,
             locatabilityRollout,
+            locatabilityvaultizabilityRollout,
             maintainabilityRollout,
             maintainabilizabilityRollout,
             manageabilityRollout,
@@ -33833,6 +34410,7 @@ function App() {
             nackizabilityRollout,
             narratabilityRollout,
             navigabilityRollout,
+            navigabilityvaultizabilityRollout,
             negotiabilityRollout,
             networkizabilityRollout,
             nodelizabilityRollout,
@@ -33914,6 +34492,7 @@ function App() {
             reduceizabilityRollout,
             redundizabilityRollout,
             referencabilityRollout,
+            referencabilityvaultizabilityRollout,
             referencizabilityRollout,
             refreshizabilityRollout,
             registrarizabilityRollout,
@@ -33942,6 +34521,7 @@ function App() {
             restoreizabilityRollout,
             retentionizabilityRollout,
             retrievabilityRollout,
+            retrievabilityvaultizabilityRollout,
             retrodictizabilityRollout,
             retryizabilityRollout,
             reviewabilityRollout,
@@ -34230,7 +34810,9 @@ function App() {
             assessabilityAdminSummary,
             assessabilityvaultizabilityAdminSummary,
             assignabilityAdminAction,
+            assignabilityvaultizabilityAdminAction,
             assignabilityAdminSummary,
+            assignabilityvaultizabilityAdminSummary,
             assuranceAdminAction,
             assuranceAdminSummary,
             assuranceizabilityAdminAction,
@@ -34252,7 +34834,9 @@ function App() {
             attesttrackizabilityAdminAction,
             attesttrackizabilityAdminSummary,
             attributabilityAdminAction,
+            attributabilityvaultizabilityAdminAction,
             attributabilityAdminSummary,
+            attributabilityvaultizabilityAdminSummary,
             auditAdminAction,
             auditAdminSummary,
             auditabilityAdminAction,
@@ -34378,7 +34962,9 @@ function App() {
             compactizabilityAdminAction,
             compactizabilityAdminSummary,
             comparabilityAdminAction,
+            comparabilityvaultizabilityAdminAction,
             comparabilityAdminSummary,
+            comparabilityvaultizabilityAdminSummary,
             comparizabilityAdminAction,
             comparizabilityAdminSummary,
             compatibilityAdminAction,
@@ -34522,7 +35108,9 @@ function App() {
             disclosureproofizabilityAdminAction,
             disclosureproofizabilityAdminSummary,
             discoverabilityAdminAction,
+            discoverabilityvaultizabilityAdminAction,
             discoverabilityAdminSummary,
+            discoverabilityvaultizabilityAdminSummary,
             discoveryizabilityAdminAction,
             discoveryizabilityAdminSummary,
             dispatchizabilityAdminAction,
@@ -34530,7 +35118,9 @@ function App() {
             distinctivenessAdminAction,
             distinctivenessAdminSummary,
             distinguishabilityAdminAction,
+            distinguishabilityvaultizabilityAdminAction,
             distinguishabilityAdminSummary,
+            distinguishabilityvaultizabilityAdminSummary,
             distributizabilityAdminAction,
             distributizabilityAdminSummary,
             documentizabilityAdminAction,
@@ -34667,6 +35257,7 @@ function App() {
             handleAssessabilityAdminAction,
             handleAssessabilityvaultizabilityAdminAction,
             handleAssignabilityAdminAction,
+            handleAssignabilityvaultizabilityAdminAction,
             handleAssuranceAdminAction,
             handleAssuranceizabilityAdminAction,
             handleAssurancevaultizabilityAdminAction,
@@ -34678,6 +35269,7 @@ function App() {
             handleAttestledgerizabilityAdminAction,
             handleAttesttrackizabilityAdminAction,
             handleAttributabilityAdminAction,
+            handleAttributabilityvaultizabilityAdminAction,
             handleAuditAdminAction,
             handleAuditabilityAdminAction,
             handleAuditabilityvaultizabilityAdminAction,
@@ -34741,6 +35333,7 @@ function App() {
             handleCompactionizabilityAdminAction,
             handleCompactizabilityAdminAction,
             handleComparabilityAdminAction,
+            handleComparabilityvaultizabilityAdminAction,
             handleComparizabilityAdminAction,
             handleCompatibilityAdminAction,
             handleCompatibilizabilityAdminAction,
@@ -34813,10 +35406,12 @@ function App() {
             handleDisclosureizabilityAdminAction,
             handleDisclosureproofizabilityAdminAction,
             handleDiscoverabilityAdminAction,
+            handleDiscoverabilityvaultizabilityAdminAction,
             handleDiscoveryizabilityAdminAction,
             handleDispatchizabilityAdminAction,
             handleDistinctivenessAdminAction,
             handleDistinguishabilityAdminAction,
+            handleDistinguishabilityvaultizabilityAdminAction,
             handleDistributizabilityAdminAction,
             handleDocumentizabilityAdminAction,
             handleDramatizabilityAdminAction,
@@ -34882,6 +35477,7 @@ function App() {
             handleHydrationizabilityAdminAction,
             handleIconizabilityAdminAction,
             handleIdentifiabilityAdminAction,
+            handleIdentifiabilityvaultizabilityAdminAction,
             handleIdentityizabilityAdminAction,
             handleIdentityproofizabilityAdminAction,
             handleIllustratabilityAdminAction,
@@ -34924,6 +35520,7 @@ function App() {
             handleLinkabilityAdminAction,
             handleLoadbalancizabilityAdminAction,
             handleLocatabilityAdminAction,
+            handleLocatabilityvaultizabilityAdminAction,
             handleMaintainabilityAdminAction,
             handleMaintainabilizabilityAdminAction,
             handleManageabilityAdminAction,
@@ -34954,6 +35551,7 @@ function App() {
             handleNackizabilityAdminAction,
             handleNarratabilityAdminAction,
             handleNavigabilityAdminAction,
+            handleNavigabilityvaultizabilityAdminAction,
             handleNegotiabilityAdminAction,
             handleNetworkizabilityAdminAction,
             handleNodelizabilityAdminAction,
@@ -35032,6 +35630,7 @@ function App() {
             handleReduceizabilityAdminAction,
             handleRedundizabilityAdminAction,
             handleReferencabilityAdminAction,
+            handleReferencabilityvaultizabilityAdminAction,
             handleReferencizabilityAdminAction,
             handleRefreshizabilityAdminAction,
             handleRegistrarizabilityAdminAction,
@@ -35059,6 +35658,7 @@ function App() {
             handleRestoreizabilityAdminAction,
             handleRetentionizabilityAdminAction,
             handleRetrievabilityAdminAction,
+            handleRetrievabilityvaultizabilityAdminAction,
             handleRetrodictizabilityAdminAction,
             handleRetryizabilityAdminAction,
             handleReviewabilityAdminAction,
@@ -35198,7 +35798,9 @@ function App() {
             iconizabilityAdminAction,
             iconizabilityAdminSummary,
             identifiabilityAdminAction,
+            identifiabilityvaultizabilityAdminAction,
             identifiabilityAdminSummary,
+            identifiabilityvaultizabilityAdminSummary,
             identityizabilityAdminAction,
             identityizabilityAdminSummary,
             identityproofizabilityAdminAction,
@@ -35282,7 +35884,9 @@ function App() {
             loadbalancizabilityAdminAction,
             loadbalancizabilityAdminSummary,
             locatabilityAdminAction,
+            locatabilityvaultizabilityAdminAction,
             locatabilityAdminSummary,
+            locatabilityvaultizabilityAdminSummary,
             maintainabilityAdminAction,
             maintainabilityAdminSummary,
             maintainabilizabilityAdminAction,
@@ -35342,7 +35946,9 @@ function App() {
             narratabilityAdminAction,
             narratabilityAdminSummary,
             navigabilityAdminAction,
+            navigabilityvaultizabilityAdminAction,
             navigabilityAdminSummary,
+            navigabilityvaultizabilityAdminSummary,
             negotiabilityAdminAction,
             negotiabilityAdminSummary,
             networkizabilityAdminAction,
@@ -35498,7 +36104,9 @@ function App() {
             redundizabilityAdminAction,
             redundizabilityAdminSummary,
             referencabilityAdminAction,
+            referencabilityvaultizabilityAdminAction,
             referencabilityAdminSummary,
+            referencabilityvaultizabilityAdminSummary,
             referencizabilityAdminAction,
             referencizabilityAdminSummary,
             refreshizabilityAdminAction,
@@ -35552,7 +36160,9 @@ function App() {
             retentionizabilityAdminAction,
             retentionizabilityAdminSummary,
             retrievabilityAdminAction,
+            retrievabilityvaultizabilityAdminAction,
             retrievabilityAdminSummary,
+            retrievabilityvaultizabilityAdminSummary,
             retrodictizabilityAdminAction,
             retrodictizabilityAdminSummary,
             retryizabilityAdminAction,

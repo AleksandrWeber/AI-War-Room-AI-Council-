@@ -29,6 +29,30 @@ const batches = [
       ['credibilityvaultizability', 'warrantabilityvaultizability'],
     ],
   },
+  {
+    source: 'milestones-v1061-v1065.mjs',
+    target: 'milestones-v1071-v1075.mjs',
+    versionBase: 571,
+    replacements: [
+      ['defensibilityvaultizability', 'attributabilityvaultizability'],
+      ['explainabilityvaultizability', 'identifiabilityvaultizability'],
+      ['demonstrabilityvaultizability', 'comparabilityvaultizability'],
+      ['justifiabilityvaultizability', 'distinguishabilityvaultizability'],
+      ['reviewabilityvaultizability', 'assignabilityvaultizability'],
+    ],
+  },
+  {
+    source: 'milestones-v1066-v1070.mjs',
+    target: 'milestones-v1076-v1080.mjs',
+    versionBase: 576,
+    replacements: [
+      ['assessabilityvaultizability', 'referencabilityvaultizability'],
+      ['measurabilityvaultizability', 'locatabilityvaultizability'],
+      ['certifiabilityvaultizability', 'retrievabilityvaultizability'],
+      ['substantiabilityvaultizability', 'discoverabilityvaultizability'],
+      ['warrantabilityvaultizability', 'navigabilityvaultizability'],
+    ],
+  },
 ]
 
 function capitalizeModule(name) {

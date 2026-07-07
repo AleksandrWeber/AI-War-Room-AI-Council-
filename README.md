@@ -1463,6 +1463,66 @@ Current `v5.326` behavior:
 - Workspace owners and admins can inspect workspace compatibilizability metrics from `GET /api/compatibilizability/workspace/:workspaceId/admin`.
 - The web billing panel shows compatibilizability rollout checks and workspace compatibilizability admin tools.
 
+Current `v5.580` behavior:
+
+- Production navigabilityvaultizability rollout readiness validates navigabilityvaultizability coverage and readiness through `GET /api/navigabilityvaultizability/readiness`.
+- Workspace owners and admins can inspect workspace navigabilityvaultizability metrics from `GET /api/navigabilityvaultizability/workspace/:workspaceId/admin`.
+- The web billing panel shows navigabilityvaultizability rollout checks and workspace navigabilityvaultizability admin tools.
+
+Current `v5.579` behavior:
+
+- Production discoverabilityvaultizability rollout readiness validates discoverabilityvaultizability coverage and readiness through `GET /api/discoverabilityvaultizability/readiness`.
+- Workspace owners and admins can inspect workspace discoverabilityvaultizability metrics from `GET /api/discoverabilityvaultizability/workspace/:workspaceId/admin`.
+- The web billing panel shows discoverabilityvaultizability rollout checks and workspace discoverabilityvaultizability admin tools.
+
+Current `v5.578` behavior:
+
+- Production retrievabilityvaultizability rollout readiness validates retrievabilityvaultizability coverage and readiness through `GET /api/retrievabilityvaultizability/readiness`.
+- Workspace owners and admins can inspect workspace retrievabilityvaultizability metrics from `GET /api/retrievabilityvaultizability/workspace/:workspaceId/admin`.
+- The web billing panel shows retrievabilityvaultizability rollout checks and workspace retrievabilityvaultizability admin tools.
+
+Current `v5.577` behavior:
+
+- Production locatabilityvaultizability rollout readiness validates locatabilityvaultizability coverage and readiness through `GET /api/locatabilityvaultizability/readiness`.
+- Workspace owners and admins can inspect workspace locatabilityvaultizability metrics from `GET /api/locatabilityvaultizability/workspace/:workspaceId/admin`.
+- The web billing panel shows locatabilityvaultizability rollout checks and workspace locatabilityvaultizability admin tools.
+
+Current `v5.576` behavior:
+
+- Production referencabilityvaultizability rollout readiness validates referencabilityvaultizability coverage and readiness through `GET /api/referencabilityvaultizability/readiness`.
+- Workspace owners and admins can inspect workspace referencabilityvaultizability metrics from `GET /api/referencabilityvaultizability/workspace/:workspaceId/admin`.
+- The web billing panel shows referencabilityvaultizability rollout checks and workspace referencabilityvaultizability admin tools.
+
+Current `v5.575` behavior:
+
+- Production assignabilityvaultizability rollout readiness validates assignabilityvaultizability coverage and readiness through `GET /api/assignabilityvaultizability/readiness`.
+- Workspace owners and admins can inspect workspace assignabilityvaultizability metrics from `GET /api/assignabilityvaultizability/workspace/:workspaceId/admin`.
+- The web billing panel shows assignabilityvaultizability rollout checks and workspace assignabilityvaultizability admin tools.
+
+Current `v5.574` behavior:
+
+- Production distinguishabilityvaultizability rollout readiness validates distinguishabilityvaultizability coverage and readiness through `GET /api/distinguishabilityvaultizability/readiness`.
+- Workspace owners and admins can inspect workspace distinguishabilityvaultizability metrics from `GET /api/distinguishabilityvaultizability/workspace/:workspaceId/admin`.
+- The web billing panel shows distinguishabilityvaultizability rollout checks and workspace distinguishabilityvaultizability admin tools.
+
+Current `v5.573` behavior:
+
+- Production comparabilityvaultizability rollout readiness validates comparabilityvaultizability coverage and readiness through `GET /api/comparabilityvaultizability/readiness`.
+- Workspace owners and admins can inspect workspace comparabilityvaultizability metrics from `GET /api/comparabilityvaultizability/workspace/:workspaceId/admin`.
+- The web billing panel shows comparabilityvaultizability rollout checks and workspace comparabilityvaultizability admin tools.
+
+Current `v5.572` behavior:
+
+- Production identifiabilityvaultizability rollout readiness validates identifiabilityvaultizability coverage and readiness through `GET /api/identifiabilityvaultizability/readiness`.
+- Workspace owners and admins can inspect workspace identifiabilityvaultizability metrics from `GET /api/identifiabilityvaultizability/workspace/:workspaceId/admin`.
+- The web billing panel shows identifiabilityvaultizability rollout checks and workspace identifiabilityvaultizability admin tools.
+
+Current `v5.571` behavior:
+
+- Production attributabilityvaultizability rollout readiness validates attributabilityvaultizability coverage and readiness through `GET /api/attributabilityvaultizability/readiness`.
+- Workspace owners and admins can inspect workspace attributabilityvaultizability metrics from `GET /api/attributabilityvaultizability/workspace/:workspaceId/admin`.
+- The web billing panel shows attributabilityvaultizability rollout checks and workspace attributabilityvaultizability admin tools.
+
 Current `v5.570` behavior:
 
 - Production warrantabilityvaultizability rollout readiness validates warrantabilityvaultizability coverage and readiness through `GET /api/warrantabilityvaultizability/readiness`.

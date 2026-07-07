@@ -393,6 +393,16 @@ import { MeasurabilityvaultizabilityModule } from './measurabilityvaultizability
 import { CertifiabilityvaultizabilityModule } from './certifiabilityvaultizability/certifiabilityvaultizability.module.js'
 import { SubstantiabilityvaultizabilityModule } from './substantiabilityvaultizability/substantiabilityvaultizability.module.js'
 import { WarrantabilityvaultizabilityModule } from './warrantabilityvaultizability/warrantabilityvaultizability.module.js'
+import { AttributabilityvaultizabilityModule } from './attributabilityvaultizability/attributabilityvaultizability.module.js'
+import { IdentifiabilityvaultizabilityModule } from './identifiabilityvaultizability/identifiabilityvaultizability.module.js'
+import { ComparabilityvaultizabilityModule } from './comparabilityvaultizability/comparabilityvaultizability.module.js'
+import { DistinguishabilityvaultizabilityModule } from './distinguishabilityvaultizability/distinguishabilityvaultizability.module.js'
+import { AssignabilityvaultizabilityModule } from './assignabilityvaultizability/assignabilityvaultizability.module.js'
+import { ReferencabilityvaultizabilityModule } from './referencabilityvaultizability/referencabilityvaultizability.module.js'
+import { LocatabilityvaultizabilityModule } from './locatabilityvaultizability/locatabilityvaultizability.module.js'
+import { RetrievabilityvaultizabilityModule } from './retrievabilityvaultizability/retrievabilityvaultizability.module.js'
+import { DiscoverabilityvaultizabilityModule } from './discoverabilityvaultizability/discoverabilityvaultizability.module.js'
+import { NavigabilityvaultizabilityModule } from './navigabilityvaultizability/navigabilityvaultizability.module.js'
 
 @Module({
   imports: [
@@ -790,6 +800,16 @@ import { WarrantabilityvaultizabilityModule } from './warrantabilityvaultizabili
     CertifiabilityvaultizabilityModule,
     SubstantiabilityvaultizabilityModule,
     WarrantabilityvaultizabilityModule,
+    AttributabilityvaultizabilityModule,
+    IdentifiabilityvaultizabilityModule,
+    ComparabilityvaultizabilityModule,
+    DistinguishabilityvaultizabilityModule,
+    AssignabilityvaultizabilityModule,
+    ReferencabilityvaultizabilityModule,
+    LocatabilityvaultizabilityModule,
+    RetrievabilityvaultizabilityModule,
+    DiscoverabilityvaultizabilityModule,
+    NavigabilityvaultizabilityModule,
   ],
   exports: [
     CustomizabilityModule,

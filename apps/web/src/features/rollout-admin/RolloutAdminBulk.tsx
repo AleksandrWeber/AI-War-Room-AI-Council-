@@ -580,6 +580,46 @@ import {
   formatWarrantabilityvaultizabilityRolloutStatus,
 } from '../../warrantabilityvaultizability-ui'
 import {
+  formatAssignabilityvaultizabilityRolloutCheckStatus,
+  formatAssignabilityvaultizabilityRolloutStatus,
+} from '../../assignabilityvaultizability-ui'
+import {
+  formatNavigabilityvaultizabilityRolloutCheckStatus,
+  formatNavigabilityvaultizabilityRolloutStatus,
+} from '../../navigabilityvaultizability-ui'
+import {
+  formatDiscoverabilityvaultizabilityRolloutCheckStatus,
+  formatDiscoverabilityvaultizabilityRolloutStatus,
+} from '../../discoverabilityvaultizability-ui'
+import {
+  formatRetrievabilityvaultizabilityRolloutCheckStatus,
+  formatRetrievabilityvaultizabilityRolloutStatus,
+} from '../../retrievabilityvaultizability-ui'
+import {
+  formatLocatabilityvaultizabilityRolloutCheckStatus,
+  formatLocatabilityvaultizabilityRolloutStatus,
+} from '../../locatabilityvaultizability-ui'
+import {
+  formatReferencabilityvaultizabilityRolloutCheckStatus,
+  formatReferencabilityvaultizabilityRolloutStatus,
+} from '../../referencabilityvaultizability-ui'
+import {
+  formatDistinguishabilityvaultizabilityRolloutCheckStatus,
+  formatDistinguishabilityvaultizabilityRolloutStatus,
+} from '../../distinguishabilityvaultizability-ui'
+import {
+  formatComparabilityvaultizabilityRolloutCheckStatus,
+  formatComparabilityvaultizabilityRolloutStatus,
+} from '../../comparabilityvaultizability-ui'
+import {
+  formatIdentifiabilityvaultizabilityRolloutCheckStatus,
+  formatIdentifiabilityvaultizabilityRolloutStatus,
+} from '../../identifiabilityvaultizability-ui'
+import {
+  formatAttributabilityvaultizabilityRolloutCheckStatus,
+  formatAttributabilityvaultizabilityRolloutStatus,
+} from '../../attributabilityvaultizability-ui'
+import {
   formatSubstantiabilityvaultizabilityRolloutCheckStatus,
   formatSubstantiabilityvaultizabilityRolloutStatus,
 } from '../../substantiabilityvaultizability-ui'
@@ -7195,6 +7235,96 @@ export default function RolloutAdminBulk(props: RolloutAdminBulkProps) {
             rollout={props.warrantabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
             formatStatus={formatWarrantabilityvaultizabilityRolloutStatus as (status: string) => string}
             formatCheckStatus={formatWarrantabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.attributabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production attributabilityvaultizability rollout readiness"
+            rollout={props.attributabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatAttributabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatAttributabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.identifiabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production identifiabilityvaultizability rollout readiness"
+            rollout={props.identifiabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatIdentifiabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatIdentifiabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.comparabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production comparabilityvaultizability rollout readiness"
+            rollout={props.comparabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatComparabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatComparabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.distinguishabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production distinguishabilityvaultizability rollout readiness"
+            rollout={props.distinguishabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatDistinguishabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatDistinguishabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.assignabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production assignabilityvaultizability rollout readiness"
+            rollout={props.assignabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatAssignabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatAssignabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.referencabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production referencabilityvaultizability rollout readiness"
+            rollout={props.referencabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatReferencabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatReferencabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.locatabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production locatabilityvaultizability rollout readiness"
+            rollout={props.locatabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatLocatabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatLocatabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.retrievabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production retrievabilityvaultizability rollout readiness"
+            rollout={props.retrievabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatRetrievabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatRetrievabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.discoverabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production discoverabilityvaultizability rollout readiness"
+            rollout={props.discoverabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatDiscoverabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatDiscoverabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.navigabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production navigabilityvaultizability rollout readiness"
+            rollout={props.navigabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatNavigabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatNavigabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
           />
         ) : null}
     </>
