@@ -894,6 +894,26 @@ import type {
   ReconciliationizabilityAdminSummaryResponse,
   GovernanceizabilityRolloutResponse,
   GovernanceizabilityAdminSummaryResponse,
+  ComplianceizabilityRolloutResponse,
+  ComplianceizabilityAdminSummaryResponse,
+  PolicyizabilityRolloutResponse,
+  PolicyizabilityAdminSummaryResponse,
+  EnforcementizabilityRolloutResponse,
+  EnforcementizabilityAdminSummaryResponse,
+  AssuranceizabilityRolloutResponse,
+  AssuranceizabilityAdminSummaryResponse,
+  AttestationizabilityRolloutResponse,
+  AttestationizabilityAdminSummaryResponse,
+  CertificationizabilityRolloutResponse,
+  CertificationizabilityAdminSummaryResponse,
+  AccreditationizabilityRolloutResponse,
+  AccreditationizabilityAdminSummaryResponse,
+  SpecificationizabilityRolloutResponse,
+  SpecificationizabilityAdminSummaryResponse,
+  InstrumentationizabilityRolloutResponse,
+  InstrumentationizabilityAdminSummaryResponse,
+  TelemetryizabilityRolloutResponse,
+  TelemetryizabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -4876,6 +4896,96 @@ import {
   formatGovernanceizabilityRolloutStatus,
 } from './governanceizability-ui'
 import {
+  executeComplianceizabilityAdminAction,
+  fetchComplianceizabilityAdminSummary,
+  fetchComplianceizabilityRollout,
+  formatComplianceizabilityAdminAction,
+  formatComplianceizabilityDomain,
+  formatComplianceizabilityRolloutCheckStatus,
+  formatComplianceizabilityRolloutStatus,
+} from './complianceizability-ui'
+import {
+  executePolicyizabilityAdminAction,
+  fetchPolicyizabilityAdminSummary,
+  fetchPolicyizabilityRollout,
+  formatPolicyizabilityAdminAction,
+  formatPolicyizabilityDomain,
+  formatPolicyizabilityRolloutCheckStatus,
+  formatPolicyizabilityRolloutStatus,
+} from './policyizability-ui'
+import {
+  executeEnforcementizabilityAdminAction,
+  fetchEnforcementizabilityAdminSummary,
+  fetchEnforcementizabilityRollout,
+  formatEnforcementizabilityAdminAction,
+  formatEnforcementizabilityDomain,
+  formatEnforcementizabilityRolloutCheckStatus,
+  formatEnforcementizabilityRolloutStatus,
+} from './enforcementizability-ui'
+import {
+  executeAssuranceizabilityAdminAction,
+  fetchAssuranceizabilityAdminSummary,
+  fetchAssuranceizabilityRollout,
+  formatAssuranceizabilityAdminAction,
+  formatAssuranceizabilityDomain,
+  formatAssuranceizabilityRolloutCheckStatus,
+  formatAssuranceizabilityRolloutStatus,
+} from './assuranceizability-ui'
+import {
+  executeAttestationizabilityAdminAction,
+  fetchAttestationizabilityAdminSummary,
+  fetchAttestationizabilityRollout,
+  formatAttestationizabilityAdminAction,
+  formatAttestationizabilityDomain,
+  formatAttestationizabilityRolloutCheckStatus,
+  formatAttestationizabilityRolloutStatus,
+} from './attestationizability-ui'
+import {
+  executeCertificationizabilityAdminAction,
+  fetchCertificationizabilityAdminSummary,
+  fetchCertificationizabilityRollout,
+  formatCertificationizabilityAdminAction,
+  formatCertificationizabilityDomain,
+  formatCertificationizabilityRolloutCheckStatus,
+  formatCertificationizabilityRolloutStatus,
+} from './certificationizability-ui'
+import {
+  executeAccreditationizabilityAdminAction,
+  fetchAccreditationizabilityAdminSummary,
+  fetchAccreditationizabilityRollout,
+  formatAccreditationizabilityAdminAction,
+  formatAccreditationizabilityDomain,
+  formatAccreditationizabilityRolloutCheckStatus,
+  formatAccreditationizabilityRolloutStatus,
+} from './accreditationizability-ui'
+import {
+  executeSpecificationizabilityAdminAction,
+  fetchSpecificationizabilityAdminSummary,
+  fetchSpecificationizabilityRollout,
+  formatSpecificationizabilityAdminAction,
+  formatSpecificationizabilityDomain,
+  formatSpecificationizabilityRolloutCheckStatus,
+  formatSpecificationizabilityRolloutStatus,
+} from './specificationizability-ui'
+import {
+  executeInstrumentationizabilityAdminAction,
+  fetchInstrumentationizabilityAdminSummary,
+  fetchInstrumentationizabilityRollout,
+  formatInstrumentationizabilityAdminAction,
+  formatInstrumentationizabilityDomain,
+  formatInstrumentationizabilityRolloutCheckStatus,
+  formatInstrumentationizabilityRolloutStatus,
+} from './instrumentationizability-ui'
+import {
+  executeTelemetryizabilityAdminAction,
+  fetchTelemetryizabilityAdminSummary,
+  fetchTelemetryizabilityRollout,
+  formatTelemetryizabilityAdminAction,
+  formatTelemetryizabilityDomain,
+  formatTelemetryizabilityRolloutCheckStatus,
+  formatTelemetryizabilityRolloutStatus,
+} from './telemetryizability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -6304,6 +6414,26 @@ function App() {
     useState<ReconciliationizabilityRolloutResponse | null>(null)
   const [governanceizabilityRollout, setGovernanceizabilityRollout] =
     useState<GovernanceizabilityRolloutResponse | null>(null)
+  const [complianceizabilityRollout, setComplianceizabilityRollout] =
+    useState<ComplianceizabilityRolloutResponse | null>(null)
+  const [policyizabilityRollout, setPolicyizabilityRollout] =
+    useState<PolicyizabilityRolloutResponse | null>(null)
+  const [enforcementizabilityRollout, setEnforcementizabilityRollout] =
+    useState<EnforcementizabilityRolloutResponse | null>(null)
+  const [assuranceizabilityRollout, setAssuranceizabilityRollout] =
+    useState<AssuranceizabilityRolloutResponse | null>(null)
+  const [attestationizabilityRollout, setAttestationizabilityRollout] =
+    useState<AttestationizabilityRolloutResponse | null>(null)
+  const [certificationizabilityRollout, setCertificationizabilityRollout] =
+    useState<CertificationizabilityRolloutResponse | null>(null)
+  const [accreditationizabilityRollout, setAccreditationizabilityRollout] =
+    useState<AccreditationizabilityRolloutResponse | null>(null)
+  const [specificationizabilityRollout, setSpecificationizabilityRollout] =
+    useState<SpecificationizabilityRolloutResponse | null>(null)
+  const [instrumentationizabilityRollout, setInstrumentationizabilityRollout] =
+    useState<InstrumentationizabilityRolloutResponse | null>(null)
+  const [telemetryizabilityRollout, setTelemetryizabilityRollout] =
+    useState<TelemetryizabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -7261,6 +7391,26 @@ function App() {
     useState<ReconciliationizabilityAdminSummaryResponse | null>(null)
   const [governanceizabilityAdminSummary, setGovernanceizabilityAdminSummary] =
     useState<GovernanceizabilityAdminSummaryResponse | null>(null)
+  const [complianceizabilityAdminSummary, setComplianceizabilityAdminSummary] =
+    useState<ComplianceizabilityAdminSummaryResponse | null>(null)
+  const [policyizabilityAdminSummary, setPolicyizabilityAdminSummary] =
+    useState<PolicyizabilityAdminSummaryResponse | null>(null)
+  const [enforcementizabilityAdminSummary, setEnforcementizabilityAdminSummary] =
+    useState<EnforcementizabilityAdminSummaryResponse | null>(null)
+  const [assuranceizabilityAdminSummary, setAssuranceizabilityAdminSummary] =
+    useState<AssuranceizabilityAdminSummaryResponse | null>(null)
+  const [attestationizabilityAdminSummary, setAttestationizabilityAdminSummary] =
+    useState<AttestationizabilityAdminSummaryResponse | null>(null)
+  const [certificationizabilityAdminSummary, setCertificationizabilityAdminSummary] =
+    useState<CertificationizabilityAdminSummaryResponse | null>(null)
+  const [accreditationizabilityAdminSummary, setAccreditationizabilityAdminSummary] =
+    useState<AccreditationizabilityAdminSummaryResponse | null>(null)
+  const [specificationizabilityAdminSummary, setSpecificationizabilityAdminSummary] =
+    useState<SpecificationizabilityAdminSummaryResponse | null>(null)
+  const [instrumentationizabilityAdminSummary, setInstrumentationizabilityAdminSummary] =
+    useState<InstrumentationizabilityAdminSummaryResponse | null>(null)
+  const [telemetryizabilityAdminSummary, setTelemetryizabilityAdminSummary] =
+    useState<TelemetryizabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -8579,6 +8729,36 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [governanceizabilityAdminAction, setGovernanceizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [complianceizabilityAdminAction, setComplianceizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [policyizabilityAdminAction, setPolicyizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [enforcementizabilityAdminAction, setEnforcementizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [assuranceizabilityAdminAction, setAssuranceizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [attestationizabilityAdminAction, setAttestationizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [certificationizabilityAdminAction, setCertificationizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [accreditationizabilityAdminAction, setAccreditationizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [specificationizabilityAdminAction, setSpecificationizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [instrumentationizabilityAdminAction, setInstrumentationizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [telemetryizabilityAdminAction, setTelemetryizabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -13980,6 +14160,126 @@ function App() {
         }
       })
 
+    fetchComplianceizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setComplianceizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setComplianceizabilityRollout(null)
+        }
+      })
+
+    fetchPolicyizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setPolicyizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setPolicyizabilityRollout(null)
+        }
+      })
+
+    fetchEnforcementizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setEnforcementizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setEnforcementizabilityRollout(null)
+        }
+      })
+
+    fetchAssuranceizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAssuranceizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAssuranceizabilityRollout(null)
+        }
+      })
+
+    fetchAttestationizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAttestationizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAttestationizabilityRollout(null)
+        }
+      })
+
+    fetchCertificationizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setCertificationizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setCertificationizabilityRollout(null)
+        }
+      })
+
+    fetchAccreditationizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAccreditationizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAccreditationizabilityRollout(null)
+        }
+      })
+
+    fetchSpecificationizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setSpecificationizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setSpecificationizabilityRollout(null)
+        }
+      })
+
+    fetchInstrumentationizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setInstrumentationizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setInstrumentationizabilityRollout(null)
+        }
+      })
+
+    fetchTelemetryizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setTelemetryizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTelemetryizabilityRollout(null)
+        }
+      })
+
     fetchUsageCapabilities(apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
@@ -17746,6 +18046,76 @@ function App() {
         workspaceAuthHeaders,
       )
       setGovernanceizabilityAdminSummary(governanceizabilityAdmin)
+
+      const complianceizabilityAdmin = await fetchComplianceizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setComplianceizabilityAdminSummary(complianceizabilityAdmin)
+
+      const policyizabilityAdmin = await fetchPolicyizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPolicyizabilityAdminSummary(policyizabilityAdmin)
+
+      const enforcementizabilityAdmin = await fetchEnforcementizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEnforcementizabilityAdminSummary(enforcementizabilityAdmin)
+
+      const assuranceizabilityAdmin = await fetchAssuranceizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAssuranceizabilityAdminSummary(assuranceizabilityAdmin)
+
+      const attestationizabilityAdmin = await fetchAttestationizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAttestationizabilityAdminSummary(attestationizabilityAdmin)
+
+      const certificationizabilityAdmin = await fetchCertificationizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCertificationizabilityAdminSummary(certificationizabilityAdmin)
+
+      const accreditationizabilityAdmin = await fetchAccreditationizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAccreditationizabilityAdminSummary(accreditationizabilityAdmin)
+
+      const specificationizabilityAdmin = await fetchSpecificationizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSpecificationizabilityAdminSummary(specificationizabilityAdmin)
+
+      const instrumentationizabilityAdmin = await fetchInstrumentationizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setInstrumentationizabilityAdminSummary(instrumentationizabilityAdmin)
+
+      const telemetryizabilityAdmin = await fetchTelemetryizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTelemetryizabilityAdminSummary(telemetryizabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -18978,6 +19348,296 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleTelemetryizabilityAdminAction(
+    action: 'refresh_telemetryizability_summary',
+  ) {
+    setTelemetryizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeTelemetryizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchTelemetryizabilityRollout(apiBaseUrl)
+      setTelemetryizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run telemetryizability admin action.',
+      )
+    } finally {
+      setTelemetryizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleInstrumentationizabilityAdminAction(
+    action: 'refresh_instrumentationizability_summary',
+  ) {
+    setInstrumentationizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeInstrumentationizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchInstrumentationizabilityRollout(apiBaseUrl)
+      setInstrumentationizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run instrumentationizability admin action.',
+      )
+    } finally {
+      setInstrumentationizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleSpecificationizabilityAdminAction(
+    action: 'refresh_specificationizability_summary',
+  ) {
+    setSpecificationizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeSpecificationizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchSpecificationizabilityRollout(apiBaseUrl)
+      setSpecificationizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run specificationizability admin action.',
+      )
+    } finally {
+      setSpecificationizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAccreditationizabilityAdminAction(
+    action: 'refresh_accreditationizability_summary',
+  ) {
+    setAccreditationizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAccreditationizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAccreditationizabilityRollout(apiBaseUrl)
+      setAccreditationizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run accreditationizability admin action.',
+      )
+    } finally {
+      setAccreditationizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleCertificationizabilityAdminAction(
+    action: 'refresh_certificationizability_summary',
+  ) {
+    setCertificationizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeCertificationizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchCertificationizabilityRollout(apiBaseUrl)
+      setCertificationizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run certificationizability admin action.',
+      )
+    } finally {
+      setCertificationizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAttestationizabilityAdminAction(
+    action: 'refresh_attestationizability_summary',
+  ) {
+    setAttestationizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAttestationizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAttestationizabilityRollout(apiBaseUrl)
+      setAttestationizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run attestationizability admin action.',
+      )
+    } finally {
+      setAttestationizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAssuranceizabilityAdminAction(
+    action: 'refresh_assuranceizability_summary',
+  ) {
+    setAssuranceizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAssuranceizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAssuranceizabilityRollout(apiBaseUrl)
+      setAssuranceizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run assuranceizability admin action.',
+      )
+    } finally {
+      setAssuranceizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleEnforcementizabilityAdminAction(
+    action: 'refresh_enforcementizability_summary',
+  ) {
+    setEnforcementizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeEnforcementizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchEnforcementizabilityRollout(apiBaseUrl)
+      setEnforcementizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run enforcementizability admin action.',
+      )
+    } finally {
+      setEnforcementizabilityAdminAction('idle')
+    }
+  }
+
+  async function handlePolicyizabilityAdminAction(
+    action: 'refresh_policyizability_summary',
+  ) {
+    setPolicyizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executePolicyizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchPolicyizabilityRollout(apiBaseUrl)
+      setPolicyizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run policyizability admin action.',
+      )
+    } finally {
+      setPolicyizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleComplianceizabilityAdminAction(
+    action: 'refresh_complianceizability_summary',
+  ) {
+    setComplianceizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeComplianceizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchComplianceizabilityRollout(apiBaseUrl)
+      setComplianceizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run complianceizability admin action.',
+      )
+    } finally {
+      setComplianceizabilityAdminAction('idle')
     }
   }
 
@@ -44015,6 +44675,296 @@ function App() {
               ))}
             </div>
             <small>Checked at {scalingizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {attestationizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production attestationizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${attestationizabilityRollout.status}`}
+              >
+                {formatAttestationizabilityRolloutStatus(attestationizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{attestationizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {attestationizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAttestationizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {attestationizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {assuranceizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production assuranceizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${assuranceizabilityRollout.status}`}
+              >
+                {formatAssuranceizabilityRolloutStatus(assuranceizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{assuranceizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {assuranceizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAssuranceizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {assuranceizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {enforcementizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production enforcementizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${enforcementizabilityRollout.status}`}
+              >
+                {formatEnforcementizabilityRolloutStatus(enforcementizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{enforcementizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {enforcementizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatEnforcementizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {enforcementizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {policyizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production policyizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${policyizabilityRollout.status}`}
+              >
+                {formatPolicyizabilityRolloutStatus(policyizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{policyizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {policyizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatPolicyizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {policyizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {complianceizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production complianceizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${complianceizabilityRollout.status}`}
+              >
+                {formatComplianceizabilityRolloutStatus(complianceizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{complianceizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {complianceizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatComplianceizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {complianceizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {telemetryizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production telemetryizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${telemetryizabilityRollout.status}`}
+              >
+                {formatTelemetryizabilityRolloutStatus(telemetryizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{telemetryizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {telemetryizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatTelemetryizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {telemetryizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {instrumentationizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production instrumentationizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${instrumentationizabilityRollout.status}`}
+              >
+                {formatInstrumentationizabilityRolloutStatus(instrumentationizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{instrumentationizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {instrumentationizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatInstrumentationizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {instrumentationizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {specificationizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production specificationizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${specificationizabilityRollout.status}`}
+              >
+                {formatSpecificationizabilityRolloutStatus(specificationizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{specificationizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {specificationizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatSpecificationizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {specificationizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {accreditationizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production accreditationizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${accreditationizabilityRollout.status}`}
+              >
+                {formatAccreditationizabilityRolloutStatus(accreditationizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{accreditationizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {accreditationizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAccreditationizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {accreditationizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {certificationizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production certificationizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${certificationizabilityRollout.status}`}
+              >
+                {formatCertificationizabilityRolloutStatus(certificationizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{certificationizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {certificationizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatCertificationizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {certificationizabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -72952,6 +73902,656 @@ function App() {
                 }
               >
                 {formatScalingizabilityAdminAction('refresh_scalingizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {attestationizabilityAdminSummary ? (
+          <div className="billing-admin workspace-attestationizability-admin">
+            <div className="billing-admin__header">
+              <span>Attestationizability admin</span>
+              <strong>{attestationizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{attestationizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification attestationizability</span>
+                <strong>
+                  {attestationizabilityAdminSummary.stats.attestationizabilityPercent}%
+                </strong>
+                <small>
+                  {attestationizabilityAdminSummary.stats.coveredDomains}/
+                  {attestationizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Attestationizability signals</span>
+                <strong>{attestationizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {attestationizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-attestationizability-list">
+              {attestationizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-attestationizability-card workspace-attestationizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAttestationizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {attestationizabilityAdminSummary.availableActions.includes(
+              'refresh_attestationizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={attestationizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAttestationizabilityAdminAction(
+                    'refresh_attestationizability_summary',
+                  )
+                }
+              >
+                {formatAttestationizabilityAdminAction('refresh_attestationizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {assuranceizabilityAdminSummary ? (
+          <div className="billing-admin workspace-assuranceizability-admin">
+            <div className="billing-admin__header">
+              <span>Assuranceizability admin</span>
+              <strong>{assuranceizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{assuranceizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan assuranceizability</span>
+                <strong>
+                  {assuranceizabilityAdminSummary.stats.assuranceizabilityPercent}%
+                </strong>
+                <small>
+                  {assuranceizabilityAdminSummary.stats.coveredDomains}/
+                  {assuranceizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Assuranceizability signals</span>
+                <strong>{assuranceizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {assuranceizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-assuranceizability-list">
+              {assuranceizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-assuranceizability-card workspace-assuranceizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAssuranceizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {assuranceizabilityAdminSummary.availableActions.includes(
+              'refresh_assuranceizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={assuranceizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAssuranceizabilityAdminAction(
+                    'refresh_assuranceizability_summary',
+                  )
+                }
+              >
+                {formatAssuranceizabilityAdminAction('refresh_assuranceizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {enforcementizabilityAdminSummary ? (
+          <div className="billing-admin workspace-enforcementizability-admin">
+            <div className="billing-admin__header">
+              <span>Enforcementizability admin</span>
+              <strong>{enforcementizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{enforcementizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key enforcementizability</span>
+                <strong>
+                  {enforcementizabilityAdminSummary.stats.enforcementizabilityPercent}%
+                </strong>
+                <small>
+                  {enforcementizabilityAdminSummary.stats.coveredDomains}/
+                  {enforcementizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Enforcementizability signals</span>
+                <strong>{enforcementizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {enforcementizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-enforcementizability-list">
+              {enforcementizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-enforcementizability-card workspace-enforcementizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatEnforcementizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {enforcementizabilityAdminSummary.availableActions.includes(
+              'refresh_enforcementizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={enforcementizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleEnforcementizabilityAdminAction(
+                    'refresh_enforcementizability_summary',
+                  )
+                }
+              >
+                {formatEnforcementizabilityAdminAction('refresh_enforcementizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {policyizabilityAdminSummary ? (
+          <div className="billing-admin workspace-policyizability-admin">
+            <div className="billing-admin__header">
+              <span>Policyizability admin</span>
+              <strong>{policyizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{policyizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership policyizability</span>
+                <strong>
+                  {policyizabilityAdminSummary.stats.policyizabilityPercent}%
+                </strong>
+                <small>
+                  {policyizabilityAdminSummary.stats.coveredDomains}/
+                  {policyizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Policyizability signals</span>
+                <strong>{policyizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {policyizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-policyizability-list">
+              {policyizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-policyizability-card workspace-policyizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatPolicyizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {policyizabilityAdminSummary.availableActions.includes(
+              'refresh_policyizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={policyizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handlePolicyizabilityAdminAction(
+                    'refresh_policyizability_summary',
+                  )
+                }
+              >
+                {formatPolicyizabilityAdminAction('refresh_policyizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {complianceizabilityAdminSummary ? (
+          <div className="billing-admin workspace-complianceizability-admin">
+            <div className="billing-admin__header">
+              <span>Complianceizability admin</span>
+              <strong>{complianceizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{complianceizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice complianceizability</span>
+                <strong>
+                  {complianceizabilityAdminSummary.stats.complianceizabilityPercent}%
+                </strong>
+                <small>
+                  {complianceizabilityAdminSummary.stats.coveredDomains}/
+                  {complianceizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Complianceizability signals</span>
+                <strong>{complianceizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {complianceizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-complianceizability-list">
+              {complianceizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-complianceizability-card workspace-complianceizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatComplianceizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {complianceizabilityAdminSummary.availableActions.includes(
+              'refresh_complianceizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={complianceizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleComplianceizabilityAdminAction(
+                    'refresh_complianceizability_summary',
+                  )
+                }
+              >
+                {formatComplianceizabilityAdminAction('refresh_complianceizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {telemetryizabilityAdminSummary ? (
+          <div className="billing-admin workspace-telemetryizability-admin">
+            <div className="billing-admin__header">
+              <span>Telemetryizability admin</span>
+              <strong>{telemetryizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{telemetryizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification telemetryizability</span>
+                <strong>
+                  {telemetryizabilityAdminSummary.stats.telemetryizabilityPercent}%
+                </strong>
+                <small>
+                  {telemetryizabilityAdminSummary.stats.coveredDomains}/
+                  {telemetryizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Telemetryizability signals</span>
+                <strong>{telemetryizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {telemetryizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-telemetryizability-list">
+              {telemetryizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-telemetryizability-card workspace-telemetryizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatTelemetryizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {telemetryizabilityAdminSummary.availableActions.includes(
+              'refresh_telemetryizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={telemetryizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleTelemetryizabilityAdminAction(
+                    'refresh_telemetryizability_summary',
+                  )
+                }
+              >
+                {formatTelemetryizabilityAdminAction('refresh_telemetryizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {instrumentationizabilityAdminSummary ? (
+          <div className="billing-admin workspace-instrumentationizability-admin">
+            <div className="billing-admin__header">
+              <span>Instrumentationizability admin</span>
+              <strong>{instrumentationizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{instrumentationizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan instrumentationizability</span>
+                <strong>
+                  {instrumentationizabilityAdminSummary.stats.instrumentationizabilityPercent}%
+                </strong>
+                <small>
+                  {instrumentationizabilityAdminSummary.stats.coveredDomains}/
+                  {instrumentationizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Instrumentationizability signals</span>
+                <strong>{instrumentationizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {instrumentationizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-instrumentationizability-list">
+              {instrumentationizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-instrumentationizability-card workspace-instrumentationizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatInstrumentationizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {instrumentationizabilityAdminSummary.availableActions.includes(
+              'refresh_instrumentationizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={instrumentationizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleInstrumentationizabilityAdminAction(
+                    'refresh_instrumentationizability_summary',
+                  )
+                }
+              >
+                {formatInstrumentationizabilityAdminAction('refresh_instrumentationizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {specificationizabilityAdminSummary ? (
+          <div className="billing-admin workspace-specificationizability-admin">
+            <div className="billing-admin__header">
+              <span>Specificationizability admin</span>
+              <strong>{specificationizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{specificationizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key specificationizability</span>
+                <strong>
+                  {specificationizabilityAdminSummary.stats.specificationizabilityPercent}%
+                </strong>
+                <small>
+                  {specificationizabilityAdminSummary.stats.coveredDomains}/
+                  {specificationizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Specificationizability signals</span>
+                <strong>{specificationizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {specificationizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-specificationizability-list">
+              {specificationizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-specificationizability-card workspace-specificationizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatSpecificationizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {specificationizabilityAdminSummary.availableActions.includes(
+              'refresh_specificationizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={specificationizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleSpecificationizabilityAdminAction(
+                    'refresh_specificationizability_summary',
+                  )
+                }
+              >
+                {formatSpecificationizabilityAdminAction('refresh_specificationizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {accreditationizabilityAdminSummary ? (
+          <div className="billing-admin workspace-accreditationizability-admin">
+            <div className="billing-admin__header">
+              <span>Accreditationizability admin</span>
+              <strong>{accreditationizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{accreditationizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership accreditationizability</span>
+                <strong>
+                  {accreditationizabilityAdminSummary.stats.accreditationizabilityPercent}%
+                </strong>
+                <small>
+                  {accreditationizabilityAdminSummary.stats.coveredDomains}/
+                  {accreditationizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Accreditationizability signals</span>
+                <strong>{accreditationizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {accreditationizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-accreditationizability-list">
+              {accreditationizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-accreditationizability-card workspace-accreditationizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAccreditationizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {accreditationizabilityAdminSummary.availableActions.includes(
+              'refresh_accreditationizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={accreditationizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAccreditationizabilityAdminAction(
+                    'refresh_accreditationizability_summary',
+                  )
+                }
+              >
+                {formatAccreditationizabilityAdminAction('refresh_accreditationizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {certificationizabilityAdminSummary ? (
+          <div className="billing-admin workspace-certificationizability-admin">
+            <div className="billing-admin__header">
+              <span>Certificationizability admin</span>
+              <strong>{certificationizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{certificationizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice certificationizability</span>
+                <strong>
+                  {certificationizabilityAdminSummary.stats.certificationizabilityPercent}%
+                </strong>
+                <small>
+                  {certificationizabilityAdminSummary.stats.coveredDomains}/
+                  {certificationizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Certificationizability signals</span>
+                <strong>{certificationizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {certificationizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-certificationizability-list">
+              {certificationizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-certificationizability-card workspace-certificationizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatCertificationizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {certificationizabilityAdminSummary.availableActions.includes(
+              'refresh_certificationizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={certificationizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleCertificationizabilityAdminAction(
+                    'refresh_certificationizability_summary',
+                  )
+                }
+              >
+                {formatCertificationizabilityAdminAction('refresh_certificationizability_summary')}
               </button>
             ) : null}
           </div>

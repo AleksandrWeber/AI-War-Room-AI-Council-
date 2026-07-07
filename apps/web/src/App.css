@@ -12145,6 +12145,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-complianceizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-complianceizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-complianceizability-card p,
+.workspace-complianceizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-complianceizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-complianceizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-policyizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-policyizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-policyizability-card p,
+.workspace-policyizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-policyizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-policyizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-enforcementizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-enforcementizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-enforcementizability-card p,
+.workspace-enforcementizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-enforcementizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-enforcementizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-assuranceizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-assuranceizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-assuranceizability-card p,
+.workspace-assuranceizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-assuranceizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-assuranceizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-attestationizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-attestationizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-attestationizability-card p,
+.workspace-attestationizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-attestationizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-attestationizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-certificationizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-certificationizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-certificationizability-card p,
+.workspace-certificationizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-certificationizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-certificationizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-accreditationizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-accreditationizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-accreditationizability-card p,
+.workspace-accreditationizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-accreditationizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-accreditationizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-specificationizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-specificationizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-specificationizability-card p,
+.workspace-specificationizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-specificationizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-specificationizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-instrumentationizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-instrumentationizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-instrumentationizability-card p,
+.workspace-instrumentationizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-instrumentationizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-instrumentationizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-telemetryizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-telemetryizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-telemetryizability-card p,
+.workspace-telemetryizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-telemetryizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-telemetryizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

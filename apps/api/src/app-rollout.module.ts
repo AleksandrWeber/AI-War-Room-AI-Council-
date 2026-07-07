@@ -283,6 +283,16 @@ import { HealingizabilityModule } from './healingizability/healingizability.modu
 import { RemediationizabilityModule } from './remediationizability/remediationizability.module.js'
 import { ReconciliationizabilityModule } from './reconciliationizability/reconciliationizability.module.js'
 import { GovernanceizabilityModule } from './governanceizability/governanceizability.module.js'
+import { ComplianceizabilityModule } from './complianceizability/complianceizability.module.js'
+import { PolicyizabilityModule } from './policyizability/policyizability.module.js'
+import { EnforcementizabilityModule } from './enforcementizability/enforcementizability.module.js'
+import { AssuranceizabilityModule } from './assuranceizability/assuranceizability.module.js'
+import { AttestationizabilityModule } from './attestationizability/attestationizability.module.js'
+import { CertificationizabilityModule } from './certificationizability/certificationizability.module.js'
+import { AccreditationizabilityModule } from './accreditationizability/accreditationizability.module.js'
+import { SpecificationizabilityModule } from './specificationizability/specificationizability.module.js'
+import { InstrumentationizabilityModule } from './instrumentationizability/instrumentationizability.module.js'
+import { TelemetryizabilityModule } from './telemetryizability/telemetryizability.module.js'
 
 @Module({
   imports: [
@@ -570,6 +580,16 @@ import { GovernanceizabilityModule } from './governanceizability/governanceizabi
     RemediationizabilityModule,
     ReconciliationizabilityModule,
     GovernanceizabilityModule,
+    ComplianceizabilityModule,
+    PolicyizabilityModule,
+    EnforcementizabilityModule,
+    AssuranceizabilityModule,
+    AttestationizabilityModule,
+    CertificationizabilityModule,
+    AccreditationizabilityModule,
+    SpecificationizabilityModule,
+    InstrumentationizabilityModule,
+    TelemetryizabilityModule,
   ],
   exports: [
     CustomizabilityModule,
