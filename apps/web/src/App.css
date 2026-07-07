@@ -13705,6 +13705,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-compliancechainizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-compliancechainizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-compliancechainizability-card p,
+.workspace-compliancechainizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-compliancechainizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-compliancechainizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-attestledgerizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-attestledgerizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-attestledgerizability-card p,
+.workspace-attestledgerizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-attestledgerizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-attestledgerizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-evidencetrackizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-evidencetrackizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-evidencetrackizability-card p,
+.workspace-evidencetrackizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-evidencetrackizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-evidencetrackizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-prooflineizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-prooflineizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-prooflineizability-card p,
+.workspace-prooflineizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-prooflineizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-prooflineizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-notarproofizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-notarproofizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-notarproofizability-card p,
+.workspace-notarproofizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-notarproofizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-notarproofizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-auditlineizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-auditlineizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-auditlineizability-card p,
+.workspace-auditlineizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-auditlineizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-auditlineizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-traceledgerizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-traceledgerizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-traceledgerizability-card p,
+.workspace-traceledgerizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-traceledgerizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-traceledgerizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-disclosureproofizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-disclosureproofizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-disclosureproofizability-card p,
+.workspace-disclosureproofizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-disclosureproofizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-disclosureproofizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-registrarproofizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-registrarproofizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-registrarproofizability-card p,
+.workspace-registrarproofizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-registrarproofizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-registrarproofizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-witnessproofizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-witnessproofizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-witnessproofizability-card p,
+.workspace-witnessproofizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-witnessproofizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-witnessproofizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

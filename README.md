@@ -1456,7 +1456,19 @@ Current `v5.326` behavior:
 - Workspace owners and admins can inspect workspace compatibilizability metrics from `GET /api/compatibilizability/workspace/:workspaceId/admin`.
 - The web billing panel shows compatibilizability rollout checks and workspace compatibilizability admin tools.
 
-Current `v5.520` behavior:
+Current `v5.530` behavior:
+
+- Production witnessproofizability rollout readiness validates witnessproofizability coverage and readiness through `GET /api/witnessproofizability/readiness`.
+- Workspace owners and admins can inspect workspace witnessproofizability metrics from `GET /api/witnessproofizability/workspace/:workspaceId/admin`.
+- The web billing panel shows witnessproofizability rollout checks and workspace witnessproofizability admin tools.
+
+Current `v5.330` behavior:
+
+- Production notarproofizability rollout readiness validates notarproofizability coverage and readiness through `GET /api/notarproofizability/readiness`.
+- Workspace owners and admins can inspect workspace notarproofizability metrics from `GET /api/notarproofizability/workspace/:workspaceId/admin`.
+- The web billing panel shows notarproofizability rollout checks and workspace notarproofizability admin tools.
+
+Current `v5.330` behavior:
 
 - Production auditproofizability rollout readiness validates auditproofizability coverage and readiness through `GET /api/auditproofizability/readiness`.
 - Workspace owners and admins can inspect workspace auditproofizability metrics from `GET /api/auditproofizability/workspace/:workspaceId/admin`.

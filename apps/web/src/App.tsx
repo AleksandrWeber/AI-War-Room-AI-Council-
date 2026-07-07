@@ -1014,6 +1014,26 @@ import type {
   RegistrarizabilityAdminSummaryResponse,
   AuditproofizabilityRolloutResponse,
   AuditproofizabilityAdminSummaryResponse,
+  CompliancechainizabilityRolloutResponse,
+  CompliancechainizabilityAdminSummaryResponse,
+  AttestledgerizabilityRolloutResponse,
+  AttestledgerizabilityAdminSummaryResponse,
+  EvidencetrackizabilityRolloutResponse,
+  EvidencetrackizabilityAdminSummaryResponse,
+  ProoflineizabilityRolloutResponse,
+  ProoflineizabilityAdminSummaryResponse,
+  NotarproofizabilityRolloutResponse,
+  NotarproofizabilityAdminSummaryResponse,
+  AuditlineizabilityRolloutResponse,
+  AuditlineizabilityAdminSummaryResponse,
+  TraceledgerizabilityRolloutResponse,
+  TraceledgerizabilityAdminSummaryResponse,
+  DisclosureproofizabilityRolloutResponse,
+  DisclosureproofizabilityAdminSummaryResponse,
+  RegistrarproofizabilityRolloutResponse,
+  RegistrarproofizabilityAdminSummaryResponse,
+  WitnessproofizabilityRolloutResponse,
+  WitnessproofizabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -5536,6 +5556,96 @@ import {
   formatAuditproofizabilityRolloutStatus,
 } from './auditproofizability-ui'
 import {
+  executeCompliancechainizabilityAdminAction,
+  fetchCompliancechainizabilityAdminSummary,
+  fetchCompliancechainizabilityRollout,
+  formatCompliancechainizabilityAdminAction,
+  formatCompliancechainizabilityDomain,
+  formatCompliancechainizabilityRolloutCheckStatus,
+  formatCompliancechainizabilityRolloutStatus,
+} from './compliancechainizability-ui'
+import {
+  executeAttestledgerizabilityAdminAction,
+  fetchAttestledgerizabilityAdminSummary,
+  fetchAttestledgerizabilityRollout,
+  formatAttestledgerizabilityAdminAction,
+  formatAttestledgerizabilityDomain,
+  formatAttestledgerizabilityRolloutCheckStatus,
+  formatAttestledgerizabilityRolloutStatus,
+} from './attestledgerizability-ui'
+import {
+  executeEvidencetrackizabilityAdminAction,
+  fetchEvidencetrackizabilityAdminSummary,
+  fetchEvidencetrackizabilityRollout,
+  formatEvidencetrackizabilityAdminAction,
+  formatEvidencetrackizabilityDomain,
+  formatEvidencetrackizabilityRolloutCheckStatus,
+  formatEvidencetrackizabilityRolloutStatus,
+} from './evidencetrackizability-ui'
+import {
+  executeProoflineizabilityAdminAction,
+  fetchProoflineizabilityAdminSummary,
+  fetchProoflineizabilityRollout,
+  formatProoflineizabilityAdminAction,
+  formatProoflineizabilityDomain,
+  formatProoflineizabilityRolloutCheckStatus,
+  formatProoflineizabilityRolloutStatus,
+} from './prooflineizability-ui'
+import {
+  executeNotarproofizabilityAdminAction,
+  fetchNotarproofizabilityAdminSummary,
+  fetchNotarproofizabilityRollout,
+  formatNotarproofizabilityAdminAction,
+  formatNotarproofizabilityDomain,
+  formatNotarproofizabilityRolloutCheckStatus,
+  formatNotarproofizabilityRolloutStatus,
+} from './notarproofizability-ui'
+import {
+  executeAuditlineizabilityAdminAction,
+  fetchAuditlineizabilityAdminSummary,
+  fetchAuditlineizabilityRollout,
+  formatAuditlineizabilityAdminAction,
+  formatAuditlineizabilityDomain,
+  formatAuditlineizabilityRolloutCheckStatus,
+  formatAuditlineizabilityRolloutStatus,
+} from './auditlineizability-ui'
+import {
+  executeTraceledgerizabilityAdminAction,
+  fetchTraceledgerizabilityAdminSummary,
+  fetchTraceledgerizabilityRollout,
+  formatTraceledgerizabilityAdminAction,
+  formatTraceledgerizabilityDomain,
+  formatTraceledgerizabilityRolloutCheckStatus,
+  formatTraceledgerizabilityRolloutStatus,
+} from './traceledgerizability-ui'
+import {
+  executeDisclosureproofizabilityAdminAction,
+  fetchDisclosureproofizabilityAdminSummary,
+  fetchDisclosureproofizabilityRollout,
+  formatDisclosureproofizabilityAdminAction,
+  formatDisclosureproofizabilityDomain,
+  formatDisclosureproofizabilityRolloutCheckStatus,
+  formatDisclosureproofizabilityRolloutStatus,
+} from './disclosureproofizability-ui'
+import {
+  executeRegistrarproofizabilityAdminAction,
+  fetchRegistrarproofizabilityAdminSummary,
+  fetchRegistrarproofizabilityRollout,
+  formatRegistrarproofizabilityAdminAction,
+  formatRegistrarproofizabilityDomain,
+  formatRegistrarproofizabilityRolloutCheckStatus,
+  formatRegistrarproofizabilityRolloutStatus,
+} from './registrarproofizability-ui'
+import {
+  executeWitnessproofizabilityAdminAction,
+  fetchWitnessproofizabilityAdminSummary,
+  fetchWitnessproofizabilityRollout,
+  formatWitnessproofizabilityAdminAction,
+  formatWitnessproofizabilityDomain,
+  formatWitnessproofizabilityRolloutCheckStatus,
+  formatWitnessproofizabilityRolloutStatus,
+} from './witnessproofizability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -7084,6 +7194,26 @@ function App() {
     useState<RegistrarizabilityRolloutResponse | null>(null)
   const [auditproofizabilityRollout, setAuditproofizabilityRollout] =
     useState<AuditproofizabilityRolloutResponse | null>(null)
+  const [compliancechainizabilityRollout, setCompliancechainizabilityRollout] =
+    useState<CompliancechainizabilityRolloutResponse | null>(null)
+  const [attestledgerizabilityRollout, setAttestledgerizabilityRollout] =
+    useState<AttestledgerizabilityRolloutResponse | null>(null)
+  const [evidencetrackizabilityRollout, setEvidencetrackizabilityRollout] =
+    useState<EvidencetrackizabilityRolloutResponse | null>(null)
+  const [prooflineizabilityRollout, setProoflineizabilityRollout] =
+    useState<ProoflineizabilityRolloutResponse | null>(null)
+  const [notarproofizabilityRollout, setNotarproofizabilityRollout] =
+    useState<NotarproofizabilityRolloutResponse | null>(null)
+  const [auditlineizabilityRollout, setAuditlineizabilityRollout] =
+    useState<AuditlineizabilityRolloutResponse | null>(null)
+  const [traceledgerizabilityRollout, setTraceledgerizabilityRollout] =
+    useState<TraceledgerizabilityRolloutResponse | null>(null)
+  const [disclosureproofizabilityRollout, setDisclosureproofizabilityRollout] =
+    useState<DisclosureproofizabilityRolloutResponse | null>(null)
+  const [registrarproofizabilityRollout, setRegistrarproofizabilityRollout] =
+    useState<RegistrarproofizabilityRolloutResponse | null>(null)
+  const [witnessproofizabilityRollout, setWitnessproofizabilityRollout] =
+    useState<WitnessproofizabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -8161,6 +8291,26 @@ function App() {
     useState<RegistrarizabilityAdminSummaryResponse | null>(null)
   const [auditproofizabilityAdminSummary, setAuditproofizabilityAdminSummary] =
     useState<AuditproofizabilityAdminSummaryResponse | null>(null)
+  const [compliancechainizabilityAdminSummary, setCompliancechainizabilityAdminSummary] =
+    useState<CompliancechainizabilityAdminSummaryResponse | null>(null)
+  const [attestledgerizabilityAdminSummary, setAttestledgerizabilityAdminSummary] =
+    useState<AttestledgerizabilityAdminSummaryResponse | null>(null)
+  const [evidencetrackizabilityAdminSummary, setEvidencetrackizabilityAdminSummary] =
+    useState<EvidencetrackizabilityAdminSummaryResponse | null>(null)
+  const [prooflineizabilityAdminSummary, setProoflineizabilityAdminSummary] =
+    useState<ProoflineizabilityAdminSummaryResponse | null>(null)
+  const [notarproofizabilityAdminSummary, setNotarproofizabilityAdminSummary] =
+    useState<NotarproofizabilityAdminSummaryResponse | null>(null)
+  const [auditlineizabilityAdminSummary, setAuditlineizabilityAdminSummary] =
+    useState<AuditlineizabilityAdminSummaryResponse | null>(null)
+  const [traceledgerizabilityAdminSummary, setTraceledgerizabilityAdminSummary] =
+    useState<TraceledgerizabilityAdminSummaryResponse | null>(null)
+  const [disclosureproofizabilityAdminSummary, setDisclosureproofizabilityAdminSummary] =
+    useState<DisclosureproofizabilityAdminSummaryResponse | null>(null)
+  const [registrarproofizabilityAdminSummary, setRegistrarproofizabilityAdminSummary] =
+    useState<RegistrarproofizabilityAdminSummaryResponse | null>(null)
+  const [witnessproofizabilityAdminSummary, setWitnessproofizabilityAdminSummary] =
+    useState<WitnessproofizabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -9659,6 +9809,36 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [auditproofizabilityAdminAction, setAuditproofizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [compliancechainizabilityAdminAction, setCompliancechainizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [attestledgerizabilityAdminAction, setAttestledgerizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [evidencetrackizabilityAdminAction, setEvidencetrackizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [prooflineizabilityAdminAction, setProoflineizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [notarproofizabilityAdminAction, setNotarproofizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [auditlineizabilityAdminAction, setAuditlineizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [traceledgerizabilityAdminAction, setTraceledgerizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [disclosureproofizabilityAdminAction, setDisclosureproofizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [registrarproofizabilityAdminAction, setRegistrarproofizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [witnessproofizabilityAdminAction, setWitnessproofizabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -15780,6 +15960,126 @@ function App() {
         }
       })
 
+    fetchCompliancechainizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setCompliancechainizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setCompliancechainizabilityRollout(null)
+        }
+      })
+
+    fetchAttestledgerizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAttestledgerizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAttestledgerizabilityRollout(null)
+        }
+      })
+
+    fetchEvidencetrackizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setEvidencetrackizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setEvidencetrackizabilityRollout(null)
+        }
+      })
+
+    fetchProoflineizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setProoflineizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setProoflineizabilityRollout(null)
+        }
+      })
+
+    fetchNotarproofizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setNotarproofizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setNotarproofizabilityRollout(null)
+        }
+      })
+
+    fetchAuditlineizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAuditlineizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAuditlineizabilityRollout(null)
+        }
+      })
+
+    fetchTraceledgerizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setTraceledgerizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTraceledgerizabilityRollout(null)
+        }
+      })
+
+    fetchDisclosureproofizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setDisclosureproofizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setDisclosureproofizabilityRollout(null)
+        }
+      })
+
+    fetchRegistrarproofizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setRegistrarproofizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setRegistrarproofizabilityRollout(null)
+        }
+      })
+
+    fetchWitnessproofizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setWitnessproofizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setWitnessproofizabilityRollout(null)
+        }
+      })
+
     fetchUsageCapabilities(apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
@@ -19966,6 +20266,76 @@ function App() {
         workspaceAuthHeaders,
       )
       setAuditproofizabilityAdminSummary(auditproofizabilityAdmin)
+
+      const compliancechainizabilityAdmin = await fetchCompliancechainizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCompliancechainizabilityAdminSummary(compliancechainizabilityAdmin)
+
+      const attestledgerizabilityAdmin = await fetchAttestledgerizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAttestledgerizabilityAdminSummary(attestledgerizabilityAdmin)
+
+      const evidencetrackizabilityAdmin = await fetchEvidencetrackizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEvidencetrackizabilityAdminSummary(evidencetrackizabilityAdmin)
+
+      const prooflineizabilityAdmin = await fetchProoflineizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProoflineizabilityAdminSummary(prooflineizabilityAdmin)
+
+      const notarproofizabilityAdmin = await fetchNotarproofizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNotarproofizabilityAdminSummary(notarproofizabilityAdmin)
+
+      const auditlineizabilityAdmin = await fetchAuditlineizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuditlineizabilityAdminSummary(auditlineizabilityAdmin)
+
+      const traceledgerizabilityAdmin = await fetchTraceledgerizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTraceledgerizabilityAdminSummary(traceledgerizabilityAdmin)
+
+      const disclosureproofizabilityAdmin = await fetchDisclosureproofizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDisclosureproofizabilityAdminSummary(disclosureproofizabilityAdmin)
+
+      const registrarproofizabilityAdmin = await fetchRegistrarproofizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRegistrarproofizabilityAdminSummary(registrarproofizabilityAdmin)
+
+      const witnessproofizabilityAdmin = await fetchWitnessproofizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setWitnessproofizabilityAdminSummary(witnessproofizabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -21198,6 +21568,296 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleWitnessproofizabilityAdminAction(
+    action: 'refresh_witnessproofizability_summary',
+  ) {
+    setWitnessproofizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeWitnessproofizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchWitnessproofizabilityRollout(apiBaseUrl)
+      setWitnessproofizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run witnessproofizability admin action.',
+      )
+    } finally {
+      setWitnessproofizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleRegistrarproofizabilityAdminAction(
+    action: 'refresh_registrarproofizability_summary',
+  ) {
+    setRegistrarproofizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeRegistrarproofizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchRegistrarproofizabilityRollout(apiBaseUrl)
+      setRegistrarproofizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run registrarproofizability admin action.',
+      )
+    } finally {
+      setRegistrarproofizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleDisclosureproofizabilityAdminAction(
+    action: 'refresh_disclosureproofizability_summary',
+  ) {
+    setDisclosureproofizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeDisclosureproofizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchDisclosureproofizabilityRollout(apiBaseUrl)
+      setDisclosureproofizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run disclosureproofizability admin action.',
+      )
+    } finally {
+      setDisclosureproofizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleTraceledgerizabilityAdminAction(
+    action: 'refresh_traceledgerizability_summary',
+  ) {
+    setTraceledgerizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeTraceledgerizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchTraceledgerizabilityRollout(apiBaseUrl)
+      setTraceledgerizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run traceledgerizability admin action.',
+      )
+    } finally {
+      setTraceledgerizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAuditlineizabilityAdminAction(
+    action: 'refresh_auditlineizability_summary',
+  ) {
+    setAuditlineizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAuditlineizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAuditlineizabilityRollout(apiBaseUrl)
+      setAuditlineizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run auditlineizability admin action.',
+      )
+    } finally {
+      setAuditlineizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleNotarproofizabilityAdminAction(
+    action: 'refresh_notarproofizability_summary',
+  ) {
+    setNotarproofizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeNotarproofizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchNotarproofizabilityRollout(apiBaseUrl)
+      setNotarproofizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run notarproofizability admin action.',
+      )
+    } finally {
+      setNotarproofizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleProoflineizabilityAdminAction(
+    action: 'refresh_prooflineizability_summary',
+  ) {
+    setProoflineizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeProoflineizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchProoflineizabilityRollout(apiBaseUrl)
+      setProoflineizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run prooflineizability admin action.',
+      )
+    } finally {
+      setProoflineizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleEvidencetrackizabilityAdminAction(
+    action: 'refresh_evidencetrackizability_summary',
+  ) {
+    setEvidencetrackizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeEvidencetrackizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchEvidencetrackizabilityRollout(apiBaseUrl)
+      setEvidencetrackizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run evidencetrackizability admin action.',
+      )
+    } finally {
+      setEvidencetrackizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAttestledgerizabilityAdminAction(
+    action: 'refresh_attestledgerizability_summary',
+  ) {
+    setAttestledgerizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAttestledgerizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAttestledgerizabilityRollout(apiBaseUrl)
+      setAttestledgerizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run attestledgerizability admin action.',
+      )
+    } finally {
+      setAttestledgerizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleCompliancechainizabilityAdminAction(
+    action: 'refresh_compliancechainizability_summary',
+  ) {
+    setCompliancechainizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeCompliancechainizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchCompliancechainizabilityRollout(apiBaseUrl)
+      setCompliancechainizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run compliancechainizability admin action.',
+      )
+    } finally {
+      setCompliancechainizabilityAdminAction('idle')
     }
   }
 
@@ -49715,6 +50375,296 @@ function App() {
               ))}
             </div>
             <small>Checked at {ruleproofizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {notarproofizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production notarproofizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${notarproofizabilityRollout.status}`}
+              >
+                {formatNotarproofizabilityRolloutStatus(notarproofizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{notarproofizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {notarproofizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatNotarproofizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {notarproofizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {prooflineizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production prooflineizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${prooflineizabilityRollout.status}`}
+              >
+                {formatProoflineizabilityRolloutStatus(prooflineizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{prooflineizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {prooflineizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatProoflineizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {prooflineizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {evidencetrackizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production evidencetrackizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${evidencetrackizabilityRollout.status}`}
+              >
+                {formatEvidencetrackizabilityRolloutStatus(evidencetrackizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{evidencetrackizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {evidencetrackizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatEvidencetrackizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {evidencetrackizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {attestledgerizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production attestledgerizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${attestledgerizabilityRollout.status}`}
+              >
+                {formatAttestledgerizabilityRolloutStatus(attestledgerizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{attestledgerizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {attestledgerizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAttestledgerizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {attestledgerizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {compliancechainizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production compliancechainizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${compliancechainizabilityRollout.status}`}
+              >
+                {formatCompliancechainizabilityRolloutStatus(compliancechainizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{compliancechainizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {compliancechainizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatCompliancechainizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {compliancechainizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {witnessproofizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production witnessproofizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${witnessproofizabilityRollout.status}`}
+              >
+                {formatWitnessproofizabilityRolloutStatus(witnessproofizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{witnessproofizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {witnessproofizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatWitnessproofizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {witnessproofizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {registrarproofizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production registrarproofizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${registrarproofizabilityRollout.status}`}
+              >
+                {formatRegistrarproofizabilityRolloutStatus(registrarproofizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{registrarproofizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {registrarproofizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatRegistrarproofizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {registrarproofizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {disclosureproofizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production disclosureproofizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${disclosureproofizabilityRollout.status}`}
+              >
+                {formatDisclosureproofizabilityRolloutStatus(disclosureproofizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{disclosureproofizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {disclosureproofizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatDisclosureproofizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {disclosureproofizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {traceledgerizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production traceledgerizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${traceledgerizabilityRollout.status}`}
+              >
+                {formatTraceledgerizabilityRolloutStatus(traceledgerizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{traceledgerizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {traceledgerizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatTraceledgerizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {traceledgerizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {auditlineizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production auditlineizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${auditlineizabilityRollout.status}`}
+              >
+                {formatAuditlineizabilityRolloutStatus(auditlineizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{auditlineizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {auditlineizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAuditlineizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {auditlineizabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -82552,6 +83502,656 @@ function App() {
                 }
               >
                 {formatRuleproofizabilityAdminAction('refresh_ruleproofizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {notarproofizabilityAdminSummary ? (
+          <div className="billing-admin workspace-notarproofizability-admin">
+            <div className="billing-admin__header">
+              <span>Notarproofizability admin</span>
+              <strong>{notarproofizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{notarproofizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification notarproofizability</span>
+                <strong>
+                  {notarproofizabilityAdminSummary.stats.notarproofizabilityPercent}%
+                </strong>
+                <small>
+                  {notarproofizabilityAdminSummary.stats.coveredDomains}/
+                  {notarproofizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Notarproofizability signals</span>
+                <strong>{notarproofizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {notarproofizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-notarproofizability-list">
+              {notarproofizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-notarproofizability-card workspace-notarproofizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatNotarproofizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {notarproofizabilityAdminSummary.availableActions.includes(
+              'refresh_notarproofizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={notarproofizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleNotarproofizabilityAdminAction(
+                    'refresh_notarproofizability_summary',
+                  )
+                }
+              >
+                {formatNotarproofizabilityAdminAction('refresh_notarproofizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {prooflineizabilityAdminSummary ? (
+          <div className="billing-admin workspace-prooflineizability-admin">
+            <div className="billing-admin__header">
+              <span>Prooflineizability admin</span>
+              <strong>{prooflineizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{prooflineizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan prooflineizability</span>
+                <strong>
+                  {prooflineizabilityAdminSummary.stats.prooflineizabilityPercent}%
+                </strong>
+                <small>
+                  {prooflineizabilityAdminSummary.stats.coveredDomains}/
+                  {prooflineizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Prooflineizability signals</span>
+                <strong>{prooflineizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {prooflineizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-prooflineizability-list">
+              {prooflineizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-prooflineizability-card workspace-prooflineizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatProoflineizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {prooflineizabilityAdminSummary.availableActions.includes(
+              'refresh_prooflineizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={prooflineizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleProoflineizabilityAdminAction(
+                    'refresh_prooflineizability_summary',
+                  )
+                }
+              >
+                {formatProoflineizabilityAdminAction('refresh_prooflineizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {evidencetrackizabilityAdminSummary ? (
+          <div className="billing-admin workspace-evidencetrackizability-admin">
+            <div className="billing-admin__header">
+              <span>Evidencetrackizability admin</span>
+              <strong>{evidencetrackizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{evidencetrackizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key evidencetrackizability</span>
+                <strong>
+                  {evidencetrackizabilityAdminSummary.stats.evidencetrackizabilityPercent}%
+                </strong>
+                <small>
+                  {evidencetrackizabilityAdminSummary.stats.coveredDomains}/
+                  {evidencetrackizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Evidencetrackizability signals</span>
+                <strong>{evidencetrackizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {evidencetrackizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-evidencetrackizability-list">
+              {evidencetrackizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-evidencetrackizability-card workspace-evidencetrackizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatEvidencetrackizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {evidencetrackizabilityAdminSummary.availableActions.includes(
+              'refresh_evidencetrackizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={evidencetrackizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleEvidencetrackizabilityAdminAction(
+                    'refresh_evidencetrackizability_summary',
+                  )
+                }
+              >
+                {formatEvidencetrackizabilityAdminAction('refresh_evidencetrackizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {attestledgerizabilityAdminSummary ? (
+          <div className="billing-admin workspace-attestledgerizability-admin">
+            <div className="billing-admin__header">
+              <span>Attestledgerizability admin</span>
+              <strong>{attestledgerizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{attestledgerizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership attestledgerizability</span>
+                <strong>
+                  {attestledgerizabilityAdminSummary.stats.attestledgerizabilityPercent}%
+                </strong>
+                <small>
+                  {attestledgerizabilityAdminSummary.stats.coveredDomains}/
+                  {attestledgerizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Attestledgerizability signals</span>
+                <strong>{attestledgerizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {attestledgerizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-attestledgerizability-list">
+              {attestledgerizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-attestledgerizability-card workspace-attestledgerizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAttestledgerizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {attestledgerizabilityAdminSummary.availableActions.includes(
+              'refresh_attestledgerizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={attestledgerizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAttestledgerizabilityAdminAction(
+                    'refresh_attestledgerizability_summary',
+                  )
+                }
+              >
+                {formatAttestledgerizabilityAdminAction('refresh_attestledgerizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {compliancechainizabilityAdminSummary ? (
+          <div className="billing-admin workspace-compliancechainizability-admin">
+            <div className="billing-admin__header">
+              <span>Compliancechainizability admin</span>
+              <strong>{compliancechainizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{compliancechainizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice compliancechainizability</span>
+                <strong>
+                  {compliancechainizabilityAdminSummary.stats.compliancechainizabilityPercent}%
+                </strong>
+                <small>
+                  {compliancechainizabilityAdminSummary.stats.coveredDomains}/
+                  {compliancechainizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Compliancechainizability signals</span>
+                <strong>{compliancechainizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {compliancechainizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-compliancechainizability-list">
+              {compliancechainizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-compliancechainizability-card workspace-compliancechainizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatCompliancechainizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {compliancechainizabilityAdminSummary.availableActions.includes(
+              'refresh_compliancechainizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={compliancechainizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleCompliancechainizabilityAdminAction(
+                    'refresh_compliancechainizability_summary',
+                  )
+                }
+              >
+                {formatCompliancechainizabilityAdminAction('refresh_compliancechainizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {witnessproofizabilityAdminSummary ? (
+          <div className="billing-admin workspace-witnessproofizability-admin">
+            <div className="billing-admin__header">
+              <span>Witnessproofizability admin</span>
+              <strong>{witnessproofizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{witnessproofizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification witnessproofizability</span>
+                <strong>
+                  {witnessproofizabilityAdminSummary.stats.witnessproofizabilityPercent}%
+                </strong>
+                <small>
+                  {witnessproofizabilityAdminSummary.stats.coveredDomains}/
+                  {witnessproofizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Witnessproofizability signals</span>
+                <strong>{witnessproofizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {witnessproofizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-witnessproofizability-list">
+              {witnessproofizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-witnessproofizability-card workspace-witnessproofizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatWitnessproofizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {witnessproofizabilityAdminSummary.availableActions.includes(
+              'refresh_witnessproofizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={witnessproofizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleWitnessproofizabilityAdminAction(
+                    'refresh_witnessproofizability_summary',
+                  )
+                }
+              >
+                {formatWitnessproofizabilityAdminAction('refresh_witnessproofizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {registrarproofizabilityAdminSummary ? (
+          <div className="billing-admin workspace-registrarproofizability-admin">
+            <div className="billing-admin__header">
+              <span>Registrarproofizability admin</span>
+              <strong>{registrarproofizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{registrarproofizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan registrarproofizability</span>
+                <strong>
+                  {registrarproofizabilityAdminSummary.stats.registrarproofizabilityPercent}%
+                </strong>
+                <small>
+                  {registrarproofizabilityAdminSummary.stats.coveredDomains}/
+                  {registrarproofizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Registrarproofizability signals</span>
+                <strong>{registrarproofizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {registrarproofizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-registrarproofizability-list">
+              {registrarproofizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-registrarproofizability-card workspace-registrarproofizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatRegistrarproofizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {registrarproofizabilityAdminSummary.availableActions.includes(
+              'refresh_registrarproofizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={registrarproofizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleRegistrarproofizabilityAdminAction(
+                    'refresh_registrarproofizability_summary',
+                  )
+                }
+              >
+                {formatRegistrarproofizabilityAdminAction('refresh_registrarproofizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {disclosureproofizabilityAdminSummary ? (
+          <div className="billing-admin workspace-disclosureproofizability-admin">
+            <div className="billing-admin__header">
+              <span>Disclosureproofizability admin</span>
+              <strong>{disclosureproofizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{disclosureproofizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key disclosureproofizability</span>
+                <strong>
+                  {disclosureproofizabilityAdminSummary.stats.disclosureproofizabilityPercent}%
+                </strong>
+                <small>
+                  {disclosureproofizabilityAdminSummary.stats.coveredDomains}/
+                  {disclosureproofizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Disclosureproofizability signals</span>
+                <strong>{disclosureproofizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {disclosureproofizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-disclosureproofizability-list">
+              {disclosureproofizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-disclosureproofizability-card workspace-disclosureproofizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatDisclosureproofizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {disclosureproofizabilityAdminSummary.availableActions.includes(
+              'refresh_disclosureproofizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={disclosureproofizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleDisclosureproofizabilityAdminAction(
+                    'refresh_disclosureproofizability_summary',
+                  )
+                }
+              >
+                {formatDisclosureproofizabilityAdminAction('refresh_disclosureproofizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {traceledgerizabilityAdminSummary ? (
+          <div className="billing-admin workspace-traceledgerizability-admin">
+            <div className="billing-admin__header">
+              <span>Traceledgerizability admin</span>
+              <strong>{traceledgerizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{traceledgerizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership traceledgerizability</span>
+                <strong>
+                  {traceledgerizabilityAdminSummary.stats.traceledgerizabilityPercent}%
+                </strong>
+                <small>
+                  {traceledgerizabilityAdminSummary.stats.coveredDomains}/
+                  {traceledgerizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Traceledgerizability signals</span>
+                <strong>{traceledgerizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {traceledgerizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-traceledgerizability-list">
+              {traceledgerizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-traceledgerizability-card workspace-traceledgerizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatTraceledgerizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {traceledgerizabilityAdminSummary.availableActions.includes(
+              'refresh_traceledgerizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={traceledgerizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleTraceledgerizabilityAdminAction(
+                    'refresh_traceledgerizability_summary',
+                  )
+                }
+              >
+                {formatTraceledgerizabilityAdminAction('refresh_traceledgerizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {auditlineizabilityAdminSummary ? (
+          <div className="billing-admin workspace-auditlineizability-admin">
+            <div className="billing-admin__header">
+              <span>Auditlineizability admin</span>
+              <strong>{auditlineizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{auditlineizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice auditlineizability</span>
+                <strong>
+                  {auditlineizabilityAdminSummary.stats.auditlineizabilityPercent}%
+                </strong>
+                <small>
+                  {auditlineizabilityAdminSummary.stats.coveredDomains}/
+                  {auditlineizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Auditlineizability signals</span>
+                <strong>{auditlineizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {auditlineizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-auditlineizability-list">
+              {auditlineizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-auditlineizability-card workspace-auditlineizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAuditlineizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {auditlineizabilityAdminSummary.availableActions.includes(
+              'refresh_auditlineizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={auditlineizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAuditlineizabilityAdminAction(
+                    'refresh_auditlineizability_summary',
+                  )
+                }
+              >
+                {formatAuditlineizabilityAdminAction('refresh_auditlineizability_summary')}
               </button>
             ) : null}
           </div>

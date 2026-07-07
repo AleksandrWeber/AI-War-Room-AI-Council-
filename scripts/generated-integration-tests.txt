@@ -1,26 +1,26 @@
 
-describe('ruleproofizability rollout integration', () => {
-  it('reports ruleproofizability capabilities and rollout readiness', async () => {
+describe('auditlineizability rollout integration', () => {
+  it('reports auditlineizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app.getHttpServer())
-      .get('/api/ruleproofizability/capabilities')
+      .get('/api/auditlineizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsRuleproofizabilityRollout: true,
-      supportsRuleproofizabilityAdminTools: true,
-      supportsBillingInvoiceRuleproofizabilitySignals: true,
+      supportsAuditlineizabilityRollout: true,
+      supportsAuditlineizabilityAdminTools: true,
+      supportsBillingInvoiceAuditlineizabilitySignals: true,
     })
 
     const rollout = await request(app.getHttpServer())
-      .get('/api/ruleproofizability/readiness')
+      .get('/api/auditlineizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns ruleproofizability admin summary for owners', async () => {
+  it('returns auditlineizability admin summary for owners', async () => {
     const response = await request(app.getHttpServer())
-      .get('/api/ruleproofizability/workspace/workspace_1/admin')
+      .get('/api/auditlineizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -30,14 +30,14 @@ describe('ruleproofizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        ruleproofizabilityPercent: expect.any(Number),
+        auditlineizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects ruleproofizability admin tools for members', async () => {
+  it('rejects auditlineizability admin tools for members', async () => {
     await request(app.getHttpServer())
-      .get('/api/ruleproofizability/workspace/workspace_1/admin')
+      .get('/api/auditlineizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -47,28 +47,28 @@ describe('ruleproofizability rollout integration', () => {
 })
 
 
-describe('traceproofizability rollout integration', () => {
-  it('reports traceproofizability capabilities and rollout readiness', async () => {
+describe('traceledgerizability rollout integration', () => {
+  it('reports traceledgerizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app.getHttpServer())
-      .get('/api/traceproofizability/capabilities')
+      .get('/api/traceledgerizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsTraceproofizabilityRollout: true,
-      supportsTraceproofizabilityAdminTools: true,
-      supportsMembershipTraceproofizabilitySignals: true,
+      supportsTraceledgerizabilityRollout: true,
+      supportsTraceledgerizabilityAdminTools: true,
+      supportsMembershipTraceledgerizabilitySignals: true,
     })
 
     const rollout = await request(app.getHttpServer())
-      .get('/api/traceproofizability/readiness')
+      .get('/api/traceledgerizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns traceproofizability admin summary for owners', async () => {
+  it('returns traceledgerizability admin summary for owners', async () => {
     const response = await request(app.getHttpServer())
-      .get('/api/traceproofizability/workspace/workspace_1/admin')
+      .get('/api/traceledgerizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -78,14 +78,14 @@ describe('traceproofizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        traceproofizabilityPercent: expect.any(Number),
+        traceledgerizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects traceproofizability admin tools for members', async () => {
+  it('rejects traceledgerizability admin tools for members', async () => {
     await request(app.getHttpServer())
-      .get('/api/traceproofizability/workspace/workspace_1/admin')
+      .get('/api/traceledgerizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -95,28 +95,28 @@ describe('traceproofizability rollout integration', () => {
 })
 
 
-describe('disclosureizability rollout integration', () => {
-  it('reports disclosureizability capabilities and rollout readiness', async () => {
+describe('disclosureproofizability rollout integration', () => {
+  it('reports disclosureproofizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app.getHttpServer())
-      .get('/api/disclosureizability/capabilities')
+      .get('/api/disclosureproofizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsDisclosureizabilityRollout: true,
-      supportsDisclosureizabilityAdminTools: true,
-      supportsIdempotencyKeyDisclosureizabilitySignals: true,
+      supportsDisclosureproofizabilityRollout: true,
+      supportsDisclosureproofizabilityAdminTools: true,
+      supportsIdempotencyKeyDisclosureproofizabilitySignals: true,
     })
 
     const rollout = await request(app.getHttpServer())
-      .get('/api/disclosureizability/readiness')
+      .get('/api/disclosureproofizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns disclosureizability admin summary for owners', async () => {
+  it('returns disclosureproofizability admin summary for owners', async () => {
     const response = await request(app.getHttpServer())
-      .get('/api/disclosureizability/workspace/workspace_1/admin')
+      .get('/api/disclosureproofizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -126,14 +126,14 @@ describe('disclosureizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        disclosureizabilityPercent: expect.any(Number),
+        disclosureproofizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects disclosureizability admin tools for members', async () => {
+  it('rejects disclosureproofizability admin tools for members', async () => {
     await request(app.getHttpServer())
-      .get('/api/disclosureizability/workspace/workspace_1/admin')
+      .get('/api/disclosureproofizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -143,28 +143,28 @@ describe('disclosureizability rollout integration', () => {
 })
 
 
-describe('registrarizability rollout integration', () => {
-  it('reports registrarizability capabilities and rollout readiness', async () => {
+describe('registrarproofizability rollout integration', () => {
+  it('reports registrarproofizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app.getHttpServer())
-      .get('/api/registrarizability/capabilities')
+      .get('/api/registrarproofizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsRegistrarizabilityRollout: true,
-      supportsRegistrarizabilityAdminTools: true,
-      supportsShieldScanRegistrarizabilitySignals: true,
+      supportsRegistrarproofizabilityRollout: true,
+      supportsRegistrarproofizabilityAdminTools: true,
+      supportsShieldScanRegistrarproofizabilitySignals: true,
     })
 
     const rollout = await request(app.getHttpServer())
-      .get('/api/registrarizability/readiness')
+      .get('/api/registrarproofizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns registrarizability admin summary for owners', async () => {
+  it('returns registrarproofizability admin summary for owners', async () => {
     const response = await request(app.getHttpServer())
-      .get('/api/registrarizability/workspace/workspace_1/admin')
+      .get('/api/registrarproofizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -174,14 +174,14 @@ describe('registrarizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        registrarizabilityPercent: expect.any(Number),
+        registrarproofizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects registrarizability admin tools for members', async () => {
+  it('rejects registrarproofizability admin tools for members', async () => {
     await request(app.getHttpServer())
-      .get('/api/registrarizability/workspace/workspace_1/admin')
+      .get('/api/registrarproofizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -191,28 +191,28 @@ describe('registrarizability rollout integration', () => {
 })
 
 
-describe('auditproofizability rollout integration', () => {
-  it('reports auditproofizability capabilities and rollout readiness', async () => {
+describe('witnessproofizability rollout integration', () => {
+  it('reports witnessproofizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app.getHttpServer())
-      .get('/api/auditproofizability/capabilities')
+      .get('/api/witnessproofizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsAuditproofizabilityRollout: true,
-      supportsAuditproofizabilityAdminTools: true,
-      supportsBillingNotificationAuditproofizabilitySignals: true,
+      supportsWitnessproofizabilityRollout: true,
+      supportsWitnessproofizabilityAdminTools: true,
+      supportsBillingNotificationWitnessproofizabilitySignals: true,
     })
 
     const rollout = await request(app.getHttpServer())
-      .get('/api/auditproofizability/readiness')
+      .get('/api/witnessproofizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns auditproofizability admin summary for owners', async () => {
+  it('returns witnessproofizability admin summary for owners', async () => {
     const response = await request(app.getHttpServer())
-      .get('/api/auditproofizability/workspace/workspace_1/admin')
+      .get('/api/witnessproofizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -222,14 +222,14 @@ describe('auditproofizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        auditproofizabilityPercent: expect.any(Number),
+        witnessproofizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects auditproofizability admin tools for members', async () => {
+  it('rejects witnessproofizability admin tools for members', async () => {
     await request(app.getHttpServer())
-      .get('/api/auditproofizability/workspace/workspace_1/admin')
+      .get('/api/witnessproofizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
