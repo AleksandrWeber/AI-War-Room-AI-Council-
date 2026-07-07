@@ -303,6 +303,16 @@ import { PermissionizabilityModule } from './permissionizability/permissionizabi
 import { AuthorizationizabilityModule } from './authorizationizability/authorizationizability.module.js'
 import { AuthenticationizabilityModule } from './authenticationizability/authenticationizability.module.js'
 import { IdentityizabilityModule } from './identityizability/identityizability.module.js'
+import { RiskizabilityModule } from './riskizability/riskizability.module.js'
+import { SecurityizabilityModule } from './securityizability/securityizability.module.js'
+import { PrivacyizabilityModule } from './privacyizability/privacyizability.module.js'
+import { TrustizabilityModule } from './trustizability/trustizability.module.js'
+import { IntegrityizabilityModule } from './integrityizability/integrityizability.module.js'
+import { ThreatizabilityModule } from './threatizability/threatizability.module.js'
+import { VulnerabilityizabilityModule } from './vulnerabilityizability/vulnerabilityizability.module.js'
+import { MitigationizabilityModule } from './mitigationizability/mitigationizability.module.js'
+import { HardeningizabilityModule } from './hardeningizability/hardeningizability.module.js'
+import { SegregationizabilityModule } from './segregationizability/segregationizability.module.js'
 
 @Module({
   imports: [
@@ -610,6 +620,16 @@ import { IdentityizabilityModule } from './identityizability/identityizability.m
     AuthorizationizabilityModule,
     AuthenticationizabilityModule,
     IdentityizabilityModule,
+    RiskizabilityModule,
+    SecurityizabilityModule,
+    PrivacyizabilityModule,
+    TrustizabilityModule,
+    IntegrityizabilityModule,
+    ThreatizabilityModule,
+    VulnerabilityizabilityModule,
+    MitigationizabilityModule,
+    HardeningizabilityModule,
+    SegregationizabilityModule,
   ],
   exports: [
     CustomizabilityModule,

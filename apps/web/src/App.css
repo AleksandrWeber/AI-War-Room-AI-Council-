@@ -12665,6 +12665,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-riskizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-riskizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-riskizability-card p,
+.workspace-riskizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-riskizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-riskizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-securityizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-securityizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-securityizability-card p,
+.workspace-securityizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-securityizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-securityizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-privacyizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-privacyizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-privacyizability-card p,
+.workspace-privacyizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-privacyizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-privacyizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-trustizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-trustizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-trustizability-card p,
+.workspace-trustizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-trustizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-trustizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-integrityizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-integrityizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-integrityizability-card p,
+.workspace-integrityizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-integrityizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-integrityizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-threatizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-threatizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-threatizability-card p,
+.workspace-threatizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-threatizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-threatizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-vulnerabilityizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-vulnerabilityizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-vulnerabilityizability-card p,
+.workspace-vulnerabilityizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-vulnerabilityizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-vulnerabilityizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-mitigationizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-mitigationizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-mitigationizability-card p,
+.workspace-mitigationizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-mitigationizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-mitigationizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-hardeningizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-hardeningizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-hardeningizability-card p,
+.workspace-hardeningizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-hardeningizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-hardeningizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-segregationizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-segregationizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-segregationizability-card p,
+.workspace-segregationizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-segregationizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-segregationizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

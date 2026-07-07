@@ -934,6 +934,26 @@ import type {
   AuthenticationizabilityAdminSummaryResponse,
   IdentityizabilityRolloutResponse,
   IdentityizabilityAdminSummaryResponse,
+  RiskizabilityRolloutResponse,
+  RiskizabilityAdminSummaryResponse,
+  SecurityizabilityRolloutResponse,
+  SecurityizabilityAdminSummaryResponse,
+  PrivacyizabilityRolloutResponse,
+  PrivacyizabilityAdminSummaryResponse,
+  TrustizabilityRolloutResponse,
+  TrustizabilityAdminSummaryResponse,
+  IntegrityizabilityRolloutResponse,
+  IntegrityizabilityAdminSummaryResponse,
+  ThreatizabilityRolloutResponse,
+  ThreatizabilityAdminSummaryResponse,
+  VulnerabilityizabilityRolloutResponse,
+  VulnerabilityizabilityAdminSummaryResponse,
+  MitigationizabilityRolloutResponse,
+  MitigationizabilityAdminSummaryResponse,
+  HardeningizabilityRolloutResponse,
+  HardeningizabilityAdminSummaryResponse,
+  SegregationizabilityRolloutResponse,
+  SegregationizabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -5096,6 +5116,96 @@ import {
   formatIdentityizabilityRolloutStatus,
 } from './identityizability-ui'
 import {
+  executeRiskizabilityAdminAction,
+  fetchRiskizabilityAdminSummary,
+  fetchRiskizabilityRollout,
+  formatRiskizabilityAdminAction,
+  formatRiskizabilityDomain,
+  formatRiskizabilityRolloutCheckStatus,
+  formatRiskizabilityRolloutStatus,
+} from './riskizability-ui'
+import {
+  executeSecurityizabilityAdminAction,
+  fetchSecurityizabilityAdminSummary,
+  fetchSecurityizabilityRollout,
+  formatSecurityizabilityAdminAction,
+  formatSecurityizabilityDomain,
+  formatSecurityizabilityRolloutCheckStatus,
+  formatSecurityizabilityRolloutStatus,
+} from './securityizability-ui'
+import {
+  executePrivacyizabilityAdminAction,
+  fetchPrivacyizabilityAdminSummary,
+  fetchPrivacyizabilityRollout,
+  formatPrivacyizabilityAdminAction,
+  formatPrivacyizabilityDomain,
+  formatPrivacyizabilityRolloutCheckStatus,
+  formatPrivacyizabilityRolloutStatus,
+} from './privacyizability-ui'
+import {
+  executeTrustizabilityAdminAction,
+  fetchTrustizabilityAdminSummary,
+  fetchTrustizabilityRollout,
+  formatTrustizabilityAdminAction,
+  formatTrustizabilityDomain,
+  formatTrustizabilityRolloutCheckStatus,
+  formatTrustizabilityRolloutStatus,
+} from './trustizability-ui'
+import {
+  executeIntegrityizabilityAdminAction,
+  fetchIntegrityizabilityAdminSummary,
+  fetchIntegrityizabilityRollout,
+  formatIntegrityizabilityAdminAction,
+  formatIntegrityizabilityDomain,
+  formatIntegrityizabilityRolloutCheckStatus,
+  formatIntegrityizabilityRolloutStatus,
+} from './integrityizability-ui'
+import {
+  executeThreatizabilityAdminAction,
+  fetchThreatizabilityAdminSummary,
+  fetchThreatizabilityRollout,
+  formatThreatizabilityAdminAction,
+  formatThreatizabilityDomain,
+  formatThreatizabilityRolloutCheckStatus,
+  formatThreatizabilityRolloutStatus,
+} from './threatizability-ui'
+import {
+  executeVulnerabilityizabilityAdminAction,
+  fetchVulnerabilityizabilityAdminSummary,
+  fetchVulnerabilityizabilityRollout,
+  formatVulnerabilityizabilityAdminAction,
+  formatVulnerabilityizabilityDomain,
+  formatVulnerabilityizabilityRolloutCheckStatus,
+  formatVulnerabilityizabilityRolloutStatus,
+} from './vulnerabilityizability-ui'
+import {
+  executeMitigationizabilityAdminAction,
+  fetchMitigationizabilityAdminSummary,
+  fetchMitigationizabilityRollout,
+  formatMitigationizabilityAdminAction,
+  formatMitigationizabilityDomain,
+  formatMitigationizabilityRolloutCheckStatus,
+  formatMitigationizabilityRolloutStatus,
+} from './mitigationizability-ui'
+import {
+  executeHardeningizabilityAdminAction,
+  fetchHardeningizabilityAdminSummary,
+  fetchHardeningizabilityRollout,
+  formatHardeningizabilityAdminAction,
+  formatHardeningizabilityDomain,
+  formatHardeningizabilityRolloutCheckStatus,
+  formatHardeningizabilityRolloutStatus,
+} from './hardeningizability-ui'
+import {
+  executeSegregationizabilityAdminAction,
+  fetchSegregationizabilityAdminSummary,
+  fetchSegregationizabilityRollout,
+  formatSegregationizabilityAdminAction,
+  formatSegregationizabilityDomain,
+  formatSegregationizabilityRolloutCheckStatus,
+  formatSegregationizabilityRolloutStatus,
+} from './segregationizability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -6564,6 +6674,26 @@ function App() {
     useState<AuthenticationizabilityRolloutResponse | null>(null)
   const [identityizabilityRollout, setIdentityizabilityRollout] =
     useState<IdentityizabilityRolloutResponse | null>(null)
+  const [riskizabilityRollout, setRiskizabilityRollout] =
+    useState<RiskizabilityRolloutResponse | null>(null)
+  const [securityizabilityRollout, setSecurityizabilityRollout] =
+    useState<SecurityizabilityRolloutResponse | null>(null)
+  const [privacyizabilityRollout, setPrivacyizabilityRollout] =
+    useState<PrivacyizabilityRolloutResponse | null>(null)
+  const [trustizabilityRollout, setTrustizabilityRollout] =
+    useState<TrustizabilityRolloutResponse | null>(null)
+  const [integrityizabilityRollout, setIntegrityizabilityRollout] =
+    useState<IntegrityizabilityRolloutResponse | null>(null)
+  const [threatizabilityRollout, setThreatizabilityRollout] =
+    useState<ThreatizabilityRolloutResponse | null>(null)
+  const [vulnerabilityizabilityRollout, setVulnerabilityizabilityRollout] =
+    useState<VulnerabilityizabilityRolloutResponse | null>(null)
+  const [mitigationizabilityRollout, setMitigationizabilityRollout] =
+    useState<MitigationizabilityRolloutResponse | null>(null)
+  const [hardeningizabilityRollout, setHardeningizabilityRollout] =
+    useState<HardeningizabilityRolloutResponse | null>(null)
+  const [segregationizabilityRollout, setSegregationizabilityRollout] =
+    useState<SegregationizabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -7561,6 +7691,26 @@ function App() {
     useState<AuthenticationizabilityAdminSummaryResponse | null>(null)
   const [identityizabilityAdminSummary, setIdentityizabilityAdminSummary] =
     useState<IdentityizabilityAdminSummaryResponse | null>(null)
+  const [riskizabilityAdminSummary, setRiskizabilityAdminSummary] =
+    useState<RiskizabilityAdminSummaryResponse | null>(null)
+  const [securityizabilityAdminSummary, setSecurityizabilityAdminSummary] =
+    useState<SecurityizabilityAdminSummaryResponse | null>(null)
+  const [privacyizabilityAdminSummary, setPrivacyizabilityAdminSummary] =
+    useState<PrivacyizabilityAdminSummaryResponse | null>(null)
+  const [trustizabilityAdminSummary, setTrustizabilityAdminSummary] =
+    useState<TrustizabilityAdminSummaryResponse | null>(null)
+  const [integrityizabilityAdminSummary, setIntegrityizabilityAdminSummary] =
+    useState<IntegrityizabilityAdminSummaryResponse | null>(null)
+  const [threatizabilityAdminSummary, setThreatizabilityAdminSummary] =
+    useState<ThreatizabilityAdminSummaryResponse | null>(null)
+  const [vulnerabilityizabilityAdminSummary, setVulnerabilityizabilityAdminSummary] =
+    useState<VulnerabilityizabilityAdminSummaryResponse | null>(null)
+  const [mitigationizabilityAdminSummary, setMitigationizabilityAdminSummary] =
+    useState<MitigationizabilityAdminSummaryResponse | null>(null)
+  const [hardeningizabilityAdminSummary, setHardeningizabilityAdminSummary] =
+    useState<HardeningizabilityAdminSummaryResponse | null>(null)
+  const [segregationizabilityAdminSummary, setSegregationizabilityAdminSummary] =
+    useState<SegregationizabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -8939,6 +9089,36 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [identityizabilityAdminAction, setIdentityizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [riskizabilityAdminAction, setRiskizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [securityizabilityAdminAction, setSecurityizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [privacyizabilityAdminAction, setPrivacyizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [trustizabilityAdminAction, setTrustizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [integrityizabilityAdminAction, setIntegrityizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [threatizabilityAdminAction, setThreatizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [vulnerabilityizabilityAdminAction, setVulnerabilityizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [mitigationizabilityAdminAction, setMitigationizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [hardeningizabilityAdminAction, setHardeningizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [segregationizabilityAdminAction, setSegregationizabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -14580,6 +14760,126 @@ function App() {
         }
       })
 
+    fetchRiskizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setRiskizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setRiskizabilityRollout(null)
+        }
+      })
+
+    fetchSecurityizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setSecurityizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setSecurityizabilityRollout(null)
+        }
+      })
+
+    fetchPrivacyizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setPrivacyizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setPrivacyizabilityRollout(null)
+        }
+      })
+
+    fetchTrustizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setTrustizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTrustizabilityRollout(null)
+        }
+      })
+
+    fetchIntegrityizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setIntegrityizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setIntegrityizabilityRollout(null)
+        }
+      })
+
+    fetchThreatizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setThreatizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setThreatizabilityRollout(null)
+        }
+      })
+
+    fetchVulnerabilityizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setVulnerabilityizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setVulnerabilityizabilityRollout(null)
+        }
+      })
+
+    fetchMitigationizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setMitigationizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setMitigationizabilityRollout(null)
+        }
+      })
+
+    fetchHardeningizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setHardeningizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setHardeningizabilityRollout(null)
+        }
+      })
+
+    fetchSegregationizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setSegregationizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setSegregationizabilityRollout(null)
+        }
+      })
+
     fetchUsageCapabilities(apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
@@ -18486,6 +18786,76 @@ function App() {
         workspaceAuthHeaders,
       )
       setIdentityizabilityAdminSummary(identityizabilityAdmin)
+
+      const riskizabilityAdmin = await fetchRiskizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRiskizabilityAdminSummary(riskizabilityAdmin)
+
+      const securityizabilityAdmin = await fetchSecurityizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSecurityizabilityAdminSummary(securityizabilityAdmin)
+
+      const privacyizabilityAdmin = await fetchPrivacyizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPrivacyizabilityAdminSummary(privacyizabilityAdmin)
+
+      const trustizabilityAdmin = await fetchTrustizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTrustizabilityAdminSummary(trustizabilityAdmin)
+
+      const integrityizabilityAdmin = await fetchIntegrityizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIntegrityizabilityAdminSummary(integrityizabilityAdmin)
+
+      const threatizabilityAdmin = await fetchThreatizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setThreatizabilityAdminSummary(threatizabilityAdmin)
+
+      const vulnerabilityizabilityAdmin = await fetchVulnerabilityizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setVulnerabilityizabilityAdminSummary(vulnerabilityizabilityAdmin)
+
+      const mitigationizabilityAdmin = await fetchMitigationizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMitigationizabilityAdminSummary(mitigationizabilityAdmin)
+
+      const hardeningizabilityAdmin = await fetchHardeningizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setHardeningizabilityAdminSummary(hardeningizabilityAdmin)
+
+      const segregationizabilityAdmin = await fetchSegregationizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSegregationizabilityAdminSummary(segregationizabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -19718,6 +20088,296 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleSegregationizabilityAdminAction(
+    action: 'refresh_segregationizability_summary',
+  ) {
+    setSegregationizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeSegregationizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchSegregationizabilityRollout(apiBaseUrl)
+      setSegregationizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run segregationizability admin action.',
+      )
+    } finally {
+      setSegregationizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleHardeningizabilityAdminAction(
+    action: 'refresh_hardeningizability_summary',
+  ) {
+    setHardeningizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeHardeningizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchHardeningizabilityRollout(apiBaseUrl)
+      setHardeningizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run hardeningizability admin action.',
+      )
+    } finally {
+      setHardeningizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleMitigationizabilityAdminAction(
+    action: 'refresh_mitigationizability_summary',
+  ) {
+    setMitigationizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeMitigationizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchMitigationizabilityRollout(apiBaseUrl)
+      setMitigationizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run mitigationizability admin action.',
+      )
+    } finally {
+      setMitigationizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleVulnerabilityizabilityAdminAction(
+    action: 'refresh_vulnerabilityizability_summary',
+  ) {
+    setVulnerabilityizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeVulnerabilityizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchVulnerabilityizabilityRollout(apiBaseUrl)
+      setVulnerabilityizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run vulnerabilityizability admin action.',
+      )
+    } finally {
+      setVulnerabilityizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleThreatizabilityAdminAction(
+    action: 'refresh_threatizability_summary',
+  ) {
+    setThreatizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeThreatizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchThreatizabilityRollout(apiBaseUrl)
+      setThreatizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run threatizability admin action.',
+      )
+    } finally {
+      setThreatizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleIntegrityizabilityAdminAction(
+    action: 'refresh_integrityizability_summary',
+  ) {
+    setIntegrityizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeIntegrityizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchIntegrityizabilityRollout(apiBaseUrl)
+      setIntegrityizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run integrityizability admin action.',
+      )
+    } finally {
+      setIntegrityizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleTrustizabilityAdminAction(
+    action: 'refresh_trustizability_summary',
+  ) {
+    setTrustizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeTrustizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchTrustizabilityRollout(apiBaseUrl)
+      setTrustizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run trustizability admin action.',
+      )
+    } finally {
+      setTrustizabilityAdminAction('idle')
+    }
+  }
+
+  async function handlePrivacyizabilityAdminAction(
+    action: 'refresh_privacyizability_summary',
+  ) {
+    setPrivacyizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executePrivacyizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchPrivacyizabilityRollout(apiBaseUrl)
+      setPrivacyizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run privacyizability admin action.',
+      )
+    } finally {
+      setPrivacyizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleSecurityizabilityAdminAction(
+    action: 'refresh_securityizability_summary',
+  ) {
+    setSecurityizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeSecurityizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchSecurityizabilityRollout(apiBaseUrl)
+      setSecurityizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run securityizability admin action.',
+      )
+    } finally {
+      setSecurityizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleRiskizabilityAdminAction(
+    action: 'refresh_riskizability_summary',
+  ) {
+    setRiskizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeRiskizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchRiskizabilityRollout(apiBaseUrl)
+      setRiskizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run riskizability admin action.',
+      )
+    } finally {
+      setRiskizabilityAdminAction('idle')
     }
   }
 
@@ -45915,6 +46575,296 @@ function App() {
               ))}
             </div>
             <small>Checked at {entitlementizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {integrityizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production integrityizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${integrityizabilityRollout.status}`}
+              >
+                {formatIntegrityizabilityRolloutStatus(integrityizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{integrityizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {integrityizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatIntegrityizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {integrityizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {trustizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production trustizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${trustizabilityRollout.status}`}
+              >
+                {formatTrustizabilityRolloutStatus(trustizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{trustizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {trustizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatTrustizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {trustizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {privacyizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production privacyizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${privacyizabilityRollout.status}`}
+              >
+                {formatPrivacyizabilityRolloutStatus(privacyizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{privacyizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {privacyizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatPrivacyizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {privacyizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {securityizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production securityizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${securityizabilityRollout.status}`}
+              >
+                {formatSecurityizabilityRolloutStatus(securityizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{securityizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {securityizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatSecurityizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {securityizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {riskizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production riskizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${riskizabilityRollout.status}`}
+              >
+                {formatRiskizabilityRolloutStatus(riskizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{riskizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {riskizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatRiskizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {riskizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {segregationizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production segregationizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${segregationizabilityRollout.status}`}
+              >
+                {formatSegregationizabilityRolloutStatus(segregationizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{segregationizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {segregationizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatSegregationizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {segregationizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {hardeningizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production hardeningizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${hardeningizabilityRollout.status}`}
+              >
+                {formatHardeningizabilityRolloutStatus(hardeningizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{hardeningizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {hardeningizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatHardeningizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {hardeningizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {mitigationizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production mitigationizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${mitigationizabilityRollout.status}`}
+              >
+                {formatMitigationizabilityRolloutStatus(mitigationizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{mitigationizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {mitigationizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatMitigationizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {mitigationizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {vulnerabilityizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production vulnerabilityizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${vulnerabilityizabilityRollout.status}`}
+              >
+                {formatVulnerabilityizabilityRolloutStatus(vulnerabilityizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{vulnerabilityizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {vulnerabilityizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatVulnerabilityizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {vulnerabilityizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {threatizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production threatizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${threatizabilityRollout.status}`}
+              >
+                {formatThreatizabilityRolloutStatus(threatizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{threatizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {threatizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatThreatizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {threatizabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -76152,6 +77102,656 @@ function App() {
                 }
               >
                 {formatEntitlementizabilityAdminAction('refresh_entitlementizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {integrityizabilityAdminSummary ? (
+          <div className="billing-admin workspace-integrityizability-admin">
+            <div className="billing-admin__header">
+              <span>Integrityizability admin</span>
+              <strong>{integrityizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{integrityizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification integrityizability</span>
+                <strong>
+                  {integrityizabilityAdminSummary.stats.integrityizabilityPercent}%
+                </strong>
+                <small>
+                  {integrityizabilityAdminSummary.stats.coveredDomains}/
+                  {integrityizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Integrityizability signals</span>
+                <strong>{integrityizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {integrityizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-integrityizability-list">
+              {integrityizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-integrityizability-card workspace-integrityizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatIntegrityizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {integrityizabilityAdminSummary.availableActions.includes(
+              'refresh_integrityizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={integrityizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleIntegrityizabilityAdminAction(
+                    'refresh_integrityizability_summary',
+                  )
+                }
+              >
+                {formatIntegrityizabilityAdminAction('refresh_integrityizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {trustizabilityAdminSummary ? (
+          <div className="billing-admin workspace-trustizability-admin">
+            <div className="billing-admin__header">
+              <span>Trustizability admin</span>
+              <strong>{trustizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{trustizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan trustizability</span>
+                <strong>
+                  {trustizabilityAdminSummary.stats.trustizabilityPercent}%
+                </strong>
+                <small>
+                  {trustizabilityAdminSummary.stats.coveredDomains}/
+                  {trustizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Trustizability signals</span>
+                <strong>{trustizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {trustizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-trustizability-list">
+              {trustizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-trustizability-card workspace-trustizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatTrustizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {trustizabilityAdminSummary.availableActions.includes(
+              'refresh_trustizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={trustizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleTrustizabilityAdminAction(
+                    'refresh_trustizability_summary',
+                  )
+                }
+              >
+                {formatTrustizabilityAdminAction('refresh_trustizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {privacyizabilityAdminSummary ? (
+          <div className="billing-admin workspace-privacyizability-admin">
+            <div className="billing-admin__header">
+              <span>Privacyizability admin</span>
+              <strong>{privacyizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{privacyizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key privacyizability</span>
+                <strong>
+                  {privacyizabilityAdminSummary.stats.privacyizabilityPercent}%
+                </strong>
+                <small>
+                  {privacyizabilityAdminSummary.stats.coveredDomains}/
+                  {privacyizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Privacyizability signals</span>
+                <strong>{privacyizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {privacyizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-privacyizability-list">
+              {privacyizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-privacyizability-card workspace-privacyizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatPrivacyizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {privacyizabilityAdminSummary.availableActions.includes(
+              'refresh_privacyizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={privacyizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handlePrivacyizabilityAdminAction(
+                    'refresh_privacyizability_summary',
+                  )
+                }
+              >
+                {formatPrivacyizabilityAdminAction('refresh_privacyizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {securityizabilityAdminSummary ? (
+          <div className="billing-admin workspace-securityizability-admin">
+            <div className="billing-admin__header">
+              <span>Securityizability admin</span>
+              <strong>{securityizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{securityizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership securityizability</span>
+                <strong>
+                  {securityizabilityAdminSummary.stats.securityizabilityPercent}%
+                </strong>
+                <small>
+                  {securityizabilityAdminSummary.stats.coveredDomains}/
+                  {securityizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Securityizability signals</span>
+                <strong>{securityizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {securityizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-securityizability-list">
+              {securityizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-securityizability-card workspace-securityizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatSecurityizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {securityizabilityAdminSummary.availableActions.includes(
+              'refresh_securityizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={securityizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleSecurityizabilityAdminAction(
+                    'refresh_securityizability_summary',
+                  )
+                }
+              >
+                {formatSecurityizabilityAdminAction('refresh_securityizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {riskizabilityAdminSummary ? (
+          <div className="billing-admin workspace-riskizability-admin">
+            <div className="billing-admin__header">
+              <span>Riskizability admin</span>
+              <strong>{riskizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{riskizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice riskizability</span>
+                <strong>
+                  {riskizabilityAdminSummary.stats.riskizabilityPercent}%
+                </strong>
+                <small>
+                  {riskizabilityAdminSummary.stats.coveredDomains}/
+                  {riskizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Riskizability signals</span>
+                <strong>{riskizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {riskizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-riskizability-list">
+              {riskizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-riskizability-card workspace-riskizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatRiskizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {riskizabilityAdminSummary.availableActions.includes(
+              'refresh_riskizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={riskizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleRiskizabilityAdminAction(
+                    'refresh_riskizability_summary',
+                  )
+                }
+              >
+                {formatRiskizabilityAdminAction('refresh_riskizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {segregationizabilityAdminSummary ? (
+          <div className="billing-admin workspace-segregationizability-admin">
+            <div className="billing-admin__header">
+              <span>Segregationizability admin</span>
+              <strong>{segregationizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{segregationizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification segregationizability</span>
+                <strong>
+                  {segregationizabilityAdminSummary.stats.segregationizabilityPercent}%
+                </strong>
+                <small>
+                  {segregationizabilityAdminSummary.stats.coveredDomains}/
+                  {segregationizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Segregationizability signals</span>
+                <strong>{segregationizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {segregationizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-segregationizability-list">
+              {segregationizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-segregationizability-card workspace-segregationizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatSegregationizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {segregationizabilityAdminSummary.availableActions.includes(
+              'refresh_segregationizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={segregationizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleSegregationizabilityAdminAction(
+                    'refresh_segregationizability_summary',
+                  )
+                }
+              >
+                {formatSegregationizabilityAdminAction('refresh_segregationizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {hardeningizabilityAdminSummary ? (
+          <div className="billing-admin workspace-hardeningizability-admin">
+            <div className="billing-admin__header">
+              <span>Hardeningizability admin</span>
+              <strong>{hardeningizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{hardeningizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan hardeningizability</span>
+                <strong>
+                  {hardeningizabilityAdminSummary.stats.hardeningizabilityPercent}%
+                </strong>
+                <small>
+                  {hardeningizabilityAdminSummary.stats.coveredDomains}/
+                  {hardeningizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Hardeningizability signals</span>
+                <strong>{hardeningizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {hardeningizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-hardeningizability-list">
+              {hardeningizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-hardeningizability-card workspace-hardeningizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatHardeningizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {hardeningizabilityAdminSummary.availableActions.includes(
+              'refresh_hardeningizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={hardeningizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleHardeningizabilityAdminAction(
+                    'refresh_hardeningizability_summary',
+                  )
+                }
+              >
+                {formatHardeningizabilityAdminAction('refresh_hardeningizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {mitigationizabilityAdminSummary ? (
+          <div className="billing-admin workspace-mitigationizability-admin">
+            <div className="billing-admin__header">
+              <span>Mitigationizability admin</span>
+              <strong>{mitigationizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{mitigationizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key mitigationizability</span>
+                <strong>
+                  {mitigationizabilityAdminSummary.stats.mitigationizabilityPercent}%
+                </strong>
+                <small>
+                  {mitigationizabilityAdminSummary.stats.coveredDomains}/
+                  {mitigationizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Mitigationizability signals</span>
+                <strong>{mitigationizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {mitigationizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-mitigationizability-list">
+              {mitigationizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-mitigationizability-card workspace-mitigationizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatMitigationizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {mitigationizabilityAdminSummary.availableActions.includes(
+              'refresh_mitigationizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={mitigationizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleMitigationizabilityAdminAction(
+                    'refresh_mitigationizability_summary',
+                  )
+                }
+              >
+                {formatMitigationizabilityAdminAction('refresh_mitigationizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {vulnerabilityizabilityAdminSummary ? (
+          <div className="billing-admin workspace-vulnerabilityizability-admin">
+            <div className="billing-admin__header">
+              <span>Vulnerabilityizability admin</span>
+              <strong>{vulnerabilityizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{vulnerabilityizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership vulnerabilityizability</span>
+                <strong>
+                  {vulnerabilityizabilityAdminSummary.stats.vulnerabilityizabilityPercent}%
+                </strong>
+                <small>
+                  {vulnerabilityizabilityAdminSummary.stats.coveredDomains}/
+                  {vulnerabilityizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Vulnerabilityizability signals</span>
+                <strong>{vulnerabilityizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {vulnerabilityizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-vulnerabilityizability-list">
+              {vulnerabilityizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-vulnerabilityizability-card workspace-vulnerabilityizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatVulnerabilityizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {vulnerabilityizabilityAdminSummary.availableActions.includes(
+              'refresh_vulnerabilityizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={vulnerabilityizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleVulnerabilityizabilityAdminAction(
+                    'refresh_vulnerabilityizability_summary',
+                  )
+                }
+              >
+                {formatVulnerabilityizabilityAdminAction('refresh_vulnerabilityizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {threatizabilityAdminSummary ? (
+          <div className="billing-admin workspace-threatizability-admin">
+            <div className="billing-admin__header">
+              <span>Threatizability admin</span>
+              <strong>{threatizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{threatizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice threatizability</span>
+                <strong>
+                  {threatizabilityAdminSummary.stats.threatizabilityPercent}%
+                </strong>
+                <small>
+                  {threatizabilityAdminSummary.stats.coveredDomains}/
+                  {threatizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Threatizability signals</span>
+                <strong>{threatizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {threatizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-threatizability-list">
+              {threatizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-threatizability-card workspace-threatizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatThreatizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {threatizabilityAdminSummary.availableActions.includes(
+              'refresh_threatizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={threatizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleThreatizabilityAdminAction(
+                    'refresh_threatizability_summary',
+                  )
+                }
+              >
+                {formatThreatizabilityAdminAction('refresh_threatizability_summary')}
               </button>
             ) : null}
           </div>
