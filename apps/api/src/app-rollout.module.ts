@@ -418,6 +418,21 @@ import { CustomizabilityvaultizabilityModule } from './customizabilityvaultizabi
 import { OperabilityvaultizabilityModule } from './operabilityvaultizability/operabilityvaultizability.module.js'
 import { TunabilityvaultizabilityModule } from './tunabilityvaultizability/tunabilityvaultizability.module.js'
 import { AdjustabilityvaultizabilityModule } from './adjustabilityvaultizability/adjustabilityvaultizability.module.js'
+import { ProgrammabilityvaultizabilityModule } from './programmabilityvaultizability/programmabilityvaultizability.module.js'
+import { DeployabilityvaultizabilityModule } from './deployabilityvaultizability/deployabilityvaultizability.module.js'
+import { ManageabilityvaultizabilityModule } from './manageabilityvaultizability/manageabilityvaultizability.module.js'
+import { ControllabilityvaultizabilityModule } from './controllabilityvaultizability/controllabilityvaultizability.module.js'
+import { IntegrabilityvaultizabilityModule } from './integrabilityvaultizability/integrabilityvaultizability.module.js'
+import { OrchestrabilityvaultizabilityModule } from './orchestrabilityvaultizability/orchestrabilityvaultizability.module.js'
+import { SchedulabilityvaultizabilityModule } from './schedulabilityvaultizability/schedulabilityvaultizability.module.js'
+import { AutomatabilityvaultizabilityModule } from './automatabilityvaultizability/automatabilityvaultizability.module.js'
+import { MonitorabilityvaultizabilityModule } from './monitorabilityvaultizability/monitorabilityvaultizability.module.js'
+import { PredictabilityvaultizabilityModule } from './predictabilityvaultizability/predictabilityvaultizability.module.js'
+import { RepeatabilityvaultizabilityModule } from './repeatabilityvaultizability/repeatabilityvaultizability.module.js'
+import { ResponsivenessvaultizabilityModule } from './responsivenessvaultizability/responsivenessvaultizability.module.js'
+import { DependabilityvaultizabilityModule } from './dependabilityvaultizability/dependabilityvaultizability.module.js'
+import { ComposabilityvaultizabilityModule } from './composabilityvaultizability/composabilityvaultizability.module.js'
+import { TrustworthinessvaultizabilityModule } from './trustworthinessvaultizability/trustworthinessvaultizability.module.js'
 
 @Module({
   imports: [
@@ -840,6 +855,21 @@ import { AdjustabilityvaultizabilityModule } from './adjustabilityvaultizability
     OperabilityvaultizabilityModule,
     TunabilityvaultizabilityModule,
     AdjustabilityvaultizabilityModule,
+    ProgrammabilityvaultizabilityModule,
+    DeployabilityvaultizabilityModule,
+    ManageabilityvaultizabilityModule,
+    ControllabilityvaultizabilityModule,
+    IntegrabilityvaultizabilityModule,
+    OrchestrabilityvaultizabilityModule,
+    SchedulabilityvaultizabilityModule,
+    AutomatabilityvaultizabilityModule,
+    MonitorabilityvaultizabilityModule,
+    PredictabilityvaultizabilityModule,
+    RepeatabilityvaultizabilityModule,
+    ResponsivenessvaultizabilityModule,
+    DependabilityvaultizabilityModule,
+    ComposabilityvaultizabilityModule,
+    TrustworthinessvaultizabilityModule,
   ],
   exports: [
     CustomizabilityModule,
