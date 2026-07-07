@@ -1,9 +1,15 @@
-import { Suspense, lazy, type ReactNode } from 'react'
+import { Suspense, lazy } from 'react'
 import type { WorkspaceAdminPanelsProps } from '@ai-war-room/web-blocks'
+import type { RolloutAdminBulkProps } from './rollout-admin/RolloutAdminBulk'
 
 const LazyWorkspaceAdminPanels = lazy(async () => {
   const module = await import('@ai-war-room/web-blocks')
   return { default: module.WorkspaceAdminPanels }
+})
+
+const LazyRolloutAdminBulk = lazy(async () => {
+  const module = await import('./rollout-admin/RolloutAdminBulk')
+  return { default: module.default }
 })
 
 export function WorkspaceAdminLazySection(
@@ -20,10 +26,10 @@ export function WorkspaceAdminLazySection(
 
 export function RolloutAdminLazyGate({
   enabled,
-  children,
+  rolloutProps,
 }: {
   enabled: boolean
-  children: ReactNode
+  rolloutProps: RolloutAdminBulkProps
 }) {
   if (!enabled) {
     return null
@@ -31,7 +37,7 @@ export function RolloutAdminLazyGate({
 
   return (
     <Suspense fallback={<p className="clear-copy">Loading rollout controls...</p>}>
-      {children}
+      <LazyRolloutAdminBulk {...rolloutProps} />
     </Suspense>
   )
 }

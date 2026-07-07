@@ -1,22 +1,22 @@
-type RolloutCheck = {
+export type RolloutReadinessCheck = {
   name: string
   label: string
-  status: 'pass' | 'fail' | 'skip'
+  status: string
   detail: string
 }
 
-type RolloutSnapshot = {
-  status: 'ready' | 'not_ready' | 'disabled'
+export type RolloutReadinessSnapshot = {
+  status: string
   guidance: string
-  checks: RolloutCheck[]
+  checks: RolloutReadinessCheck[]
   checkedAt: string
 }
 
 export type RolloutReadinessCardProps = {
   title: string
-  rollout: RolloutSnapshot
-  formatStatus: (status: RolloutSnapshot['status']) => string
-  formatCheckStatus: (status: RolloutCheck['status']) => string
+  rollout: RolloutReadinessSnapshot
+  formatStatus: (status: string) => string
+  formatCheckStatus: (status: string) => string
 }
 
 export function RolloutReadinessCard({
