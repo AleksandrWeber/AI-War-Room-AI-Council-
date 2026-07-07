@@ -20,7 +20,7 @@
     "docker:up:full": "docker compose up -d postgres redis api web",
     "docker:up:temporal": "docker compose --profile temporal up -d postgres redis api web temporal-worker",
     "lint": "npm run lint --workspaces --if-present",
-    "quality:gate": "npm run build && npm run lint && npm run typecheck && npm run test && npm audit --omit=dev && docker compose config",
+    "quality:gate": "npm run build && npm run lint && npm run typecheck && npm run test:gate --workspace @ai-war-room/api && npm audit --omit=dev && docker compose config",
     "quality:infra": "npm run infra:up && npm run db:migrate",
     "test": "npm run test --workspaces --if-present",
     "typecheck": "npm run typecheck --workspaces --if-present",

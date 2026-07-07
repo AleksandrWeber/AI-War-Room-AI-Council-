@@ -10,6 +10,7 @@ const reportPath = join(reportDir, 'vitest-report.json')
 rmSync(reportPath, { force: true })
 mkdirSync(reportDir, { recursive: true })
 
+const startedAt = Date.now()
 const run = spawnSync(
   'npx',
   [
@@ -30,6 +31,8 @@ const run = spawnSync(
   },
 )
 
+const elapsedMs = Date.now() - startedAt
+
 let report
 try {
   report = JSON.parse(readFileSync(reportPath, 'utf8'))
@@ -38,7 +41,7 @@ try {
   process.exit(run.status ?? 1)
 }
 
-const durationMs = Number(report.duration ?? 0)
+const durationMs = Number(report.duration ?? elapsedMs)
 const failedTests = Number(report.numFailedTests ?? 0)
 
 if (failedTests > 0) {
