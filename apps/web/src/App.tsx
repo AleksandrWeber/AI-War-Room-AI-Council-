@@ -10393,6 +10393,7 @@ function App() {
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
     useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
+  const [rolloutControlsEnabled, setRolloutControlsEnabled] = useState(false)
 
   useEffect(() => {
     if (!useTemporalWorkflowRuntime) {
@@ -10463,6 +10464,12 @@ function App() {
           setAuthCapabilities(null)
         }
       })
+
+    if (!rolloutControlsEnabled) {
+      return () => {
+        controller.abort()
+      }
+    }
 
     fetchAuthRollout(apiBaseUrl)
       .then((rollout) => {
@@ -17034,7 +17041,7 @@ function App() {
     return () => {
       controller.abort()
     }
-  }, [])
+  }, [rolloutControlsEnabled])
 
   useEffect(() => {
     if (authCapabilities?.provider !== 'session') {
@@ -37598,6 +37605,18 @@ function App() {
           </div>
           <div className={`api-status api-status--${apiHealth}`}>
             API status: {apiHealth}
+          </div>
+          <div className="hero-actions">
+            <button
+              type="button"
+              className="secondary-action"
+              onClick={() => setRolloutControlsEnabled(true)}
+              disabled={rolloutControlsEnabled}
+            >
+              {rolloutControlsEnabled
+                ? 'Rollout controls loaded'
+                : 'Load rollout/admin controls'}
+            </button>
           </div>
         </div>
       </section>
