@@ -23,11 +23,14 @@
     "quality:gate": "npm run build && npm run lint && npm run typecheck && npm run test:gate --workspace @ai-war-room/api && npm audit --omit=dev && docker compose config",
     "quality:infra": "npm run infra:up && npm run db:migrate",
     "test": "npm run test --workspaces --if-present",
+    "test:e2e": "playwright test",
+    "test:e2e:install": "playwright install chromium",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "worker:temporal": "npm run worker:temporal --workspace @ai-war-room/api",
     "worker:temporal:dev": "npm run worker:temporal:dev --workspace @ai-war-room/api"
   },
   "devDependencies": {
+    "@playwright/test": "^1.58.2",
     "@types/node": "^24.13.2",
     "oxlint": "^1.71.0",
     "typescript": "~6.0.2"

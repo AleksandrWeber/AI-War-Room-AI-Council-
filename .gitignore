@@ -23,3 +23,8 @@ coverage
 # Codegen snapshots
 apps/web/scripts/.app-source-snapshot.tsx
 
+# Playwright
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
