@@ -13445,6 +13445,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-policyproofizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-policyproofizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-policyproofizability-card p,
+.workspace-policyproofizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-policyproofizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-policyproofizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-notarizationizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-notarizationizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-notarizationizability-card p,
+.workspace-notarizationizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-notarizationizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-notarizationizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-witnessizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-witnessizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-witnessizability-card p,
+.workspace-witnessizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-witnessizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-witnessizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-ledgerizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-ledgerizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-ledgerizability-card p,
+.workspace-ledgerizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-ledgerizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-ledgerizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-signatureproofizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-signatureproofizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-signatureproofizability-card p,
+.workspace-signatureproofizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-signatureproofizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-signatureproofizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-ruleproofizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-ruleproofizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-ruleproofizability-card p,
+.workspace-ruleproofizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-ruleproofizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-ruleproofizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-traceproofizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-traceproofizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-traceproofizability-card p,
+.workspace-traceproofizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-traceproofizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-traceproofizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-disclosureizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-disclosureizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-disclosureizability-card p,
+.workspace-disclosureizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-disclosureizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-disclosureizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-registrarizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-registrarizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-registrarizability-card p,
+.workspace-registrarizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-registrarizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-registrarizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-auditproofizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-auditproofizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-auditproofizability-card p,
+.workspace-auditproofizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-auditproofizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-auditproofizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

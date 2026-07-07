@@ -333,6 +333,16 @@ import { AttesttrackizabilityModule } from './attesttrackizability/attesttrackiz
 import { EvidencizabilityModule } from './evidencizability/evidencizability.module.js'
 import { ChainofcustodyizabilityModule } from './chainofcustodyizability/chainofcustodyizability.module.js'
 import { TamperproofizabilityModule } from './tamperproofizability/tamperproofizability.module.js'
+import { PolicyproofizabilityModule } from './policyproofizability/policyproofizability.module.js'
+import { NotarizationizabilityModule } from './notarizationizability/notarizationizability.module.js'
+import { WitnessizabilityModule } from './witnessizability/witnessizability.module.js'
+import { LedgerizabilityModule } from './ledgerizability/ledgerizability.module.js'
+import { SignatureproofizabilityModule } from './signatureproofizability/signatureproofizability.module.js'
+import { RuleproofizabilityModule } from './ruleproofizability/ruleproofizability.module.js'
+import { TraceproofizabilityModule } from './traceproofizability/traceproofizability.module.js'
+import { DisclosureizabilityModule } from './disclosureizability/disclosureizability.module.js'
+import { RegistrarizabilityModule } from './registrarizability/registrarizability.module.js'
+import { AuditproofizabilityModule } from './auditproofizability/auditproofizability.module.js'
 
 @Module({
   imports: [
@@ -670,6 +680,16 @@ import { TamperproofizabilityModule } from './tamperproofizability/tamperproofiz
     EvidencizabilityModule,
     ChainofcustodyizabilityModule,
     TamperproofizabilityModule,
+    PolicyproofizabilityModule,
+    NotarizationizabilityModule,
+    WitnessizabilityModule,
+    LedgerizabilityModule,
+    SignatureproofizabilityModule,
+    RuleproofizabilityModule,
+    TraceproofizabilityModule,
+    DisclosureizabilityModule,
+    RegistrarizabilityModule,
+    AuditproofizabilityModule,
   ],
   exports: [
     CustomizabilityModule,
