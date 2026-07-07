@@ -1,26 +1,26 @@
 
-describe('identityproofizability rollout integration', () => {
-  it('reports identityproofizability capabilities and rollout readiness', async () => {
+describe('governancetrackizability rollout integration', () => {
+  it('reports governancetrackizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app.getHttpServer())
-      .get('/api/identityproofizability/capabilities')
+      .get('/api/governancetrackizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsIdentityproofizabilityRollout: true,
-      supportsIdentityproofizabilityAdminTools: true,
-      supportsBillingInvoiceIdentityproofizabilitySignals: true,
+      supportsGovernancetrackizabilityRollout: true,
+      supportsGovernancetrackizabilityAdminTools: true,
+      supportsBillingInvoiceGovernancetrackizabilitySignals: true,
     })
 
     const rollout = await request(app.getHttpServer())
-      .get('/api/identityproofizability/readiness')
+      .get('/api/governancetrackizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns identityproofizability admin summary for owners', async () => {
+  it('returns governancetrackizability admin summary for owners', async () => {
     const response = await request(app.getHttpServer())
-      .get('/api/identityproofizability/workspace/workspace_1/admin')
+      .get('/api/governancetrackizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -30,14 +30,14 @@ describe('identityproofizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        identityproofizabilityPercent: expect.any(Number),
+        governancetrackizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects identityproofizability admin tools for members', async () => {
+  it('rejects governancetrackizability admin tools for members', async () => {
     await request(app.getHttpServer())
-      .get('/api/identityproofizability/workspace/workspace_1/admin')
+      .get('/api/governancetrackizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -47,28 +47,28 @@ describe('identityproofizability rollout integration', () => {
 })
 
 
-describe('keymanagementizability rollout integration', () => {
-  it('reports keymanagementizability capabilities and rollout readiness', async () => {
+describe('attesttrackizability rollout integration', () => {
+  it('reports attesttrackizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app.getHttpServer())
-      .get('/api/keymanagementizability/capabilities')
+      .get('/api/attesttrackizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsKeymanagementizabilityRollout: true,
-      supportsKeymanagementizabilityAdminTools: true,
-      supportsMembershipKeymanagementizabilitySignals: true,
+      supportsAttesttrackizabilityRollout: true,
+      supportsAttesttrackizabilityAdminTools: true,
+      supportsMembershipAttesttrackizabilitySignals: true,
     })
 
     const rollout = await request(app.getHttpServer())
-      .get('/api/keymanagementizability/readiness')
+      .get('/api/attesttrackizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns keymanagementizability admin summary for owners', async () => {
+  it('returns attesttrackizability admin summary for owners', async () => {
     const response = await request(app.getHttpServer())
-      .get('/api/keymanagementizability/workspace/workspace_1/admin')
+      .get('/api/attesttrackizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -78,14 +78,14 @@ describe('keymanagementizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        keymanagementizabilityPercent: expect.any(Number),
+        attesttrackizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects keymanagementizability admin tools for members', async () => {
+  it('rejects attesttrackizability admin tools for members', async () => {
     await request(app.getHttpServer())
-      .get('/api/keymanagementizability/workspace/workspace_1/admin')
+      .get('/api/attesttrackizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -95,28 +95,28 @@ describe('keymanagementizability rollout integration', () => {
 })
 
 
-describe('secretmanagementizability rollout integration', () => {
-  it('reports secretmanagementizability capabilities and rollout readiness', async () => {
+describe('evidencizability rollout integration', () => {
+  it('reports evidencizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app.getHttpServer())
-      .get('/api/secretmanagementizability/capabilities')
+      .get('/api/evidencizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsSecretmanagementizabilityRollout: true,
-      supportsSecretmanagementizabilityAdminTools: true,
-      supportsIdempotencyKeySecretmanagementizabilitySignals: true,
+      supportsEvidencizabilityRollout: true,
+      supportsEvidencizabilityAdminTools: true,
+      supportsIdempotencyKeyEvidencizabilitySignals: true,
     })
 
     const rollout = await request(app.getHttpServer())
-      .get('/api/secretmanagementizability/readiness')
+      .get('/api/evidencizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns secretmanagementizability admin summary for owners', async () => {
+  it('returns evidencizability admin summary for owners', async () => {
     const response = await request(app.getHttpServer())
-      .get('/api/secretmanagementizability/workspace/workspace_1/admin')
+      .get('/api/evidencizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -126,14 +126,14 @@ describe('secretmanagementizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        secretmanagementizabilityPercent: expect.any(Number),
+        evidencizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects secretmanagementizability admin tools for members', async () => {
+  it('rejects evidencizability admin tools for members', async () => {
     await request(app.getHttpServer())
-      .get('/api/secretmanagementizability/workspace/workspace_1/admin')
+      .get('/api/evidencizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -143,28 +143,28 @@ describe('secretmanagementizability rollout integration', () => {
 })
 
 
-describe('cryptographyizability rollout integration', () => {
-  it('reports cryptographyizability capabilities and rollout readiness', async () => {
+describe('chainofcustodyizability rollout integration', () => {
+  it('reports chainofcustodyizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app.getHttpServer())
-      .get('/api/cryptographyizability/capabilities')
+      .get('/api/chainofcustodyizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsCryptographyizabilityRollout: true,
-      supportsCryptographyizabilityAdminTools: true,
-      supportsShieldScanCryptographyizabilitySignals: true,
+      supportsChainofcustodyizabilityRollout: true,
+      supportsChainofcustodyizabilityAdminTools: true,
+      supportsShieldScanChainofcustodyizabilitySignals: true,
     })
 
     const rollout = await request(app.getHttpServer())
-      .get('/api/cryptographyizability/readiness')
+      .get('/api/chainofcustodyizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns cryptographyizability admin summary for owners', async () => {
+  it('returns chainofcustodyizability admin summary for owners', async () => {
     const response = await request(app.getHttpServer())
-      .get('/api/cryptographyizability/workspace/workspace_1/admin')
+      .get('/api/chainofcustodyizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -174,14 +174,14 @@ describe('cryptographyizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        cryptographyizabilityPercent: expect.any(Number),
+        chainofcustodyizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects cryptographyizability admin tools for members', async () => {
+  it('rejects chainofcustodyizability admin tools for members', async () => {
     await request(app.getHttpServer())
-      .get('/api/cryptographyizability/workspace/workspace_1/admin')
+      .get('/api/chainofcustodyizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -191,28 +191,28 @@ describe('cryptographyizability rollout integration', () => {
 })
 
 
-describe('complianceguardizability rollout integration', () => {
-  it('reports complianceguardizability capabilities and rollout readiness', async () => {
+describe('tamperproofizability rollout integration', () => {
+  it('reports tamperproofizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app.getHttpServer())
-      .get('/api/complianceguardizability/capabilities')
+      .get('/api/tamperproofizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsComplianceguardizabilityRollout: true,
-      supportsComplianceguardizabilityAdminTools: true,
-      supportsBillingNotificationComplianceguardizabilitySignals: true,
+      supportsTamperproofizabilityRollout: true,
+      supportsTamperproofizabilityAdminTools: true,
+      supportsBillingNotificationTamperproofizabilitySignals: true,
     })
 
     const rollout = await request(app.getHttpServer())
-      .get('/api/complianceguardizability/readiness')
+      .get('/api/tamperproofizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns complianceguardizability admin summary for owners', async () => {
+  it('returns tamperproofizability admin summary for owners', async () => {
     const response = await request(app.getHttpServer())
-      .get('/api/complianceguardizability/workspace/workspace_1/admin')
+      .get('/api/tamperproofizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -222,14 +222,14 @@ describe('complianceguardizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        complianceguardizabilityPercent: expect.any(Number),
+        tamperproofizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects complianceguardizability admin tools for members', async () => {
+  it('rejects tamperproofizability admin tools for members', async () => {
     await request(app.getHttpServer())
-      .get('/api/complianceguardizability/workspace/workspace_1/admin')
+      .get('/api/tamperproofizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',

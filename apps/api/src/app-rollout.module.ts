@@ -323,6 +323,16 @@ import { KeymanagementizabilityModule } from './keymanagementizability/keymanage
 import { SecretmanagementizabilityModule } from './secretmanagementizability/secretmanagementizability.module.js'
 import { CryptographyizabilityModule } from './cryptographyizability/cryptographyizability.module.js'
 import { ComplianceguardizabilityModule } from './complianceguardizability/complianceguardizability.module.js'
+import { ProvenanceizabilityModule } from './provenanceizability/provenanceizability.module.js'
+import { LineageizabilityModule } from './lineageizability/lineageizability.module.js'
+import { ForensicizabilityModule } from './forensicizability/forensicizability.module.js'
+import { AudittrailizabilityModule } from './audittrailizability/audittrailizability.module.js'
+import { ComplianceproofizabilityModule } from './complianceproofizability/complianceproofizability.module.js'
+import { GovernancetrackizabilityModule } from './governancetrackizability/governancetrackizability.module.js'
+import { AttesttrackizabilityModule } from './attesttrackizability/attesttrackizability.module.js'
+import { EvidencizabilityModule } from './evidencizability/evidencizability.module.js'
+import { ChainofcustodyizabilityModule } from './chainofcustodyizability/chainofcustodyizability.module.js'
+import { TamperproofizabilityModule } from './tamperproofizability/tamperproofizability.module.js'
 
 @Module({
   imports: [
@@ -650,6 +660,16 @@ import { ComplianceguardizabilityModule } from './complianceguardizability/compl
     SecretmanagementizabilityModule,
     CryptographyizabilityModule,
     ComplianceguardizabilityModule,
+    ProvenanceizabilityModule,
+    LineageizabilityModule,
+    ForensicizabilityModule,
+    AudittrailizabilityModule,
+    ComplianceproofizabilityModule,
+    GovernancetrackizabilityModule,
+    AttesttrackizabilityModule,
+    EvidencizabilityModule,
+    ChainofcustodyizabilityModule,
+    TamperproofizabilityModule,
   ],
   exports: [
     CustomizabilityModule,
