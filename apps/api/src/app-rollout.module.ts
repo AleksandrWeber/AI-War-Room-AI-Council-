@@ -273,6 +273,16 @@ import { CoordinationizabilityModule } from './coordinationizability/coordinatio
 import { PartitioningizabilityModule } from './partitioningizability/partitioningizability.module.js'
 import { ClusteringizabilityModule } from './clusteringizability/clusteringizability.module.js'
 import { MeshingizabilityModule } from './meshingizability/meshingizability.module.js'
+import { DiscoveryizabilityModule } from './discoveryizability/discoveryizability.module.js'
+import { RegistrationizabilityModule } from './registrationizability/registrationizability.module.js'
+import { ProvisioningizabilityModule } from './provisioningizability/provisioningizability.module.js'
+import { AllocationizabilityModule } from './allocationizability/allocationizability.module.js'
+import { DeallocationizabilityModule } from './deallocationizability/deallocationizability.module.js'
+import { ScalingizabilityModule } from './scalingizability/scalingizability.module.js'
+import { HealingizabilityModule } from './healingizability/healingizability.module.js'
+import { RemediationizabilityModule } from './remediationizability/remediationizability.module.js'
+import { ReconciliationizabilityModule } from './reconciliationizability/reconciliationizability.module.js'
+import { GovernanceizabilityModule } from './governanceizability/governanceizability.module.js'
 
 @Module({
   imports: [
@@ -550,6 +560,16 @@ import { MeshingizabilityModule } from './meshingizability/meshingizability.modu
     PartitioningizabilityModule,
     ClusteringizabilityModule,
     MeshingizabilityModule,
+    DiscoveryizabilityModule,
+    RegistrationizabilityModule,
+    ProvisioningizabilityModule,
+    AllocationizabilityModule,
+    DeallocationizabilityModule,
+    ScalingizabilityModule,
+    HealingizabilityModule,
+    RemediationizabilityModule,
+    ReconciliationizabilityModule,
+    GovernanceizabilityModule,
   ],
   exports: [
     CustomizabilityModule,

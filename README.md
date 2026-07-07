@@ -1456,7 +1456,19 @@ Current `v5.326` behavior:
 - Workspace owners and admins can inspect workspace compatibilizability metrics from `GET /api/compatibilizability/workspace/:workspaceId/admin`.
 - The web billing panel shows compatibilizability rollout checks and workspace compatibilizability admin tools.
 
-Current `v5.450` behavior:
+Current `v5.460` behavior:
+
+- Production governanceizability rollout readiness validates governanceizability coverage and readiness through `GET /api/governanceizability/readiness`.
+- Workspace owners and admins can inspect workspace governanceizability metrics from `GET /api/governanceizability/workspace/:workspaceId/admin`.
+- The web billing panel shows governanceizability rollout checks and workspace governanceizability admin tools.
+
+Current `v5.330` behavior:
+
+- Production deallocationizability rollout readiness validates deallocationizability coverage and readiness through `GET /api/deallocationizability/readiness`.
+- Workspace owners and admins can inspect workspace deallocationizability metrics from `GET /api/deallocationizability/workspace/:workspaceId/admin`.
+- The web billing panel shows deallocationizability rollout checks and workspace deallocationizability admin tools.
+
+Current `v5.225` behavior:
 
 - Production meshingizability rollout readiness validates meshingizability coverage and readiness through `GET /api/meshingizability/readiness`.
 - Workspace owners and admins can inspect workspace meshingizability metrics from `GET /api/meshingizability/workspace/:workspaceId/admin`.
