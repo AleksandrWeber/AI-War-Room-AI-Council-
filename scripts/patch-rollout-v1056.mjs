@@ -9,6 +9,13 @@ const BASE = {
   Name: 'Attestationvaultizability',
 }
 
+function replaceOrThrow(content, search, replacement, label) {
+  if (!content.includes(search)) {
+    throw new Error(`Patch anchor missing for ${label}: ${search}`)
+  }
+  return content.replace(search, replacement)
+}
+
 // index.ts
 const indexPath = join(root, 'packages/schemas/src/index.ts')
 let index = readFileSync(indexPath, 'utf8')
@@ -19,9 +26,11 @@ const exportBlock = milestones
   )
   .join('\n')
 if (!index.includes('./assurancevaultizability-rollout.js')) {
-  index = index.replace(
+  index = replaceOrThrow(
+    index,
     "export * from './attestationvaultizability-admin.js'",
     `export * from './attestationvaultizability-admin.js'\n${exportBlock}`,
+    'schemas index export block',
   )
   writeFileSync(indexPath, index)
 }
@@ -37,13 +46,17 @@ if (!appModule.includes("from './assurancevaultizability/assurancevaultizability
     )
     .join('\n')
   const moduleBlock = milestones.map((m) => `    ${m.Name}Module,`).join('\n')
-  appModule = appModule.replace(
+  appModule = replaceOrThrow(
+    appModule,
     "import { AttestationvaultizabilityModule } from './attestationvaultizability/attestationvaultizability.module.js'",
     `import { AttestationvaultizabilityModule } from './attestationvaultizability/attestationvaultizability.module.js'\n${importBlock}`,
+    'app-rollout import anchor',
   )
-  appModule = appModule.replace(
+  appModule = replaceOrThrow(
+    appModule,
     '    AttestationvaultizabilityModule,',
     `    AttestationvaultizabilityModule,\n${moduleBlock}`,
+    'app-rollout module list anchor',
   )
   writeFileSync(appModulePath, appModule)
 }
@@ -59,6 +72,9 @@ const generatedTests = readFileSync(
   'utf8',
 )
 if (!tests.includes("describe('assurancevaultizability rollout integration'")) {
+  if (!/\}\)\s*$/.test(tests)) {
+    throw new Error('Integration test file has unexpected ending; cannot append generated tests.')
+  }
   tests = tests.replace(/\}\)\s*$/, `})${generatedTests}`)
   writeFileSync(testPath, tests)
 }

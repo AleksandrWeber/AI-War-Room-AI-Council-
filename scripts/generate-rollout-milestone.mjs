@@ -8,6 +8,23 @@ const root = join(import.meta.dirname, '..')
 
 // Legacy batch configs remain in git history; this script generates the active batch.
 
+function validateMilestones(input) {
+  if (!Array.isArray(input) || input.length === 0) {
+    throw new Error('Milestones input is empty; generation aborted.')
+  }
+
+  const names = new Set()
+  for (const m of input) {
+    if (!m?.name || !m?.Name || !m?.action || !m?.version) {
+      throw new Error(`Invalid milestone entry: ${JSON.stringify(m)}`)
+    }
+    if (names.has(m.name)) {
+      throw new Error(`Duplicate milestone name detected: ${m.name}`)
+    }
+    names.add(m.name)
+  }
+}
+
 function rolloutSchema(m) {
   return `import { z } from 'zod'
 import { nonEmptyStringSchema, utcDateStringSchema } from './common.js'
@@ -905,6 +922,8 @@ describe('${m.name} rollout integration', () => {
 })
 `
 }
+
+validateMilestones(milestones)
 
 for (const m of milestones) {
   writeFileSync(
