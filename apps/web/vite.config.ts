@@ -12,19 +12,16 @@ export default defineConfig({
             return 'vendor'
           }
 
-          if (
-            id.includes('/features/rollout-admin/') ||
-            id.includes('/features/domain-admin/') ||
-            id.includes('/features/operations-admin/')
-          ) {
-            return undefined
-          }
-
           if (id.includes('/apps/web/src/') && id.endsWith('-ui.ts')) {
-            if (id.includes('/features/')) {
-              return undefined
+            if (
+              id.includes('billing-ui.ts') ||
+              id.includes('workspace-ui.ts') ||
+              id.includes('usage-ui.ts')
+            ) {
+              return 'app-ui'
             }
-            return 'app-ui'
+
+            return undefined
           }
 
           return undefined

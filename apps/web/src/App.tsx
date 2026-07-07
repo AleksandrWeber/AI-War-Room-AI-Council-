@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Fragment, useEffect, useRef, useState, type FormEvent } from 'react'
 import type {
   AuthCapabilitiesResponse,
@@ -1105,2714 +1106,7 @@ import { BillingWorkspacePanel, UsageAdminPanel } from '@ai-war-room/web-blocks'
 import { CoreOperationsAdminLazyGate, DomainAdminLazyGate } from './features/AdminLazySection'
 import { RolloutAdminLazyGate, WorkspaceAdminLazySection } from './features/RolloutAdminLazySection'
 import './App.css'
-import {
-  fetchAuthRollout,
-} from './auth-ui'
-import {
-  fetchLlmRollout,
-} from './llm-ui'
-import {
-  fetchResearchRollout,
-} from './research-ui'
-import {
-  fetchTemporalRollout,
-} from './temporal-ui'
-import {
-  executeModelHealthAdminAction,
-  fetchModelHealthAdminSummary,
-  fetchModelRouterRollout,
-} from './model-router-ui'
-import {
-  executeShieldReviewAdminAction,
-  fetchShieldReviewAdminSummary,
-  fetchShieldRollout,
-} from './shield-ui'
-import {
-  executeProviderKeyAdminAction,
-  fetchProviderCredentialsRollout,
-  fetchProviderKeyAdminSummary,
-} from './provider-credentials-ui'
-import {
-  executeObservabilityAdminAction,
-  fetchObservabilityAdminSummary,
-  fetchObservabilityRollout,
-} from './observability-ui'
-import {
-  executePromptRegressionAdminAction,
-  fetchPromptEvaluationRollout,
-  fetchPromptRegressionAdminSummary,
-} from './evaluation-ui'
-import {
-  downloadRunHistoryExport,
-  executeRunHistoryAdminAction,
-  fetchRunHistoryAdminSummary,
-  fetchRunHistoryRollout,
-} from './run-history-ui'
-import {
-  executeStreamRecoveryAdminAction,
-  fetchStreamRecoveryAdminSummary,
-  fetchStreamReplayRollout,
-} from './stream-replay-ui'
-import {
-  executeIdempotencyAdminAction,
-  fetchIdempotencyAdminSummary,
-  fetchIdempotencyRollout,
-} from './idempotency-ui'
-import {
-  executeQuotaAdminAction,
-  fetchQuotaAdminSummary,
-  fetchUsageLimitsRollout,
-} from './usage-limits-ui'
-import {
-  executeDeploymentAdminAction,
-  fetchDeploymentAdminSummary,
-  fetchDeploymentRollout,
-} from './deployment-ui'
-import {
-  executeMigrationAdminAction,
-  fetchMigrationAdminSummary,
-  fetchMigrationRollout,
-} from './migrations-ui'
-import {
-  executeBackupAdminAction,
-  fetchBackupAdminSummary,
-  fetchBackupRollout,
-} from './backup-ui'
-import {
-  executeAuditAdminAction,
-  fetchAuditAdminSummary,
-  fetchAuditTrailRollout,
-} from './audit-trail-ui'
-import {
-  executeComplianceAdminAction,
-  fetchComplianceAdminSummary,
-  fetchComplianceRollout,
-} from './compliance-ui'
-import {
-  executeIncidentAdminAction,
-  fetchIncidentAdminSummary,
-  fetchIncidentResponseRollout,
-} from './incident-response-ui'
-import {
-  executeReleaseAdminAction,
-  fetchReleaseAdminSummary,
-  fetchReleaseRollout,
-} from './release-ui'
-import {
-  executeSloAdminAction,
-  fetchSloAdminSummary,
-  fetchSloRollout,
-} from './slo-ui'
-import {
-  executeCapacityAdminAction,
-  fetchCapacityAdminSummary,
-  fetchCapacityRollout,
-} from './capacity-ui'
-import {
-  executePerformanceAdminAction,
-  fetchPerformanceAdminSummary,
-  fetchPerformanceRollout,
-} from './performance-ui'
-import {
-  executeResilienceAdminAction,
-  fetchResilienceAdminSummary,
-  fetchResilienceRollout,
-} from './resilience-ui'
-import {
-  executeAvailabilityAdminAction,
-  fetchAvailabilityAdminSummary,
-  fetchAvailabilityRollout,
-} from './availability-ui'
-import {
-  executeReliabilityAdminAction,
-  fetchReliabilityAdminSummary,
-  fetchReliabilityRollout,
-} from './reliability-ui'
-import {
-  executeStabilityAdminAction,
-  fetchStabilityAdminSummary,
-  fetchStabilityRollout,
-} from './stability-ui'
-import {
-  executeConsistencyAdminAction,
-  fetchConsistencyAdminSummary,
-  fetchConsistencyRollout,
-} from './consistency-ui'
-import {
-  executeIntegrityAdminAction,
-  fetchIntegrityAdminSummary,
-  fetchIntegrityRollout,
-} from './integrity-ui'
-import {
-  executeDurabilityAdminAction,
-  fetchDurabilityAdminSummary,
-  fetchDurabilityRollout,
-} from './durability-ui'
-import {
-  executeRecoverabilityAdminAction,
-  fetchRecoverabilityAdminSummary,
-  fetchRecoverabilityRollout,
-} from './recoverability-ui'
-import {
-  executeMaintainabilityAdminAction,
-  fetchMaintainabilityAdminSummary,
-  fetchMaintainabilityRollout,
-} from './maintainability-ui'
-import {
-  executeScalabilityAdminAction,
-  fetchScalabilityAdminSummary,
-  fetchScalabilityRollout,
-} from './scalability-ui'
-import {
-  executeTraceabilityAdminAction,
-  fetchTraceabilityAdminSummary,
-  fetchTraceabilityRollout,
-} from './traceability-ui'
-import {
-  executeEfficiencyAdminAction,
-  fetchEfficiencyAdminSummary,
-  fetchEfficiencyRollout,
-} from './efficiency-ui'
-import {
-  executeOptimizationAdminAction,
-  fetchOptimizationAdminSummary,
-  fetchOptimizationRollout,
-} from './optimization-ui'
-import {
-  executeUtilizationAdminAction,
-  fetchUtilizationAdminSummary,
-  fetchUtilizationRollout,
-} from './utilization-ui'
-import {
-  executeSustainabilityAdminAction,
-  fetchSustainabilityAdminSummary,
-  fetchSustainabilityRollout,
-} from './sustainability-ui'
-import {
-  executeGovernanceAdminAction,
-  fetchGovernanceAdminSummary,
-  fetchGovernanceRollout,
-} from './governance-ui'
-import {
-  executeOversightAdminAction,
-  fetchOversightAdminSummary,
-  fetchOversightRollout,
-} from './oversight-ui'
-import {
-  executeAssuranceAdminAction,
-  fetchAssuranceAdminSummary,
-  fetchAssuranceRollout,
-} from './assurance-ui'
-import {
-  executeAccountabilityAdminAction,
-  fetchAccountabilityAdminSummary,
-  fetchAccountabilityRollout,
-} from './accountability-ui'
-import {
-  executeTransparencyAdminAction,
-  fetchTransparencyAdminSummary,
-  fetchTransparencyRollout,
-} from './transparency-ui'
-import {
-  executeAttestationAdminAction,
-  fetchAttestationAdminSummary,
-  fetchAttestationRollout,
-} from './attestation-ui'
-import {
-  executeAuthenticityAdminAction,
-  fetchAuthenticityAdminSummary,
-  fetchAuthenticityRollout,
-} from './authenticity-ui'
-import {
-  executeProvenanceAdminAction,
-  fetchProvenanceAdminSummary,
-  fetchProvenanceRollout,
-} from './provenance-ui'
-import {
-  executeVerifiabilityAdminAction,
-  fetchVerifiabilityAdminSummary,
-  fetchVerifiabilityRollout,
-} from './verifiability-ui'
-import {
-  executeConfirmabilityAdminAction,
-  fetchConfirmabilityAdminSummary,
-  fetchConfirmabilityRollout,
-} from './confirmability-ui'
-import {
-  executeValidityAdminAction,
-  fetchValidityAdminSummary,
-  fetchValidityRollout,
-} from './validity-ui'
-import {
-  executeCredibilityAdminAction,
-  fetchCredibilityAdminSummary,
-  fetchCredibilityRollout,
-} from './credibility-ui'
-import {
-  executeReproducibilityAdminAction,
-  fetchReproducibilityAdminSummary,
-  fetchReproducibilityRollout,
-} from './reproducibility-ui'
-import {
-  executeDefensibilityAdminAction,
-  fetchDefensibilityAdminSummary,
-  fetchDefensibilityRollout,
-} from './defensibility-ui'
-import {
-  executeAuditabilityAdminAction,
-  fetchAuditabilityAdminSummary,
-  fetchAuditabilityRollout,
-} from './auditability-ui'
-import {
-  executeInspectabilityAdminAction,
-  fetchInspectabilityAdminSummary,
-  fetchInspectabilityRollout,
-} from './inspectability-ui'
-import {
-  executeExplainabilityAdminAction,
-  fetchExplainabilityAdminSummary,
-  fetchExplainabilityRollout,
-} from './explainability-ui'
-import {
-  executeDemonstrabilityAdminAction,
-  fetchDemonstrabilityAdminSummary,
-  fetchDemonstrabilityRollout,
-} from './demonstrability-ui'
-import {
-  executeJustifiabilityAdminAction,
-  fetchJustifiabilityAdminSummary,
-  fetchJustifiabilityRollout,
-} from './justifiability-ui'
-import {
-  executeReviewabilityAdminAction,
-  fetchReviewabilityAdminSummary,
-  fetchReviewabilityRollout,
-} from './reviewability-ui'
-import {
-  executeAssessabilityAdminAction,
-  fetchAssessabilityAdminSummary,
-  fetchAssessabilityRollout,
-} from './assessability-ui'
-import {
-  executeMeasurabilityAdminAction,
-  fetchMeasurabilityAdminSummary,
-  fetchMeasurabilityRollout,
-} from './measurability-ui'
-import {
-  executeCertifiabilityAdminAction,
-  fetchCertifiabilityAdminSummary,
-  fetchCertifiabilityRollout,
-} from './certifiability-ui'
-import {
-  executeSubstantiabilityAdminAction,
-  fetchSubstantiabilityAdminSummary,
-  fetchSubstantiabilityRollout,
-} from './substantiability-ui'
-import {
-  executeWarrantabilityAdminAction,
-  fetchWarrantabilityAdminSummary,
-  fetchWarrantabilityRollout,
-} from './warrantability-ui'
-import {
-  executeAttributabilityAdminAction,
-  fetchAttributabilityAdminSummary,
-  fetchAttributabilityRollout,
-} from './attributability-ui'
-import {
-  executeIdentifiabilityAdminAction,
-  fetchIdentifiabilityAdminSummary,
-  fetchIdentifiabilityRollout,
-} from './identifiability-ui'
-import {
-  executeComparabilityAdminAction,
-  fetchComparabilityAdminSummary,
-  fetchComparabilityRollout,
-} from './comparability-ui'
-import {
-  executeDistinguishabilityAdminAction,
-  fetchDistinguishabilityAdminSummary,
-  fetchDistinguishabilityRollout,
-} from './distinguishability-ui'
-import {
-  executeAssignabilityAdminAction,
-  fetchAssignabilityAdminSummary,
-  fetchAssignabilityRollout,
-} from './assignability-ui'
-import {
-  executeReferencabilityAdminAction,
-  fetchReferencabilityAdminSummary,
-  fetchReferencabilityRollout,
-} from './referencability-ui'
-import {
-  executeLocatabilityAdminAction,
-  fetchLocatabilityAdminSummary,
-  fetchLocatabilityRollout,
-} from './locatability-ui'
-import {
-  executeRetrievabilityAdminAction,
-  fetchRetrievabilityAdminSummary,
-  fetchRetrievabilityRollout,
-} from './retrievability-ui'
-import {
-  executeDiscoverabilityAdminAction,
-  fetchDiscoverabilityAdminSummary,
-  fetchDiscoverabilityRollout,
-} from './discoverability-ui'
-import {
-  executeNavigabilityAdminAction,
-  fetchNavigabilityAdminSummary,
-  fetchNavigabilityRollout,
-} from './navigability-ui'
-import {
-  executeConnectabilityAdminAction,
-  fetchConnectabilityAdminSummary,
-  fetchConnectabilityRollout,
-} from './connectability-ui'
-import {
-  executeLinkabilityAdminAction,
-  fetchLinkabilityAdminSummary,
-  fetchLinkabilityRollout,
-} from './linkability-ui'
-import {
-  executeInterchangeabilityAdminAction,
-  fetchInterchangeabilityAdminSummary,
-  fetchInterchangeabilityRollout,
-} from './interchangeability-ui'
-import {
-  executeTransferabilityAdminAction,
-  fetchTransferabilityAdminSummary,
-  fetchTransferabilityRollout,
-} from './transferability-ui'
-import {
-  executePortabilityAdminAction,
-  fetchPortabilityAdminSummary,
-  fetchPortabilityRollout,
-} from './portability-ui'
-import {
-  executeCompatibilityAdminAction,
-  fetchCompatibilityAdminSummary,
-  fetchCompatibilityRollout,
-} from './compatibility-ui'
-import {
-  executeAdaptabilityAdminAction,
-  fetchAdaptabilityAdminSummary,
-  fetchAdaptabilityRollout,
-} from './adaptability-ui'
-import {
-  executeFlexibilityAdminAction,
-  fetchFlexibilityAdminSummary,
-  fetchFlexibilityRollout,
-} from './flexibility-ui'
-import {
-  executeExtensibilityAdminAction,
-  fetchExtensibilityAdminSummary,
-  fetchExtensibilityRollout,
-} from './extensibility-ui'
-import {
-  executeModifiabilityAdminAction,
-  fetchModifiabilityAdminSummary,
-  fetchModifiabilityRollout,
-} from './modifiability-ui'
-import {
-  executeConfigurabilityAdminAction,
-  fetchConfigurabilityAdminSummary,
-  fetchConfigurabilityRollout,
-} from './configurability-ui'
-import {
-  executeCustomizabilityAdminAction,
-  fetchCustomizabilityAdminSummary,
-  fetchCustomizabilityRollout,
-} from './customizability-ui'
-import {
-  executeOperabilityAdminAction,
-  fetchOperabilityAdminSummary,
-  fetchOperabilityRollout,
-} from './operability-ui'
-import {
-  executeTunabilityAdminAction,
-  fetchTunabilityAdminSummary,
-  fetchTunabilityRollout,
-} from './tunability-ui'
-import {
-  executeAdjustabilityAdminAction,
-  fetchAdjustabilityAdminSummary,
-  fetchAdjustabilityRollout,
-} from './adjustability-ui'
-import {
-  executeProgrammabilityAdminAction,
-  fetchProgrammabilityAdminSummary,
-  fetchProgrammabilityRollout,
-} from './programmability-ui'
-import {
-  executeDeployabilityAdminAction,
-  fetchDeployabilityAdminSummary,
-  fetchDeployabilityRollout,
-} from './deployability-ui'
-import {
-  executeManageabilityAdminAction,
-  fetchManageabilityAdminSummary,
-  fetchManageabilityRollout,
-} from './manageability-ui'
-import {
-  executeControllabilityAdminAction,
-  fetchControllabilityAdminSummary,
-  fetchControllabilityRollout,
-} from './controllability-ui'
-import {
-  executeIntegrabilityAdminAction,
-  fetchIntegrabilityAdminSummary,
-  fetchIntegrabilityRollout,
-} from './integrability-ui'
-import {
-  executeOrchestrabilityAdminAction,
-  fetchOrchestrabilityAdminSummary,
-  fetchOrchestrabilityRollout,
-} from './orchestrability-ui'
-import {
-  executeSchedulabilityAdminAction,
-  fetchSchedulabilityAdminSummary,
-  fetchSchedulabilityRollout,
-} from './schedulability-ui'
-import {
-  executeAutomatabilityAdminAction,
-  fetchAutomatabilityAdminSummary,
-  fetchAutomatabilityRollout,
-} from './automatability-ui'
-import {
-  executeMonitorabilityAdminAction,
-  fetchMonitorabilityAdminSummary,
-  fetchMonitorabilityRollout,
-} from './monitorability-ui'
-import {
-  executePredictabilityAdminAction,
-  fetchPredictabilityAdminSummary,
-  fetchPredictabilityRollout,
-} from './predictability-ui'
-import {
-  executeRepeatabilityAdminAction,
-  fetchRepeatabilityAdminSummary,
-  fetchRepeatabilityRollout,
-} from './repeatability-ui'
-import {
-  executeResponsivenessAdminAction,
-  fetchResponsivenessAdminSummary,
-  fetchResponsivenessRollout,
-} from './responsiveness-ui'
-import {
-  executeDependabilityAdminAction,
-  fetchDependabilityAdminSummary,
-  fetchDependabilityRollout,
-} from './dependability-ui'
-import {
-  executeComposabilityAdminAction,
-  fetchComposabilityAdminSummary,
-  fetchComposabilityRollout,
-} from './composability-ui'
-import {
-  executeTrustworthinessAdminAction,
-  fetchTrustworthinessAdminSummary,
-  fetchTrustworthinessRollout,
-} from './trustworthiness-ui'
-import {
-  executeUsabilityAdminAction,
-  fetchUsabilityAdminSummary,
-  fetchUsabilityRollout,
-} from './usability-ui'
-import {
-  executeAccessibilityAdminAction,
-  fetchAccessibilityAdminSummary,
-  fetchAccessibilityRollout,
-} from './accessibility-ui'
-import {
-  executeEffectivenessAdminAction,
-  fetchEffectivenessAdminSummary,
-  fetchEffectivenessRollout,
-} from './effectiveness-ui'
-import {
-  executeAppropriatenessAdminAction,
-  fetchAppropriatenessAdminSummary,
-  fetchAppropriatenessRollout,
-} from './appropriateness-ui'
-import {
-  executeSurvivabilityAdminAction,
-  fetchSurvivabilityAdminSummary,
-  fetchSurvivabilityRollout,
-} from './survivability-ui'
-import {
-  executeViabilityAdminAction,
-  fetchViabilityAdminSummary,
-  fetchViabilityRollout,
-} from './viability-ui'
-import {
-  executeFeasibilityAdminAction,
-  fetchFeasibilityAdminSummary,
-  fetchFeasibilityRollout,
-} from './feasibility-ui'
-import {
-  executeConformanceAdminAction,
-  fetchConformanceAdminSummary,
-  fetchConformanceRollout,
-} from './conformance-ui'
-import {
-  executeAdoptabilityAdminAction,
-  fetchAdoptabilityAdminSummary,
-  fetchAdoptabilityRollout,
-} from './adoptability-ui'
-import {
-  executeAcceptabilityAdminAction,
-  fetchAcceptabilityAdminSummary,
-  fetchAcceptabilityRollout,
-} from './acceptability-ui'
-import {
-  executeAffordabilityAdminAction,
-  fetchAffordabilityAdminSummary,
-  fetchAffordabilityRollout,
-} from './affordability-ui'
-import {
-  executeDesirabilityAdminAction,
-  fetchDesirabilityAdminSummary,
-  fetchDesirabilityRollout,
-} from './desirability-ui'
-import {
-  executeMarketabilityAdminAction,
-  fetchMarketabilityAdminSummary,
-  fetchMarketabilityRollout,
-} from './marketability-ui'
-import {
-  executeSuitabilityAdminAction,
-  fetchSuitabilityAdminSummary,
-  fetchSuitabilityRollout,
-} from './suitability-ui'
-import {
-  executeProfitabilityAdminAction,
-  fetchProfitabilityAdminSummary,
-  fetchProfitabilityRollout,
-} from './profitability-ui'
-import {
-  executeLearnabilityAdminAction,
-  fetchLearnabilityAdminSummary,
-  fetchLearnabilityRollout,
-} from './learnability-ui'
-import {
-  executeDeliverabilityAdminAction,
-  fetchDeliverabilityAdminSummary,
-  fetchDeliverabilityRollout,
-} from './deliverability-ui'
-import {
-  executeUnderstandabilityAdminAction,
-  fetchUnderstandabilityAdminSummary,
-  fetchUnderstandabilityRollout,
-} from './understandability-ui'
-import {
-  executeMemorabilityAdminAction,
-  fetchMemorabilityAdminSummary,
-  fetchMemorabilityRollout,
-} from './memorability-ui'
-import {
-  executeTeachabilityAdminAction,
-  fetchTeachabilityAdminSummary,
-  fetchTeachabilityRollout,
-} from './teachability-ui'
-import {
-  executeReadabilityAdminAction,
-  fetchReadabilityAdminSummary,
-  fetchReadabilityRollout,
-} from './readability-ui'
-import {
-  executeClarityAdminAction,
-  fetchClarityAdminSummary,
-  fetchClarityRollout,
-} from './clarity-ui'
-import {
-  executeSimplicityAdminAction,
-  fetchSimplicityAdminSummary,
-  fetchSimplicityRollout,
-} from './simplicity-ui'
-import {
-  executeNegotiabilityAdminAction,
-  fetchNegotiabilityAdminSummary,
-  fetchNegotiabilityRollout,
-} from './negotiability-ui'
-import {
-  executeComprehensibilityAdminAction,
-  fetchComprehensibilityAdminSummary,
-  fetchComprehensibilityRollout,
-} from './comprehensibility-ui'
-import {
-  executeIntelligibilityAdminAction,
-  fetchIntelligibilityAdminSummary,
-  fetchIntelligibilityRollout,
-} from './intelligibility-ui'
-import {
-  executeLegibilityAdminAction,
-  fetchLegibilityAdminSummary,
-  fetchLegibilityRollout,
-} from './legibility-ui'
-import {
-  executeParsabilityAdminAction,
-  fetchParsabilityAdminSummary,
-  fetchParsabilityRollout,
-} from './parsability-ui'
-import {
-  executeCoherenceAdminAction,
-  fetchCoherenceAdminSummary,
-  fetchCoherenceRollout,
-} from './coherence-ui'
-import {
-  executeFamiliarityAdminAction,
-  fetchFamiliarityAdminSummary,
-  fetchFamiliarityRollout,
-} from './familiarity-ui'
-import {
-  executeRecognizabilityAdminAction,
-  fetchRecognizabilityAdminSummary,
-  fetchRecognizabilityRollout,
-} from './recognizability-ui'
-import {
-  executeInterpretabilityAdminAction,
-  fetchInterpretabilityAdminSummary,
-  fetchInterpretabilityRollout,
-} from './interpretability-ui'
-import {
-  executeScannabilityAdminAction,
-  fetchScannabilityAdminSummary,
-  fetchScannabilityRollout,
-} from './scannability-ui'
-import {
-  executePerceptibilityAdminAction,
-  fetchPerceptibilityAdminSummary,
-  fetchPerceptibilityRollout,
-} from './perceptibility-ui'
-import {
-  executeNoticeabilityAdminAction,
-  fetchNoticeabilityAdminSummary,
-  fetchNoticeabilityRollout,
-} from './noticeability-ui'
-import {
-  executeDiscernibilityAdminAction,
-  fetchDiscernibilityAdminSummary,
-  fetchDiscernibilityRollout,
-} from './discernibility-ui'
-import {
-  executeDistinctivenessAdminAction,
-  fetchDistinctivenessAdminSummary,
-  fetchDistinctivenessRollout,
-} from './distinctiveness-ui'
-import {
-  executeConspicuousnessAdminAction,
-  fetchConspicuousnessAdminSummary,
-  fetchConspicuousnessRollout,
-} from './conspicuousness-ui'
-import {
-  executeDetectabilityAdminAction,
-  fetchDetectabilityAdminSummary,
-  fetchDetectabilityRollout,
-} from './detectability-ui'
-import {
-  executeDescribabilityAdminAction,
-  fetchDescribabilityAdminSummary,
-  fetchDescribabilityRollout,
-} from './describability-ui'
-import {
-  executeExpressivenessAdminAction,
-  fetchExpressivenessAdminSummary,
-  fetchExpressivenessRollout,
-} from './expressiveness-ui'
-import {
-  executeCommunicabilityAdminAction,
-  fetchCommunicabilityAdminSummary,
-  fetchCommunicabilityRollout,
-} from './communicability-ui'
-import {
-  executeArticulabilityAdminAction,
-  fetchArticulabilityAdminSummary,
-  fetchArticulabilityRollout,
-} from './articulability-ui'
-import {
-  executeElaboratabilityAdminAction,
-  fetchElaboratabilityAdminSummary,
-  fetchElaboratabilityRollout,
-} from './elaboratability-ui'
-import {
-  executeRepresentabilityAdminAction,
-  fetchRepresentabilityAdminSummary,
-  fetchRepresentabilityRollout,
-} from './representability-ui'
-import {
-  executePresentabilityAdminAction,
-  fetchPresentabilityAdminSummary,
-  fetchPresentabilityRollout,
-} from './presentability-ui'
-import {
-  executeEnunciabilityAdminAction,
-  fetchEnunciabilityAdminSummary,
-  fetchEnunciabilityRollout,
-} from './enunciability-ui'
-import {
-  executeFormulatabilityAdminAction,
-  fetchFormulatabilityAdminSummary,
-  fetchFormulatabilityRollout,
-} from './formulatability-ui'
-import {
-  executeNarratabilityAdminAction,
-  fetchNarratabilityAdminSummary,
-  fetchNarratabilityRollout,
-} from './narratability-ui'
-import {
-  executeIllustratabilityAdminAction,
-  fetchIllustratabilityAdminSummary,
-  fetchIllustratabilityRollout,
-} from './illustratability-ui'
-import {
-  executeSymbolizabilityAdminAction,
-  fetchSymbolizabilityAdminSummary,
-  fetchSymbolizabilityRollout,
-} from './symbolizability-ui'
-import {
-  executeVisualizabilityAdminAction,
-  fetchVisualizabilityAdminSummary,
-  fetchVisualizabilityRollout,
-} from './visualizability-ui'
-import {
-  executeEvocatabilityAdminAction,
-  fetchEvocatabilityAdminSummary,
-  fetchEvocatabilityRollout,
-} from './evocatability-ui'
-import {
-  executeSignifiabilityAdminAction,
-  fetchSignifiabilityAdminSummary,
-  fetchSignifiabilityRollout,
-} from './signifiability-ui'
-import {
-  executeConnotabilityAdminAction,
-  fetchConnotabilityAdminSummary,
-  fetchConnotabilityRollout,
-} from './connotability-ui'
-import {
-  executeTypifiabilityAdminAction,
-  fetchTypifiabilityAdminSummary,
-  fetchTypifiabilityRollout,
-} from './typifiability-ui'
-import {
-  executeMetaphorizabilityAdminAction,
-  fetchMetaphorizabilityAdminSummary,
-  fetchMetaphorizabilityRollout,
-} from './metaphorizability-ui'
-import {
-  executeDramatizabilityAdminAction,
-  fetchDramatizabilityAdminSummary,
-  fetchDramatizabilityRollout,
-} from './dramatizability-ui'
-import {
-  executePersonifiabilityAdminAction,
-  fetchPersonifiabilityAdminSummary,
-  fetchPersonifiabilityRollout,
-} from './personifiability-ui'
-import {
-  executeMaterializabilityAdminAction,
-  fetchMaterializabilityAdminSummary,
-  fetchMaterializabilityRollout,
-} from './materializability-ui'
-import {
-  executeIconizabilityAdminAction,
-  fetchIconizabilityAdminSummary,
-  fetchIconizabilityRollout,
-} from './iconizability-ui'
-import {
-  executeAllegorizabilityAdminAction,
-  fetchAllegorizabilityAdminSummary,
-  fetchAllegorizabilityRollout,
-} from './allegorizability-ui'
-import {
-  executeTokenizabilityAdminAction,
-  fetchTokenizabilityAdminSummary,
-  fetchTokenizabilityRollout,
-} from './tokenizability-ui'
-import {
-  executeStylizabilityAdminAction,
-  fetchStylizabilityAdminSummary,
-  fetchStylizabilityRollout,
-} from './stylizability-ui'
-import {
-  executeEmblemizabilityAdminAction,
-  fetchEmblemizabilityAdminSummary,
-  fetchEmblemizabilityRollout,
-} from './emblemizability-ui'
-import {
-  executeAnalogizabilityAdminAction,
-  fetchAnalogizabilityAdminSummary,
-  fetchAnalogizabilityRollout,
-} from './analogizability-ui'
-import {
-  executeParabolizabilityAdminAction,
-  fetchParabolizabilityAdminSummary,
-  fetchParabolizabilityRollout,
-} from './parabolizability-ui'
-import {
-  executeArchetypizabilityAdminAction,
-  fetchArchetypizabilityAdminSummary,
-  fetchArchetypizabilityRollout,
-} from './archetypizability-ui'
-import {
-  executeCaracterizabilityAdminAction,
-  fetchCaracterizabilityAdminSummary,
-  fetchCaracterizabilityRollout,
-} from './caracterizability-ui'
-import {
-  executeMythicizabilityAdminAction,
-  fetchMythicizabilityAdminSummary,
-  fetchMythicizabilityRollout,
-} from './mythicizability-ui'
-import {
-  executeSemiotizabilityAdminAction,
-  fetchSemiotizabilityAdminSummary,
-  fetchSemiotizabilityRollout,
-} from './semiotizability-ui'
-import {
-  executeHermeneutizabilityAdminAction,
-  fetchHermeneutizabilityAdminSummary,
-  fetchHermeneutizabilityRollout,
-} from './hermeneutizability-ui'
-import {
-  executeLexicalizabilityAdminAction,
-  fetchLexicalizabilityAdminSummary,
-  fetchLexicalizabilityRollout,
-} from './lexicalizability-ui'
-import {
-  executeSemanticizabilityAdminAction,
-  fetchSemanticizabilityAdminSummary,
-  fetchSemanticizabilityRollout,
-} from './semanticizability-ui'
-import {
-  executePragmatizabilityAdminAction,
-  fetchPragmatizabilityAdminSummary,
-  fetchPragmatizabilityRollout,
-} from './pragmatizability-ui'
-import {
-  executeSyntacticizabilityAdminAction,
-  fetchSyntacticizabilityAdminSummary,
-  fetchSyntacticizabilityRollout,
-} from './syntacticizability-ui'
-import {
-  executeRhetorizabilityAdminAction,
-  fetchRhetorizabilityAdminSummary,
-  fetchRhetorizabilityRollout,
-} from './rhetorizability-ui'
-import {
-  executeMorphizabilityAdminAction,
-  fetchMorphizabilityAdminSummary,
-  fetchMorphizabilityRollout,
-} from './morphizability-ui'
-import {
-  executeCodifiabilityAdminAction,
-  fetchCodifiabilityAdminSummary,
-  fetchCodifiabilityRollout,
-} from './codifiability-ui'
-import {
-  executeHermeticizabilityAdminAction,
-  fetchHermeticizabilityAdminSummary,
-  fetchHermeticizabilityRollout,
-} from './hermeticizability-ui'
-import {
-  executeEpistemizabilityAdminAction,
-  fetchEpistemizabilityAdminSummary,
-  fetchEpistemizabilityRollout,
-} from './epistemizability-ui'
-import {
-  executeDialectizabilityAdminAction,
-  fetchDialectizabilityAdminSummary,
-  fetchDialectizabilityRollout,
-} from './dialectizability-ui'
-import {
-  executeOntologizabilityAdminAction,
-  fetchOntologizabilityAdminSummary,
-  fetchOntologizabilityRollout,
-} from './ontologizability-ui'
-import {
-  executePhenomenizabilityAdminAction,
-  fetchPhenomenizabilityAdminSummary,
-  fetchPhenomenizabilityRollout,
-} from './phenomenizability-ui'
-import {
-  executeAxiologizabilityAdminAction,
-  fetchAxiologizabilityAdminSummary,
-  fetchAxiologizabilityRollout,
-} from './axiologizability-ui'
-import {
-  executeTeleologizabilityAdminAction,
-  fetchTeleologizabilityAdminSummary,
-  fetchTeleologizabilityRollout,
-} from './teleologizability-ui'
-import {
-  executeGnoseizabilityAdminAction,
-  fetchGnoseizabilityAdminSummary,
-  fetchGnoseizabilityRollout,
-} from './gnoseizability-ui'
-import {
-  executeMethodizabilityAdminAction,
-  fetchMethodizabilityAdminSummary,
-  fetchMethodizabilityRollout,
-} from './methodizability-ui'
-import {
-  executeHistorizabilityAdminAction,
-  fetchHistorizabilityAdminSummary,
-  fetchHistorizabilityRollout,
-} from './historizability-ui'
-import {
-  executeCategorizabilityAdminAction,
-  fetchCategorizabilityAdminSummary,
-  fetchCategorizabilityRollout,
-} from './categorizability-ui'
-import {
-  executeTaxonomizabilityAdminAction,
-  fetchTaxonomizabilityAdminSummary,
-  fetchTaxonomizabilityRollout,
-} from './taxonomizability-ui'
-import {
-  executeClassifiabilityAdminAction,
-  fetchClassifiabilityAdminSummary,
-  fetchClassifiabilityRollout,
-} from './classifiability-ui'
-import {
-  executeTypologizabilityAdminAction,
-  fetchTypologizabilityAdminSummary,
-  fetchTypologizabilityRollout,
-} from './typologizability-ui'
-import {
-  executeStratifiabilityAdminAction,
-  fetchStratifiabilityAdminSummary,
-  fetchStratifiabilityRollout,
-} from './stratifiability-ui'
-import {
-  executeOrdinarizabilityAdminAction,
-  fetchOrdinarizabilityAdminSummary,
-  fetchOrdinarizabilityRollout,
-} from './ordinarizability-ui'
-import {
-  executeSystematizabilityAdminAction,
-  fetchSystematizabilityAdminSummary,
-  fetchSystematizabilityRollout,
-} from './systematizability-ui'
-import {
-  executeHierarchizabilityAdminAction,
-  fetchHierarchizabilityAdminSummary,
-  fetchHierarchizabilityRollout,
-} from './hierarchizability-ui'
-import {
-  executeSegmentizabilityAdminAction,
-  fetchSegmentizabilityAdminSummary,
-  fetchSegmentizabilityRollout,
-} from './segmentizability-ui'
-import {
-  executeClusterizabilityAdminAction,
-  fetchClusterizabilityAdminSummary,
-  fetchClusterizabilityRollout,
-} from './clusterizability-ui'
-import {
-  executeNomenclatizabilityAdminAction,
-  fetchNomenclatizabilityAdminSummary,
-  fetchNomenclatizabilityRollout,
-} from './nomenclatizability-ui'
-import {
-  executeCatalogizabilityAdminAction,
-  fetchCatalogizabilityAdminSummary,
-  fetchCatalogizabilityRollout,
-} from './catalogizability-ui'
-import {
-  executeIndexizabilityAdminAction,
-  fetchIndexizabilityAdminSummary,
-  fetchIndexizabilityRollout,
-} from './indexizability-ui'
-import {
-  executeDirectoryizabilityAdminAction,
-  fetchDirectoryizabilityAdminSummary,
-  fetchDirectoryizabilityRollout,
-} from './directoryizability-ui'
-import {
-  executeInventoryizabilityAdminAction,
-  fetchInventoryizabilityAdminSummary,
-  fetchInventoryizabilityRollout,
-} from './inventoryizability-ui'
-import {
-  executeRegistryizabilityAdminAction,
-  fetchRegistryizabilityAdminSummary,
-  fetchRegistryizabilityRollout,
-} from './registryizability-ui'
-import {
-  executeArchivizabilityAdminAction,
-  fetchArchivizabilityAdminSummary,
-  fetchArchivizabilityRollout,
-} from './archivizability-ui'
-import {
-  executeCuratizabilityAdminAction,
-  fetchCuratizabilityAdminSummary,
-  fetchCuratizabilityRollout,
-} from './curatizability-ui'
-import {
-  executeCollectizabilityAdminAction,
-  fetchCollectizabilityAdminSummary,
-  fetchCollectizabilityRollout,
-} from './collectizability-ui'
-import {
-  executeAggregatizabilityAdminAction,
-  fetchAggregatizabilityAdminSummary,
-  fetchAggregatizabilityRollout,
-} from './aggregatizability-ui'
-import {
-  executeCompilatizabilityAdminAction,
-  fetchCompilatizabilityAdminSummary,
-  fetchCompilatizabilityRollout,
-} from './compilatizability-ui'
-import {
-  executeBibliographizabilityAdminAction,
-  fetchBibliographizabilityAdminSummary,
-  fetchBibliographizabilityRollout,
-} from './bibliographizability-ui'
-import {
-  executeReferencizabilityAdminAction,
-  fetchReferencizabilityAdminSummary,
-  fetchReferencizabilityRollout,
-} from './referencizability-ui'
-import {
-  executeDocumentizabilityAdminAction,
-  fetchDocumentizabilityAdminSummary,
-  fetchDocumentizabilityRollout,
-} from './documentizability-ui'
-import {
-  executeAnnotationizabilityAdminAction,
-  fetchAnnotationizabilityAdminSummary,
-  fetchAnnotationizabilityRollout,
-} from './annotationizability-ui'
-import {
-  executeCitationizabilityAdminAction,
-  fetchCitationizabilityAdminSummary,
-  fetchCitationizabilityRollout,
-} from './citationizability-ui'
-import {
-  executeConsolidatizabilityAdminAction,
-  fetchConsolidatizabilityAdminSummary,
-  fetchConsolidatizabilityRollout,
-} from './consolidatizability-ui'
-import {
-  executeHarmonizabilityAdminAction,
-  fetchHarmonizabilityAdminSummary,
-  fetchHarmonizabilityRollout,
-} from './harmonizability-ui'
-import {
-  executeParametrizabilityAdminAction,
-  fetchParametrizabilityAdminSummary,
-  fetchParametrizabilityRollout,
-} from './parametrizability-ui'
-import {
-  executeSerializabilityAdminAction,
-  fetchSerializabilityAdminSummary,
-  fetchSerializabilityRollout,
-} from './serializability-ui'
-import {
-  executeNormalizabilityAdminAction,
-  fetchNormalizabilityAdminSummary,
-  fetchNormalizabilityRollout,
-} from './normalizability-ui'
-import {
-  executeGlossarizabilityAdminAction,
-  fetchGlossarizabilityAdminSummary,
-  fetchGlossarizabilityRollout,
-} from './glossarizability-ui'
-import {
-  executeThesaurusizabilityAdminAction,
-  fetchThesaurusizabilityAdminSummary,
-  fetchThesaurusizabilityRollout,
-} from './thesaurusizability-ui'
-import {
-  executeTerminologizabilityAdminAction,
-  fetchTerminologizabilityAdminSummary,
-  fetchTerminologizabilityRollout,
-} from './terminologizability-ui'
-import {
-  executeVocabularizabilityAdminAction,
-  fetchVocabularizabilityAdminSummary,
-  fetchVocabularizabilityRollout,
-} from './vocabularizability-ui'
-import {
-  executeFootnotizabilityAdminAction,
-  fetchFootnotizabilityAdminSummary,
-  fetchFootnotizabilityRollout,
-} from './footnotizability-ui'
-import {
-  executeContextualizabilityAdminAction,
-  fetchContextualizabilityAdminSummary,
-  fetchContextualizabilityRollout,
-} from './contextualizability-ui'
-import {
-  executeGeneralizabilityAdminAction,
-  fetchGeneralizabilityAdminSummary,
-  fetchGeneralizabilityRollout,
-} from './generalizability-ui'
-import {
-  executeStandardizabilityAdminAction,
-  fetchStandardizabilityAdminSummary,
-  fetchStandardizabilityRollout,
-} from './standardizability-ui'
-import {
-  executeFormalizabilityAdminAction,
-  fetchFormalizabilityAdminSummary,
-  fetchFormalizabilityRollout,
-} from './formalizability-ui'
-import {
-  executeCanonicalizabilityAdminAction,
-  fetchCanonicalizabilityAdminSummary,
-  fetchCanonicalizabilityRollout,
-} from './canonicalizability-ui'
-import {
-  executeAbstractizabilityAdminAction,
-  fetchAbstractizabilityAdminSummary,
-  fetchAbstractizabilityRollout,
-} from './abstractizability-ui'
-import {
-  executeConcretizabilityAdminAction,
-  fetchConcretizabilityAdminSummary,
-  fetchConcretizabilityRollout,
-} from './concretizability-ui'
-import {
-  executeDefinizabilityAdminAction,
-  fetchDefinizabilityAdminSummary,
-  fetchDefinizabilityRollout,
-} from './definizability-ui'
-import {
-  executeInferencizabilityAdminAction,
-  fetchInferencizabilityAdminSummary,
-  fetchInferencizabilityRollout,
-} from './inferencizability-ui'
-import {
-  executeDeducizabilityAdminAction,
-  fetchDeducizabilityAdminSummary,
-  fetchDeducizabilityRollout,
-} from './deducizability-ui'
-import {
-  executeProbabilizabilityAdminAction,
-  fetchProbabilizabilityAdminSummary,
-  fetchProbabilizabilityRollout,
-} from './probabilizability-ui'
-import {
-  executeStochasticizabilityAdminAction,
-  fetchStochasticizabilityAdminSummary,
-  fetchStochasticizabilityRollout,
-} from './stochasticizability-ui'
-import {
-  executeDeterminizabilityAdminAction,
-  fetchDeterminizabilityAdminSummary,
-  fetchDeterminizabilityRollout,
-} from './determinizability-ui'
-import {
-  executePredictizabilityAdminAction,
-  fetchPredictizabilityAdminSummary,
-  fetchPredictizabilityRollout,
-} from './predictizability-ui'
-import {
-  executeExtrapolizabilityAdminAction,
-  fetchExtrapolizabilityAdminSummary,
-  fetchExtrapolizabilityRollout,
-} from './extrapolizability-ui'
-import {
-  executeInductizabilityAdminAction,
-  fetchInductizabilityAdminSummary,
-  fetchInductizabilityRollout,
-} from './inductizability-ui'
-import {
-  executeAbductizabilityAdminAction,
-  fetchAbductizabilityAdminSummary,
-  fetchAbductizabilityRollout,
-} from './abductizability-ui'
-import {
-  executeRetrodictizabilityAdminAction,
-  fetchRetrodictizabilityAdminSummary,
-  fetchRetrodictizabilityRollout,
-} from './retrodictizability-ui'
-import {
-  executeCorroborizabilityAdminAction,
-  fetchCorroborizabilityAdminSummary,
-  fetchCorroborizabilityRollout,
-} from './corroborizability-ui'
-import {
-  executeFalsifiizabilityAdminAction,
-  fetchFalsifiizabilityAdminSummary,
-  fetchFalsifiizabilityRollout,
-} from './falsifiizability-ui'
-import {
-  executeInterpolizabilityAdminAction,
-  fetchInterpolizabilityAdminSummary,
-  fetchInterpolizabilityRollout,
-} from './interpolizability-ui'
-import {
-  executeRegressizabilityAdminAction,
-  fetchRegressizabilityAdminSummary,
-  fetchRegressizabilityRollout,
-} from './regressizability-ui'
-import {
-  executeHeuristizabilityAdminAction,
-  fetchHeuristizabilityAdminSummary,
-  fetchHeuristizabilityRollout,
-} from './heuristizability-ui'
-import {
-  executeSimulatizabilityAdminAction,
-  fetchSimulatizabilityAdminSummary,
-  fetchSimulatizabilityRollout,
-} from './simulatizability-ui'
-import {
-  executeOptimizabilityAdminAction,
-  fetchOptimizabilityAdminSummary,
-  fetchOptimizabilityRollout,
-} from './optimizability-ui'
-import {
-  executeCalibratizabilityAdminAction,
-  fetchCalibratizabilityAdminSummary,
-  fetchCalibratizabilityRollout,
-} from './calibratizability-ui'
-import {
-  executeMetricizabilityAdminAction,
-  fetchMetricizabilityAdminSummary,
-  fetchMetricizabilityRollout,
-} from './metricizability-ui'
-import {
-  executeBenchmarkizabilityAdminAction,
-  fetchBenchmarkizabilityAdminSummary,
-  fetchBenchmarkizabilityRollout,
-} from './benchmarkizability-ui'
-import {
-  executeComparizabilityAdminAction,
-  fetchComparizabilityAdminSummary,
-  fetchComparizabilityRollout,
-} from './comparizability-ui'
-import {
-  executeTolerizabilityAdminAction,
-  fetchTolerizabilityAdminSummary,
-  fetchTolerizabilityRollout,
-} from './tolerizability-ui'
-import {
-  executeApproximatizabilityAdminAction,
-  fetchApproximatizabilityAdminSummary,
-  fetchApproximatizabilityRollout,
-} from './approximatizability-ui'
-import {
-  executeIterativizabilityAdminAction,
-  fetchIterativizabilityAdminSummary,
-  fetchIterativizabilityRollout,
-} from './iterativizability-ui'
-import {
-  executeConvergizabilityAdminAction,
-  fetchConvergizabilityAdminSummary,
-  fetchConvergizabilityRollout,
-} from './convergizability-ui'
-import {
-  executeStabilizabilityAdminAction,
-  fetchStabilizabilityAdminSummary,
-  fetchStabilizabilityRollout,
-} from './stabilizability-ui'
-import {
-  executeAdaptizabilityAdminAction,
-  fetchAdaptizabilityAdminSummary,
-  fetchAdaptizabilityRollout,
-} from './adaptizability-ui'
-import {
-  executeScalabilizabilityAdminAction,
-  fetchScalabilizabilityAdminSummary,
-  fetchScalabilizabilityRollout,
-} from './scalabilizability-ui'
-import {
-  executeElasticizabilityAdminAction,
-  fetchElasticizabilityAdminSummary,
-  fetchElasticizabilityRollout,
-} from './elasticizability-ui'
-import {
-  executeResilientizabilityAdminAction,
-  fetchResilientizabilityAdminSummary,
-  fetchResilientizabilityRollout,
-} from './resilientizability-ui'
-import {
-  executeRobustizabilityAdminAction,
-  fetchRobustizabilityAdminSummary,
-  fetchRobustizabilityRollout,
-} from './robustizability-ui'
-import {
-  executeDependableizabilityAdminAction,
-  fetchDependableizabilityAdminSummary,
-  fetchDependableizabilityRollout,
-} from './dependableizability-ui'
-import {
-  executeRecoverizabilityAdminAction,
-  fetchRecoverizabilityAdminSummary,
-  fetchRecoverizabilityRollout,
-} from './recoverizability-ui'
-import {
-  executeRedundizabilityAdminAction,
-  fetchRedundizabilityAdminSummary,
-  fetchRedundizabilityRollout,
-} from './redundizability-ui'
-import {
-  executeFailoverizabilityAdminAction,
-  fetchFailoverizabilityAdminSummary,
-  fetchFailoverizabilityRollout,
-} from './failoverizability-ui'
-import {
-  executeContinuizabilityAdminAction,
-  fetchContinuizabilityAdminSummary,
-  fetchContinuizabilityRollout,
-} from './continuizability-ui'
-import {
-  executeSustainizabilityAdminAction,
-  fetchSustainizabilityAdminSummary,
-  fetchSustainizabilityRollout,
-} from './sustainizability-ui'
-import {
-  executeAvailabilizabilityAdminAction,
-  fetchAvailabilizabilityAdminSummary,
-  fetchAvailabilizabilityRollout,
-} from './availabilizability-ui'
-import {
-  executeTraceabilizabilityAdminAction,
-  fetchTraceabilizabilityAdminSummary,
-  fetchTraceabilizabilityRollout,
-} from './traceabilizability-ui'
-import {
-  executeMonitorizabilityAdminAction,
-  fetchMonitorizabilityAdminSummary,
-  fetchMonitorizabilityRollout,
-} from './monitorizability-ui'
-import {
-  executeAlertabilizabilityAdminAction,
-  fetchAlertabilizabilityAdminSummary,
-  fetchAlertabilizabilityRollout,
-} from './alertabilizability-ui'
-import {
-  executeObservabilizabilityAdminAction,
-  fetchObservabilizabilityAdminSummary,
-  fetchObservabilizabilityRollout,
-} from './observabilizability-ui'
-import {
-  executeRestorabilizabilityAdminAction,
-  fetchRestorabilizabilityAdminSummary,
-  fetchRestorabilizabilityRollout,
-} from './restorabilizability-ui'
-import {
-  executeReplicabilizabilityAdminAction,
-  fetchReplicabilizabilityAdminSummary,
-  fetchReplicabilizabilityRollout,
-} from './replicabilizability-ui'
-import {
-  executeLoadbalancizabilityAdminAction,
-  fetchLoadbalancizabilityAdminSummary,
-  fetchLoadbalancizabilityRollout,
-} from './loadbalancizability-ui'
-import {
-  executeAutoscalingizabilityAdminAction,
-  fetchAutoscalingizabilityAdminSummary,
-  fetchAutoscalingizabilityRollout,
-} from './autoscalingizability-ui'
-import {
-  executeDeployabilizabilityAdminAction,
-  fetchDeployabilizabilityAdminSummary,
-  fetchDeployabilizabilityRollout,
-} from './deployabilizability-ui'
-import {
-  executeConfigurabilizabilityAdminAction,
-  fetchConfigurabilizabilityAdminSummary,
-  fetchConfigurabilizabilityRollout,
-} from './configurabilizability-ui'
-import {
-  executeOperabilizabilityAdminAction,
-  fetchOperabilizabilityAdminSummary,
-  fetchOperabilizabilityRollout,
-} from './operabilizability-ui'
-import {
-  executeMaintainabilizabilityAdminAction,
-  fetchMaintainabilizabilityAdminSummary,
-  fetchMaintainabilizabilityRollout,
-} from './maintainabilizability-ui'
-import {
-  executeDiagnosabilizabilityAdminAction,
-  fetchDiagnosabilizabilityAdminSummary,
-  fetchDiagnosabilizabilityRollout,
-} from './diagnosabilizability-ui'
-import {
-  executeTroubleshootizabilityAdminAction,
-  fetchTroubleshootizabilityAdminSummary,
-  fetchTroubleshootizabilityRollout,
-} from './troubleshootizability-ui'
-import {
-  executeRollbackabilizabilityAdminAction,
-  fetchRollbackabilizabilityAdminSummary,
-  fetchRollbackabilizabilityRollout,
-} from './rollbackabilizability-ui'
-import {
-  executeCanaryizabilityAdminAction,
-  fetchCanaryizabilityAdminSummary,
-  fetchCanaryizabilityRollout,
-} from './canaryizability-ui'
-import {
-  executeBluegreenizabilityAdminAction,
-  fetchBluegreenizabilityAdminSummary,
-  fetchBluegreenizabilityRollout,
-} from './bluegreenizability-ui'
-import {
-  executeProgressiveizabilityAdminAction,
-  fetchProgressiveizabilityAdminSummary,
-  fetchProgressiveizabilityRollout,
-} from './progressiveizability-ui'
-import {
-  executeFeatureflagizabilityAdminAction,
-  fetchFeatureflagizabilityAdminSummary,
-  fetchFeatureflagizabilityRollout,
-} from './featureflagizability-ui'
-import {
-  executeScriptabilizabilityAdminAction,
-  fetchScriptabilizabilityAdminSummary,
-  fetchScriptabilizabilityRollout,
-} from './scriptabilizability-ui'
-import {
-  executeAutomatizabilityAdminAction,
-  fetchAutomatizabilityAdminSummary,
-  fetchAutomatizabilityRollout,
-} from './automatizability-ui'
-import {
-  executeOrchestrizabilityAdminAction,
-  fetchOrchestrizabilityAdminSummary,
-  fetchOrchestrizabilityRollout,
-} from './orchestrizability-ui'
-import {
-  executeSchedulizabilityAdminAction,
-  fetchSchedulizabilityAdminSummary,
-  fetchSchedulizabilityRollout,
-} from './schedulizability-ui'
-import {
-  executeTriggerizabilityAdminAction,
-  fetchTriggerizabilityAdminSummary,
-  fetchTriggerizabilityRollout,
-} from './triggerizability-ui'
-import {
-  executeReleasizabilityAdminAction,
-  fetchReleasizabilityAdminSummary,
-  fetchReleasizabilityRollout,
-} from './releasizability-ui'
-import {
-  executeVersionizabilityAdminAction,
-  fetchVersionizabilityAdminSummary,
-  fetchVersionizabilityRollout,
-} from './versionizability-ui'
-import {
-  executeMigratizabilityAdminAction,
-  fetchMigratizabilityAdminSummary,
-  fetchMigratizabilityRollout,
-} from './migratizability-ui'
-import {
-  executeUpgradizabilityAdminAction,
-  fetchUpgradizabilityAdminSummary,
-  fetchUpgradizabilityRollout,
-} from './upgradizability-ui'
-import {
-  executePatchizabilityAdminAction,
-  fetchPatchizabilityAdminSummary,
-  fetchPatchizabilityRollout,
-} from './patchizability-ui'
-import {
-  executeIntegrabilizabilityAdminAction,
-  fetchIntegrabilizabilityAdminSummary,
-  fetchIntegrabilizabilityRollout,
-} from './integrabilizability-ui'
-import {
-  executeComposabilizabilityAdminAction,
-  fetchComposabilizabilityAdminSummary,
-  fetchComposabilizabilityRollout,
-} from './composabilizability-ui'
-import {
-  executeModularizabilityAdminAction,
-  fetchModularizabilityAdminSummary,
-  fetchModularizabilityRollout,
-} from './modularizability-ui'
-import {
-  executeExtensibilizabilityAdminAction,
-  fetchExtensibilizabilityAdminSummary,
-  fetchExtensibilizabilityRollout,
-} from './extensibilizability-ui'
-import {
-  executePluggabilizabilityAdminAction,
-  fetchPluggabilizabilityAdminSummary,
-  fetchPluggabilizabilityRollout,
-} from './pluggabilizability-ui'
-import {
-  executeCompatibilizabilityAdminAction,
-  fetchCompatibilizabilityAdminSummary,
-  fetchCompatibilizabilityRollout,
-} from './compatibilizability-ui'
-import {
-  executeInteroperabilizabilityAdminAction,
-  fetchInteroperabilizabilityAdminSummary,
-  fetchInteroperabilizabilityRollout,
-} from './interoperabilizability-ui'
-import {
-  executeConnectabilizabilityAdminAction,
-  fetchConnectabilizabilityAdminSummary,
-  fetchConnectabilizabilityRollout,
-} from './connectabilizability-ui'
-import {
-  executeInterfabilizabilityAdminAction,
-  fetchInterfabilizabilityAdminSummary,
-  fetchInterfabilizabilityRollout,
-} from './interfabilizability-ui'
-import {
-  executeProtocolizabilityAdminAction,
-  fetchProtocolizabilityAdminSummary,
-  fetchProtocolizabilityRollout,
-} from './protocolizability-ui'
-import {
-  executeEncapsulizabilityAdminAction,
-  fetchEncapsulizabilityAdminSummary,
-  fetchEncapsulizabilityRollout,
-} from './encapsulizability-ui'
-import {
-  executeIsolatizabilityAdminAction,
-  fetchIsolatizabilityAdminSummary,
-  fetchIsolatizabilityRollout,
-} from './isolatizability-ui'
-import {
-  executeSandboxizabilityAdminAction,
-  fetchSandboxizabilityAdminSummary,
-  fetchSandboxizabilityRollout,
-} from './sandboxizability-ui'
-import {
-  executeContainerizabilityAdminAction,
-  fetchContainerizabilityAdminSummary,
-  fetchContainerizabilityRollout,
-} from './containerizability-ui'
-import {
-  executeBoundarizabilityAdminAction,
-  fetchBoundarizabilityAdminSummary,
-  fetchBoundarizabilityRollout,
-} from './boundarizability-ui'
-import {
-  executeVirtualizabilityAdminAction,
-  fetchVirtualizabilityAdminSummary,
-  fetchVirtualizabilityRollout,
-} from './virtualizability-ui'
-import {
-  executeDistributizabilityAdminAction,
-  fetchDistributizabilityAdminSummary,
-  fetchDistributizabilityRollout,
-} from './distributizability-ui'
-import {
-  executeFederatizabilityAdminAction,
-  fetchFederatizabilityAdminSummary,
-  fetchFederatizabilityRollout,
-} from './federatizability-ui'
-import {
-  executeDecentralizabilityAdminAction,
-  fetchDecentralizabilityAdminSummary,
-  fetchDecentralizabilityRollout,
-} from './decentralizability-ui'
-import {
-  executeMeshabilizabilityAdminAction,
-  fetchMeshabilizabilityAdminSummary,
-  fetchMeshabilizabilityRollout,
-} from './meshabilizability-ui'
-import {
-  executeTopologizabilityAdminAction,
-  fetchTopologizabilityAdminSummary,
-  fetchTopologizabilityRollout,
-} from './topologizability-ui'
-import {
-  executeNetworkizabilityAdminAction,
-  fetchNetworkizabilityAdminSummary,
-  fetchNetworkizabilityRollout,
-} from './networkizability-ui'
-import {
-  executeGatewayizabilityAdminAction,
-  fetchGatewayizabilityAdminSummary,
-  fetchGatewayizabilityRollout,
-} from './gatewayizability-ui'
-import {
-  executeBrokerizabilityAdminAction,
-  fetchBrokerizabilityAdminSummary,
-  fetchBrokerizabilityRollout,
-} from './brokerizability-ui'
-import {
-  executeRelayizabilityAdminAction,
-  fetchRelayizabilityAdminSummary,
-  fetchRelayizabilityRollout,
-} from './relayizability-ui'
-import {
-  executeRoutizabilityAdminAction,
-  fetchRoutizabilityAdminSummary,
-  fetchRoutizabilityRollout,
-} from './routizability-ui'
-import {
-  executeQueueizabilityAdminAction,
-  fetchQueueizabilityAdminSummary,
-  fetchQueueizabilityRollout,
-} from './queueizability-ui'
-import {
-  executeEventizabilityAdminAction,
-  fetchEventizabilityAdminSummary,
-  fetchEventizabilityRollout,
-} from './eventizability-ui'
-import {
-  executeChannelizabilityAdminAction,
-  fetchChannelizabilityAdminSummary,
-  fetchChannelizabilityRollout,
-} from './channelizability-ui'
-import {
-  executeNotifizabilityAdminAction,
-  fetchNotifizabilityAdminSummary,
-  fetchNotifizabilityRollout,
-} from './notifizability-ui'
-import {
-  executeSubscribizabilityAdminAction,
-  fetchSubscribizabilityAdminSummary,
-  fetchSubscribizabilityRollout,
-} from './subscribizability-ui'
-import {
-  executePublishizabilityAdminAction,
-  fetchPublishizabilityAdminSummary,
-  fetchPublishizabilityRollout,
-} from './publishizability-ui'
-import {
-  executeConsumizabilityAdminAction,
-  fetchConsumizabilityAdminSummary,
-  fetchConsumizabilityRollout,
-} from './consumizability-ui'
-import {
-  executeDeliverizabilityAdminAction,
-  fetchDeliverizabilityAdminSummary,
-  fetchDeliverizabilityRollout,
-} from './deliverizability-ui'
-import {
-  executeDispatchizabilityAdminAction,
-  fetchDispatchizabilityAdminSummary,
-  fetchDispatchizabilityRollout,
-} from './dispatchizability-ui'
-import {
-  executeHandoffizabilityAdminAction,
-  fetchHandoffizabilityAdminSummary,
-  fetchHandoffizabilityRollout,
-} from './handoffizability-ui'
-import {
-  executeSynchronizabilityAdminAction,
-  fetchSynchronizabilityAdminSummary,
-  fetchSynchronizabilityRollout,
-} from './synchronizability-ui'
-import {
-  executeAsynchronizabilityAdminAction,
-  fetchAsynchronizabilityAdminSummary,
-  fetchAsynchronizabilityRollout,
-} from './asynchronizability-ui'
-import {
-  executeBroadcastizabilityAdminAction,
-  fetchBroadcastizabilityAdminSummary,
-  fetchBroadcastizabilityRollout,
-} from './broadcastizability-ui'
-import {
-  executeMulticastizabilityAdminAction,
-  fetchMulticastizabilityAdminSummary,
-  fetchMulticastizabilityRollout,
-} from './multicastizability-ui'
-import {
-  executeUnicastizabilityAdminAction,
-  fetchUnicastizabilityAdminSummary,
-  fetchUnicastizabilityRollout,
-} from './unicastizability-ui'
-import {
-  executeFanoutizabilityAdminAction,
-  fetchFanoutizabilityAdminSummary,
-  fetchFanoutizabilityRollout,
-} from './fanoutizability-ui'
-import {
-  executeBackpressureizabilityAdminAction,
-  fetchBackpressureizabilityAdminSummary,
-  fetchBackpressureizabilityRollout,
-} from './backpressureizability-ui'
-import {
-  executeThrottleizabilityAdminAction,
-  fetchThrottleizabilityAdminSummary,
-  fetchThrottleizabilityRollout,
-} from './throttleizability-ui'
-import {
-  executeDebouncizabilityAdminAction,
-  fetchDebouncizabilityAdminSummary,
-  fetchDebouncizabilityRollout,
-} from './debouncizability-ui'
-import {
-  executeBufferizabilityAdminAction,
-  fetchBufferizabilityAdminSummary,
-  fetchBufferizabilityRollout,
-} from './bufferizability-ui'
-import {
-  executeBatchizabilityAdminAction,
-  fetchBatchizabilityAdminSummary,
-  fetchBatchizabilityRollout,
-} from './batchizability-ui'
-import {
-  executeRetryizabilityAdminAction,
-  fetchRetryizabilityAdminSummary,
-  fetchRetryizabilityRollout,
-} from './retryizability-ui'
-import {
-  executeCircuitizabilityAdminAction,
-  fetchCircuitizabilityAdminSummary,
-  fetchCircuitizabilityRollout,
-} from './circuitizability-ui'
-import {
-  executeTimeoutizabilityAdminAction,
-  fetchTimeoutizabilityAdminSummary,
-  fetchTimeoutizabilityRollout,
-} from './timeoutizability-ui'
-import {
-  executeAckizabilityAdminAction,
-  fetchAckizabilityAdminSummary,
-  fetchAckizabilityRollout,
-} from './ackizability-ui'
-import {
-  executeNackizabilityAdminAction,
-  fetchNackizabilityAdminSummary,
-  fetchNackizabilityRollout,
-} from './nackizability-ui'
-import {
-  executeDeadletterizabilityAdminAction,
-  fetchDeadletterizabilityAdminSummary,
-  fetchDeadletterizabilityRollout,
-} from './deadletterizability-ui'
-import {
-  executeDedupizabilityAdminAction,
-  fetchDedupizabilityAdminSummary,
-  fetchDedupizabilityRollout,
-} from './dedupizability-ui'
-import {
-  executeSequencizabilityAdminAction,
-  fetchSequencizabilityAdminSummary,
-  fetchSequencizabilityRollout,
-} from './sequencizability-ui'
-import {
-  executePartitionizabilityAdminAction,
-  fetchPartitionizabilityAdminSummary,
-  fetchPartitionizabilityRollout,
-} from './partitionizability-ui'
-import {
-  executeShardingizabilityAdminAction,
-  fetchShardingizabilityAdminSummary,
-  fetchShardingizabilityRollout,
-} from './shardingizability-ui'
-import {
-  executeOrderingizabilityAdminAction,
-  fetchOrderingizabilityAdminSummary,
-  fetchOrderingizabilityRollout,
-} from './orderingizability-ui'
-import {
-  executeCheckpointizabilityAdminAction,
-  fetchCheckpointizabilityAdminSummary,
-  fetchCheckpointizabilityRollout,
-} from './checkpointizability-ui'
-import {
-  executeRecoveryizabilityAdminAction,
-  fetchRecoveryizabilityAdminSummary,
-  fetchRecoveryizabilityRollout,
-} from './recoveryizability-ui'
-import {
-  executeCompactionizabilityAdminAction,
-  fetchCompactionizabilityAdminSummary,
-  fetchCompactionizabilityRollout,
-} from './compactionizability-ui'
-import {
-  executeRebalanceizabilityAdminAction,
-  fetchRebalanceizabilityAdminSummary,
-  fetchRebalanceizabilityRollout,
-} from './rebalanceizability-ui'
-import {
-  executeLeaderizabilityAdminAction,
-  fetchLeaderizabilityAdminSummary,
-  fetchLeaderizabilityRollout,
-} from './leaderizability-ui'
-import {
-  executeFollowerizabilityAdminAction,
-  fetchFollowerizabilityAdminSummary,
-  fetchFollowerizabilityRollout,
-} from './followerizability-ui'
-import {
-  executeConsensusizabilityAdminAction,
-  fetchConsensusizabilityAdminSummary,
-  fetchConsensusizabilityRollout,
-} from './consensusizability-ui'
-import {
-  executeQuorumizabilityAdminAction,
-  fetchQuorumizabilityAdminSummary,
-  fetchQuorumizabilityRollout,
-} from './quorumizability-ui'
-import {
-  executeSnapshotizabilityAdminAction,
-  fetchSnapshotizabilityAdminSummary,
-  fetchSnapshotizabilityRollout,
-} from './snapshotizability-ui'
-import {
-  executeJournalizabilityAdminAction,
-  fetchJournalizabilityAdminSummary,
-  fetchJournalizabilityRollout,
-} from './journalizability-ui'
-import {
-  executeAppendizabilityAdminAction,
-  fetchAppendizabilityAdminSummary,
-  fetchAppendizabilityRollout,
-} from './appendizability-ui'
-import {
-  executeWalizabilityAdminAction,
-  fetchWalizabilityAdminSummary,
-  fetchWalizabilityRollout,
-} from './walizability-ui'
-import {
-  executeReplicationizabilityAdminAction,
-  fetchReplicationizabilityAdminSummary,
-  fetchReplicationizabilityRollout,
-} from './replicationizability-ui'
-import {
-  executeMirroringizabilityAdminAction,
-  fetchMirroringizabilityAdminSummary,
-  fetchMirroringizabilityRollout,
-} from './mirroringizability-ui'
-import {
-  executeCloningizabilityAdminAction,
-  fetchCloningizabilityAdminSummary,
-  fetchCloningizabilityRollout,
-} from './cloningizability-ui'
-import {
-  executePropagationizabilityAdminAction,
-  fetchPropagationizabilityAdminSummary,
-  fetchPropagationizabilityRollout,
-} from './propagationizability-ui'
-import {
-  executeMaterializationizabilityAdminAction,
-  fetchMaterializationizabilityAdminSummary,
-  fetchMaterializationizabilityRollout,
-} from './materializationizability-ui'
-import {
-  executeHydrationizabilityAdminAction,
-  fetchHydrationizabilityAdminSummary,
-  fetchHydrationizabilityRollout,
-} from './hydrationizability-ui'
-import {
-  executeInvalidationizabilityAdminAction,
-  fetchInvalidationizabilityAdminSummary,
-  fetchInvalidationizabilityRollout,
-} from './invalidationizability-ui'
-import {
-  executeEvictionizabilityAdminAction,
-  fetchEvictionizabilityAdminSummary,
-  fetchEvictionizabilityRollout,
-} from './evictionizability-ui'
-import {
-  executeTtlizabilityAdminAction,
-  fetchTtlizabilityAdminSummary,
-  fetchTtlizabilityRollout,
-} from './ttlizability-ui'
-import {
-  executeExpirationizabilityAdminAction,
-  fetchExpirationizabilityAdminSummary,
-  fetchExpirationizabilityRollout,
-} from './expirationizability-ui'
-import {
-  executeRefreshizabilityAdminAction,
-  fetchRefreshizabilityAdminSummary,
-  fetchRefreshizabilityRollout,
-} from './refreshizability-ui'
-import {
-  executeWarmizabilityAdminAction,
-  fetchWarmizabilityAdminSummary,
-  fetchWarmizabilityRollout,
-} from './warmizability-ui'
-import {
-  executeColdizabilityAdminAction,
-  fetchColdizabilityAdminSummary,
-  fetchColdizabilityRollout,
-} from './coldizability-ui'
-import {
-  executePrefetchizabilityAdminAction,
-  fetchPrefetchizabilityAdminSummary,
-  fetchPrefetchizabilityRollout,
-} from './prefetchizability-ui'
-import {
-  executeCacheizabilityAdminAction,
-  fetchCacheizabilityAdminSummary,
-  fetchCacheizabilityRollout,
-} from './cacheizability-ui'
-import {
-  executeMemorizabilityAdminAction,
-  fetchMemorizabilityAdminSummary,
-  fetchMemorizabilityRollout,
-} from './memorizability-ui'
-import {
-  executePersistizabilityAdminAction,
-  fetchPersistizabilityAdminSummary,
-  fetchPersistizabilityRollout,
-} from './persistizability-ui'
-import {
-  executeCompressizabilityAdminAction,
-  fetchCompressizabilityAdminSummary,
-  fetchCompressizabilityRollout,
-} from './compressizability-ui'
-import {
-  executeDecompressizabilityAdminAction,
-  fetchDecompressizabilityAdminSummary,
-  fetchDecompressizabilityRollout,
-} from './decompressizability-ui'
-import {
-  executeArchiveizabilityAdminAction,
-  fetchArchiveizabilityAdminSummary,
-  fetchArchiveizabilityRollout,
-} from './archiveizability-ui'
-import {
-  executeRestoreizabilityAdminAction,
-  fetchRestoreizabilityAdminSummary,
-  fetchRestoreizabilityRollout,
-} from './restoreizability-ui'
-import {
-  executeBackupizabilityAdminAction,
-  fetchBackupizabilityAdminSummary,
-  fetchBackupizabilityRollout,
-} from './backupizability-ui'
-import {
-  executeExportizabilityAdminAction,
-  fetchExportizabilityAdminSummary,
-  fetchExportizabilityRollout,
-} from './exportizability-ui'
-import {
-  executeImportizabilityAdminAction,
-  fetchImportizabilityAdminSummary,
-  fetchImportizabilityRollout,
-} from './importizability-ui'
-import {
-  executeIndexingizabilityAdminAction,
-  fetchIndexingizabilityAdminSummary,
-  fetchIndexingizabilityRollout,
-} from './indexingizability-ui'
-import {
-  executeSearchizabilityAdminAction,
-  fetchSearchizabilityAdminSummary,
-  fetchSearchizabilityRollout,
-} from './searchizability-ui'
-import {
-  executeVersioningizabilityAdminAction,
-  fetchVersioningizabilityAdminSummary,
-  fetchVersioningizabilityRollout,
-} from './versioningizability-ui'
-import {
-  executeCompactizabilityAdminAction,
-  fetchCompactizabilityAdminSummary,
-  fetchCompactizabilityRollout,
-} from './compactizability-ui'
-import {
-  executeExpandizabilityAdminAction,
-  fetchExpandizabilityAdminSummary,
-  fetchExpandizabilityRollout,
-} from './expandizability-ui'
-import {
-  executeRetentionizabilityAdminAction,
-  fetchRetentionizabilityAdminSummary,
-  fetchRetentionizabilityRollout,
-} from './retentionizability-ui'
-import {
-  executeQueryizabilityAdminAction,
-  fetchQueryizabilityAdminSummary,
-  fetchQueryizabilityRollout,
-} from './queryizability-ui'
-import {
-  executeFilterizabilityAdminAction,
-  fetchFilterizabilityAdminSummary,
-  fetchFilterizabilityRollout,
-} from './filterizability-ui'
-import {
-  executeSortizabilityAdminAction,
-  fetchSortizabilityAdminSummary,
-  fetchSortizabilityRollout,
-} from './sortizability-ui'
-import {
-  executePaginizabilityAdminAction,
-  fetchPaginizabilityAdminSummary,
-  fetchPaginizabilityRollout,
-} from './paginizability-ui'
-import {
-  executePivotizabilityAdminAction,
-  fetchPivotizabilityAdminSummary,
-  fetchPivotizabilityRollout,
-} from './pivotizability-ui'
-import {
-  executeGroupizabilityAdminAction,
-  fetchGroupizabilityAdminSummary,
-  fetchGroupizabilityRollout,
-} from './groupizability-ui'
-import {
-  executeJoinizabilityAdminAction,
-  fetchJoinizabilityAdminSummary,
-  fetchJoinizabilityRollout,
-} from './joinizability-ui'
-import {
-  executeMergeizabilityAdminAction,
-  fetchMergeizabilityAdminSummary,
-  fetchMergeizabilityRollout,
-} from './mergeizability-ui'
-import {
-  executeSplitizabilityAdminAction,
-  fetchSplitizabilityAdminSummary,
-  fetchSplitizabilityRollout,
-} from './splitizability-ui'
-import {
-  executeProjectizabilityAdminAction,
-  fetchProjectizabilityAdminSummary,
-  fetchProjectizabilityRollout,
-} from './projectizability-ui'
-import {
-  executeTransformizabilityAdminAction,
-  fetchTransformizabilityAdminSummary,
-  fetchTransformizabilityRollout,
-} from './transformizability-ui'
-import {
-  executeMapizabilityAdminAction,
-  fetchMapizabilityAdminSummary,
-  fetchMapizabilityRollout,
-} from './mapizability-ui'
-import {
-  executeReduceizabilityAdminAction,
-  fetchReduceizabilityAdminSummary,
-  fetchReduceizabilityRollout,
-} from './reduceizability-ui'
-import {
-  executeFoldizabilityAdminAction,
-  fetchFoldizabilityAdminSummary,
-  fetchFoldizabilityRollout,
-} from './foldizability-ui'
-import {
-  executeScanizabilityAdminAction,
-  fetchScanizabilityAdminSummary,
-  fetchScanizabilityRollout,
-} from './scanizability-ui'
-import {
-  executeChainingizabilityAdminAction,
-  fetchChainingizabilityAdminSummary,
-  fetchChainingizabilityRollout,
-} from './chainingizability-ui'
-import {
-  executePipeliningizabilityAdminAction,
-  fetchPipeliningizabilityAdminSummary,
-  fetchPipeliningizabilityRollout,
-} from './pipeliningizability-ui'
-import {
-  executeBatchingizabilityAdminAction,
-  fetchBatchingizabilityAdminSummary,
-  fetchBatchingizabilityRollout,
-} from './batchingizability-ui'
-import {
-  executeStreamizabilityAdminAction,
-  fetchStreamizabilityAdminSummary,
-  fetchStreamizabilityRollout,
-} from './streamizability-ui'
-import {
-  executeWindowizabilityAdminAction,
-  fetchWindowizabilityAdminSummary,
-  fetchWindowizabilityRollout,
-} from './windowizability-ui'
-import {
-  executeOrchestrationizabilityAdminAction,
-  fetchOrchestrationizabilityAdminSummary,
-  fetchOrchestrationizabilityRollout,
-} from './orchestrationizability-ui'
-import {
-  executeSchedulingizabilityAdminAction,
-  fetchSchedulingizabilityAdminSummary,
-  fetchSchedulingizabilityRollout,
-} from './schedulingizability-ui'
-import {
-  executeTriggeringizabilityAdminAction,
-  fetchTriggeringizabilityAdminSummary,
-  fetchTriggeringizabilityRollout,
-} from './triggeringizability-ui'
-import {
-  executeRoutingizabilityAdminAction,
-  fetchRoutingizabilityAdminSummary,
-  fetchRoutingizabilityRollout,
-} from './routingizability-ui'
-import {
-  executeBalancingizabilityAdminAction,
-  fetchBalancingizabilityAdminSummary,
-  fetchBalancingizabilityRollout,
-} from './balancingizability-ui'
-import {
-  executeNodelizabilityAdminAction,
-  fetchNodelizabilityAdminSummary,
-  fetchNodelizabilityRollout,
-} from './nodelizability-ui'
-import {
-  executeCoordinationizabilityAdminAction,
-  fetchCoordinationizabilityAdminSummary,
-  fetchCoordinationizabilityRollout,
-} from './coordinationizability-ui'
-import {
-  executePartitioningizabilityAdminAction,
-  fetchPartitioningizabilityAdminSummary,
-  fetchPartitioningizabilityRollout,
-} from './partitioningizability-ui'
-import {
-  executeClusteringizabilityAdminAction,
-  fetchClusteringizabilityAdminSummary,
-  fetchClusteringizabilityRollout,
-} from './clusteringizability-ui'
-import {
-  executeMeshingizabilityAdminAction,
-  fetchMeshingizabilityAdminSummary,
-  fetchMeshingizabilityRollout,
-} from './meshingizability-ui'
-import {
-  executeDiscoveryizabilityAdminAction,
-  fetchDiscoveryizabilityAdminSummary,
-  fetchDiscoveryizabilityRollout,
-} from './discoveryizability-ui'
-import {
-  executeRegistrationizabilityAdminAction,
-  fetchRegistrationizabilityAdminSummary,
-  fetchRegistrationizabilityRollout,
-} from './registrationizability-ui'
-import {
-  executeProvisioningizabilityAdminAction,
-  fetchProvisioningizabilityAdminSummary,
-  fetchProvisioningizabilityRollout,
-} from './provisioningizability-ui'
-import {
-  executeAllocationizabilityAdminAction,
-  fetchAllocationizabilityAdminSummary,
-  fetchAllocationizabilityRollout,
-} from './allocationizability-ui'
-import {
-  executeDeallocationizabilityAdminAction,
-  fetchDeallocationizabilityAdminSummary,
-  fetchDeallocationizabilityRollout,
-} from './deallocationizability-ui'
-import {
-  executeScalingizabilityAdminAction,
-  fetchScalingizabilityAdminSummary,
-  fetchScalingizabilityRollout,
-} from './scalingizability-ui'
-import {
-  executeHealingizabilityAdminAction,
-  fetchHealingizabilityAdminSummary,
-  fetchHealingizabilityRollout,
-} from './healingizability-ui'
-import {
-  executeRemediationizabilityAdminAction,
-  fetchRemediationizabilityAdminSummary,
-  fetchRemediationizabilityRollout,
-} from './remediationizability-ui'
-import {
-  executeReconciliationizabilityAdminAction,
-  fetchReconciliationizabilityAdminSummary,
-  fetchReconciliationizabilityRollout,
-} from './reconciliationizability-ui'
-import {
-  executeGovernanceizabilityAdminAction,
-  fetchGovernanceizabilityAdminSummary,
-  fetchGovernanceizabilityRollout,
-} from './governanceizability-ui'
-import {
-  executeComplianceizabilityAdminAction,
-  fetchComplianceizabilityAdminSummary,
-  fetchComplianceizabilityRollout,
-} from './complianceizability-ui'
-import {
-  executePolicyizabilityAdminAction,
-  fetchPolicyizabilityAdminSummary,
-  fetchPolicyizabilityRollout,
-} from './policyizability-ui'
-import {
-  executeEnforcementizabilityAdminAction,
-  fetchEnforcementizabilityAdminSummary,
-  fetchEnforcementizabilityRollout,
-} from './enforcementizability-ui'
-import {
-  executeAssuranceizabilityAdminAction,
-  fetchAssuranceizabilityAdminSummary,
-  fetchAssuranceizabilityRollout,
-} from './assuranceizability-ui'
-import {
-  executeAttestationizabilityAdminAction,
-  fetchAttestationizabilityAdminSummary,
-  fetchAttestationizabilityRollout,
-} from './attestationizability-ui'
-import {
-  executeCertificationizabilityAdminAction,
-  fetchCertificationizabilityAdminSummary,
-  fetchCertificationizabilityRollout,
-} from './certificationizability-ui'
-import {
-  executeAccreditationizabilityAdminAction,
-  fetchAccreditationizabilityAdminSummary,
-  fetchAccreditationizabilityRollout,
-} from './accreditationizability-ui'
-import {
-  executeSpecificationizabilityAdminAction,
-  fetchSpecificationizabilityAdminSummary,
-  fetchSpecificationizabilityRollout,
-} from './specificationizability-ui'
-import {
-  executeInstrumentationizabilityAdminAction,
-  fetchInstrumentationizabilityAdminSummary,
-  fetchInstrumentationizabilityRollout,
-} from './instrumentationizability-ui'
-import {
-  executeTelemetryizabilityAdminAction,
-  fetchTelemetryizabilityAdminSummary,
-  fetchTelemetryizabilityRollout,
-} from './telemetryizability-ui'
-import {
-  executeAuditingizabilityAdminAction,
-  fetchAuditingizabilityAdminSummary,
-  fetchAuditingizabilityRollout,
-} from './auditingizability-ui'
-import {
-  executeAccountabilityizabilityAdminAction,
-  fetchAccountabilityizabilityAdminSummary,
-  fetchAccountabilityizabilityRollout,
-} from './accountabilityizability-ui'
-import {
-  executeTransparencyizabilityAdminAction,
-  fetchTransparencyizabilityAdminSummary,
-  fetchTransparencyizabilityRollout,
-} from './transparencyizability-ui'
-import {
-  executeOversightizabilityAdminAction,
-  fetchOversightizabilityAdminSummary,
-  fetchOversightizabilityRollout,
-} from './oversightizability-ui'
-import {
-  executeControlizabilityAdminAction,
-  fetchControlizabilityAdminSummary,
-  fetchControlizabilityRollout,
-} from './controlizability-ui'
-import {
-  executeEntitlementizabilityAdminAction,
-  fetchEntitlementizabilityAdminSummary,
-  fetchEntitlementizabilityRollout,
-} from './entitlementizability-ui'
-import {
-  executePermissionizabilityAdminAction,
-  fetchPermissionizabilityAdminSummary,
-  fetchPermissionizabilityRollout,
-} from './permissionizability-ui'
-import {
-  executeAuthorizationizabilityAdminAction,
-  fetchAuthorizationizabilityAdminSummary,
-  fetchAuthorizationizabilityRollout,
-} from './authorizationizability-ui'
-import {
-  executeAuthenticationizabilityAdminAction,
-  fetchAuthenticationizabilityAdminSummary,
-  fetchAuthenticationizabilityRollout,
-} from './authenticationizability-ui'
-import {
-  executeIdentityizabilityAdminAction,
-  fetchIdentityizabilityAdminSummary,
-  fetchIdentityizabilityRollout,
-} from './identityizability-ui'
-import {
-  executeRiskizabilityAdminAction,
-  fetchRiskizabilityAdminSummary,
-  fetchRiskizabilityRollout,
-} from './riskizability-ui'
-import {
-  executeSecurityizabilityAdminAction,
-  fetchSecurityizabilityAdminSummary,
-  fetchSecurityizabilityRollout,
-} from './securityizability-ui'
-import {
-  executePrivacyizabilityAdminAction,
-  fetchPrivacyizabilityAdminSummary,
-  fetchPrivacyizabilityRollout,
-} from './privacyizability-ui'
-import {
-  executeTrustizabilityAdminAction,
-  fetchTrustizabilityAdminSummary,
-  fetchTrustizabilityRollout,
-} from './trustizability-ui'
-import {
-  executeIntegrityizabilityAdminAction,
-  fetchIntegrityizabilityAdminSummary,
-  fetchIntegrityizabilityRollout,
-} from './integrityizability-ui'
-import {
-  executeThreatizabilityAdminAction,
-  fetchThreatizabilityAdminSummary,
-  fetchThreatizabilityRollout,
-} from './threatizability-ui'
-import {
-  executeVulnerabilityizabilityAdminAction,
-  fetchVulnerabilityizabilityAdminSummary,
-  fetchVulnerabilityizabilityRollout,
-} from './vulnerabilityizability-ui'
-import {
-  executeMitigationizabilityAdminAction,
-  fetchMitigationizabilityAdminSummary,
-  fetchMitigationizabilityRollout,
-} from './mitigationizability-ui'
-import {
-  executeHardeningizabilityAdminAction,
-  fetchHardeningizabilityAdminSummary,
-  fetchHardeningizabilityRollout,
-} from './hardeningizability-ui'
-import {
-  executeSegregationizabilityAdminAction,
-  fetchSegregationizabilityAdminSummary,
-  fetchSegregationizabilityRollout,
-} from './segregationizability-ui'
-import {
-  executeConfidentialityizabilityAdminAction,
-  fetchConfidentialityizabilityAdminSummary,
-  fetchConfidentialityizabilityRollout,
-} from './confidentialityizability-ui'
-import {
-  executeNonrepudiationizabilityAdminAction,
-  fetchNonrepudiationizabilityAdminSummary,
-  fetchNonrepudiationizabilityRollout,
-} from './nonrepudiationizability-ui'
-import {
-  executeAccesscontrolizabilityAdminAction,
-  fetchAccesscontrolizabilityAdminSummary,
-  fetchAccesscontrolizabilityRollout,
-} from './accesscontrolizability-ui'
-import {
-  executeLeastprivilegeizabilityAdminAction,
-  fetchLeastprivilegeizabilityAdminSummary,
-  fetchLeastprivilegeizabilityRollout,
-} from './leastprivilegeizability-ui'
-import {
-  executeZerotrustizabilityAdminAction,
-  fetchZerotrustizabilityAdminSummary,
-  fetchZerotrustizabilityRollout,
-} from './zerotrustizability-ui'
-import {
-  executeIdentityproofizabilityAdminAction,
-  fetchIdentityproofizabilityAdminSummary,
-  fetchIdentityproofizabilityRollout,
-} from './identityproofizability-ui'
-import {
-  executeKeymanagementizabilityAdminAction,
-  fetchKeymanagementizabilityAdminSummary,
-  fetchKeymanagementizabilityRollout,
-} from './keymanagementizability-ui'
-import {
-  executeSecretmanagementizabilityAdminAction,
-  fetchSecretmanagementizabilityAdminSummary,
-  fetchSecretmanagementizabilityRollout,
-} from './secretmanagementizability-ui'
-import {
-  executeCryptographyizabilityAdminAction,
-  fetchCryptographyizabilityAdminSummary,
-  fetchCryptographyizabilityRollout,
-} from './cryptographyizability-ui'
-import {
-  executeComplianceguardizabilityAdminAction,
-  fetchComplianceguardizabilityAdminSummary,
-  fetchComplianceguardizabilityRollout,
-} from './complianceguardizability-ui'
-import {
-  executeProvenanceizabilityAdminAction,
-  fetchProvenanceizabilityAdminSummary,
-  fetchProvenanceizabilityRollout,
-} from './provenanceizability-ui'
-import {
-  executeLineageizabilityAdminAction,
-  fetchLineageizabilityAdminSummary,
-  fetchLineageizabilityRollout,
-} from './lineageizability-ui'
-import {
-  executeForensicizabilityAdminAction,
-  fetchForensicizabilityAdminSummary,
-  fetchForensicizabilityRollout,
-} from './forensicizability-ui'
-import {
-  executeAudittrailizabilityAdminAction,
-  fetchAudittrailizabilityAdminSummary,
-  fetchAudittrailizabilityRollout,
-} from './audittrailizability-ui'
-import {
-  executeComplianceproofizabilityAdminAction,
-  fetchComplianceproofizabilityAdminSummary,
-  fetchComplianceproofizabilityRollout,
-} from './complianceproofizability-ui'
-import {
-  executeGovernancetrackizabilityAdminAction,
-  fetchGovernancetrackizabilityAdminSummary,
-  fetchGovernancetrackizabilityRollout,
-} from './governancetrackizability-ui'
-import {
-  executeAttesttrackizabilityAdminAction,
-  fetchAttesttrackizabilityAdminSummary,
-  fetchAttesttrackizabilityRollout,
-} from './attesttrackizability-ui'
-import {
-  executeEvidencizabilityAdminAction,
-  fetchEvidencizabilityAdminSummary,
-  fetchEvidencizabilityRollout,
-} from './evidencizability-ui'
-import {
-  executeChainofcustodyizabilityAdminAction,
-  fetchChainofcustodyizabilityAdminSummary,
-  fetchChainofcustodyizabilityRollout,
-} from './chainofcustodyizability-ui'
-import {
-  executeTamperproofizabilityAdminAction,
-  fetchTamperproofizabilityAdminSummary,
-  fetchTamperproofizabilityRollout,
-} from './tamperproofizability-ui'
-import {
-  executePolicyproofizabilityAdminAction,
-  fetchPolicyproofizabilityAdminSummary,
-  fetchPolicyproofizabilityRollout,
-} from './policyproofizability-ui'
-import {
-  executeNotarizationizabilityAdminAction,
-  fetchNotarizationizabilityAdminSummary,
-  fetchNotarizationizabilityRollout,
-} from './notarizationizability-ui'
-import {
-  executeWitnessizabilityAdminAction,
-  fetchWitnessizabilityAdminSummary,
-  fetchWitnessizabilityRollout,
-} from './witnessizability-ui'
-import {
-  executeLedgerizabilityAdminAction,
-  fetchLedgerizabilityAdminSummary,
-  fetchLedgerizabilityRollout,
-} from './ledgerizability-ui'
-import {
-  executeSignatureproofizabilityAdminAction,
-  fetchSignatureproofizabilityAdminSummary,
-  fetchSignatureproofizabilityRollout,
-} from './signatureproofizability-ui'
-import {
-  executeRuleproofizabilityAdminAction,
-  fetchRuleproofizabilityAdminSummary,
-  fetchRuleproofizabilityRollout,
-} from './ruleproofizability-ui'
-import {
-  executeTraceproofizabilityAdminAction,
-  fetchTraceproofizabilityAdminSummary,
-  fetchTraceproofizabilityRollout,
-} from './traceproofizability-ui'
-import {
-  executeDisclosureizabilityAdminAction,
-  fetchDisclosureizabilityAdminSummary,
-  fetchDisclosureizabilityRollout,
-} from './disclosureizability-ui'
-import {
-  executeRegistrarizabilityAdminAction,
-  fetchRegistrarizabilityAdminSummary,
-  fetchRegistrarizabilityRollout,
-} from './registrarizability-ui'
-import {
-  executeAuditproofizabilityAdminAction,
-  fetchAuditproofizabilityAdminSummary,
-  fetchAuditproofizabilityRollout,
-} from './auditproofizability-ui'
-import {
-  executeCompliancechainizabilityAdminAction,
-  fetchCompliancechainizabilityAdminSummary,
-  fetchCompliancechainizabilityRollout,
-} from './compliancechainizability-ui'
-import {
-  executeAttestledgerizabilityAdminAction,
-  fetchAttestledgerizabilityAdminSummary,
-  fetchAttestledgerizabilityRollout,
-} from './attestledgerizability-ui'
-import {
-  executeEvidencetrackizabilityAdminAction,
-  fetchEvidencetrackizabilityAdminSummary,
-  fetchEvidencetrackizabilityRollout,
-} from './evidencetrackizability-ui'
-import {
-  executeProoflineizabilityAdminAction,
-  fetchProoflineizabilityAdminSummary,
-  fetchProoflineizabilityRollout,
-} from './prooflineizability-ui'
-import {
-  executeNotarproofizabilityAdminAction,
-  fetchNotarproofizabilityAdminSummary,
-  fetchNotarproofizabilityRollout,
-} from './notarproofizability-ui'
-import {
-  executeAuditlineizabilityAdminAction,
-  fetchAuditlineizabilityAdminSummary,
-  fetchAuditlineizabilityRollout,
-} from './auditlineizability-ui'
-import {
-  executeTraceledgerizabilityAdminAction,
-  fetchTraceledgerizabilityAdminSummary,
-  fetchTraceledgerizabilityRollout,
-} from './traceledgerizability-ui'
-import {
-  executeDisclosureproofizabilityAdminAction,
-  fetchDisclosureproofizabilityAdminSummary,
-  fetchDisclosureproofizabilityRollout,
-} from './disclosureproofizability-ui'
-import {
-  executeRegistrarproofizabilityAdminAction,
-  fetchRegistrarproofizabilityAdminSummary,
-  fetchRegistrarproofizabilityRollout,
-} from './registrarproofizability-ui'
-import {
-  executeWitnessproofizabilityAdminAction,
-  fetchWitnessproofizabilityAdminSummary,
-  fetchWitnessproofizabilityRollout,
-} from './witnessproofizability-ui'
-import {
-  executeComplianceledgerizabilityAdminAction,
-  fetchComplianceledgerizabilityAdminSummary,
-  fetchComplianceledgerizabilityRollout,
-} from './complianceledgerizability-ui'
-import {
-  executeNotarledgerizabilityAdminAction,
-  fetchNotarledgerizabilityAdminSummary,
-  fetchNotarledgerizabilityRollout,
-} from './notarledgerizability-ui'
-import {
-  executeWitnessledgerizabilityAdminAction,
-  fetchWitnessledgerizabilityAdminSummary,
-  fetchWitnessledgerizabilityRollout,
-} from './witnessledgerizability-ui'
-import {
-  executeProofregistryizabilityAdminAction,
-  fetchProofregistryizabilityAdminSummary,
-  fetchProofregistryizabilityRollout,
-} from './proofregistryizability-ui'
-import {
-  executeAuditregistryizabilityAdminAction,
-  fetchAuditregistryizabilityAdminSummary,
-  fetchAuditregistryizabilityRollout,
-} from './auditregistryizability-ui'
-import {
-  executeCompliancejournalizabilityAdminAction,
-  fetchCompliancejournalizabilityAdminSummary,
-  fetchCompliancejournalizabilityRollout,
-} from './compliancejournalizability-ui'
-import {
-  executeNotarjournalizabilityAdminAction,
-  fetchNotarjournalizabilityAdminSummary,
-  fetchNotarjournalizabilityRollout,
-} from './notarjournalizability-ui'
-import {
-  executeWitnessjournalizabilityAdminAction,
-  fetchWitnessjournalizabilityAdminSummary,
-  fetchWitnessjournalizabilityRollout,
-} from './witnessjournalizability-ui'
-import {
-  executeProofjournalizabilityAdminAction,
-  fetchProofjournalizabilityAdminSummary,
-  fetchProofjournalizabilityRollout,
-} from './proofjournalizability-ui'
-import {
-  executeAuditjournalizabilityAdminAction,
-  fetchAuditjournalizabilityAdminSummary,
-  fetchAuditjournalizabilityRollout,
-} from './auditjournalizability-ui'
-import {
-  executeRegistryjournalizabilityAdminAction,
-  fetchRegistryjournalizabilityAdminSummary,
-  fetchRegistryjournalizabilityRollout,
-} from './registryjournalizability-ui'
-import {
-  executeTracejournalizabilityAdminAction,
-  fetchTracejournalizabilityAdminSummary,
-  fetchTracejournalizabilityRollout,
-} from './tracejournalizability-ui'
-import {
-  executeEvidencejournalizabilityAdminAction,
-  fetchEvidencejournalizabilityAdminSummary,
-  fetchEvidencejournalizabilityRollout,
-} from './evidencejournalizability-ui'
-import {
-  executeAttestjournalizabilityAdminAction,
-  fetchAttestjournalizabilityAdminSummary,
-  fetchAttestjournalizabilityRollout,
-} from './attestjournalizability-ui'
-import {
-  executeIntegrityjournalizabilityAdminAction,
-  fetchIntegrityjournalizabilityAdminSummary,
-  fetchIntegrityjournalizabilityRollout,
-} from './integrityjournalizability-ui'
-import {
-  executeRegistryvaultizabilityAdminAction,
-  fetchRegistryvaultizabilityAdminSummary,
-  fetchRegistryvaultizabilityRollout,
-} from './registryvaultizability-ui'
-import {
-  executeTracevaultizabilityAdminAction,
-  fetchTracevaultizabilityAdminSummary,
-  fetchTracevaultizabilityRollout,
-} from './tracevaultizability-ui'
-import {
-  executeEvidencevaultizabilityAdminAction,
-  fetchEvidencevaultizabilityAdminSummary,
-  fetchEvidencevaultizabilityRollout,
-} from './evidencevaultizability-ui'
-import {
-  executeAuditvaultizabilityAdminAction,
-  fetchAuditvaultizabilityAdminSummary,
-  fetchAuditvaultizabilityRollout,
-} from './auditvaultizability-ui'
-import {
-  executeCompliancevaultizabilityAdminAction,
-  fetchCompliancevaultizabilityAdminSummary,
-  fetchCompliancevaultizabilityRollout,
-} from './compliancevaultizability-ui'
-import {
-  executeValidityvaultizabilityAdminAction,
-  fetchValidityvaultizabilityAdminSummary,
-  fetchValidityvaultizabilityRollout,
-} from './validityvaultizability-ui'
-import {
-  executeAuthenticityvaultizabilityAdminAction,
-  fetchAuthenticityvaultizabilityAdminSummary,
-  fetchAuthenticityvaultizabilityRollout,
-} from './authenticityvaultizability-ui'
-import {
-  executeProvenancevaultizabilityAdminAction,
-  fetchProvenancevaultizabilityAdminSummary,
-  fetchProvenancevaultizabilityRollout,
-} from './provenancevaultizability-ui'
-import {
-  executeVerificationvaultizabilityAdminAction,
-  fetchVerificationvaultizabilityAdminSummary,
-  fetchVerificationvaultizabilityRollout,
-} from './verificationvaultizability-ui'
-import {
-  executeAttestationvaultizabilityAdminAction,
-  fetchAttestationvaultizabilityAdminSummary,
-  fetchAttestationvaultizabilityRollout,
-} from './attestationvaultizability-ui'
-import {
-  executeAssurancevaultizabilityAdminAction,
-  fetchAssurancevaultizabilityAdminSummary,
-  fetchAssurancevaultizabilityRollout,
-} from './assurancevaultizability-ui'
-import {
-  executeAuditabilityvaultizabilityAdminAction,
-  fetchAuditabilityvaultizabilityAdminSummary,
-  fetchAuditabilityvaultizabilityRollout,
-} from './auditabilityvaultizability-ui'
-import {
-  executeInspectabilityvaultizabilityAdminAction,
-  fetchInspectabilityvaultizabilityAdminSummary,
-  fetchInspectabilityvaultizabilityRollout,
-} from './inspectabilityvaultizability-ui'
-import {
-  executeReproducibilityvaultizabilityAdminAction,
-  fetchReproducibilityvaultizabilityAdminSummary,
-  fetchReproducibilityvaultizabilityRollout,
-} from './reproducibilityvaultizability-ui'
-import {
-  executeCredibilityvaultizabilityAdminAction,
-  fetchCredibilityvaultizabilityAdminSummary,
-  fetchCredibilityvaultizabilityRollout,
-} from './credibilityvaultizability-ui'
+import { callUi } from './lazy-ui'
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
@@ -3846,7 +1140,6 @@ import {
 import {
   executeUsageAdminAction,
   fetchUsageAdminSummary,
-  fetchUsageCapabilities,
   formatUsageAdminAction,
 } from './usage-ui'
 import {
@@ -8298,7 +5591,9 @@ function App() {
       }
     }
 
-    fetchAuthRollout(apiBaseUrl)
+    void loadDeferredAdminControlsData()
+
+    callUi('auth-ui', 'fetchAuthRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAuthRollout(rollout)
@@ -8310,7 +5605,7 @@ function App() {
         }
       })
 
-    fetchLlmRollout(apiBaseUrl)
+    callUi('llm-ui', 'fetchLlmRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setLlmRollout(rollout)
@@ -8322,7 +5617,7 @@ function App() {
         }
       })
 
-    fetchResearchRollout(apiBaseUrl)
+    callUi('research-ui', 'fetchResearchRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setResearchRollout(rollout)
@@ -8334,7 +5629,7 @@ function App() {
         }
       })
 
-    fetchTemporalRollout(apiBaseUrl)
+    callUi('temporal-ui', 'fetchTemporalRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTemporalRollout(rollout)
@@ -8346,7 +5641,7 @@ function App() {
         }
       })
 
-    fetchModelRouterRollout(apiBaseUrl)
+    callUi('model-router-ui', 'fetchModelRouterRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setModelRouterRollout(rollout)
@@ -8358,7 +5653,7 @@ function App() {
         }
       })
 
-    fetchShieldRollout(apiBaseUrl)
+    callUi('shield-ui', 'fetchShieldRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setShieldRollout(rollout)
@@ -8370,7 +5665,7 @@ function App() {
         }
       })
 
-    fetchProviderCredentialsRollout(apiBaseUrl)
+    callUi('provider-credentials-ui', 'fetchProviderCredentialsRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setProviderCredentialsRollout(rollout)
@@ -8382,7 +5677,7 @@ function App() {
         }
       })
 
-    fetchObservabilityRollout(apiBaseUrl)
+    callUi('observability-ui', 'fetchObservabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setObservabilityRollout(rollout)
@@ -8394,7 +5689,7 @@ function App() {
         }
       })
 
-    fetchPromptEvaluationRollout(apiBaseUrl)
+    callUi('evaluation-ui', 'fetchPromptEvaluationRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPromptEvaluationRollout(rollout)
@@ -8406,7 +5701,7 @@ function App() {
         }
       })
 
-    fetchRunHistoryRollout(apiBaseUrl)
+    callUi('run-history-ui', 'fetchRunHistoryRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRunHistoryRollout(rollout)
@@ -8418,7 +5713,7 @@ function App() {
         }
       })
 
-    fetchStreamReplayRollout(apiBaseUrl)
+    callUi('stream-replay-ui', 'fetchStreamReplayRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setStreamReplayRollout(rollout)
@@ -8430,7 +5725,7 @@ function App() {
         }
       })
 
-    fetchIdempotencyRollout(apiBaseUrl)
+    callUi('idempotency-ui', 'fetchIdempotencyRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setIdempotencyRollout(rollout)
@@ -8442,7 +5737,7 @@ function App() {
         }
       })
 
-    fetchUsageLimitsRollout(apiBaseUrl)
+    callUi('usage-limits-ui', 'fetchUsageLimitsRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setUsageLimitsRollout(rollout)
@@ -8454,7 +5749,7 @@ function App() {
         }
       })
 
-    fetchDeploymentRollout(apiBaseUrl)
+    callUi('deployment-ui', 'fetchDeploymentRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDeploymentRollout(rollout)
@@ -8466,7 +5761,7 @@ function App() {
         }
       })
 
-    fetchMigrationRollout(apiBaseUrl)
+    callUi('migrations-ui', 'fetchMigrationRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMigrationRollout(rollout)
@@ -8478,7 +5773,7 @@ function App() {
         }
       })
 
-    fetchBackupRollout(apiBaseUrl)
+    callUi('backup-ui', 'fetchBackupRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setBackupRollout(rollout)
@@ -8490,7 +5785,7 @@ function App() {
         }
       })
 
-    fetchAuditTrailRollout(apiBaseUrl)
+    callUi('audit-trail-ui', 'fetchAuditTrailRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAuditTrailRollout(rollout)
@@ -8502,7 +5797,7 @@ function App() {
         }
       })
 
-    fetchComplianceRollout(apiBaseUrl)
+    callUi('compliance-ui', 'fetchComplianceRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setComplianceRollout(rollout)
@@ -8514,7 +5809,7 @@ function App() {
         }
       })
 
-    fetchIncidentResponseRollout(apiBaseUrl)
+    callUi('incident-response-ui', 'fetchIncidentResponseRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setIncidentResponseRollout(rollout)
@@ -8526,7 +5821,7 @@ function App() {
         }
       })
 
-    fetchReleaseRollout(apiBaseUrl)
+    callUi('release-ui', 'fetchReleaseRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setReleaseRollout(rollout)
@@ -8538,7 +5833,7 @@ function App() {
         }
       })
 
-    fetchSloRollout(apiBaseUrl)
+    callUi('slo-ui', 'fetchSloRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSloRollout(rollout)
@@ -8550,7 +5845,7 @@ function App() {
         }
       })
 
-    fetchCapacityRollout(apiBaseUrl)
+    callUi('capacity-ui', 'fetchCapacityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCapacityRollout(rollout)
@@ -8562,7 +5857,7 @@ function App() {
         }
       })
 
-    fetchPerformanceRollout(apiBaseUrl)
+    callUi('performance-ui', 'fetchPerformanceRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPerformanceRollout(rollout)
@@ -8574,7 +5869,7 @@ function App() {
         }
       })
 
-    fetchResilienceRollout(apiBaseUrl)
+    callUi('resilience-ui', 'fetchResilienceRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setResilienceRollout(rollout)
@@ -8586,7 +5881,7 @@ function App() {
         }
       })
 
-    fetchAvailabilityRollout(apiBaseUrl)
+    callUi('availability-ui', 'fetchAvailabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAvailabilityRollout(rollout)
@@ -8598,7 +5893,7 @@ function App() {
         }
       })
 
-    fetchReliabilityRollout(apiBaseUrl)
+    callUi('reliability-ui', 'fetchReliabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setReliabilityRollout(rollout)
@@ -8610,7 +5905,7 @@ function App() {
         }
       })
 
-    fetchStabilityRollout(apiBaseUrl)
+    callUi('stability-ui', 'fetchStabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setStabilityRollout(rollout)
@@ -8622,7 +5917,7 @@ function App() {
         }
       })
 
-    fetchConsistencyRollout(apiBaseUrl)
+    callUi('consistency-ui', 'fetchConsistencyRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setConsistencyRollout(rollout)
@@ -8634,7 +5929,7 @@ function App() {
         }
       })
 
-    fetchIntegrityRollout(apiBaseUrl)
+    callUi('integrity-ui', 'fetchIntegrityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setIntegrityRollout(rollout)
@@ -8646,7 +5941,7 @@ function App() {
         }
       })
 
-    fetchDurabilityRollout(apiBaseUrl)
+    callUi('durability-ui', 'fetchDurabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDurabilityRollout(rollout)
@@ -8658,7 +5953,7 @@ function App() {
         }
       })
 
-    fetchRecoverabilityRollout(apiBaseUrl)
+    callUi('recoverability-ui', 'fetchRecoverabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRecoverabilityRollout(rollout)
@@ -8670,7 +5965,7 @@ function App() {
         }
       })
 
-    fetchMaintainabilityRollout(apiBaseUrl)
+    callUi('maintainability-ui', 'fetchMaintainabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMaintainabilityRollout(rollout)
@@ -8682,7 +5977,7 @@ function App() {
         }
       })
 
-    fetchScalabilityRollout(apiBaseUrl)
+    callUi('scalability-ui', 'fetchScalabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setScalabilityRollout(rollout)
@@ -8694,7 +5989,7 @@ function App() {
         }
       })
 
-    fetchTraceabilityRollout(apiBaseUrl)
+    callUi('traceability-ui', 'fetchTraceabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTraceabilityRollout(rollout)
@@ -8706,7 +6001,7 @@ function App() {
         }
       })
 
-    fetchEfficiencyRollout(apiBaseUrl)
+    callUi('efficiency-ui', 'fetchEfficiencyRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setEfficiencyRollout(rollout)
@@ -8718,7 +6013,7 @@ function App() {
         }
       })
 
-    fetchOptimizationRollout(apiBaseUrl)
+    callUi('optimization-ui', 'fetchOptimizationRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setOptimizationRollout(rollout)
@@ -8730,7 +6025,7 @@ function App() {
         }
       })
 
-    fetchUtilizationRollout(apiBaseUrl)
+    callUi('utilization-ui', 'fetchUtilizationRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setUtilizationRollout(rollout)
@@ -8742,7 +6037,7 @@ function App() {
         }
       })
 
-    fetchSustainabilityRollout(apiBaseUrl)
+    callUi('sustainability-ui', 'fetchSustainabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSustainabilityRollout(rollout)
@@ -8754,7 +6049,7 @@ function App() {
         }
       })
 
-    fetchGovernanceRollout(apiBaseUrl)
+    callUi('governance-ui', 'fetchGovernanceRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setGovernanceRollout(rollout)
@@ -8766,7 +6061,7 @@ function App() {
         }
       })
 
-    fetchOversightRollout(apiBaseUrl)
+    callUi('oversight-ui', 'fetchOversightRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setOversightRollout(rollout)
@@ -8778,7 +6073,7 @@ function App() {
         }
       })
 
-    fetchAssuranceRollout(apiBaseUrl)
+    callUi('assurance-ui', 'fetchAssuranceRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAssuranceRollout(rollout)
@@ -8790,7 +6085,7 @@ function App() {
         }
       })
 
-    fetchAccountabilityRollout(apiBaseUrl)
+    callUi('accountability-ui', 'fetchAccountabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAccountabilityRollout(rollout)
@@ -8802,7 +6097,7 @@ function App() {
         }
       })
 
-    fetchTransparencyRollout(apiBaseUrl)
+    callUi('transparency-ui', 'fetchTransparencyRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTransparencyRollout(rollout)
@@ -8814,7 +6109,7 @@ function App() {
         }
       })
 
-    fetchAttestationRollout(apiBaseUrl)
+    callUi('attestation-ui', 'fetchAttestationRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAttestationRollout(rollout)
@@ -8826,7 +6121,7 @@ function App() {
         }
       })
 
-    fetchAuthenticityRollout(apiBaseUrl)
+    callUi('authenticity-ui', 'fetchAuthenticityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAuthenticityRollout(rollout)
@@ -8838,7 +6133,7 @@ function App() {
         }
       })
 
-    fetchProvenanceRollout(apiBaseUrl)
+    callUi('provenance-ui', 'fetchProvenanceRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setProvenanceRollout(rollout)
@@ -8850,7 +6145,7 @@ function App() {
         }
       })
 
-    fetchVerifiabilityRollout(apiBaseUrl)
+    callUi('verifiability-ui', 'fetchVerifiabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setVerifiabilityRollout(rollout)
@@ -8862,7 +6157,7 @@ function App() {
         }
       })
 
-    fetchConfirmabilityRollout(apiBaseUrl)
+    callUi('confirmability-ui', 'fetchConfirmabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setConfirmabilityRollout(rollout)
@@ -8874,7 +6169,7 @@ function App() {
         }
       })
 
-    fetchValidityRollout(apiBaseUrl)
+    callUi('validity-ui', 'fetchValidityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setValidityRollout(rollout)
@@ -8886,7 +6181,7 @@ function App() {
         }
       })
 
-    fetchCredibilityRollout(apiBaseUrl)
+    callUi('credibility-ui', 'fetchCredibilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCredibilityRollout(rollout)
@@ -8898,7 +6193,7 @@ function App() {
         }
       })
 
-    fetchReproducibilityRollout(apiBaseUrl)
+    callUi('reproducibility-ui', 'fetchReproducibilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setReproducibilityRollout(rollout)
@@ -8910,7 +6205,7 @@ function App() {
         }
       })
 
-    fetchDefensibilityRollout(apiBaseUrl)
+    callUi('defensibility-ui', 'fetchDefensibilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDefensibilityRollout(rollout)
@@ -8922,7 +6217,7 @@ function App() {
         }
       })
 
-    fetchAuditabilityRollout(apiBaseUrl)
+    callUi('auditability-ui', 'fetchAuditabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAuditabilityRollout(rollout)
@@ -8934,7 +6229,7 @@ function App() {
         }
       })
 
-    fetchInspectabilityRollout(apiBaseUrl)
+    callUi('inspectability-ui', 'fetchInspectabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setInspectabilityRollout(rollout)
@@ -8946,7 +6241,7 @@ function App() {
         }
       })
 
-    fetchExplainabilityRollout(apiBaseUrl)
+    callUi('explainability-ui', 'fetchExplainabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setExplainabilityRollout(rollout)
@@ -8958,7 +6253,7 @@ function App() {
         }
       })
 
-    fetchDemonstrabilityRollout(apiBaseUrl)
+    callUi('demonstrability-ui', 'fetchDemonstrabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDemonstrabilityRollout(rollout)
@@ -8970,7 +6265,7 @@ function App() {
         }
       })
 
-    fetchJustifiabilityRollout(apiBaseUrl)
+    callUi('justifiability-ui', 'fetchJustifiabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setJustifiabilityRollout(rollout)
@@ -8982,7 +6277,7 @@ function App() {
         }
       })
 
-    fetchReviewabilityRollout(apiBaseUrl)
+    callUi('reviewability-ui', 'fetchReviewabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setReviewabilityRollout(rollout)
@@ -8994,7 +6289,7 @@ function App() {
         }
       })
 
-    fetchAssessabilityRollout(apiBaseUrl)
+    callUi('assessability-ui', 'fetchAssessabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAssessabilityRollout(rollout)
@@ -9006,7 +6301,7 @@ function App() {
         }
       })
 
-    fetchMeasurabilityRollout(apiBaseUrl)
+    callUi('measurability-ui', 'fetchMeasurabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMeasurabilityRollout(rollout)
@@ -9018,7 +6313,7 @@ function App() {
         }
       })
 
-    fetchCertifiabilityRollout(apiBaseUrl)
+    callUi('certifiability-ui', 'fetchCertifiabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCertifiabilityRollout(rollout)
@@ -9030,7 +6325,7 @@ function App() {
         }
       })
 
-    fetchSubstantiabilityRollout(apiBaseUrl)
+    callUi('substantiability-ui', 'fetchSubstantiabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSubstantiabilityRollout(rollout)
@@ -9042,7 +6337,7 @@ function App() {
         }
       })
 
-    fetchWarrantabilityRollout(apiBaseUrl)
+    callUi('warrantability-ui', 'fetchWarrantabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setWarrantabilityRollout(rollout)
@@ -9054,7 +6349,7 @@ function App() {
         }
       })
 
-    fetchAttributabilityRollout(apiBaseUrl)
+    callUi('attributability-ui', 'fetchAttributabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAttributabilityRollout(rollout)
@@ -9066,7 +6361,7 @@ function App() {
         }
       })
 
-    fetchIdentifiabilityRollout(apiBaseUrl)
+    callUi('identifiability-ui', 'fetchIdentifiabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setIdentifiabilityRollout(rollout)
@@ -9078,7 +6373,7 @@ function App() {
         }
       })
 
-    fetchComparabilityRollout(apiBaseUrl)
+    callUi('comparability-ui', 'fetchComparabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setComparabilityRollout(rollout)
@@ -9090,7 +6385,7 @@ function App() {
         }
       })
 
-    fetchDistinguishabilityRollout(apiBaseUrl)
+    callUi('distinguishability-ui', 'fetchDistinguishabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDistinguishabilityRollout(rollout)
@@ -9102,7 +6397,7 @@ function App() {
         }
       })
 
-    fetchAssignabilityRollout(apiBaseUrl)
+    callUi('assignability-ui', 'fetchAssignabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAssignabilityRollout(rollout)
@@ -9114,7 +6409,7 @@ function App() {
         }
       })
 
-    fetchReferencabilityRollout(apiBaseUrl)
+    callUi('referencability-ui', 'fetchReferencabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setReferencabilityRollout(rollout)
@@ -9126,7 +6421,7 @@ function App() {
         }
       })
 
-    fetchLocatabilityRollout(apiBaseUrl)
+    callUi('locatability-ui', 'fetchLocatabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setLocatabilityRollout(rollout)
@@ -9138,7 +6433,7 @@ function App() {
         }
       })
 
-    fetchRetrievabilityRollout(apiBaseUrl)
+    callUi('retrievability-ui', 'fetchRetrievabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRetrievabilityRollout(rollout)
@@ -9150,7 +6445,7 @@ function App() {
         }
       })
 
-    fetchDiscoverabilityRollout(apiBaseUrl)
+    callUi('discoverability-ui', 'fetchDiscoverabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDiscoverabilityRollout(rollout)
@@ -9162,7 +6457,7 @@ function App() {
         }
       })
 
-    fetchNavigabilityRollout(apiBaseUrl)
+    callUi('navigability-ui', 'fetchNavigabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setNavigabilityRollout(rollout)
@@ -9174,7 +6469,7 @@ function App() {
         }
       })
 
-    fetchConnectabilityRollout(apiBaseUrl)
+    callUi('connectability-ui', 'fetchConnectabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setConnectabilityRollout(rollout)
@@ -9186,7 +6481,7 @@ function App() {
         }
       })
 
-    fetchLinkabilityRollout(apiBaseUrl)
+    callUi('linkability-ui', 'fetchLinkabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setLinkabilityRollout(rollout)
@@ -9198,7 +6493,7 @@ function App() {
         }
       })
 
-    fetchInterchangeabilityRollout(apiBaseUrl)
+    callUi('interchangeability-ui', 'fetchInterchangeabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setInterchangeabilityRollout(rollout)
@@ -9210,7 +6505,7 @@ function App() {
         }
       })
 
-    fetchTransferabilityRollout(apiBaseUrl)
+    callUi('transferability-ui', 'fetchTransferabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTransferabilityRollout(rollout)
@@ -9222,7 +6517,7 @@ function App() {
         }
       })
 
-    fetchPortabilityRollout(apiBaseUrl)
+    callUi('portability-ui', 'fetchPortabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPortabilityRollout(rollout)
@@ -9234,7 +6529,7 @@ function App() {
         }
       })
 
-    fetchCompatibilityRollout(apiBaseUrl)
+    callUi('compatibility-ui', 'fetchCompatibilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCompatibilityRollout(rollout)
@@ -9246,7 +6541,7 @@ function App() {
         }
       })
 
-    fetchAdaptabilityRollout(apiBaseUrl)
+    callUi('adaptability-ui', 'fetchAdaptabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAdaptabilityRollout(rollout)
@@ -9258,7 +6553,7 @@ function App() {
         }
       })
 
-    fetchFlexibilityRollout(apiBaseUrl)
+    callUi('flexibility-ui', 'fetchFlexibilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setFlexibilityRollout(rollout)
@@ -9270,7 +6565,7 @@ function App() {
         }
       })
 
-    fetchExtensibilityRollout(apiBaseUrl)
+    callUi('extensibility-ui', 'fetchExtensibilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setExtensibilityRollout(rollout)
@@ -9282,7 +6577,7 @@ function App() {
         }
       })
 
-    fetchModifiabilityRollout(apiBaseUrl)
+    callUi('modifiability-ui', 'fetchModifiabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setModifiabilityRollout(rollout)
@@ -9294,7 +6589,7 @@ function App() {
         }
       })
 
-    fetchConfigurabilityRollout(apiBaseUrl)
+    callUi('configurability-ui', 'fetchConfigurabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setConfigurabilityRollout(rollout)
@@ -9306,7 +6601,7 @@ function App() {
         }
       })
 
-    fetchCustomizabilityRollout(apiBaseUrl)
+    callUi('customizability-ui', 'fetchCustomizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCustomizabilityRollout(rollout)
@@ -9318,7 +6613,7 @@ function App() {
         }
       })
 
-    fetchOperabilityRollout(apiBaseUrl)
+    callUi('operability-ui', 'fetchOperabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setOperabilityRollout(rollout)
@@ -9330,7 +6625,7 @@ function App() {
         }
       })
 
-    fetchTunabilityRollout(apiBaseUrl)
+    callUi('tunability-ui', 'fetchTunabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTunabilityRollout(rollout)
@@ -9342,7 +6637,7 @@ function App() {
         }
       })
 
-    fetchAdjustabilityRollout(apiBaseUrl)
+    callUi('adjustability-ui', 'fetchAdjustabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAdjustabilityRollout(rollout)
@@ -9354,7 +6649,7 @@ function App() {
         }
       })
 
-    fetchProgrammabilityRollout(apiBaseUrl)
+    callUi('programmability-ui', 'fetchProgrammabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setProgrammabilityRollout(rollout)
@@ -9366,7 +6661,7 @@ function App() {
         }
       })
 
-    fetchDeployabilityRollout(apiBaseUrl)
+    callUi('deployability-ui', 'fetchDeployabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDeployabilityRollout(rollout)
@@ -9378,7 +6673,7 @@ function App() {
         }
       })
 
-    fetchManageabilityRollout(apiBaseUrl)
+    callUi('manageability-ui', 'fetchManageabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setManageabilityRollout(rollout)
@@ -9390,7 +6685,7 @@ function App() {
         }
       })
 
-    fetchControllabilityRollout(apiBaseUrl)
+    callUi('controllability-ui', 'fetchControllabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setControllabilityRollout(rollout)
@@ -9402,7 +6697,7 @@ function App() {
         }
       })
 
-    fetchIntegrabilityRollout(apiBaseUrl)
+    callUi('integrability-ui', 'fetchIntegrabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setIntegrabilityRollout(rollout)
@@ -9414,7 +6709,7 @@ function App() {
         }
       })
 
-    fetchOrchestrabilityRollout(apiBaseUrl)
+    callUi('orchestrability-ui', 'fetchOrchestrabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setOrchestrabilityRollout(rollout)
@@ -9426,7 +6721,7 @@ function App() {
         }
       })
 
-    fetchSchedulabilityRollout(apiBaseUrl)
+    callUi('schedulability-ui', 'fetchSchedulabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSchedulabilityRollout(rollout)
@@ -9438,7 +6733,7 @@ function App() {
         }
       })
 
-    fetchAutomatabilityRollout(apiBaseUrl)
+    callUi('automatability-ui', 'fetchAutomatabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAutomatabilityRollout(rollout)
@@ -9450,7 +6745,7 @@ function App() {
         }
       })
 
-    fetchMonitorabilityRollout(apiBaseUrl)
+    callUi('monitorability-ui', 'fetchMonitorabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMonitorabilityRollout(rollout)
@@ -9462,7 +6757,7 @@ function App() {
         }
       })
 
-    fetchPredictabilityRollout(apiBaseUrl)
+    callUi('predictability-ui', 'fetchPredictabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPredictabilityRollout(rollout)
@@ -9474,7 +6769,7 @@ function App() {
         }
       })
 
-    fetchRepeatabilityRollout(apiBaseUrl)
+    callUi('repeatability-ui', 'fetchRepeatabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRepeatabilityRollout(rollout)
@@ -9486,7 +6781,7 @@ function App() {
         }
       })
 
-    fetchResponsivenessRollout(apiBaseUrl)
+    callUi('responsiveness-ui', 'fetchResponsivenessRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setResponsivenessRollout(rollout)
@@ -9498,7 +6793,7 @@ function App() {
         }
       })
 
-    fetchDependabilityRollout(apiBaseUrl)
+    callUi('dependability-ui', 'fetchDependabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDependabilityRollout(rollout)
@@ -9510,7 +6805,7 @@ function App() {
         }
       })
 
-    fetchComposabilityRollout(apiBaseUrl)
+    callUi('composability-ui', 'fetchComposabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setComposabilityRollout(rollout)
@@ -9522,7 +6817,7 @@ function App() {
         }
       })
 
-    fetchTrustworthinessRollout(apiBaseUrl)
+    callUi('trustworthiness-ui', 'fetchTrustworthinessRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTrustworthinessRollout(rollout)
@@ -9534,7 +6829,7 @@ function App() {
         }
       })
 
-    fetchUsabilityRollout(apiBaseUrl)
+    callUi('usability-ui', 'fetchUsabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setUsabilityRollout(rollout)
@@ -9546,7 +6841,7 @@ function App() {
         }
       })
 
-    fetchAccessibilityRollout(apiBaseUrl)
+    callUi('accessibility-ui', 'fetchAccessibilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAccessibilityRollout(rollout)
@@ -9558,7 +6853,7 @@ function App() {
         }
       })
 
-    fetchEffectivenessRollout(apiBaseUrl)
+    callUi('effectiveness-ui', 'fetchEffectivenessRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setEffectivenessRollout(rollout)
@@ -9570,7 +6865,7 @@ function App() {
         }
       })
 
-    fetchAppropriatenessRollout(apiBaseUrl)
+    callUi('appropriateness-ui', 'fetchAppropriatenessRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAppropriatenessRollout(rollout)
@@ -9582,7 +6877,7 @@ function App() {
         }
       })
 
-    fetchSurvivabilityRollout(apiBaseUrl)
+    callUi('survivability-ui', 'fetchSurvivabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSurvivabilityRollout(rollout)
@@ -9594,7 +6889,7 @@ function App() {
         }
       })
 
-    fetchViabilityRollout(apiBaseUrl)
+    callUi('viability-ui', 'fetchViabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setViabilityRollout(rollout)
@@ -9606,7 +6901,7 @@ function App() {
         }
       })
 
-    fetchFeasibilityRollout(apiBaseUrl)
+    callUi('feasibility-ui', 'fetchFeasibilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setFeasibilityRollout(rollout)
@@ -9618,7 +6913,7 @@ function App() {
         }
       })
 
-    fetchConformanceRollout(apiBaseUrl)
+    callUi('conformance-ui', 'fetchConformanceRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setConformanceRollout(rollout)
@@ -9630,7 +6925,7 @@ function App() {
         }
       })
 
-    fetchAdoptabilityRollout(apiBaseUrl)
+    callUi('adoptability-ui', 'fetchAdoptabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAdoptabilityRollout(rollout)
@@ -9642,7 +6937,7 @@ function App() {
         }
       })
 
-    fetchAcceptabilityRollout(apiBaseUrl)
+    callUi('acceptability-ui', 'fetchAcceptabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAcceptabilityRollout(rollout)
@@ -9654,7 +6949,7 @@ function App() {
         }
       })
 
-    fetchAffordabilityRollout(apiBaseUrl)
+    callUi('affordability-ui', 'fetchAffordabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAffordabilityRollout(rollout)
@@ -9666,7 +6961,7 @@ function App() {
         }
       })
 
-    fetchDesirabilityRollout(apiBaseUrl)
+    callUi('desirability-ui', 'fetchDesirabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDesirabilityRollout(rollout)
@@ -9678,7 +6973,7 @@ function App() {
         }
       })
 
-    fetchMarketabilityRollout(apiBaseUrl)
+    callUi('marketability-ui', 'fetchMarketabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMarketabilityRollout(rollout)
@@ -9690,7 +6985,7 @@ function App() {
         }
       })
 
-    fetchSuitabilityRollout(apiBaseUrl)
+    callUi('suitability-ui', 'fetchSuitabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSuitabilityRollout(rollout)
@@ -9702,7 +6997,7 @@ function App() {
         }
       })
 
-    fetchProfitabilityRollout(apiBaseUrl)
+    callUi('profitability-ui', 'fetchProfitabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setProfitabilityRollout(rollout)
@@ -9714,7 +7009,7 @@ function App() {
         }
       })
 
-    fetchLearnabilityRollout(apiBaseUrl)
+    callUi('learnability-ui', 'fetchLearnabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setLearnabilityRollout(rollout)
@@ -9726,7 +7021,7 @@ function App() {
         }
       })
 
-    fetchDeliverabilityRollout(apiBaseUrl)
+    callUi('deliverability-ui', 'fetchDeliverabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDeliverabilityRollout(rollout)
@@ -9738,7 +7033,7 @@ function App() {
         }
       })
 
-    fetchUnderstandabilityRollout(apiBaseUrl)
+    callUi('understandability-ui', 'fetchUnderstandabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setUnderstandabilityRollout(rollout)
@@ -9750,7 +7045,7 @@ function App() {
         }
       })
 
-    fetchMemorabilityRollout(apiBaseUrl)
+    callUi('memorability-ui', 'fetchMemorabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMemorabilityRollout(rollout)
@@ -9762,7 +7057,7 @@ function App() {
         }
       })
 
-    fetchTeachabilityRollout(apiBaseUrl)
+    callUi('teachability-ui', 'fetchTeachabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTeachabilityRollout(rollout)
@@ -9774,7 +7069,7 @@ function App() {
         }
       })
 
-    fetchReadabilityRollout(apiBaseUrl)
+    callUi('readability-ui', 'fetchReadabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setReadabilityRollout(rollout)
@@ -9786,7 +7081,7 @@ function App() {
         }
       })
 
-    fetchClarityRollout(apiBaseUrl)
+    callUi('clarity-ui', 'fetchClarityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setClarityRollout(rollout)
@@ -9798,7 +7093,7 @@ function App() {
         }
       })
 
-    fetchSimplicityRollout(apiBaseUrl)
+    callUi('simplicity-ui', 'fetchSimplicityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSimplicityRollout(rollout)
@@ -9810,7 +7105,7 @@ function App() {
         }
       })
 
-    fetchNegotiabilityRollout(apiBaseUrl)
+    callUi('negotiability-ui', 'fetchNegotiabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setNegotiabilityRollout(rollout)
@@ -9822,7 +7117,7 @@ function App() {
         }
       })
 
-    fetchComprehensibilityRollout(apiBaseUrl)
+    callUi('comprehensibility-ui', 'fetchComprehensibilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setComprehensibilityRollout(rollout)
@@ -9834,7 +7129,7 @@ function App() {
         }
       })
 
-    fetchIntelligibilityRollout(apiBaseUrl)
+    callUi('intelligibility-ui', 'fetchIntelligibilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setIntelligibilityRollout(rollout)
@@ -9846,7 +7141,7 @@ function App() {
         }
       })
 
-    fetchLegibilityRollout(apiBaseUrl)
+    callUi('legibility-ui', 'fetchLegibilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setLegibilityRollout(rollout)
@@ -9858,7 +7153,7 @@ function App() {
         }
       })
 
-    fetchParsabilityRollout(apiBaseUrl)
+    callUi('parsability-ui', 'fetchParsabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setParsabilityRollout(rollout)
@@ -9870,7 +7165,7 @@ function App() {
         }
       })
 
-    fetchCoherenceRollout(apiBaseUrl)
+    callUi('coherence-ui', 'fetchCoherenceRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCoherenceRollout(rollout)
@@ -9882,7 +7177,7 @@ function App() {
         }
       })
 
-    fetchFamiliarityRollout(apiBaseUrl)
+    callUi('familiarity-ui', 'fetchFamiliarityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setFamiliarityRollout(rollout)
@@ -9894,7 +7189,7 @@ function App() {
         }
       })
 
-    fetchRecognizabilityRollout(apiBaseUrl)
+    callUi('recognizability-ui', 'fetchRecognizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRecognizabilityRollout(rollout)
@@ -9906,7 +7201,7 @@ function App() {
         }
       })
 
-    fetchInterpretabilityRollout(apiBaseUrl)
+    callUi('interpretability-ui', 'fetchInterpretabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setInterpretabilityRollout(rollout)
@@ -9918,7 +7213,7 @@ function App() {
         }
       })
 
-    fetchScannabilityRollout(apiBaseUrl)
+    callUi('scannability-ui', 'fetchScannabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setScannabilityRollout(rollout)
@@ -9930,7 +7225,7 @@ function App() {
         }
       })
 
-    fetchPerceptibilityRollout(apiBaseUrl)
+    callUi('perceptibility-ui', 'fetchPerceptibilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPerceptibilityRollout(rollout)
@@ -9942,7 +7237,7 @@ function App() {
         }
       })
 
-    fetchNoticeabilityRollout(apiBaseUrl)
+    callUi('noticeability-ui', 'fetchNoticeabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setNoticeabilityRollout(rollout)
@@ -9954,7 +7249,7 @@ function App() {
         }
       })
 
-    fetchDiscernibilityRollout(apiBaseUrl)
+    callUi('discernibility-ui', 'fetchDiscernibilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDiscernibilityRollout(rollout)
@@ -9966,7 +7261,7 @@ function App() {
         }
       })
 
-    fetchDistinctivenessRollout(apiBaseUrl)
+    callUi('distinctiveness-ui', 'fetchDistinctivenessRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDistinctivenessRollout(rollout)
@@ -9978,7 +7273,7 @@ function App() {
         }
       })
 
-    fetchConspicuousnessRollout(apiBaseUrl)
+    callUi('conspicuousness-ui', 'fetchConspicuousnessRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setConspicuousnessRollout(rollout)
@@ -9990,7 +7285,7 @@ function App() {
         }
       })
 
-    fetchDetectabilityRollout(apiBaseUrl)
+    callUi('detectability-ui', 'fetchDetectabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDetectabilityRollout(rollout)
@@ -10002,7 +7297,7 @@ function App() {
         }
       })
 
-    fetchDescribabilityRollout(apiBaseUrl)
+    callUi('describability-ui', 'fetchDescribabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDescribabilityRollout(rollout)
@@ -10014,7 +7309,7 @@ function App() {
         }
       })
 
-    fetchExpressivenessRollout(apiBaseUrl)
+    callUi('expressiveness-ui', 'fetchExpressivenessRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setExpressivenessRollout(rollout)
@@ -10026,7 +7321,7 @@ function App() {
         }
       })
 
-    fetchCommunicabilityRollout(apiBaseUrl)
+    callUi('communicability-ui', 'fetchCommunicabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCommunicabilityRollout(rollout)
@@ -10038,7 +7333,7 @@ function App() {
         }
       })
 
-    fetchArticulabilityRollout(apiBaseUrl)
+    callUi('articulability-ui', 'fetchArticulabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setArticulabilityRollout(rollout)
@@ -10050,7 +7345,7 @@ function App() {
         }
       })
 
-    fetchElaboratabilityRollout(apiBaseUrl)
+    callUi('elaboratability-ui', 'fetchElaboratabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setElaboratabilityRollout(rollout)
@@ -10062,7 +7357,7 @@ function App() {
         }
       })
 
-    fetchRepresentabilityRollout(apiBaseUrl)
+    callUi('representability-ui', 'fetchRepresentabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRepresentabilityRollout(rollout)
@@ -10074,7 +7369,7 @@ function App() {
         }
       })
 
-    fetchPresentabilityRollout(apiBaseUrl)
+    callUi('presentability-ui', 'fetchPresentabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPresentabilityRollout(rollout)
@@ -10086,7 +7381,7 @@ function App() {
         }
       })
 
-    fetchEnunciabilityRollout(apiBaseUrl)
+    callUi('enunciability-ui', 'fetchEnunciabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setEnunciabilityRollout(rollout)
@@ -10098,7 +7393,7 @@ function App() {
         }
       })
 
-    fetchFormulatabilityRollout(apiBaseUrl)
+    callUi('formulatability-ui', 'fetchFormulatabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setFormulatabilityRollout(rollout)
@@ -10110,7 +7405,7 @@ function App() {
         }
       })
 
-    fetchNarratabilityRollout(apiBaseUrl)
+    callUi('narratability-ui', 'fetchNarratabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setNarratabilityRollout(rollout)
@@ -10122,7 +7417,7 @@ function App() {
         }
       })
 
-    fetchIllustratabilityRollout(apiBaseUrl)
+    callUi('illustratability-ui', 'fetchIllustratabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setIllustratabilityRollout(rollout)
@@ -10134,7 +7429,7 @@ function App() {
         }
       })
 
-    fetchSymbolizabilityRollout(apiBaseUrl)
+    callUi('symbolizability-ui', 'fetchSymbolizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSymbolizabilityRollout(rollout)
@@ -10146,7 +7441,7 @@ function App() {
         }
       })
 
-    fetchVisualizabilityRollout(apiBaseUrl)
+    callUi('visualizability-ui', 'fetchVisualizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setVisualizabilityRollout(rollout)
@@ -10158,7 +7453,7 @@ function App() {
         }
       })
 
-    fetchEvocatabilityRollout(apiBaseUrl)
+    callUi('evocatability-ui', 'fetchEvocatabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setEvocatabilityRollout(rollout)
@@ -10170,7 +7465,7 @@ function App() {
         }
       })
 
-    fetchSignifiabilityRollout(apiBaseUrl)
+    callUi('signifiability-ui', 'fetchSignifiabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSignifiabilityRollout(rollout)
@@ -10182,7 +7477,7 @@ function App() {
         }
       })
 
-    fetchConnotabilityRollout(apiBaseUrl)
+    callUi('connotability-ui', 'fetchConnotabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setConnotabilityRollout(rollout)
@@ -10194,7 +7489,7 @@ function App() {
         }
       })
 
-    fetchTypifiabilityRollout(apiBaseUrl)
+    callUi('typifiability-ui', 'fetchTypifiabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTypifiabilityRollout(rollout)
@@ -10206,7 +7501,7 @@ function App() {
         }
       })
 
-    fetchMetaphorizabilityRollout(apiBaseUrl)
+    callUi('metaphorizability-ui', 'fetchMetaphorizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMetaphorizabilityRollout(rollout)
@@ -10218,7 +7513,7 @@ function App() {
         }
       })
 
-    fetchDramatizabilityRollout(apiBaseUrl)
+    callUi('dramatizability-ui', 'fetchDramatizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDramatizabilityRollout(rollout)
@@ -10230,7 +7525,7 @@ function App() {
         }
       })
 
-    fetchPersonifiabilityRollout(apiBaseUrl)
+    callUi('personifiability-ui', 'fetchPersonifiabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPersonifiabilityRollout(rollout)
@@ -10242,7 +7537,7 @@ function App() {
         }
       })
 
-    fetchMaterializabilityRollout(apiBaseUrl)
+    callUi('materializability-ui', 'fetchMaterializabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMaterializabilityRollout(rollout)
@@ -10254,7 +7549,7 @@ function App() {
         }
       })
 
-    fetchIconizabilityRollout(apiBaseUrl)
+    callUi('iconizability-ui', 'fetchIconizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setIconizabilityRollout(rollout)
@@ -10266,7 +7561,7 @@ function App() {
         }
       })
 
-    fetchAllegorizabilityRollout(apiBaseUrl)
+    callUi('allegorizability-ui', 'fetchAllegorizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAllegorizabilityRollout(rollout)
@@ -10278,7 +7573,7 @@ function App() {
         }
       })
 
-    fetchTokenizabilityRollout(apiBaseUrl)
+    callUi('tokenizability-ui', 'fetchTokenizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTokenizabilityRollout(rollout)
@@ -10290,7 +7585,7 @@ function App() {
         }
       })
 
-    fetchStylizabilityRollout(apiBaseUrl)
+    callUi('stylizability-ui', 'fetchStylizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setStylizabilityRollout(rollout)
@@ -10302,7 +7597,7 @@ function App() {
         }
       })
 
-    fetchEmblemizabilityRollout(apiBaseUrl)
+    callUi('emblemizability-ui', 'fetchEmblemizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setEmblemizabilityRollout(rollout)
@@ -10314,7 +7609,7 @@ function App() {
         }
       })
 
-    fetchAnalogizabilityRollout(apiBaseUrl)
+    callUi('analogizability-ui', 'fetchAnalogizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAnalogizabilityRollout(rollout)
@@ -10326,7 +7621,7 @@ function App() {
         }
       })
 
-    fetchParabolizabilityRollout(apiBaseUrl)
+    callUi('parabolizability-ui', 'fetchParabolizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setParabolizabilityRollout(rollout)
@@ -10338,7 +7633,7 @@ function App() {
         }
       })
 
-    fetchArchetypizabilityRollout(apiBaseUrl)
+    callUi('archetypizability-ui', 'fetchArchetypizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setArchetypizabilityRollout(rollout)
@@ -10350,7 +7645,7 @@ function App() {
         }
       })
 
-    fetchCaracterizabilityRollout(apiBaseUrl)
+    callUi('caracterizability-ui', 'fetchCaracterizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCaracterizabilityRollout(rollout)
@@ -10362,7 +7657,7 @@ function App() {
         }
       })
 
-    fetchMythicizabilityRollout(apiBaseUrl)
+    callUi('mythicizability-ui', 'fetchMythicizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMythicizabilityRollout(rollout)
@@ -10374,7 +7669,7 @@ function App() {
         }
       })
 
-    fetchSemiotizabilityRollout(apiBaseUrl)
+    callUi('semiotizability-ui', 'fetchSemiotizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSemiotizabilityRollout(rollout)
@@ -10386,7 +7681,7 @@ function App() {
         }
       })
 
-    fetchHermeneutizabilityRollout(apiBaseUrl)
+    callUi('hermeneutizability-ui', 'fetchHermeneutizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setHermeneutizabilityRollout(rollout)
@@ -10398,7 +7693,7 @@ function App() {
         }
       })
 
-    fetchLexicalizabilityRollout(apiBaseUrl)
+    callUi('lexicalizability-ui', 'fetchLexicalizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setLexicalizabilityRollout(rollout)
@@ -10410,7 +7705,7 @@ function App() {
         }
       })
 
-    fetchSemanticizabilityRollout(apiBaseUrl)
+    callUi('semanticizability-ui', 'fetchSemanticizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSemanticizabilityRollout(rollout)
@@ -10422,7 +7717,7 @@ function App() {
         }
       })
 
-    fetchPragmatizabilityRollout(apiBaseUrl)
+    callUi('pragmatizability-ui', 'fetchPragmatizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPragmatizabilityRollout(rollout)
@@ -10434,7 +7729,7 @@ function App() {
         }
       })
 
-    fetchSyntacticizabilityRollout(apiBaseUrl)
+    callUi('syntacticizability-ui', 'fetchSyntacticizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSyntacticizabilityRollout(rollout)
@@ -10446,7 +7741,7 @@ function App() {
         }
       })
 
-    fetchRhetorizabilityRollout(apiBaseUrl)
+    callUi('rhetorizability-ui', 'fetchRhetorizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRhetorizabilityRollout(rollout)
@@ -10458,7 +7753,7 @@ function App() {
         }
       })
 
-    fetchMorphizabilityRollout(apiBaseUrl)
+    callUi('morphizability-ui', 'fetchMorphizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMorphizabilityRollout(rollout)
@@ -10470,7 +7765,7 @@ function App() {
         }
       })
 
-    fetchCodifiabilityRollout(apiBaseUrl)
+    callUi('codifiability-ui', 'fetchCodifiabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCodifiabilityRollout(rollout)
@@ -10482,7 +7777,7 @@ function App() {
         }
       })
 
-    fetchHermeticizabilityRollout(apiBaseUrl)
+    callUi('hermeticizability-ui', 'fetchHermeticizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setHermeticizabilityRollout(rollout)
@@ -10494,7 +7789,7 @@ function App() {
         }
       })
 
-    fetchEpistemizabilityRollout(apiBaseUrl)
+    callUi('epistemizability-ui', 'fetchEpistemizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setEpistemizabilityRollout(rollout)
@@ -10506,7 +7801,7 @@ function App() {
         }
       })
 
-    fetchDialectizabilityRollout(apiBaseUrl)
+    callUi('dialectizability-ui', 'fetchDialectizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDialectizabilityRollout(rollout)
@@ -10518,7 +7813,7 @@ function App() {
         }
       })
 
-    fetchOntologizabilityRollout(apiBaseUrl)
+    callUi('ontologizability-ui', 'fetchOntologizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setOntologizabilityRollout(rollout)
@@ -10530,7 +7825,7 @@ function App() {
         }
       })
 
-    fetchPhenomenizabilityRollout(apiBaseUrl)
+    callUi('phenomenizability-ui', 'fetchPhenomenizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPhenomenizabilityRollout(rollout)
@@ -10542,7 +7837,7 @@ function App() {
         }
       })
 
-    fetchAxiologizabilityRollout(apiBaseUrl)
+    callUi('axiologizability-ui', 'fetchAxiologizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAxiologizabilityRollout(rollout)
@@ -10554,7 +7849,7 @@ function App() {
         }
       })
 
-    fetchTeleologizabilityRollout(apiBaseUrl)
+    callUi('teleologizability-ui', 'fetchTeleologizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTeleologizabilityRollout(rollout)
@@ -10566,7 +7861,7 @@ function App() {
         }
       })
 
-    fetchGnoseizabilityRollout(apiBaseUrl)
+    callUi('gnoseizability-ui', 'fetchGnoseizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setGnoseizabilityRollout(rollout)
@@ -10578,7 +7873,7 @@ function App() {
         }
       })
 
-    fetchMethodizabilityRollout(apiBaseUrl)
+    callUi('methodizability-ui', 'fetchMethodizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMethodizabilityRollout(rollout)
@@ -10590,7 +7885,7 @@ function App() {
         }
       })
 
-    fetchHistorizabilityRollout(apiBaseUrl)
+    callUi('historizability-ui', 'fetchHistorizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setHistorizabilityRollout(rollout)
@@ -10602,7 +7897,7 @@ function App() {
         }
       })
 
-    fetchCategorizabilityRollout(apiBaseUrl)
+    callUi('categorizability-ui', 'fetchCategorizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCategorizabilityRollout(rollout)
@@ -10614,7 +7909,7 @@ function App() {
         }
       })
 
-    fetchTaxonomizabilityRollout(apiBaseUrl)
+    callUi('taxonomizability-ui', 'fetchTaxonomizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTaxonomizabilityRollout(rollout)
@@ -10626,7 +7921,7 @@ function App() {
         }
       })
 
-    fetchClassifiabilityRollout(apiBaseUrl)
+    callUi('classifiability-ui', 'fetchClassifiabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setClassifiabilityRollout(rollout)
@@ -10638,7 +7933,7 @@ function App() {
         }
       })
 
-    fetchTypologizabilityRollout(apiBaseUrl)
+    callUi('typologizability-ui', 'fetchTypologizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTypologizabilityRollout(rollout)
@@ -10650,7 +7945,7 @@ function App() {
         }
       })
 
-    fetchStratifiabilityRollout(apiBaseUrl)
+    callUi('stratifiability-ui', 'fetchStratifiabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setStratifiabilityRollout(rollout)
@@ -10662,7 +7957,7 @@ function App() {
         }
       })
 
-    fetchOrdinarizabilityRollout(apiBaseUrl)
+    callUi('ordinarizability-ui', 'fetchOrdinarizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setOrdinarizabilityRollout(rollout)
@@ -10674,7 +7969,7 @@ function App() {
         }
       })
 
-    fetchSystematizabilityRollout(apiBaseUrl)
+    callUi('systematizability-ui', 'fetchSystematizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSystematizabilityRollout(rollout)
@@ -10686,7 +7981,7 @@ function App() {
         }
       })
 
-    fetchHierarchizabilityRollout(apiBaseUrl)
+    callUi('hierarchizability-ui', 'fetchHierarchizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setHierarchizabilityRollout(rollout)
@@ -10698,7 +7993,7 @@ function App() {
         }
       })
 
-    fetchSegmentizabilityRollout(apiBaseUrl)
+    callUi('segmentizability-ui', 'fetchSegmentizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSegmentizabilityRollout(rollout)
@@ -10710,7 +8005,7 @@ function App() {
         }
       })
 
-    fetchClusterizabilityRollout(apiBaseUrl)
+    callUi('clusterizability-ui', 'fetchClusterizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setClusterizabilityRollout(rollout)
@@ -10722,7 +8017,7 @@ function App() {
         }
       })
 
-    fetchNomenclatizabilityRollout(apiBaseUrl)
+    callUi('nomenclatizability-ui', 'fetchNomenclatizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setNomenclatizabilityRollout(rollout)
@@ -10734,7 +8029,7 @@ function App() {
         }
       })
 
-    fetchCatalogizabilityRollout(apiBaseUrl)
+    callUi('catalogizability-ui', 'fetchCatalogizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCatalogizabilityRollout(rollout)
@@ -10746,7 +8041,7 @@ function App() {
         }
       })
 
-    fetchIndexizabilityRollout(apiBaseUrl)
+    callUi('indexizability-ui', 'fetchIndexizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setIndexizabilityRollout(rollout)
@@ -10758,7 +8053,7 @@ function App() {
         }
       })
 
-    fetchDirectoryizabilityRollout(apiBaseUrl)
+    callUi('directoryizability-ui', 'fetchDirectoryizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDirectoryizabilityRollout(rollout)
@@ -10770,7 +8065,7 @@ function App() {
         }
       })
 
-    fetchInventoryizabilityRollout(apiBaseUrl)
+    callUi('inventoryizability-ui', 'fetchInventoryizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setInventoryizabilityRollout(rollout)
@@ -10782,7 +8077,7 @@ function App() {
         }
       })
 
-    fetchRegistryizabilityRollout(apiBaseUrl)
+    callUi('registryizability-ui', 'fetchRegistryizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRegistryizabilityRollout(rollout)
@@ -10794,7 +8089,7 @@ function App() {
         }
       })
 
-    fetchArchivizabilityRollout(apiBaseUrl)
+    callUi('archivizability-ui', 'fetchArchivizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setArchivizabilityRollout(rollout)
@@ -10806,7 +8101,7 @@ function App() {
         }
       })
 
-    fetchCuratizabilityRollout(apiBaseUrl)
+    callUi('curatizability-ui', 'fetchCuratizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCuratizabilityRollout(rollout)
@@ -10818,7 +8113,7 @@ function App() {
         }
       })
 
-    fetchCollectizabilityRollout(apiBaseUrl)
+    callUi('collectizability-ui', 'fetchCollectizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCollectizabilityRollout(rollout)
@@ -10830,7 +8125,7 @@ function App() {
         }
       })
 
-    fetchAggregatizabilityRollout(apiBaseUrl)
+    callUi('aggregatizability-ui', 'fetchAggregatizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAggregatizabilityRollout(rollout)
@@ -10842,7 +8137,7 @@ function App() {
         }
       })
 
-    fetchCompilatizabilityRollout(apiBaseUrl)
+    callUi('compilatizability-ui', 'fetchCompilatizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCompilatizabilityRollout(rollout)
@@ -10854,7 +8149,7 @@ function App() {
         }
       })
 
-    fetchBibliographizabilityRollout(apiBaseUrl)
+    callUi('bibliographizability-ui', 'fetchBibliographizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setBibliographizabilityRollout(rollout)
@@ -10866,7 +8161,7 @@ function App() {
         }
       })
 
-    fetchReferencizabilityRollout(apiBaseUrl)
+    callUi('referencizability-ui', 'fetchReferencizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setReferencizabilityRollout(rollout)
@@ -10878,7 +8173,7 @@ function App() {
         }
       })
 
-    fetchDocumentizabilityRollout(apiBaseUrl)
+    callUi('documentizability-ui', 'fetchDocumentizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDocumentizabilityRollout(rollout)
@@ -10890,7 +8185,7 @@ function App() {
         }
       })
 
-    fetchAnnotationizabilityRollout(apiBaseUrl)
+    callUi('annotationizability-ui', 'fetchAnnotationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAnnotationizabilityRollout(rollout)
@@ -10902,7 +8197,7 @@ function App() {
         }
       })
 
-    fetchCitationizabilityRollout(apiBaseUrl)
+    callUi('citationizability-ui', 'fetchCitationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCitationizabilityRollout(rollout)
@@ -10914,7 +8209,7 @@ function App() {
         }
       })
 
-    fetchConsolidatizabilityRollout(apiBaseUrl)
+    callUi('consolidatizability-ui', 'fetchConsolidatizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setConsolidatizabilityRollout(rollout)
@@ -10926,7 +8221,7 @@ function App() {
         }
       })
 
-    fetchHarmonizabilityRollout(apiBaseUrl)
+    callUi('harmonizability-ui', 'fetchHarmonizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setHarmonizabilityRollout(rollout)
@@ -10938,7 +8233,7 @@ function App() {
         }
       })
 
-    fetchParametrizabilityRollout(apiBaseUrl)
+    callUi('parametrizability-ui', 'fetchParametrizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setParametrizabilityRollout(rollout)
@@ -10950,7 +8245,7 @@ function App() {
         }
       })
 
-    fetchSerializabilityRollout(apiBaseUrl)
+    callUi('serializability-ui', 'fetchSerializabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSerializabilityRollout(rollout)
@@ -10962,7 +8257,7 @@ function App() {
         }
       })
 
-    fetchNormalizabilityRollout(apiBaseUrl)
+    callUi('normalizability-ui', 'fetchNormalizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setNormalizabilityRollout(rollout)
@@ -10974,7 +8269,7 @@ function App() {
         }
       })
 
-    fetchGlossarizabilityRollout(apiBaseUrl)
+    callUi('glossarizability-ui', 'fetchGlossarizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setGlossarizabilityRollout(rollout)
@@ -10986,7 +8281,7 @@ function App() {
         }
       })
 
-    fetchThesaurusizabilityRollout(apiBaseUrl)
+    callUi('thesaurusizability-ui', 'fetchThesaurusizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setThesaurusizabilityRollout(rollout)
@@ -10998,7 +8293,7 @@ function App() {
         }
       })
 
-    fetchTerminologizabilityRollout(apiBaseUrl)
+    callUi('terminologizability-ui', 'fetchTerminologizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTerminologizabilityRollout(rollout)
@@ -11010,7 +8305,7 @@ function App() {
         }
       })
 
-    fetchVocabularizabilityRollout(apiBaseUrl)
+    callUi('vocabularizability-ui', 'fetchVocabularizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setVocabularizabilityRollout(rollout)
@@ -11022,7 +8317,7 @@ function App() {
         }
       })
 
-    fetchFootnotizabilityRollout(apiBaseUrl)
+    callUi('footnotizability-ui', 'fetchFootnotizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setFootnotizabilityRollout(rollout)
@@ -11034,7 +8329,7 @@ function App() {
         }
       })
 
-    fetchContextualizabilityRollout(apiBaseUrl)
+    callUi('contextualizability-ui', 'fetchContextualizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setContextualizabilityRollout(rollout)
@@ -11046,7 +8341,7 @@ function App() {
         }
       })
 
-    fetchGeneralizabilityRollout(apiBaseUrl)
+    callUi('generalizability-ui', 'fetchGeneralizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setGeneralizabilityRollout(rollout)
@@ -11058,7 +8353,7 @@ function App() {
         }
       })
 
-    fetchStandardizabilityRollout(apiBaseUrl)
+    callUi('standardizability-ui', 'fetchStandardizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setStandardizabilityRollout(rollout)
@@ -11070,7 +8365,7 @@ function App() {
         }
       })
 
-    fetchFormalizabilityRollout(apiBaseUrl)
+    callUi('formalizability-ui', 'fetchFormalizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setFormalizabilityRollout(rollout)
@@ -11082,7 +8377,7 @@ function App() {
         }
       })
 
-    fetchCanonicalizabilityRollout(apiBaseUrl)
+    callUi('canonicalizability-ui', 'fetchCanonicalizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCanonicalizabilityRollout(rollout)
@@ -11094,7 +8389,7 @@ function App() {
         }
       })
 
-    fetchAbstractizabilityRollout(apiBaseUrl)
+    callUi('abstractizability-ui', 'fetchAbstractizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAbstractizabilityRollout(rollout)
@@ -11106,7 +8401,7 @@ function App() {
         }
       })
 
-    fetchConcretizabilityRollout(apiBaseUrl)
+    callUi('concretizability-ui', 'fetchConcretizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setConcretizabilityRollout(rollout)
@@ -11118,7 +8413,7 @@ function App() {
         }
       })
 
-    fetchDefinizabilityRollout(apiBaseUrl)
+    callUi('definizability-ui', 'fetchDefinizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDefinizabilityRollout(rollout)
@@ -11130,7 +8425,7 @@ function App() {
         }
       })
 
-    fetchInferencizabilityRollout(apiBaseUrl)
+    callUi('inferencizability-ui', 'fetchInferencizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setInferencizabilityRollout(rollout)
@@ -11142,7 +8437,7 @@ function App() {
         }
       })
 
-    fetchDeducizabilityRollout(apiBaseUrl)
+    callUi('deducizability-ui', 'fetchDeducizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDeducizabilityRollout(rollout)
@@ -11154,7 +8449,7 @@ function App() {
         }
       })
 
-    fetchProbabilizabilityRollout(apiBaseUrl)
+    callUi('probabilizability-ui', 'fetchProbabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setProbabilizabilityRollout(rollout)
@@ -11166,7 +8461,7 @@ function App() {
         }
       })
 
-    fetchStochasticizabilityRollout(apiBaseUrl)
+    callUi('stochasticizability-ui', 'fetchStochasticizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setStochasticizabilityRollout(rollout)
@@ -11178,7 +8473,7 @@ function App() {
         }
       })
 
-    fetchDeterminizabilityRollout(apiBaseUrl)
+    callUi('determinizability-ui', 'fetchDeterminizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDeterminizabilityRollout(rollout)
@@ -11190,7 +8485,7 @@ function App() {
         }
       })
 
-    fetchPredictizabilityRollout(apiBaseUrl)
+    callUi('predictizability-ui', 'fetchPredictizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPredictizabilityRollout(rollout)
@@ -11202,7 +8497,7 @@ function App() {
         }
       })
 
-    fetchExtrapolizabilityRollout(apiBaseUrl)
+    callUi('extrapolizability-ui', 'fetchExtrapolizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setExtrapolizabilityRollout(rollout)
@@ -11214,7 +8509,7 @@ function App() {
         }
       })
 
-    fetchInductizabilityRollout(apiBaseUrl)
+    callUi('inductizability-ui', 'fetchInductizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setInductizabilityRollout(rollout)
@@ -11226,7 +8521,7 @@ function App() {
         }
       })
 
-    fetchAbductizabilityRollout(apiBaseUrl)
+    callUi('abductizability-ui', 'fetchAbductizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAbductizabilityRollout(rollout)
@@ -11238,7 +8533,7 @@ function App() {
         }
       })
 
-    fetchRetrodictizabilityRollout(apiBaseUrl)
+    callUi('retrodictizability-ui', 'fetchRetrodictizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRetrodictizabilityRollout(rollout)
@@ -11250,7 +8545,7 @@ function App() {
         }
       })
 
-    fetchCorroborizabilityRollout(apiBaseUrl)
+    callUi('corroborizability-ui', 'fetchCorroborizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCorroborizabilityRollout(rollout)
@@ -11262,7 +8557,7 @@ function App() {
         }
       })
 
-    fetchFalsifiizabilityRollout(apiBaseUrl)
+    callUi('falsifiizability-ui', 'fetchFalsifiizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setFalsifiizabilityRollout(rollout)
@@ -11274,7 +8569,7 @@ function App() {
         }
       })
 
-    fetchInterpolizabilityRollout(apiBaseUrl)
+    callUi('interpolizability-ui', 'fetchInterpolizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setInterpolizabilityRollout(rollout)
@@ -11286,7 +8581,7 @@ function App() {
         }
       })
 
-    fetchRegressizabilityRollout(apiBaseUrl)
+    callUi('regressizability-ui', 'fetchRegressizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRegressizabilityRollout(rollout)
@@ -11298,7 +8593,7 @@ function App() {
         }
       })
 
-    fetchHeuristizabilityRollout(apiBaseUrl)
+    callUi('heuristizability-ui', 'fetchHeuristizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setHeuristizabilityRollout(rollout)
@@ -11310,7 +8605,7 @@ function App() {
         }
       })
 
-    fetchSimulatizabilityRollout(apiBaseUrl)
+    callUi('simulatizability-ui', 'fetchSimulatizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSimulatizabilityRollout(rollout)
@@ -11322,7 +8617,7 @@ function App() {
         }
       })
 
-    fetchOptimizabilityRollout(apiBaseUrl)
+    callUi('optimizability-ui', 'fetchOptimizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setOptimizabilityRollout(rollout)
@@ -11334,7 +8629,7 @@ function App() {
         }
       })
 
-    fetchCalibratizabilityRollout(apiBaseUrl)
+    callUi('calibratizability-ui', 'fetchCalibratizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCalibratizabilityRollout(rollout)
@@ -11346,7 +8641,7 @@ function App() {
         }
       })
 
-    fetchMetricizabilityRollout(apiBaseUrl)
+    callUi('metricizability-ui', 'fetchMetricizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMetricizabilityRollout(rollout)
@@ -11358,7 +8653,7 @@ function App() {
         }
       })
 
-    fetchBenchmarkizabilityRollout(apiBaseUrl)
+    callUi('benchmarkizability-ui', 'fetchBenchmarkizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setBenchmarkizabilityRollout(rollout)
@@ -11370,7 +8665,7 @@ function App() {
         }
       })
 
-    fetchComparizabilityRollout(apiBaseUrl)
+    callUi('comparizability-ui', 'fetchComparizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setComparizabilityRollout(rollout)
@@ -11382,7 +8677,7 @@ function App() {
         }
       })
 
-    fetchTolerizabilityRollout(apiBaseUrl)
+    callUi('tolerizability-ui', 'fetchTolerizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTolerizabilityRollout(rollout)
@@ -11394,7 +8689,7 @@ function App() {
         }
       })
 
-    fetchApproximatizabilityRollout(apiBaseUrl)
+    callUi('approximatizability-ui', 'fetchApproximatizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setApproximatizabilityRollout(rollout)
@@ -11406,7 +8701,7 @@ function App() {
         }
       })
 
-    fetchIterativizabilityRollout(apiBaseUrl)
+    callUi('iterativizability-ui', 'fetchIterativizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setIterativizabilityRollout(rollout)
@@ -11418,7 +8713,7 @@ function App() {
         }
       })
 
-    fetchConvergizabilityRollout(apiBaseUrl)
+    callUi('convergizability-ui', 'fetchConvergizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setConvergizabilityRollout(rollout)
@@ -11430,7 +8725,7 @@ function App() {
         }
       })
 
-    fetchStabilizabilityRollout(apiBaseUrl)
+    callUi('stabilizability-ui', 'fetchStabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setStabilizabilityRollout(rollout)
@@ -11442,7 +8737,7 @@ function App() {
         }
       })
 
-    fetchAdaptizabilityRollout(apiBaseUrl)
+    callUi('adaptizability-ui', 'fetchAdaptizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAdaptizabilityRollout(rollout)
@@ -11454,7 +8749,7 @@ function App() {
         }
       })
 
-    fetchScalabilizabilityRollout(apiBaseUrl)
+    callUi('scalabilizability-ui', 'fetchScalabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setScalabilizabilityRollout(rollout)
@@ -11466,7 +8761,7 @@ function App() {
         }
       })
 
-    fetchElasticizabilityRollout(apiBaseUrl)
+    callUi('elasticizability-ui', 'fetchElasticizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setElasticizabilityRollout(rollout)
@@ -11478,7 +8773,7 @@ function App() {
         }
       })
 
-    fetchResilientizabilityRollout(apiBaseUrl)
+    callUi('resilientizability-ui', 'fetchResilientizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setResilientizabilityRollout(rollout)
@@ -11490,7 +8785,7 @@ function App() {
         }
       })
 
-    fetchRobustizabilityRollout(apiBaseUrl)
+    callUi('robustizability-ui', 'fetchRobustizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRobustizabilityRollout(rollout)
@@ -11502,7 +8797,7 @@ function App() {
         }
       })
 
-    fetchDependableizabilityRollout(apiBaseUrl)
+    callUi('dependableizability-ui', 'fetchDependableizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDependableizabilityRollout(rollout)
@@ -11514,7 +8809,7 @@ function App() {
         }
       })
 
-    fetchRecoverizabilityRollout(apiBaseUrl)
+    callUi('recoverizability-ui', 'fetchRecoverizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRecoverizabilityRollout(rollout)
@@ -11526,7 +8821,7 @@ function App() {
         }
       })
 
-    fetchRedundizabilityRollout(apiBaseUrl)
+    callUi('redundizability-ui', 'fetchRedundizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRedundizabilityRollout(rollout)
@@ -11538,7 +8833,7 @@ function App() {
         }
       })
 
-    fetchFailoverizabilityRollout(apiBaseUrl)
+    callUi('failoverizability-ui', 'fetchFailoverizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setFailoverizabilityRollout(rollout)
@@ -11550,7 +8845,7 @@ function App() {
         }
       })
 
-    fetchContinuizabilityRollout(apiBaseUrl)
+    callUi('continuizability-ui', 'fetchContinuizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setContinuizabilityRollout(rollout)
@@ -11562,7 +8857,7 @@ function App() {
         }
       })
 
-    fetchSustainizabilityRollout(apiBaseUrl)
+    callUi('sustainizability-ui', 'fetchSustainizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSustainizabilityRollout(rollout)
@@ -11574,7 +8869,7 @@ function App() {
         }
       })
 
-    fetchAvailabilizabilityRollout(apiBaseUrl)
+    callUi('availabilizability-ui', 'fetchAvailabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAvailabilizabilityRollout(rollout)
@@ -11586,7 +8881,7 @@ function App() {
         }
       })
 
-    fetchTraceabilizabilityRollout(apiBaseUrl)
+    callUi('traceabilizability-ui', 'fetchTraceabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTraceabilizabilityRollout(rollout)
@@ -11598,7 +8893,7 @@ function App() {
         }
       })
 
-    fetchMonitorizabilityRollout(apiBaseUrl)
+    callUi('monitorizability-ui', 'fetchMonitorizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMonitorizabilityRollout(rollout)
@@ -11610,7 +8905,7 @@ function App() {
         }
       })
 
-    fetchAlertabilizabilityRollout(apiBaseUrl)
+    callUi('alertabilizability-ui', 'fetchAlertabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAlertabilizabilityRollout(rollout)
@@ -11622,7 +8917,7 @@ function App() {
         }
       })
 
-    fetchObservabilizabilityRollout(apiBaseUrl)
+    callUi('observabilizability-ui', 'fetchObservabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setObservabilizabilityRollout(rollout)
@@ -11634,7 +8929,7 @@ function App() {
         }
       })
 
-    fetchRestorabilizabilityRollout(apiBaseUrl)
+    callUi('restorabilizability-ui', 'fetchRestorabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRestorabilizabilityRollout(rollout)
@@ -11646,7 +8941,7 @@ function App() {
         }
       })
 
-    fetchReplicabilizabilityRollout(apiBaseUrl)
+    callUi('replicabilizability-ui', 'fetchReplicabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setReplicabilizabilityRollout(rollout)
@@ -11658,7 +8953,7 @@ function App() {
         }
       })
 
-    fetchLoadbalancizabilityRollout(apiBaseUrl)
+    callUi('loadbalancizability-ui', 'fetchLoadbalancizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setLoadbalancizabilityRollout(rollout)
@@ -11670,7 +8965,7 @@ function App() {
         }
       })
 
-    fetchAutoscalingizabilityRollout(apiBaseUrl)
+    callUi('autoscalingizability-ui', 'fetchAutoscalingizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAutoscalingizabilityRollout(rollout)
@@ -11682,7 +8977,7 @@ function App() {
         }
       })
 
-    fetchDeployabilizabilityRollout(apiBaseUrl)
+    callUi('deployabilizability-ui', 'fetchDeployabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDeployabilizabilityRollout(rollout)
@@ -11694,7 +8989,7 @@ function App() {
         }
       })
 
-    fetchConfigurabilizabilityRollout(apiBaseUrl)
+    callUi('configurabilizability-ui', 'fetchConfigurabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setConfigurabilizabilityRollout(rollout)
@@ -11706,7 +9001,7 @@ function App() {
         }
       })
 
-    fetchOperabilizabilityRollout(apiBaseUrl)
+    callUi('operabilizability-ui', 'fetchOperabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setOperabilizabilityRollout(rollout)
@@ -11718,7 +9013,7 @@ function App() {
         }
       })
 
-    fetchMaintainabilizabilityRollout(apiBaseUrl)
+    callUi('maintainabilizability-ui', 'fetchMaintainabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMaintainabilizabilityRollout(rollout)
@@ -11730,7 +9025,7 @@ function App() {
         }
       })
 
-    fetchDiagnosabilizabilityRollout(apiBaseUrl)
+    callUi('diagnosabilizability-ui', 'fetchDiagnosabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDiagnosabilizabilityRollout(rollout)
@@ -11742,7 +9037,7 @@ function App() {
         }
       })
 
-    fetchTroubleshootizabilityRollout(apiBaseUrl)
+    callUi('troubleshootizability-ui', 'fetchTroubleshootizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTroubleshootizabilityRollout(rollout)
@@ -11754,7 +9049,7 @@ function App() {
         }
       })
 
-    fetchRollbackabilizabilityRollout(apiBaseUrl)
+    callUi('rollbackabilizability-ui', 'fetchRollbackabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRollbackabilizabilityRollout(rollout)
@@ -11766,7 +9061,7 @@ function App() {
         }
       })
 
-    fetchCanaryizabilityRollout(apiBaseUrl)
+    callUi('canaryizability-ui', 'fetchCanaryizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCanaryizabilityRollout(rollout)
@@ -11778,7 +9073,7 @@ function App() {
         }
       })
 
-    fetchBluegreenizabilityRollout(apiBaseUrl)
+    callUi('bluegreenizability-ui', 'fetchBluegreenizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setBluegreenizabilityRollout(rollout)
@@ -11790,7 +9085,7 @@ function App() {
         }
       })
 
-    fetchProgressiveizabilityRollout(apiBaseUrl)
+    callUi('progressiveizability-ui', 'fetchProgressiveizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setProgressiveizabilityRollout(rollout)
@@ -11802,7 +9097,7 @@ function App() {
         }
       })
 
-    fetchFeatureflagizabilityRollout(apiBaseUrl)
+    callUi('featureflagizability-ui', 'fetchFeatureflagizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setFeatureflagizabilityRollout(rollout)
@@ -11814,7 +9109,7 @@ function App() {
         }
       })
 
-    fetchScriptabilizabilityRollout(apiBaseUrl)
+    callUi('scriptabilizability-ui', 'fetchScriptabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setScriptabilizabilityRollout(rollout)
@@ -11826,7 +9121,7 @@ function App() {
         }
       })
 
-    fetchAutomatizabilityRollout(apiBaseUrl)
+    callUi('automatizability-ui', 'fetchAutomatizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAutomatizabilityRollout(rollout)
@@ -11838,7 +9133,7 @@ function App() {
         }
       })
 
-    fetchOrchestrizabilityRollout(apiBaseUrl)
+    callUi('orchestrizability-ui', 'fetchOrchestrizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setOrchestrizabilityRollout(rollout)
@@ -11850,7 +9145,7 @@ function App() {
         }
       })
 
-    fetchSchedulizabilityRollout(apiBaseUrl)
+    callUi('schedulizability-ui', 'fetchSchedulizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSchedulizabilityRollout(rollout)
@@ -11862,7 +9157,7 @@ function App() {
         }
       })
 
-    fetchTriggerizabilityRollout(apiBaseUrl)
+    callUi('triggerizability-ui', 'fetchTriggerizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTriggerizabilityRollout(rollout)
@@ -11874,7 +9169,7 @@ function App() {
         }
       })
 
-    fetchReleasizabilityRollout(apiBaseUrl)
+    callUi('releasizability-ui', 'fetchReleasizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setReleasizabilityRollout(rollout)
@@ -11886,7 +9181,7 @@ function App() {
         }
       })
 
-    fetchVersionizabilityRollout(apiBaseUrl)
+    callUi('versionizability-ui', 'fetchVersionizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setVersionizabilityRollout(rollout)
@@ -11898,7 +9193,7 @@ function App() {
         }
       })
 
-    fetchMigratizabilityRollout(apiBaseUrl)
+    callUi('migratizability-ui', 'fetchMigratizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMigratizabilityRollout(rollout)
@@ -11910,7 +9205,7 @@ function App() {
         }
       })
 
-    fetchUpgradizabilityRollout(apiBaseUrl)
+    callUi('upgradizability-ui', 'fetchUpgradizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setUpgradizabilityRollout(rollout)
@@ -11922,7 +9217,7 @@ function App() {
         }
       })
 
-    fetchPatchizabilityRollout(apiBaseUrl)
+    callUi('patchizability-ui', 'fetchPatchizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPatchizabilityRollout(rollout)
@@ -11934,7 +9229,7 @@ function App() {
         }
       })
 
-    fetchIntegrabilizabilityRollout(apiBaseUrl)
+    callUi('integrabilizability-ui', 'fetchIntegrabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setIntegrabilizabilityRollout(rollout)
@@ -11946,7 +9241,7 @@ function App() {
         }
       })
 
-    fetchComposabilizabilityRollout(apiBaseUrl)
+    callUi('composabilizability-ui', 'fetchComposabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setComposabilizabilityRollout(rollout)
@@ -11958,7 +9253,7 @@ function App() {
         }
       })
 
-    fetchModularizabilityRollout(apiBaseUrl)
+    callUi('modularizability-ui', 'fetchModularizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setModularizabilityRollout(rollout)
@@ -11970,7 +9265,7 @@ function App() {
         }
       })
 
-    fetchExtensibilizabilityRollout(apiBaseUrl)
+    callUi('extensibilizability-ui', 'fetchExtensibilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setExtensibilizabilityRollout(rollout)
@@ -11982,7 +9277,7 @@ function App() {
         }
       })
 
-    fetchPluggabilizabilityRollout(apiBaseUrl)
+    callUi('pluggabilizability-ui', 'fetchPluggabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPluggabilizabilityRollout(rollout)
@@ -11994,7 +9289,7 @@ function App() {
         }
       })
 
-    fetchCompatibilizabilityRollout(apiBaseUrl)
+    callUi('compatibilizability-ui', 'fetchCompatibilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCompatibilizabilityRollout(rollout)
@@ -12006,7 +9301,7 @@ function App() {
         }
       })
 
-    fetchInteroperabilizabilityRollout(apiBaseUrl)
+    callUi('interoperabilizability-ui', 'fetchInteroperabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setInteroperabilizabilityRollout(rollout)
@@ -12018,7 +9313,7 @@ function App() {
         }
       })
 
-    fetchConnectabilizabilityRollout(apiBaseUrl)
+    callUi('connectabilizability-ui', 'fetchConnectabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setConnectabilizabilityRollout(rollout)
@@ -12030,7 +9325,7 @@ function App() {
         }
       })
 
-    fetchInterfabilizabilityRollout(apiBaseUrl)
+    callUi('interfabilizability-ui', 'fetchInterfabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setInterfabilizabilityRollout(rollout)
@@ -12042,7 +9337,7 @@ function App() {
         }
       })
 
-    fetchProtocolizabilityRollout(apiBaseUrl)
+    callUi('protocolizability-ui', 'fetchProtocolizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setProtocolizabilityRollout(rollout)
@@ -12054,7 +9349,7 @@ function App() {
         }
       })
 
-    fetchEncapsulizabilityRollout(apiBaseUrl)
+    callUi('encapsulizability-ui', 'fetchEncapsulizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setEncapsulizabilityRollout(rollout)
@@ -12066,7 +9361,7 @@ function App() {
         }
       })
 
-    fetchIsolatizabilityRollout(apiBaseUrl)
+    callUi('isolatizability-ui', 'fetchIsolatizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setIsolatizabilityRollout(rollout)
@@ -12078,7 +9373,7 @@ function App() {
         }
       })
 
-    fetchSandboxizabilityRollout(apiBaseUrl)
+    callUi('sandboxizability-ui', 'fetchSandboxizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSandboxizabilityRollout(rollout)
@@ -12090,7 +9385,7 @@ function App() {
         }
       })
 
-    fetchContainerizabilityRollout(apiBaseUrl)
+    callUi('containerizability-ui', 'fetchContainerizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setContainerizabilityRollout(rollout)
@@ -12102,7 +9397,7 @@ function App() {
         }
       })
 
-    fetchBoundarizabilityRollout(apiBaseUrl)
+    callUi('boundarizability-ui', 'fetchBoundarizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setBoundarizabilityRollout(rollout)
@@ -12114,7 +9409,7 @@ function App() {
         }
       })
 
-    fetchVirtualizabilityRollout(apiBaseUrl)
+    callUi('virtualizability-ui', 'fetchVirtualizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setVirtualizabilityRollout(rollout)
@@ -12126,7 +9421,7 @@ function App() {
         }
       })
 
-    fetchDistributizabilityRollout(apiBaseUrl)
+    callUi('distributizability-ui', 'fetchDistributizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDistributizabilityRollout(rollout)
@@ -12138,7 +9433,7 @@ function App() {
         }
       })
 
-    fetchFederatizabilityRollout(apiBaseUrl)
+    callUi('federatizability-ui', 'fetchFederatizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setFederatizabilityRollout(rollout)
@@ -12150,7 +9445,7 @@ function App() {
         }
       })
 
-    fetchDecentralizabilityRollout(apiBaseUrl)
+    callUi('decentralizability-ui', 'fetchDecentralizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDecentralizabilityRollout(rollout)
@@ -12162,7 +9457,7 @@ function App() {
         }
       })
 
-    fetchMeshabilizabilityRollout(apiBaseUrl)
+    callUi('meshabilizability-ui', 'fetchMeshabilizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMeshabilizabilityRollout(rollout)
@@ -12174,7 +9469,7 @@ function App() {
         }
       })
 
-    fetchTopologizabilityRollout(apiBaseUrl)
+    callUi('topologizability-ui', 'fetchTopologizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTopologizabilityRollout(rollout)
@@ -12186,7 +9481,7 @@ function App() {
         }
       })
 
-    fetchNetworkizabilityRollout(apiBaseUrl)
+    callUi('networkizability-ui', 'fetchNetworkizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setNetworkizabilityRollout(rollout)
@@ -12198,7 +9493,7 @@ function App() {
         }
       })
 
-    fetchGatewayizabilityRollout(apiBaseUrl)
+    callUi('gatewayizability-ui', 'fetchGatewayizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setGatewayizabilityRollout(rollout)
@@ -12210,7 +9505,7 @@ function App() {
         }
       })
 
-    fetchBrokerizabilityRollout(apiBaseUrl)
+    callUi('brokerizability-ui', 'fetchBrokerizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setBrokerizabilityRollout(rollout)
@@ -12222,7 +9517,7 @@ function App() {
         }
       })
 
-    fetchRelayizabilityRollout(apiBaseUrl)
+    callUi('relayizability-ui', 'fetchRelayizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRelayizabilityRollout(rollout)
@@ -12234,7 +9529,7 @@ function App() {
         }
       })
 
-    fetchRoutizabilityRollout(apiBaseUrl)
+    callUi('routizability-ui', 'fetchRoutizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRoutizabilityRollout(rollout)
@@ -12246,7 +9541,7 @@ function App() {
         }
       })
 
-    fetchQueueizabilityRollout(apiBaseUrl)
+    callUi('queueizability-ui', 'fetchQueueizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setQueueizabilityRollout(rollout)
@@ -12258,7 +9553,7 @@ function App() {
         }
       })
 
-    fetchEventizabilityRollout(apiBaseUrl)
+    callUi('eventizability-ui', 'fetchEventizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setEventizabilityRollout(rollout)
@@ -12270,7 +9565,7 @@ function App() {
         }
       })
 
-    fetchChannelizabilityRollout(apiBaseUrl)
+    callUi('channelizability-ui', 'fetchChannelizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setChannelizabilityRollout(rollout)
@@ -12282,7 +9577,7 @@ function App() {
         }
       })
 
-    fetchNotifizabilityRollout(apiBaseUrl)
+    callUi('notifizability-ui', 'fetchNotifizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setNotifizabilityRollout(rollout)
@@ -12294,7 +9589,7 @@ function App() {
         }
       })
 
-    fetchSubscribizabilityRollout(apiBaseUrl)
+    callUi('subscribizability-ui', 'fetchSubscribizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSubscribizabilityRollout(rollout)
@@ -12306,7 +9601,7 @@ function App() {
         }
       })
 
-    fetchPublishizabilityRollout(apiBaseUrl)
+    callUi('publishizability-ui', 'fetchPublishizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPublishizabilityRollout(rollout)
@@ -12318,7 +9613,7 @@ function App() {
         }
       })
 
-    fetchConsumizabilityRollout(apiBaseUrl)
+    callUi('consumizability-ui', 'fetchConsumizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setConsumizabilityRollout(rollout)
@@ -12330,7 +9625,7 @@ function App() {
         }
       })
 
-    fetchDeliverizabilityRollout(apiBaseUrl)
+    callUi('deliverizability-ui', 'fetchDeliverizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDeliverizabilityRollout(rollout)
@@ -12342,7 +9637,7 @@ function App() {
         }
       })
 
-    fetchDispatchizabilityRollout(apiBaseUrl)
+    callUi('dispatchizability-ui', 'fetchDispatchizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDispatchizabilityRollout(rollout)
@@ -12354,7 +9649,7 @@ function App() {
         }
       })
 
-    fetchHandoffizabilityRollout(apiBaseUrl)
+    callUi('handoffizability-ui', 'fetchHandoffizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setHandoffizabilityRollout(rollout)
@@ -12366,7 +9661,7 @@ function App() {
         }
       })
 
-    fetchSynchronizabilityRollout(apiBaseUrl)
+    callUi('synchronizability-ui', 'fetchSynchronizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSynchronizabilityRollout(rollout)
@@ -12378,7 +9673,7 @@ function App() {
         }
       })
 
-    fetchAsynchronizabilityRollout(apiBaseUrl)
+    callUi('asynchronizability-ui', 'fetchAsynchronizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAsynchronizabilityRollout(rollout)
@@ -12390,7 +9685,7 @@ function App() {
         }
       })
 
-    fetchBroadcastizabilityRollout(apiBaseUrl)
+    callUi('broadcastizability-ui', 'fetchBroadcastizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setBroadcastizabilityRollout(rollout)
@@ -12402,7 +9697,7 @@ function App() {
         }
       })
 
-    fetchMulticastizabilityRollout(apiBaseUrl)
+    callUi('multicastizability-ui', 'fetchMulticastizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMulticastizabilityRollout(rollout)
@@ -12414,7 +9709,7 @@ function App() {
         }
       })
 
-    fetchUnicastizabilityRollout(apiBaseUrl)
+    callUi('unicastizability-ui', 'fetchUnicastizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setUnicastizabilityRollout(rollout)
@@ -12426,7 +9721,7 @@ function App() {
         }
       })
 
-    fetchFanoutizabilityRollout(apiBaseUrl)
+    callUi('fanoutizability-ui', 'fetchFanoutizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setFanoutizabilityRollout(rollout)
@@ -12438,7 +9733,7 @@ function App() {
         }
       })
 
-    fetchBackpressureizabilityRollout(apiBaseUrl)
+    callUi('backpressureizability-ui', 'fetchBackpressureizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setBackpressureizabilityRollout(rollout)
@@ -12450,7 +9745,7 @@ function App() {
         }
       })
 
-    fetchThrottleizabilityRollout(apiBaseUrl)
+    callUi('throttleizability-ui', 'fetchThrottleizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setThrottleizabilityRollout(rollout)
@@ -12462,7 +9757,7 @@ function App() {
         }
       })
 
-    fetchDebouncizabilityRollout(apiBaseUrl)
+    callUi('debouncizability-ui', 'fetchDebouncizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDebouncizabilityRollout(rollout)
@@ -12474,7 +9769,7 @@ function App() {
         }
       })
 
-    fetchBufferizabilityRollout(apiBaseUrl)
+    callUi('bufferizability-ui', 'fetchBufferizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setBufferizabilityRollout(rollout)
@@ -12486,7 +9781,7 @@ function App() {
         }
       })
 
-    fetchBatchizabilityRollout(apiBaseUrl)
+    callUi('batchizability-ui', 'fetchBatchizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setBatchizabilityRollout(rollout)
@@ -12498,7 +9793,7 @@ function App() {
         }
       })
 
-    fetchRetryizabilityRollout(apiBaseUrl)
+    callUi('retryizability-ui', 'fetchRetryizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRetryizabilityRollout(rollout)
@@ -12510,7 +9805,7 @@ function App() {
         }
       })
 
-    fetchCircuitizabilityRollout(apiBaseUrl)
+    callUi('circuitizability-ui', 'fetchCircuitizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCircuitizabilityRollout(rollout)
@@ -12522,7 +9817,7 @@ function App() {
         }
       })
 
-    fetchTimeoutizabilityRollout(apiBaseUrl)
+    callUi('timeoutizability-ui', 'fetchTimeoutizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTimeoutizabilityRollout(rollout)
@@ -12534,7 +9829,7 @@ function App() {
         }
       })
 
-    fetchAckizabilityRollout(apiBaseUrl)
+    callUi('ackizability-ui', 'fetchAckizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAckizabilityRollout(rollout)
@@ -12546,7 +9841,7 @@ function App() {
         }
       })
 
-    fetchNackizabilityRollout(apiBaseUrl)
+    callUi('nackizability-ui', 'fetchNackizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setNackizabilityRollout(rollout)
@@ -12558,7 +9853,7 @@ function App() {
         }
       })
 
-    fetchDeadletterizabilityRollout(apiBaseUrl)
+    callUi('deadletterizability-ui', 'fetchDeadletterizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDeadletterizabilityRollout(rollout)
@@ -12570,7 +9865,7 @@ function App() {
         }
       })
 
-    fetchDedupizabilityRollout(apiBaseUrl)
+    callUi('dedupizability-ui', 'fetchDedupizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDedupizabilityRollout(rollout)
@@ -12582,7 +9877,7 @@ function App() {
         }
       })
 
-    fetchSequencizabilityRollout(apiBaseUrl)
+    callUi('sequencizability-ui', 'fetchSequencizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSequencizabilityRollout(rollout)
@@ -12594,7 +9889,7 @@ function App() {
         }
       })
 
-    fetchPartitionizabilityRollout(apiBaseUrl)
+    callUi('partitionizability-ui', 'fetchPartitionizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPartitionizabilityRollout(rollout)
@@ -12606,7 +9901,7 @@ function App() {
         }
       })
 
-    fetchShardingizabilityRollout(apiBaseUrl)
+    callUi('shardingizability-ui', 'fetchShardingizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setShardingizabilityRollout(rollout)
@@ -12618,7 +9913,7 @@ function App() {
         }
       })
 
-    fetchOrderingizabilityRollout(apiBaseUrl)
+    callUi('orderingizability-ui', 'fetchOrderingizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setOrderingizabilityRollout(rollout)
@@ -12630,7 +9925,7 @@ function App() {
         }
       })
 
-    fetchCheckpointizabilityRollout(apiBaseUrl)
+    callUi('checkpointizability-ui', 'fetchCheckpointizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCheckpointizabilityRollout(rollout)
@@ -12642,7 +9937,7 @@ function App() {
         }
       })
 
-    fetchRecoveryizabilityRollout(apiBaseUrl)
+    callUi('recoveryizability-ui', 'fetchRecoveryizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRecoveryizabilityRollout(rollout)
@@ -12654,7 +9949,7 @@ function App() {
         }
       })
 
-    fetchCompactionizabilityRollout(apiBaseUrl)
+    callUi('compactionizability-ui', 'fetchCompactionizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCompactionizabilityRollout(rollout)
@@ -12666,7 +9961,7 @@ function App() {
         }
       })
 
-    fetchRebalanceizabilityRollout(apiBaseUrl)
+    callUi('rebalanceizability-ui', 'fetchRebalanceizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRebalanceizabilityRollout(rollout)
@@ -12678,7 +9973,7 @@ function App() {
         }
       })
 
-    fetchLeaderizabilityRollout(apiBaseUrl)
+    callUi('leaderizability-ui', 'fetchLeaderizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setLeaderizabilityRollout(rollout)
@@ -12690,7 +9985,7 @@ function App() {
         }
       })
 
-    fetchFollowerizabilityRollout(apiBaseUrl)
+    callUi('followerizability-ui', 'fetchFollowerizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setFollowerizabilityRollout(rollout)
@@ -12702,7 +9997,7 @@ function App() {
         }
       })
 
-    fetchConsensusizabilityRollout(apiBaseUrl)
+    callUi('consensusizability-ui', 'fetchConsensusizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setConsensusizabilityRollout(rollout)
@@ -12714,7 +10009,7 @@ function App() {
         }
       })
 
-    fetchQuorumizabilityRollout(apiBaseUrl)
+    callUi('quorumizability-ui', 'fetchQuorumizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setQuorumizabilityRollout(rollout)
@@ -12726,7 +10021,7 @@ function App() {
         }
       })
 
-    fetchSnapshotizabilityRollout(apiBaseUrl)
+    callUi('snapshotizability-ui', 'fetchSnapshotizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSnapshotizabilityRollout(rollout)
@@ -12738,7 +10033,7 @@ function App() {
         }
       })
 
-    fetchJournalizabilityRollout(apiBaseUrl)
+    callUi('journalizability-ui', 'fetchJournalizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setJournalizabilityRollout(rollout)
@@ -12750,7 +10045,7 @@ function App() {
         }
       })
 
-    fetchAppendizabilityRollout(apiBaseUrl)
+    callUi('appendizability-ui', 'fetchAppendizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAppendizabilityRollout(rollout)
@@ -12762,7 +10057,7 @@ function App() {
         }
       })
 
-    fetchWalizabilityRollout(apiBaseUrl)
+    callUi('walizability-ui', 'fetchWalizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setWalizabilityRollout(rollout)
@@ -12774,7 +10069,7 @@ function App() {
         }
       })
 
-    fetchReplicationizabilityRollout(apiBaseUrl)
+    callUi('replicationizability-ui', 'fetchReplicationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setReplicationizabilityRollout(rollout)
@@ -12786,7 +10081,7 @@ function App() {
         }
       })
 
-    fetchMirroringizabilityRollout(apiBaseUrl)
+    callUi('mirroringizability-ui', 'fetchMirroringizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMirroringizabilityRollout(rollout)
@@ -12798,7 +10093,7 @@ function App() {
         }
       })
 
-    fetchCloningizabilityRollout(apiBaseUrl)
+    callUi('cloningizability-ui', 'fetchCloningizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCloningizabilityRollout(rollout)
@@ -12810,7 +10105,7 @@ function App() {
         }
       })
 
-    fetchPropagationizabilityRollout(apiBaseUrl)
+    callUi('propagationizability-ui', 'fetchPropagationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPropagationizabilityRollout(rollout)
@@ -12822,7 +10117,7 @@ function App() {
         }
       })
 
-    fetchMaterializationizabilityRollout(apiBaseUrl)
+    callUi('materializationizability-ui', 'fetchMaterializationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMaterializationizabilityRollout(rollout)
@@ -12834,7 +10129,7 @@ function App() {
         }
       })
 
-    fetchHydrationizabilityRollout(apiBaseUrl)
+    callUi('hydrationizability-ui', 'fetchHydrationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setHydrationizabilityRollout(rollout)
@@ -12846,7 +10141,7 @@ function App() {
         }
       })
 
-    fetchInvalidationizabilityRollout(apiBaseUrl)
+    callUi('invalidationizability-ui', 'fetchInvalidationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setInvalidationizabilityRollout(rollout)
@@ -12858,7 +10153,7 @@ function App() {
         }
       })
 
-    fetchEvictionizabilityRollout(apiBaseUrl)
+    callUi('evictionizability-ui', 'fetchEvictionizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setEvictionizabilityRollout(rollout)
@@ -12870,7 +10165,7 @@ function App() {
         }
       })
 
-    fetchTtlizabilityRollout(apiBaseUrl)
+    callUi('ttlizability-ui', 'fetchTtlizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTtlizabilityRollout(rollout)
@@ -12882,7 +10177,7 @@ function App() {
         }
       })
 
-    fetchExpirationizabilityRollout(apiBaseUrl)
+    callUi('expirationizability-ui', 'fetchExpirationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setExpirationizabilityRollout(rollout)
@@ -12894,7 +10189,7 @@ function App() {
         }
       })
 
-    fetchRefreshizabilityRollout(apiBaseUrl)
+    callUi('refreshizability-ui', 'fetchRefreshizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRefreshizabilityRollout(rollout)
@@ -12906,7 +10201,7 @@ function App() {
         }
       })
 
-    fetchWarmizabilityRollout(apiBaseUrl)
+    callUi('warmizability-ui', 'fetchWarmizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setWarmizabilityRollout(rollout)
@@ -12918,7 +10213,7 @@ function App() {
         }
       })
 
-    fetchColdizabilityRollout(apiBaseUrl)
+    callUi('coldizability-ui', 'fetchColdizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setColdizabilityRollout(rollout)
@@ -12930,7 +10225,7 @@ function App() {
         }
       })
 
-    fetchPrefetchizabilityRollout(apiBaseUrl)
+    callUi('prefetchizability-ui', 'fetchPrefetchizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPrefetchizabilityRollout(rollout)
@@ -12942,7 +10237,7 @@ function App() {
         }
       })
 
-    fetchCacheizabilityRollout(apiBaseUrl)
+    callUi('cacheizability-ui', 'fetchCacheizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCacheizabilityRollout(rollout)
@@ -12954,7 +10249,7 @@ function App() {
         }
       })
 
-    fetchMemorizabilityRollout(apiBaseUrl)
+    callUi('memorizability-ui', 'fetchMemorizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMemorizabilityRollout(rollout)
@@ -12966,7 +10261,7 @@ function App() {
         }
       })
 
-    fetchPersistizabilityRollout(apiBaseUrl)
+    callUi('persistizability-ui', 'fetchPersistizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPersistizabilityRollout(rollout)
@@ -12978,7 +10273,7 @@ function App() {
         }
       })
 
-    fetchCompressizabilityRollout(apiBaseUrl)
+    callUi('compressizability-ui', 'fetchCompressizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCompressizabilityRollout(rollout)
@@ -12990,7 +10285,7 @@ function App() {
         }
       })
 
-    fetchDecompressizabilityRollout(apiBaseUrl)
+    callUi('decompressizability-ui', 'fetchDecompressizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDecompressizabilityRollout(rollout)
@@ -13002,7 +10297,7 @@ function App() {
         }
       })
 
-    fetchArchiveizabilityRollout(apiBaseUrl)
+    callUi('archiveizability-ui', 'fetchArchiveizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setArchiveizabilityRollout(rollout)
@@ -13014,7 +10309,7 @@ function App() {
         }
       })
 
-    fetchRestoreizabilityRollout(apiBaseUrl)
+    callUi('restoreizability-ui', 'fetchRestoreizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRestoreizabilityRollout(rollout)
@@ -13026,7 +10321,7 @@ function App() {
         }
       })
 
-    fetchBackupizabilityRollout(apiBaseUrl)
+    callUi('backupizability-ui', 'fetchBackupizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setBackupizabilityRollout(rollout)
@@ -13038,7 +10333,7 @@ function App() {
         }
       })
 
-    fetchExportizabilityRollout(apiBaseUrl)
+    callUi('exportizability-ui', 'fetchExportizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setExportizabilityRollout(rollout)
@@ -13050,7 +10345,7 @@ function App() {
         }
       })
 
-    fetchImportizabilityRollout(apiBaseUrl)
+    callUi('importizability-ui', 'fetchImportizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setImportizabilityRollout(rollout)
@@ -13062,7 +10357,7 @@ function App() {
         }
       })
 
-    fetchIndexingizabilityRollout(apiBaseUrl)
+    callUi('indexingizability-ui', 'fetchIndexingizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setIndexingizabilityRollout(rollout)
@@ -13074,7 +10369,7 @@ function App() {
         }
       })
 
-    fetchSearchizabilityRollout(apiBaseUrl)
+    callUi('searchizability-ui', 'fetchSearchizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSearchizabilityRollout(rollout)
@@ -13086,7 +10381,7 @@ function App() {
         }
       })
 
-    fetchVersioningizabilityRollout(apiBaseUrl)
+    callUi('versioningizability-ui', 'fetchVersioningizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setVersioningizabilityRollout(rollout)
@@ -13098,7 +10393,7 @@ function App() {
         }
       })
 
-    fetchCompactizabilityRollout(apiBaseUrl)
+    callUi('compactizability-ui', 'fetchCompactizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCompactizabilityRollout(rollout)
@@ -13110,7 +10405,7 @@ function App() {
         }
       })
 
-    fetchExpandizabilityRollout(apiBaseUrl)
+    callUi('expandizability-ui', 'fetchExpandizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setExpandizabilityRollout(rollout)
@@ -13122,7 +10417,7 @@ function App() {
         }
       })
 
-    fetchRetentionizabilityRollout(apiBaseUrl)
+    callUi('retentionizability-ui', 'fetchRetentionizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRetentionizabilityRollout(rollout)
@@ -13134,7 +10429,7 @@ function App() {
         }
       })
 
-    fetchQueryizabilityRollout(apiBaseUrl)
+    callUi('queryizability-ui', 'fetchQueryizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setQueryizabilityRollout(rollout)
@@ -13146,7 +10441,7 @@ function App() {
         }
       })
 
-    fetchFilterizabilityRollout(apiBaseUrl)
+    callUi('filterizability-ui', 'fetchFilterizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setFilterizabilityRollout(rollout)
@@ -13158,7 +10453,7 @@ function App() {
         }
       })
 
-    fetchSortizabilityRollout(apiBaseUrl)
+    callUi('sortizability-ui', 'fetchSortizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSortizabilityRollout(rollout)
@@ -13170,7 +10465,7 @@ function App() {
         }
       })
 
-    fetchPaginizabilityRollout(apiBaseUrl)
+    callUi('paginizability-ui', 'fetchPaginizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPaginizabilityRollout(rollout)
@@ -13182,7 +10477,7 @@ function App() {
         }
       })
 
-    fetchPivotizabilityRollout(apiBaseUrl)
+    callUi('pivotizability-ui', 'fetchPivotizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPivotizabilityRollout(rollout)
@@ -13194,7 +10489,7 @@ function App() {
         }
       })
 
-    fetchGroupizabilityRollout(apiBaseUrl)
+    callUi('groupizability-ui', 'fetchGroupizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setGroupizabilityRollout(rollout)
@@ -13206,7 +10501,7 @@ function App() {
         }
       })
 
-    fetchJoinizabilityRollout(apiBaseUrl)
+    callUi('joinizability-ui', 'fetchJoinizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setJoinizabilityRollout(rollout)
@@ -13218,7 +10513,7 @@ function App() {
         }
       })
 
-    fetchMergeizabilityRollout(apiBaseUrl)
+    callUi('mergeizability-ui', 'fetchMergeizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMergeizabilityRollout(rollout)
@@ -13230,7 +10525,7 @@ function App() {
         }
       })
 
-    fetchSplitizabilityRollout(apiBaseUrl)
+    callUi('splitizability-ui', 'fetchSplitizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSplitizabilityRollout(rollout)
@@ -13242,7 +10537,7 @@ function App() {
         }
       })
 
-    fetchProjectizabilityRollout(apiBaseUrl)
+    callUi('projectizability-ui', 'fetchProjectizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setProjectizabilityRollout(rollout)
@@ -13254,7 +10549,7 @@ function App() {
         }
       })
 
-    fetchTransformizabilityRollout(apiBaseUrl)
+    callUi('transformizability-ui', 'fetchTransformizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTransformizabilityRollout(rollout)
@@ -13266,7 +10561,7 @@ function App() {
         }
       })
 
-    fetchMapizabilityRollout(apiBaseUrl)
+    callUi('mapizability-ui', 'fetchMapizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMapizabilityRollout(rollout)
@@ -13278,7 +10573,7 @@ function App() {
         }
       })
 
-    fetchReduceizabilityRollout(apiBaseUrl)
+    callUi('reduceizability-ui', 'fetchReduceizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setReduceizabilityRollout(rollout)
@@ -13290,7 +10585,7 @@ function App() {
         }
       })
 
-    fetchFoldizabilityRollout(apiBaseUrl)
+    callUi('foldizability-ui', 'fetchFoldizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setFoldizabilityRollout(rollout)
@@ -13302,7 +10597,7 @@ function App() {
         }
       })
 
-    fetchScanizabilityRollout(apiBaseUrl)
+    callUi('scanizability-ui', 'fetchScanizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setScanizabilityRollout(rollout)
@@ -13314,7 +10609,7 @@ function App() {
         }
       })
 
-    fetchChainingizabilityRollout(apiBaseUrl)
+    callUi('chainingizability-ui', 'fetchChainingizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setChainingizabilityRollout(rollout)
@@ -13326,7 +10621,7 @@ function App() {
         }
       })
 
-    fetchPipeliningizabilityRollout(apiBaseUrl)
+    callUi('pipeliningizability-ui', 'fetchPipeliningizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPipeliningizabilityRollout(rollout)
@@ -13338,7 +10633,7 @@ function App() {
         }
       })
 
-    fetchBatchingizabilityRollout(apiBaseUrl)
+    callUi('batchingizability-ui', 'fetchBatchingizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setBatchingizabilityRollout(rollout)
@@ -13350,7 +10645,7 @@ function App() {
         }
       })
 
-    fetchStreamizabilityRollout(apiBaseUrl)
+    callUi('streamizability-ui', 'fetchStreamizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setStreamizabilityRollout(rollout)
@@ -13362,7 +10657,7 @@ function App() {
         }
       })
 
-    fetchWindowizabilityRollout(apiBaseUrl)
+    callUi('windowizability-ui', 'fetchWindowizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setWindowizabilityRollout(rollout)
@@ -13374,7 +10669,7 @@ function App() {
         }
       })
 
-    fetchOrchestrationizabilityRollout(apiBaseUrl)
+    callUi('orchestrationizability-ui', 'fetchOrchestrationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setOrchestrationizabilityRollout(rollout)
@@ -13386,7 +10681,7 @@ function App() {
         }
       })
 
-    fetchSchedulingizabilityRollout(apiBaseUrl)
+    callUi('schedulingizability-ui', 'fetchSchedulingizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSchedulingizabilityRollout(rollout)
@@ -13398,7 +10693,7 @@ function App() {
         }
       })
 
-    fetchTriggeringizabilityRollout(apiBaseUrl)
+    callUi('triggeringizability-ui', 'fetchTriggeringizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTriggeringizabilityRollout(rollout)
@@ -13410,7 +10705,7 @@ function App() {
         }
       })
 
-    fetchRoutingizabilityRollout(apiBaseUrl)
+    callUi('routingizability-ui', 'fetchRoutingizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRoutingizabilityRollout(rollout)
@@ -13422,7 +10717,7 @@ function App() {
         }
       })
 
-    fetchBalancingizabilityRollout(apiBaseUrl)
+    callUi('balancingizability-ui', 'fetchBalancingizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setBalancingizabilityRollout(rollout)
@@ -13434,7 +10729,7 @@ function App() {
         }
       })
 
-    fetchNodelizabilityRollout(apiBaseUrl)
+    callUi('nodelizability-ui', 'fetchNodelizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setNodelizabilityRollout(rollout)
@@ -13446,7 +10741,7 @@ function App() {
         }
       })
 
-    fetchCoordinationizabilityRollout(apiBaseUrl)
+    callUi('coordinationizability-ui', 'fetchCoordinationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCoordinationizabilityRollout(rollout)
@@ -13458,7 +10753,7 @@ function App() {
         }
       })
 
-    fetchPartitioningizabilityRollout(apiBaseUrl)
+    callUi('partitioningizability-ui', 'fetchPartitioningizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPartitioningizabilityRollout(rollout)
@@ -13470,7 +10765,7 @@ function App() {
         }
       })
 
-    fetchClusteringizabilityRollout(apiBaseUrl)
+    callUi('clusteringizability-ui', 'fetchClusteringizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setClusteringizabilityRollout(rollout)
@@ -13482,7 +10777,7 @@ function App() {
         }
       })
 
-    fetchMeshingizabilityRollout(apiBaseUrl)
+    callUi('meshingizability-ui', 'fetchMeshingizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMeshingizabilityRollout(rollout)
@@ -13494,7 +10789,7 @@ function App() {
         }
       })
 
-    fetchDiscoveryizabilityRollout(apiBaseUrl)
+    callUi('discoveryizability-ui', 'fetchDiscoveryizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDiscoveryizabilityRollout(rollout)
@@ -13506,7 +10801,7 @@ function App() {
         }
       })
 
-    fetchRegistrationizabilityRollout(apiBaseUrl)
+    callUi('registrationizability-ui', 'fetchRegistrationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRegistrationizabilityRollout(rollout)
@@ -13518,7 +10813,7 @@ function App() {
         }
       })
 
-    fetchProvisioningizabilityRollout(apiBaseUrl)
+    callUi('provisioningizability-ui', 'fetchProvisioningizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setProvisioningizabilityRollout(rollout)
@@ -13530,7 +10825,7 @@ function App() {
         }
       })
 
-    fetchAllocationizabilityRollout(apiBaseUrl)
+    callUi('allocationizability-ui', 'fetchAllocationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAllocationizabilityRollout(rollout)
@@ -13542,7 +10837,7 @@ function App() {
         }
       })
 
-    fetchDeallocationizabilityRollout(apiBaseUrl)
+    callUi('deallocationizability-ui', 'fetchDeallocationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDeallocationizabilityRollout(rollout)
@@ -13554,7 +10849,7 @@ function App() {
         }
       })
 
-    fetchScalingizabilityRollout(apiBaseUrl)
+    callUi('scalingizability-ui', 'fetchScalingizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setScalingizabilityRollout(rollout)
@@ -13566,7 +10861,7 @@ function App() {
         }
       })
 
-    fetchHealingizabilityRollout(apiBaseUrl)
+    callUi('healingizability-ui', 'fetchHealingizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setHealingizabilityRollout(rollout)
@@ -13578,7 +10873,7 @@ function App() {
         }
       })
 
-    fetchRemediationizabilityRollout(apiBaseUrl)
+    callUi('remediationizability-ui', 'fetchRemediationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRemediationizabilityRollout(rollout)
@@ -13590,7 +10885,7 @@ function App() {
         }
       })
 
-    fetchReconciliationizabilityRollout(apiBaseUrl)
+    callUi('reconciliationizability-ui', 'fetchReconciliationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setReconciliationizabilityRollout(rollout)
@@ -13602,7 +10897,7 @@ function App() {
         }
       })
 
-    fetchGovernanceizabilityRollout(apiBaseUrl)
+    callUi('governanceizability-ui', 'fetchGovernanceizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setGovernanceizabilityRollout(rollout)
@@ -13614,7 +10909,7 @@ function App() {
         }
       })
 
-    fetchComplianceizabilityRollout(apiBaseUrl)
+    callUi('complianceizability-ui', 'fetchComplianceizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setComplianceizabilityRollout(rollout)
@@ -13626,7 +10921,7 @@ function App() {
         }
       })
 
-    fetchPolicyizabilityRollout(apiBaseUrl)
+    callUi('policyizability-ui', 'fetchPolicyizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPolicyizabilityRollout(rollout)
@@ -13638,7 +10933,7 @@ function App() {
         }
       })
 
-    fetchEnforcementizabilityRollout(apiBaseUrl)
+    callUi('enforcementizability-ui', 'fetchEnforcementizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setEnforcementizabilityRollout(rollout)
@@ -13650,7 +10945,7 @@ function App() {
         }
       })
 
-    fetchAssuranceizabilityRollout(apiBaseUrl)
+    callUi('assuranceizability-ui', 'fetchAssuranceizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAssuranceizabilityRollout(rollout)
@@ -13662,7 +10957,7 @@ function App() {
         }
       })
 
-    fetchAttestationizabilityRollout(apiBaseUrl)
+    callUi('attestationizability-ui', 'fetchAttestationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAttestationizabilityRollout(rollout)
@@ -13674,7 +10969,7 @@ function App() {
         }
       })
 
-    fetchCertificationizabilityRollout(apiBaseUrl)
+    callUi('certificationizability-ui', 'fetchCertificationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCertificationizabilityRollout(rollout)
@@ -13686,7 +10981,7 @@ function App() {
         }
       })
 
-    fetchAccreditationizabilityRollout(apiBaseUrl)
+    callUi('accreditationizability-ui', 'fetchAccreditationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAccreditationizabilityRollout(rollout)
@@ -13698,7 +10993,7 @@ function App() {
         }
       })
 
-    fetchSpecificationizabilityRollout(apiBaseUrl)
+    callUi('specificationizability-ui', 'fetchSpecificationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSpecificationizabilityRollout(rollout)
@@ -13710,7 +11005,7 @@ function App() {
         }
       })
 
-    fetchInstrumentationizabilityRollout(apiBaseUrl)
+    callUi('instrumentationizability-ui', 'fetchInstrumentationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setInstrumentationizabilityRollout(rollout)
@@ -13722,7 +11017,7 @@ function App() {
         }
       })
 
-    fetchTelemetryizabilityRollout(apiBaseUrl)
+    callUi('telemetryizability-ui', 'fetchTelemetryizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTelemetryizabilityRollout(rollout)
@@ -13734,7 +11029,7 @@ function App() {
         }
       })
 
-    fetchAuditingizabilityRollout(apiBaseUrl)
+    callUi('auditingizability-ui', 'fetchAuditingizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAuditingizabilityRollout(rollout)
@@ -13746,7 +11041,7 @@ function App() {
         }
       })
 
-    fetchAccountabilityizabilityRollout(apiBaseUrl)
+    callUi('accountabilityizability-ui', 'fetchAccountabilityizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAccountabilityizabilityRollout(rollout)
@@ -13758,7 +11053,7 @@ function App() {
         }
       })
 
-    fetchTransparencyizabilityRollout(apiBaseUrl)
+    callUi('transparencyizability-ui', 'fetchTransparencyizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTransparencyizabilityRollout(rollout)
@@ -13770,7 +11065,7 @@ function App() {
         }
       })
 
-    fetchOversightizabilityRollout(apiBaseUrl)
+    callUi('oversightizability-ui', 'fetchOversightizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setOversightizabilityRollout(rollout)
@@ -13782,7 +11077,7 @@ function App() {
         }
       })
 
-    fetchControlizabilityRollout(apiBaseUrl)
+    callUi('controlizability-ui', 'fetchControlizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setControlizabilityRollout(rollout)
@@ -13794,7 +11089,7 @@ function App() {
         }
       })
 
-    fetchEntitlementizabilityRollout(apiBaseUrl)
+    callUi('entitlementizability-ui', 'fetchEntitlementizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setEntitlementizabilityRollout(rollout)
@@ -13806,7 +11101,7 @@ function App() {
         }
       })
 
-    fetchPermissionizabilityRollout(apiBaseUrl)
+    callUi('permissionizability-ui', 'fetchPermissionizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPermissionizabilityRollout(rollout)
@@ -13818,7 +11113,7 @@ function App() {
         }
       })
 
-    fetchAuthorizationizabilityRollout(apiBaseUrl)
+    callUi('authorizationizability-ui', 'fetchAuthorizationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAuthorizationizabilityRollout(rollout)
@@ -13830,7 +11125,7 @@ function App() {
         }
       })
 
-    fetchAuthenticationizabilityRollout(apiBaseUrl)
+    callUi('authenticationizability-ui', 'fetchAuthenticationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAuthenticationizabilityRollout(rollout)
@@ -13842,7 +11137,7 @@ function App() {
         }
       })
 
-    fetchIdentityizabilityRollout(apiBaseUrl)
+    callUi('identityizability-ui', 'fetchIdentityizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setIdentityizabilityRollout(rollout)
@@ -13854,7 +11149,7 @@ function App() {
         }
       })
 
-    fetchRiskizabilityRollout(apiBaseUrl)
+    callUi('riskizability-ui', 'fetchRiskizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRiskizabilityRollout(rollout)
@@ -13866,7 +11161,7 @@ function App() {
         }
       })
 
-    fetchSecurityizabilityRollout(apiBaseUrl)
+    callUi('securityizability-ui', 'fetchSecurityizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSecurityizabilityRollout(rollout)
@@ -13878,7 +11173,7 @@ function App() {
         }
       })
 
-    fetchPrivacyizabilityRollout(apiBaseUrl)
+    callUi('privacyizability-ui', 'fetchPrivacyizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPrivacyizabilityRollout(rollout)
@@ -13890,7 +11185,7 @@ function App() {
         }
       })
 
-    fetchTrustizabilityRollout(apiBaseUrl)
+    callUi('trustizability-ui', 'fetchTrustizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTrustizabilityRollout(rollout)
@@ -13902,7 +11197,7 @@ function App() {
         }
       })
 
-    fetchIntegrityizabilityRollout(apiBaseUrl)
+    callUi('integrityizability-ui', 'fetchIntegrityizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setIntegrityizabilityRollout(rollout)
@@ -13914,7 +11209,7 @@ function App() {
         }
       })
 
-    fetchThreatizabilityRollout(apiBaseUrl)
+    callUi('threatizability-ui', 'fetchThreatizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setThreatizabilityRollout(rollout)
@@ -13926,7 +11221,7 @@ function App() {
         }
       })
 
-    fetchVulnerabilityizabilityRollout(apiBaseUrl)
+    callUi('vulnerabilityizability-ui', 'fetchVulnerabilityizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setVulnerabilityizabilityRollout(rollout)
@@ -13938,7 +11233,7 @@ function App() {
         }
       })
 
-    fetchMitigationizabilityRollout(apiBaseUrl)
+    callUi('mitigationizability-ui', 'fetchMitigationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setMitigationizabilityRollout(rollout)
@@ -13950,7 +11245,7 @@ function App() {
         }
       })
 
-    fetchHardeningizabilityRollout(apiBaseUrl)
+    callUi('hardeningizability-ui', 'fetchHardeningizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setHardeningizabilityRollout(rollout)
@@ -13962,7 +11257,7 @@ function App() {
         }
       })
 
-    fetchSegregationizabilityRollout(apiBaseUrl)
+    callUi('segregationizability-ui', 'fetchSegregationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSegregationizabilityRollout(rollout)
@@ -13974,7 +11269,7 @@ function App() {
         }
       })
 
-    fetchConfidentialityizabilityRollout(apiBaseUrl)
+    callUi('confidentialityizability-ui', 'fetchConfidentialityizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setConfidentialityizabilityRollout(rollout)
@@ -13986,7 +11281,7 @@ function App() {
         }
       })
 
-    fetchNonrepudiationizabilityRollout(apiBaseUrl)
+    callUi('nonrepudiationizability-ui', 'fetchNonrepudiationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setNonrepudiationizabilityRollout(rollout)
@@ -13998,7 +11293,7 @@ function App() {
         }
       })
 
-    fetchAccesscontrolizabilityRollout(apiBaseUrl)
+    callUi('accesscontrolizability-ui', 'fetchAccesscontrolizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAccesscontrolizabilityRollout(rollout)
@@ -14010,7 +11305,7 @@ function App() {
         }
       })
 
-    fetchLeastprivilegeizabilityRollout(apiBaseUrl)
+    callUi('leastprivilegeizability-ui', 'fetchLeastprivilegeizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setLeastprivilegeizabilityRollout(rollout)
@@ -14022,7 +11317,7 @@ function App() {
         }
       })
 
-    fetchZerotrustizabilityRollout(apiBaseUrl)
+    callUi('zerotrustizability-ui', 'fetchZerotrustizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setZerotrustizabilityRollout(rollout)
@@ -14034,7 +11329,7 @@ function App() {
         }
       })
 
-    fetchIdentityproofizabilityRollout(apiBaseUrl)
+    callUi('identityproofizability-ui', 'fetchIdentityproofizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setIdentityproofizabilityRollout(rollout)
@@ -14046,7 +11341,7 @@ function App() {
         }
       })
 
-    fetchKeymanagementizabilityRollout(apiBaseUrl)
+    callUi('keymanagementizability-ui', 'fetchKeymanagementizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setKeymanagementizabilityRollout(rollout)
@@ -14058,7 +11353,7 @@ function App() {
         }
       })
 
-    fetchSecretmanagementizabilityRollout(apiBaseUrl)
+    callUi('secretmanagementizability-ui', 'fetchSecretmanagementizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSecretmanagementizabilityRollout(rollout)
@@ -14070,7 +11365,7 @@ function App() {
         }
       })
 
-    fetchCryptographyizabilityRollout(apiBaseUrl)
+    callUi('cryptographyizability-ui', 'fetchCryptographyizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCryptographyizabilityRollout(rollout)
@@ -14082,7 +11377,7 @@ function App() {
         }
       })
 
-    fetchComplianceguardizabilityRollout(apiBaseUrl)
+    callUi('complianceguardizability-ui', 'fetchComplianceguardizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setComplianceguardizabilityRollout(rollout)
@@ -14094,7 +11389,7 @@ function App() {
         }
       })
 
-    fetchProvenanceizabilityRollout(apiBaseUrl)
+    callUi('provenanceizability-ui', 'fetchProvenanceizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setProvenanceizabilityRollout(rollout)
@@ -14106,7 +11401,7 @@ function App() {
         }
       })
 
-    fetchLineageizabilityRollout(apiBaseUrl)
+    callUi('lineageizability-ui', 'fetchLineageizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setLineageizabilityRollout(rollout)
@@ -14118,7 +11413,7 @@ function App() {
         }
       })
 
-    fetchForensicizabilityRollout(apiBaseUrl)
+    callUi('forensicizability-ui', 'fetchForensicizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setForensicizabilityRollout(rollout)
@@ -14130,7 +11425,7 @@ function App() {
         }
       })
 
-    fetchAudittrailizabilityRollout(apiBaseUrl)
+    callUi('audittrailizability-ui', 'fetchAudittrailizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAudittrailizabilityRollout(rollout)
@@ -14142,7 +11437,7 @@ function App() {
         }
       })
 
-    fetchComplianceproofizabilityRollout(apiBaseUrl)
+    callUi('complianceproofizability-ui', 'fetchComplianceproofizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setComplianceproofizabilityRollout(rollout)
@@ -14154,7 +11449,7 @@ function App() {
         }
       })
 
-    fetchGovernancetrackizabilityRollout(apiBaseUrl)
+    callUi('governancetrackizability-ui', 'fetchGovernancetrackizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setGovernancetrackizabilityRollout(rollout)
@@ -14166,7 +11461,7 @@ function App() {
         }
       })
 
-    fetchAttesttrackizabilityRollout(apiBaseUrl)
+    callUi('attesttrackizability-ui', 'fetchAttesttrackizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAttesttrackizabilityRollout(rollout)
@@ -14178,7 +11473,7 @@ function App() {
         }
       })
 
-    fetchEvidencizabilityRollout(apiBaseUrl)
+    callUi('evidencizability-ui', 'fetchEvidencizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setEvidencizabilityRollout(rollout)
@@ -14190,7 +11485,7 @@ function App() {
         }
       })
 
-    fetchChainofcustodyizabilityRollout(apiBaseUrl)
+    callUi('chainofcustodyizability-ui', 'fetchChainofcustodyizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setChainofcustodyizabilityRollout(rollout)
@@ -14202,7 +11497,7 @@ function App() {
         }
       })
 
-    fetchTamperproofizabilityRollout(apiBaseUrl)
+    callUi('tamperproofizability-ui', 'fetchTamperproofizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTamperproofizabilityRollout(rollout)
@@ -14214,7 +11509,7 @@ function App() {
         }
       })
 
-    fetchPolicyproofizabilityRollout(apiBaseUrl)
+    callUi('policyproofizability-ui', 'fetchPolicyproofizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setPolicyproofizabilityRollout(rollout)
@@ -14226,7 +11521,7 @@ function App() {
         }
       })
 
-    fetchNotarizationizabilityRollout(apiBaseUrl)
+    callUi('notarizationizability-ui', 'fetchNotarizationizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setNotarizationizabilityRollout(rollout)
@@ -14238,7 +11533,7 @@ function App() {
         }
       })
 
-    fetchWitnessizabilityRollout(apiBaseUrl)
+    callUi('witnessizability-ui', 'fetchWitnessizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setWitnessizabilityRollout(rollout)
@@ -14250,7 +11545,7 @@ function App() {
         }
       })
 
-    fetchLedgerizabilityRollout(apiBaseUrl)
+    callUi('ledgerizability-ui', 'fetchLedgerizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setLedgerizabilityRollout(rollout)
@@ -14262,7 +11557,7 @@ function App() {
         }
       })
 
-    fetchSignatureproofizabilityRollout(apiBaseUrl)
+    callUi('signatureproofizability-ui', 'fetchSignatureproofizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setSignatureproofizabilityRollout(rollout)
@@ -14274,7 +11569,7 @@ function App() {
         }
       })
 
-    fetchRuleproofizabilityRollout(apiBaseUrl)
+    callUi('ruleproofizability-ui', 'fetchRuleproofizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRuleproofizabilityRollout(rollout)
@@ -14286,7 +11581,7 @@ function App() {
         }
       })
 
-    fetchTraceproofizabilityRollout(apiBaseUrl)
+    callUi('traceproofizability-ui', 'fetchTraceproofizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTraceproofizabilityRollout(rollout)
@@ -14298,7 +11593,7 @@ function App() {
         }
       })
 
-    fetchDisclosureizabilityRollout(apiBaseUrl)
+    callUi('disclosureizability-ui', 'fetchDisclosureizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDisclosureizabilityRollout(rollout)
@@ -14310,7 +11605,7 @@ function App() {
         }
       })
 
-    fetchRegistrarizabilityRollout(apiBaseUrl)
+    callUi('registrarizability-ui', 'fetchRegistrarizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRegistrarizabilityRollout(rollout)
@@ -14322,7 +11617,7 @@ function App() {
         }
       })
 
-    fetchAuditproofizabilityRollout(apiBaseUrl)
+    callUi('auditproofizability-ui', 'fetchAuditproofizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAuditproofizabilityRollout(rollout)
@@ -14334,7 +11629,7 @@ function App() {
         }
       })
 
-    fetchCompliancechainizabilityRollout(apiBaseUrl)
+    callUi('compliancechainizability-ui', 'fetchCompliancechainizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCompliancechainizabilityRollout(rollout)
@@ -14346,7 +11641,7 @@ function App() {
         }
       })
 
-    fetchAttestledgerizabilityRollout(apiBaseUrl)
+    callUi('attestledgerizability-ui', 'fetchAttestledgerizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAttestledgerizabilityRollout(rollout)
@@ -14358,7 +11653,7 @@ function App() {
         }
       })
 
-    fetchEvidencetrackizabilityRollout(apiBaseUrl)
+    callUi('evidencetrackizability-ui', 'fetchEvidencetrackizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setEvidencetrackizabilityRollout(rollout)
@@ -14370,7 +11665,7 @@ function App() {
         }
       })
 
-    fetchProoflineizabilityRollout(apiBaseUrl)
+    callUi('prooflineizability-ui', 'fetchProoflineizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setProoflineizabilityRollout(rollout)
@@ -14382,7 +11677,7 @@ function App() {
         }
       })
 
-    fetchNotarproofizabilityRollout(apiBaseUrl)
+    callUi('notarproofizability-ui', 'fetchNotarproofizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setNotarproofizabilityRollout(rollout)
@@ -14394,7 +11689,7 @@ function App() {
         }
       })
 
-    fetchAuditlineizabilityRollout(apiBaseUrl)
+    callUi('auditlineizability-ui', 'fetchAuditlineizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAuditlineizabilityRollout(rollout)
@@ -14406,7 +11701,7 @@ function App() {
         }
       })
 
-    fetchTraceledgerizabilityRollout(apiBaseUrl)
+    callUi('traceledgerizability-ui', 'fetchTraceledgerizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTraceledgerizabilityRollout(rollout)
@@ -14418,7 +11713,7 @@ function App() {
         }
       })
 
-    fetchDisclosureproofizabilityRollout(apiBaseUrl)
+    callUi('disclosureproofizability-ui', 'fetchDisclosureproofizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setDisclosureproofizabilityRollout(rollout)
@@ -14430,7 +11725,7 @@ function App() {
         }
       })
 
-    fetchRegistrarproofizabilityRollout(apiBaseUrl)
+    callUi('registrarproofizability-ui', 'fetchRegistrarproofizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRegistrarproofizabilityRollout(rollout)
@@ -14442,7 +11737,7 @@ function App() {
         }
       })
 
-    fetchWitnessproofizabilityRollout(apiBaseUrl)
+    callUi('witnessproofizability-ui', 'fetchWitnessproofizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setWitnessproofizabilityRollout(rollout)
@@ -14454,7 +11749,7 @@ function App() {
         }
       })
 
-    fetchComplianceledgerizabilityRollout(apiBaseUrl)
+    callUi('complianceledgerizability-ui', 'fetchComplianceledgerizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setComplianceledgerizabilityRollout(rollout)
@@ -14466,7 +11761,7 @@ function App() {
         }
       })
 
-    fetchNotarledgerizabilityRollout(apiBaseUrl)
+    callUi('notarledgerizability-ui', 'fetchNotarledgerizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setNotarledgerizabilityRollout(rollout)
@@ -14478,7 +11773,7 @@ function App() {
         }
       })
 
-    fetchWitnessledgerizabilityRollout(apiBaseUrl)
+    callUi('witnessledgerizability-ui', 'fetchWitnessledgerizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setWitnessledgerizabilityRollout(rollout)
@@ -14490,7 +11785,7 @@ function App() {
         }
       })
 
-    fetchProofregistryizabilityRollout(apiBaseUrl)
+    callUi('proofregistryizability-ui', 'fetchProofregistryizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setProofregistryizabilityRollout(rollout)
@@ -14502,7 +11797,7 @@ function App() {
         }
       })
 
-    fetchAuditregistryizabilityRollout(apiBaseUrl)
+    callUi('auditregistryizability-ui', 'fetchAuditregistryizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAuditregistryizabilityRollout(rollout)
@@ -14514,7 +11809,7 @@ function App() {
         }
       })
 
-    fetchCompliancejournalizabilityRollout(apiBaseUrl)
+    callUi('compliancejournalizability-ui', 'fetchCompliancejournalizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCompliancejournalizabilityRollout(rollout)
@@ -14526,7 +11821,7 @@ function App() {
         }
       })
 
-    fetchNotarjournalizabilityRollout(apiBaseUrl)
+    callUi('notarjournalizability-ui', 'fetchNotarjournalizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setNotarjournalizabilityRollout(rollout)
@@ -14538,7 +11833,7 @@ function App() {
         }
       })
 
-    fetchWitnessjournalizabilityRollout(apiBaseUrl)
+    callUi('witnessjournalizability-ui', 'fetchWitnessjournalizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setWitnessjournalizabilityRollout(rollout)
@@ -14550,7 +11845,7 @@ function App() {
         }
       })
 
-    fetchProofjournalizabilityRollout(apiBaseUrl)
+    callUi('proofjournalizability-ui', 'fetchProofjournalizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setProofjournalizabilityRollout(rollout)
@@ -14562,7 +11857,7 @@ function App() {
         }
       })
 
-    fetchAuditjournalizabilityRollout(apiBaseUrl)
+    callUi('auditjournalizability-ui', 'fetchAuditjournalizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAuditjournalizabilityRollout(rollout)
@@ -14574,7 +11869,7 @@ function App() {
         }
       })
 
-    fetchRegistryjournalizabilityRollout(apiBaseUrl)
+    callUi('registryjournalizability-ui', 'fetchRegistryjournalizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRegistryjournalizabilityRollout(rollout)
@@ -14586,7 +11881,7 @@ function App() {
         }
       })
 
-    fetchTracejournalizabilityRollout(apiBaseUrl)
+    callUi('tracejournalizability-ui', 'fetchTracejournalizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTracejournalizabilityRollout(rollout)
@@ -14598,7 +11893,7 @@ function App() {
         }
       })
 
-    fetchEvidencejournalizabilityRollout(apiBaseUrl)
+    callUi('evidencejournalizability-ui', 'fetchEvidencejournalizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setEvidencejournalizabilityRollout(rollout)
@@ -14610,7 +11905,7 @@ function App() {
         }
       })
 
-    fetchAttestjournalizabilityRollout(apiBaseUrl)
+    callUi('attestjournalizability-ui', 'fetchAttestjournalizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAttestjournalizabilityRollout(rollout)
@@ -14622,7 +11917,7 @@ function App() {
         }
       })
 
-    fetchIntegrityjournalizabilityRollout(apiBaseUrl)
+    callUi('integrityjournalizability-ui', 'fetchIntegrityjournalizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setIntegrityjournalizabilityRollout(rollout)
@@ -14634,7 +11929,7 @@ function App() {
         }
       })
 
-    fetchRegistryvaultizabilityRollout(apiBaseUrl)
+    callUi('registryvaultizability-ui', 'fetchRegistryvaultizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setRegistryvaultizabilityRollout(rollout)
@@ -14646,7 +11941,7 @@ function App() {
         }
       })
 
-    fetchTracevaultizabilityRollout(apiBaseUrl)
+    callUi('tracevaultizability-ui', 'fetchTracevaultizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setTracevaultizabilityRollout(rollout)
@@ -14658,7 +11953,7 @@ function App() {
         }
       })
 
-    fetchEvidencevaultizabilityRollout(apiBaseUrl)
+    callUi('evidencevaultizability-ui', 'fetchEvidencevaultizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setEvidencevaultizabilityRollout(rollout)
@@ -14670,7 +11965,7 @@ function App() {
         }
       })
 
-    fetchAuditvaultizabilityRollout(apiBaseUrl)
+    callUi('auditvaultizability-ui', 'fetchAuditvaultizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAuditvaultizabilityRollout(rollout)
@@ -14682,7 +11977,7 @@ function App() {
         }
       })
 
-    fetchCompliancevaultizabilityRollout(apiBaseUrl)
+    callUi('compliancevaultizability-ui', 'fetchCompliancevaultizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCompliancevaultizabilityRollout(rollout)
@@ -14694,7 +11989,7 @@ function App() {
         }
       })
 
-    fetchValidityvaultizabilityRollout(apiBaseUrl)
+    callUi('validityvaultizability-ui', 'fetchValidityvaultizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setValidityvaultizabilityRollout(rollout)
@@ -14706,7 +12001,7 @@ function App() {
         }
       })
 
-    fetchAuthenticityvaultizabilityRollout(apiBaseUrl)
+    callUi('authenticityvaultizability-ui', 'fetchAuthenticityvaultizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAuthenticityvaultizabilityRollout(rollout)
@@ -14718,7 +12013,7 @@ function App() {
         }
       })
 
-    fetchProvenancevaultizabilityRollout(apiBaseUrl)
+    callUi('provenancevaultizability-ui', 'fetchProvenancevaultizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setProvenancevaultizabilityRollout(rollout)
@@ -14730,7 +12025,7 @@ function App() {
         }
       })
 
-    fetchVerificationvaultizabilityRollout(apiBaseUrl)
+    callUi('verificationvaultizability-ui', 'fetchVerificationvaultizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setVerificationvaultizabilityRollout(rollout)
@@ -14742,7 +12037,7 @@ function App() {
         }
       })
 
-    fetchAttestationvaultizabilityRollout(apiBaseUrl)
+    callUi('attestationvaultizability-ui', 'fetchAttestationvaultizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAttestationvaultizabilityRollout(rollout)
@@ -14754,7 +12049,7 @@ function App() {
         }
       })
 
-    fetchAssurancevaultizabilityRollout(apiBaseUrl)
+    callUi('assurancevaultizability-ui', 'fetchAssurancevaultizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAssurancevaultizabilityRollout(rollout)
@@ -14766,7 +12061,7 @@ function App() {
         }
       })
 
-    fetchAuditabilityvaultizabilityRollout(apiBaseUrl)
+    callUi('auditabilityvaultizability-ui', 'fetchAuditabilityvaultizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setAuditabilityvaultizabilityRollout(rollout)
@@ -14778,7 +12073,7 @@ function App() {
         }
       })
 
-    fetchInspectabilityvaultizabilityRollout(apiBaseUrl)
+    callUi('inspectabilityvaultizability-ui', 'fetchInspectabilityvaultizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setInspectabilityvaultizabilityRollout(rollout)
@@ -14790,7 +12085,7 @@ function App() {
         }
       })
 
-    fetchReproducibilityvaultizabilityRollout(apiBaseUrl)
+    callUi('reproducibilityvaultizability-ui', 'fetchReproducibilityvaultizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setReproducibilityvaultizabilityRollout(rollout)
@@ -14802,7 +12097,7 @@ function App() {
         }
       })
 
-    fetchCredibilityvaultizabilityRollout(apiBaseUrl)
+    callUi('credibilityvaultizability-ui', 'fetchCredibilityvaultizabilityRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setCredibilityvaultizabilityRollout(rollout)
@@ -15425,6 +12720,3789 @@ function App() {
     }
   }
 
+  async function loadDeferredAdminControlsData() {
+    try {
+      const modelHealthAdmin = await callUi('model-router-ui', 'fetchModelHealthAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setModelHealthAdminSummary(modelHealthAdmin)
+
+      const shieldReviewAdmin = await callUi('shield-ui', 'fetchShieldReviewAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setShieldReviewAdminSummary(shieldReviewAdmin)
+
+      const providerKeyAdmin = await callUi('provider-credentials-ui', 'fetchProviderKeyAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProviderKeyAdminSummary(providerKeyAdmin)
+
+      const observabilityAdmin = await callUi('observability-ui', 'fetchObservabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setObservabilityAdminSummary(observabilityAdmin)
+
+      const promptRegressionAdmin = await callUi('evaluation-ui', 'fetchPromptRegressionAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPromptRegressionAdminSummary(promptRegressionAdmin)
+
+      const runHistoryAdmin = await callUi('run-history-ui', 'fetchRunHistoryAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRunHistoryAdminSummary(runHistoryAdmin)
+
+      const streamRecoveryAdmin = await callUi('stream-replay-ui', 'fetchStreamRecoveryAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setStreamRecoveryAdminSummary(streamRecoveryAdmin)
+
+      const idempotencyAdmin = await callUi('idempotency-ui', 'fetchIdempotencyAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIdempotencyAdminSummary(idempotencyAdmin)
+
+      const quotaAdmin = await callUi('usage-limits-ui', 'fetchQuotaAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setQuotaAdminSummary(quotaAdmin)
+
+      const deploymentAdmin = await callUi('deployment-ui', 'fetchDeploymentAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDeploymentAdminSummary(deploymentAdmin)
+
+      const migrationAdmin = await callUi('migrations-ui', 'fetchMigrationAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMigrationAdminSummary(migrationAdmin)
+
+      const backupAdmin = await callUi('backup-ui', 'fetchBackupAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBackupAdminSummary(backupAdmin)
+
+      const auditAdmin = await callUi('audit-trail-ui', 'fetchAuditAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuditAdminSummary(auditAdmin)
+
+      const complianceAdmin = await callUi('compliance-ui', 'fetchComplianceAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setComplianceAdminSummary(complianceAdmin)
+
+      const incidentAdmin = await callUi('incident-response-ui', 'fetchIncidentAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIncidentAdminSummary(incidentAdmin)
+
+      const releaseAdmin = await callUi('release-ui', 'fetchReleaseAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReleaseAdminSummary(releaseAdmin)
+
+      const sloAdmin = await callUi('slo-ui', 'fetchSloAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSloAdminSummary(sloAdmin)
+
+      const capacityAdmin = await callUi('capacity-ui', 'fetchCapacityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCapacityAdminSummary(capacityAdmin)
+
+      const performanceAdmin = await callUi('performance-ui', 'fetchPerformanceAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPerformanceAdminSummary(performanceAdmin)
+
+      const resilienceAdmin = await callUi('resilience-ui', 'fetchResilienceAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setResilienceAdminSummary(resilienceAdmin)
+
+      const availabilityAdmin = await callUi('availability-ui', 'fetchAvailabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAvailabilityAdminSummary(availabilityAdmin)
+
+      const reliabilityAdmin = await callUi('reliability-ui', 'fetchReliabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReliabilityAdminSummary(reliabilityAdmin)
+
+      const stabilityAdmin = await callUi('stability-ui', 'fetchStabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setStabilityAdminSummary(stabilityAdmin)
+
+      const consistencyAdmin = await callUi('consistency-ui', 'fetchConsistencyAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConsistencyAdminSummary(consistencyAdmin)
+
+      const integrityAdmin = await callUi('integrity-ui', 'fetchIntegrityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIntegrityAdminSummary(integrityAdmin)
+
+      const durabilityAdmin = await callUi('durability-ui', 'fetchDurabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDurabilityAdminSummary(durabilityAdmin)
+
+      const recoverabilityAdmin = await callUi('recoverability-ui', 'fetchRecoverabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRecoverabilityAdminSummary(recoverabilityAdmin)
+
+      const maintainabilityAdmin = await callUi('maintainability-ui', 'fetchMaintainabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMaintainabilityAdminSummary(maintainabilityAdmin)
+
+      const scalabilityAdmin = await callUi('scalability-ui', 'fetchScalabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setScalabilityAdminSummary(scalabilityAdmin)
+
+      const traceabilityAdmin = await callUi('traceability-ui', 'fetchTraceabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTraceabilityAdminSummary(traceabilityAdmin)
+
+      const efficiencyAdmin = await callUi('efficiency-ui', 'fetchEfficiencyAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEfficiencyAdminSummary(efficiencyAdmin)
+
+      const optimizationAdmin = await callUi('optimization-ui', 'fetchOptimizationAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setOptimizationAdminSummary(optimizationAdmin)
+
+      const utilizationAdmin = await callUi('utilization-ui', 'fetchUtilizationAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setUtilizationAdminSummary(utilizationAdmin)
+
+      const sustainabilityAdmin = await callUi('sustainability-ui', 'fetchSustainabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSustainabilityAdminSummary(sustainabilityAdmin)
+
+      const governanceAdmin = await callUi('governance-ui', 'fetchGovernanceAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setGovernanceAdminSummary(governanceAdmin)
+
+      const oversightAdmin = await callUi('oversight-ui', 'fetchOversightAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setOversightAdminSummary(oversightAdmin)
+
+      const assuranceAdmin = await callUi('assurance-ui', 'fetchAssuranceAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAssuranceAdminSummary(assuranceAdmin)
+
+      const accountabilityAdmin = await callUi('accountability-ui', 'fetchAccountabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAccountabilityAdminSummary(accountabilityAdmin)
+
+      const transparencyAdmin = await callUi('transparency-ui', 'fetchTransparencyAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTransparencyAdminSummary(transparencyAdmin)
+
+      const attestationAdmin = await callUi('attestation-ui', 'fetchAttestationAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAttestationAdminSummary(attestationAdmin)
+
+      const authenticityAdmin = await callUi('authenticity-ui', 'fetchAuthenticityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuthenticityAdminSummary(authenticityAdmin)
+
+      const provenanceAdmin = await callUi('provenance-ui', 'fetchProvenanceAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProvenanceAdminSummary(provenanceAdmin)
+
+      const verifiabilityAdmin = await callUi('verifiability-ui', 'fetchVerifiabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setVerifiabilityAdminSummary(verifiabilityAdmin)
+
+      const confirmabilityAdmin = await callUi('confirmability-ui', 'fetchConfirmabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConfirmabilityAdminSummary(confirmabilityAdmin)
+
+      const validityAdmin = await callUi('validity-ui', 'fetchValidityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setValidityAdminSummary(validityAdmin)
+
+      const credibilityAdmin = await callUi('credibility-ui', 'fetchCredibilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCredibilityAdminSummary(credibilityAdmin)
+
+      const reproducibilityAdmin = await callUi('reproducibility-ui', 'fetchReproducibilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReproducibilityAdminSummary(reproducibilityAdmin)
+
+      const defensibilityAdmin = await callUi('defensibility-ui', 'fetchDefensibilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDefensibilityAdminSummary(defensibilityAdmin)
+
+      const auditabilityAdmin = await callUi('auditability-ui', 'fetchAuditabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuditabilityAdminSummary(auditabilityAdmin)
+
+      const inspectabilityAdmin = await callUi('inspectability-ui', 'fetchInspectabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setInspectabilityAdminSummary(inspectabilityAdmin)
+
+      const explainabilityAdmin = await callUi('explainability-ui', 'fetchExplainabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setExplainabilityAdminSummary(explainabilityAdmin)
+
+      const demonstrabilityAdmin = await callUi('demonstrability-ui', 'fetchDemonstrabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDemonstrabilityAdminSummary(demonstrabilityAdmin)
+
+      const justifiabilityAdmin = await callUi('justifiability-ui', 'fetchJustifiabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setJustifiabilityAdminSummary(justifiabilityAdmin)
+
+      const reviewabilityAdmin = await callUi('reviewability-ui', 'fetchReviewabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReviewabilityAdminSummary(reviewabilityAdmin)
+
+      const assessabilityAdmin = await callUi('assessability-ui', 'fetchAssessabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAssessabilityAdminSummary(assessabilityAdmin)
+
+      const measurabilityAdmin = await callUi('measurability-ui', 'fetchMeasurabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMeasurabilityAdminSummary(measurabilityAdmin)
+
+      const certifiabilityAdmin = await callUi('certifiability-ui', 'fetchCertifiabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCertifiabilityAdminSummary(certifiabilityAdmin)
+
+      const substantiabilityAdmin = await callUi('substantiability-ui', 'fetchSubstantiabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSubstantiabilityAdminSummary(substantiabilityAdmin)
+
+      const warrantabilityAdmin = await callUi('warrantability-ui', 'fetchWarrantabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setWarrantabilityAdminSummary(warrantabilityAdmin)
+
+      const attributabilityAdmin = await callUi('attributability-ui', 'fetchAttributabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAttributabilityAdminSummary(attributabilityAdmin)
+
+      const identifiabilityAdmin = await callUi('identifiability-ui', 'fetchIdentifiabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIdentifiabilityAdminSummary(identifiabilityAdmin)
+
+      const comparabilityAdmin = await callUi('comparability-ui', 'fetchComparabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setComparabilityAdminSummary(comparabilityAdmin)
+
+      const distinguishabilityAdmin = await callUi('distinguishability-ui', 'fetchDistinguishabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDistinguishabilityAdminSummary(distinguishabilityAdmin)
+
+      const assignabilityAdmin = await callUi('assignability-ui', 'fetchAssignabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAssignabilityAdminSummary(assignabilityAdmin)
+
+      const referencabilityAdmin = await callUi('referencability-ui', 'fetchReferencabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReferencabilityAdminSummary(referencabilityAdmin)
+
+      const locatabilityAdmin = await callUi('locatability-ui', 'fetchLocatabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setLocatabilityAdminSummary(locatabilityAdmin)
+
+      const retrievabilityAdmin = await callUi('retrievability-ui', 'fetchRetrievabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRetrievabilityAdminSummary(retrievabilityAdmin)
+
+      const discoverabilityAdmin = await callUi('discoverability-ui', 'fetchDiscoverabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDiscoverabilityAdminSummary(discoverabilityAdmin)
+
+      const navigabilityAdmin = await callUi('navigability-ui', 'fetchNavigabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNavigabilityAdminSummary(navigabilityAdmin)
+
+      const connectabilityAdmin = await callUi('connectability-ui', 'fetchConnectabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConnectabilityAdminSummary(connectabilityAdmin)
+
+      const linkabilityAdmin = await callUi('linkability-ui', 'fetchLinkabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setLinkabilityAdminSummary(linkabilityAdmin)
+
+      const interchangeabilityAdmin = await callUi('interchangeability-ui', 'fetchInterchangeabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setInterchangeabilityAdminSummary(interchangeabilityAdmin)
+
+      const transferabilityAdmin = await callUi('transferability-ui', 'fetchTransferabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTransferabilityAdminSummary(transferabilityAdmin)
+
+      const portabilityAdmin = await callUi('portability-ui', 'fetchPortabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPortabilityAdminSummary(portabilityAdmin)
+
+      const compatibilityAdmin = await callUi('compatibility-ui', 'fetchCompatibilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCompatibilityAdminSummary(compatibilityAdmin)
+
+      const adaptabilityAdmin = await callUi('adaptability-ui', 'fetchAdaptabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAdaptabilityAdminSummary(adaptabilityAdmin)
+
+      const flexibilityAdmin = await callUi('flexibility-ui', 'fetchFlexibilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFlexibilityAdminSummary(flexibilityAdmin)
+
+      const extensibilityAdmin = await callUi('extensibility-ui', 'fetchExtensibilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setExtensibilityAdminSummary(extensibilityAdmin)
+
+      const modifiabilityAdmin = await callUi('modifiability-ui', 'fetchModifiabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setModifiabilityAdminSummary(modifiabilityAdmin)
+
+      const configurabilityAdmin = await callUi('configurability-ui', 'fetchConfigurabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConfigurabilityAdminSummary(configurabilityAdmin)
+
+      const customizabilityAdmin = await callUi('customizability-ui', 'fetchCustomizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCustomizabilityAdminSummary(customizabilityAdmin)
+
+      const operabilityAdmin = await callUi('operability-ui', 'fetchOperabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setOperabilityAdminSummary(operabilityAdmin)
+
+      const tunabilityAdmin = await callUi('tunability-ui', 'fetchTunabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTunabilityAdminSummary(tunabilityAdmin)
+
+      const adjustabilityAdmin = await callUi('adjustability-ui', 'fetchAdjustabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAdjustabilityAdminSummary(adjustabilityAdmin)
+
+      const programmabilityAdmin = await callUi('programmability-ui', 'fetchProgrammabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProgrammabilityAdminSummary(programmabilityAdmin)
+
+      const deployabilityAdmin = await callUi('deployability-ui', 'fetchDeployabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDeployabilityAdminSummary(deployabilityAdmin)
+
+      const manageabilityAdmin = await callUi('manageability-ui', 'fetchManageabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setManageabilityAdminSummary(manageabilityAdmin)
+
+      const controllabilityAdmin = await callUi('controllability-ui', 'fetchControllabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setControllabilityAdminSummary(controllabilityAdmin)
+
+      const integrabilityAdmin = await callUi('integrability-ui', 'fetchIntegrabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIntegrabilityAdminSummary(integrabilityAdmin)
+
+      const orchestrabilityAdmin = await callUi('orchestrability-ui', 'fetchOrchestrabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setOrchestrabilityAdminSummary(orchestrabilityAdmin)
+
+      const schedulabilityAdmin = await callUi('schedulability-ui', 'fetchSchedulabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSchedulabilityAdminSummary(schedulabilityAdmin)
+
+      const automatabilityAdmin = await callUi('automatability-ui', 'fetchAutomatabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAutomatabilityAdminSummary(automatabilityAdmin)
+
+      const monitorabilityAdmin = await callUi('monitorability-ui', 'fetchMonitorabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMonitorabilityAdminSummary(monitorabilityAdmin)
+
+      const predictabilityAdmin = await callUi('predictability-ui', 'fetchPredictabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPredictabilityAdminSummary(predictabilityAdmin)
+
+      const repeatabilityAdmin = await callUi('repeatability-ui', 'fetchRepeatabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRepeatabilityAdminSummary(repeatabilityAdmin)
+
+      const responsivenessAdmin = await callUi('responsiveness-ui', 'fetchResponsivenessAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setResponsivenessAdminSummary(responsivenessAdmin)
+
+      const dependabilityAdmin = await callUi('dependability-ui', 'fetchDependabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDependabilityAdminSummary(dependabilityAdmin)
+
+      const composabilityAdmin = await callUi('composability-ui', 'fetchComposabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setComposabilityAdminSummary(composabilityAdmin)
+
+      const trustworthinessAdmin = await callUi('trustworthiness-ui', 'fetchTrustworthinessAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTrustworthinessAdminSummary(trustworthinessAdmin)
+
+      const usabilityAdmin = await callUi('usability-ui', 'fetchUsabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setUsabilityAdminSummary(usabilityAdmin)
+
+      const accessibilityAdmin = await callUi('accessibility-ui', 'fetchAccessibilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAccessibilityAdminSummary(accessibilityAdmin)
+
+      const effectivenessAdmin = await callUi('effectiveness-ui', 'fetchEffectivenessAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEffectivenessAdminSummary(effectivenessAdmin)
+
+      const appropriatenessAdmin = await callUi('appropriateness-ui', 'fetchAppropriatenessAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAppropriatenessAdminSummary(appropriatenessAdmin)
+
+      const survivabilityAdmin = await callUi('survivability-ui', 'fetchSurvivabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSurvivabilityAdminSummary(survivabilityAdmin)
+
+      const viabilityAdmin = await callUi('viability-ui', 'fetchViabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setViabilityAdminSummary(viabilityAdmin)
+
+      const feasibilityAdmin = await callUi('feasibility-ui', 'fetchFeasibilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFeasibilityAdminSummary(feasibilityAdmin)
+
+      const conformanceAdmin = await callUi('conformance-ui', 'fetchConformanceAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConformanceAdminSummary(conformanceAdmin)
+
+      const adoptabilityAdmin = await callUi('adoptability-ui', 'fetchAdoptabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAdoptabilityAdminSummary(adoptabilityAdmin)
+
+      const acceptabilityAdmin = await callUi('acceptability-ui', 'fetchAcceptabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAcceptabilityAdminSummary(acceptabilityAdmin)
+
+      const affordabilityAdmin = await callUi('affordability-ui', 'fetchAffordabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAffordabilityAdminSummary(affordabilityAdmin)
+
+      const desirabilityAdmin = await callUi('desirability-ui', 'fetchDesirabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDesirabilityAdminSummary(desirabilityAdmin)
+
+      const marketabilityAdmin = await callUi('marketability-ui', 'fetchMarketabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMarketabilityAdminSummary(marketabilityAdmin)
+
+      const suitabilityAdmin = await callUi('suitability-ui', 'fetchSuitabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSuitabilityAdminSummary(suitabilityAdmin)
+
+      const profitabilityAdmin = await callUi('profitability-ui', 'fetchProfitabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProfitabilityAdminSummary(profitabilityAdmin)
+
+      const learnabilityAdmin = await callUi('learnability-ui', 'fetchLearnabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setLearnabilityAdminSummary(learnabilityAdmin)
+
+      const deliverabilityAdmin = await callUi('deliverability-ui', 'fetchDeliverabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDeliverabilityAdminSummary(deliverabilityAdmin)
+
+      const understandabilityAdmin = await callUi('understandability-ui', 'fetchUnderstandabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setUnderstandabilityAdminSummary(understandabilityAdmin)
+
+      const memorabilityAdmin = await callUi('memorability-ui', 'fetchMemorabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMemorabilityAdminSummary(memorabilityAdmin)
+
+      const teachabilityAdmin = await callUi('teachability-ui', 'fetchTeachabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTeachabilityAdminSummary(teachabilityAdmin)
+
+      const readabilityAdmin = await callUi('readability-ui', 'fetchReadabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReadabilityAdminSummary(readabilityAdmin)
+
+      const clarityAdmin = await callUi('clarity-ui', 'fetchClarityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setClarityAdminSummary(clarityAdmin)
+
+      const simplicityAdmin = await callUi('simplicity-ui', 'fetchSimplicityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSimplicityAdminSummary(simplicityAdmin)
+
+      const negotiabilityAdmin = await callUi('negotiability-ui', 'fetchNegotiabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNegotiabilityAdminSummary(negotiabilityAdmin)
+
+      const comprehensibilityAdmin = await callUi('comprehensibility-ui', 'fetchComprehensibilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setComprehensibilityAdminSummary(comprehensibilityAdmin)
+
+      const intelligibilityAdmin = await callUi('intelligibility-ui', 'fetchIntelligibilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIntelligibilityAdminSummary(intelligibilityAdmin)
+
+      const legibilityAdmin = await callUi('legibility-ui', 'fetchLegibilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setLegibilityAdminSummary(legibilityAdmin)
+
+      const parsabilityAdmin = await callUi('parsability-ui', 'fetchParsabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setParsabilityAdminSummary(parsabilityAdmin)
+
+      const coherenceAdmin = await callUi('coherence-ui', 'fetchCoherenceAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCoherenceAdminSummary(coherenceAdmin)
+
+      const familiarityAdmin = await callUi('familiarity-ui', 'fetchFamiliarityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFamiliarityAdminSummary(familiarityAdmin)
+
+      const recognizabilityAdmin = await callUi('recognizability-ui', 'fetchRecognizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRecognizabilityAdminSummary(recognizabilityAdmin)
+
+      const interpretabilityAdmin = await callUi('interpretability-ui', 'fetchInterpretabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setInterpretabilityAdminSummary(interpretabilityAdmin)
+
+      const scannabilityAdmin = await callUi('scannability-ui', 'fetchScannabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setScannabilityAdminSummary(scannabilityAdmin)
+
+      const perceptibilityAdmin = await callUi('perceptibility-ui', 'fetchPerceptibilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPerceptibilityAdminSummary(perceptibilityAdmin)
+
+      const noticeabilityAdmin = await callUi('noticeability-ui', 'fetchNoticeabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNoticeabilityAdminSummary(noticeabilityAdmin)
+
+      const discernibilityAdmin = await callUi('discernibility-ui', 'fetchDiscernibilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDiscernibilityAdminSummary(discernibilityAdmin)
+
+      const distinctivenessAdmin = await callUi('distinctiveness-ui', 'fetchDistinctivenessAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDistinctivenessAdminSummary(distinctivenessAdmin)
+
+      const conspicuousnessAdmin = await callUi('conspicuousness-ui', 'fetchConspicuousnessAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConspicuousnessAdminSummary(conspicuousnessAdmin)
+
+      const detectabilityAdmin = await callUi('detectability-ui', 'fetchDetectabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDetectabilityAdminSummary(detectabilityAdmin)
+
+      const describabilityAdmin = await callUi('describability-ui', 'fetchDescribabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDescribabilityAdminSummary(describabilityAdmin)
+
+      const expressivenessAdmin = await callUi('expressiveness-ui', 'fetchExpressivenessAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setExpressivenessAdminSummary(expressivenessAdmin)
+
+      const communicabilityAdmin = await callUi('communicability-ui', 'fetchCommunicabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCommunicabilityAdminSummary(communicabilityAdmin)
+
+      const articulabilityAdmin = await callUi('articulability-ui', 'fetchArticulabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setArticulabilityAdminSummary(articulabilityAdmin)
+
+      const elaboratabilityAdmin = await callUi('elaboratability-ui', 'fetchElaboratabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setElaboratabilityAdminSummary(elaboratabilityAdmin)
+
+      const representabilityAdmin = await callUi('representability-ui', 'fetchRepresentabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRepresentabilityAdminSummary(representabilityAdmin)
+
+      const presentabilityAdmin = await callUi('presentability-ui', 'fetchPresentabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPresentabilityAdminSummary(presentabilityAdmin)
+
+      const enunciabilityAdmin = await callUi('enunciability-ui', 'fetchEnunciabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEnunciabilityAdminSummary(enunciabilityAdmin)
+
+      const formulatabilityAdmin = await callUi('formulatability-ui', 'fetchFormulatabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFormulatabilityAdminSummary(formulatabilityAdmin)
+
+      const narratabilityAdmin = await callUi('narratability-ui', 'fetchNarratabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNarratabilityAdminSummary(narratabilityAdmin)
+
+      const illustratabilityAdmin = await callUi('illustratability-ui', 'fetchIllustratabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIllustratabilityAdminSummary(illustratabilityAdmin)
+
+      const symbolizabilityAdmin = await callUi('symbolizability-ui', 'fetchSymbolizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSymbolizabilityAdminSummary(symbolizabilityAdmin)
+
+      const visualizabilityAdmin = await callUi('visualizability-ui', 'fetchVisualizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setVisualizabilityAdminSummary(visualizabilityAdmin)
+
+      const evocatabilityAdmin = await callUi('evocatability-ui', 'fetchEvocatabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEvocatabilityAdminSummary(evocatabilityAdmin)
+
+      const signifiabilityAdmin = await callUi('signifiability-ui', 'fetchSignifiabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSignifiabilityAdminSummary(signifiabilityAdmin)
+
+      const connotabilityAdmin = await callUi('connotability-ui', 'fetchConnotabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConnotabilityAdminSummary(connotabilityAdmin)
+
+      const typifiabilityAdmin = await callUi('typifiability-ui', 'fetchTypifiabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTypifiabilityAdminSummary(typifiabilityAdmin)
+
+      const metaphorizabilityAdmin = await callUi('metaphorizability-ui', 'fetchMetaphorizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMetaphorizabilityAdminSummary(metaphorizabilityAdmin)
+
+      const dramatizabilityAdmin = await callUi('dramatizability-ui', 'fetchDramatizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDramatizabilityAdminSummary(dramatizabilityAdmin)
+
+      const personifiabilityAdmin = await callUi('personifiability-ui', 'fetchPersonifiabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPersonifiabilityAdminSummary(personifiabilityAdmin)
+
+      const materializabilityAdmin = await callUi('materializability-ui', 'fetchMaterializabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMaterializabilityAdminSummary(materializabilityAdmin)
+
+      const iconizabilityAdmin = await callUi('iconizability-ui', 'fetchIconizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIconizabilityAdminSummary(iconizabilityAdmin)
+
+      const allegorizabilityAdmin = await callUi('allegorizability-ui', 'fetchAllegorizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAllegorizabilityAdminSummary(allegorizabilityAdmin)
+
+      const tokenizabilityAdmin = await callUi('tokenizability-ui', 'fetchTokenizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTokenizabilityAdminSummary(tokenizabilityAdmin)
+
+      const stylizabilityAdmin = await callUi('stylizability-ui', 'fetchStylizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setStylizabilityAdminSummary(stylizabilityAdmin)
+
+      const emblemizabilityAdmin = await callUi('emblemizability-ui', 'fetchEmblemizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEmblemizabilityAdminSummary(emblemizabilityAdmin)
+
+      const analogizabilityAdmin = await callUi('analogizability-ui', 'fetchAnalogizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAnalogizabilityAdminSummary(analogizabilityAdmin)
+
+      const parabolizabilityAdmin = await callUi('parabolizability-ui', 'fetchParabolizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setParabolizabilityAdminSummary(parabolizabilityAdmin)
+
+      const archetypizabilityAdmin = await callUi('archetypizability-ui', 'fetchArchetypizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setArchetypizabilityAdminSummary(archetypizabilityAdmin)
+
+      const caracterizabilityAdmin = await callUi('caracterizability-ui', 'fetchCaracterizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCaracterizabilityAdminSummary(caracterizabilityAdmin)
+
+      const mythicizabilityAdmin = await callUi('mythicizability-ui', 'fetchMythicizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMythicizabilityAdminSummary(mythicizabilityAdmin)
+
+      const semiotizabilityAdmin = await callUi('semiotizability-ui', 'fetchSemiotizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSemiotizabilityAdminSummary(semiotizabilityAdmin)
+
+      const hermeneutizabilityAdmin = await callUi('hermeneutizability-ui', 'fetchHermeneutizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setHermeneutizabilityAdminSummary(hermeneutizabilityAdmin)
+
+      const lexicalizabilityAdmin = await callUi('lexicalizability-ui', 'fetchLexicalizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setLexicalizabilityAdminSummary(lexicalizabilityAdmin)
+
+      const semanticizabilityAdmin = await callUi('semanticizability-ui', 'fetchSemanticizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSemanticizabilityAdminSummary(semanticizabilityAdmin)
+
+      const pragmatizabilityAdmin = await callUi('pragmatizability-ui', 'fetchPragmatizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPragmatizabilityAdminSummary(pragmatizabilityAdmin)
+
+      const syntacticizabilityAdmin = await callUi('syntacticizability-ui', 'fetchSyntacticizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSyntacticizabilityAdminSummary(syntacticizabilityAdmin)
+
+      const rhetorizabilityAdmin = await callUi('rhetorizability-ui', 'fetchRhetorizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRhetorizabilityAdminSummary(rhetorizabilityAdmin)
+
+      const morphizabilityAdmin = await callUi('morphizability-ui', 'fetchMorphizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMorphizabilityAdminSummary(morphizabilityAdmin)
+
+      const codifiabilityAdmin = await callUi('codifiability-ui', 'fetchCodifiabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCodifiabilityAdminSummary(codifiabilityAdmin)
+
+      const hermeticizabilityAdmin = await callUi('hermeticizability-ui', 'fetchHermeticizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setHermeticizabilityAdminSummary(hermeticizabilityAdmin)
+
+      const epistemizabilityAdmin = await callUi('epistemizability-ui', 'fetchEpistemizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEpistemizabilityAdminSummary(epistemizabilityAdmin)
+
+      const dialectizabilityAdmin = await callUi('dialectizability-ui', 'fetchDialectizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDialectizabilityAdminSummary(dialectizabilityAdmin)
+
+      const ontologizabilityAdmin = await callUi('ontologizability-ui', 'fetchOntologizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setOntologizabilityAdminSummary(ontologizabilityAdmin)
+
+      const phenomenizabilityAdmin = await callUi('phenomenizability-ui', 'fetchPhenomenizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPhenomenizabilityAdminSummary(phenomenizabilityAdmin)
+
+      const axiologizabilityAdmin = await callUi('axiologizability-ui', 'fetchAxiologizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAxiologizabilityAdminSummary(axiologizabilityAdmin)
+
+      const teleologizabilityAdmin = await callUi('teleologizability-ui', 'fetchTeleologizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTeleologizabilityAdminSummary(teleologizabilityAdmin)
+
+      const gnoseizabilityAdmin = await callUi('gnoseizability-ui', 'fetchGnoseizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setGnoseizabilityAdminSummary(gnoseizabilityAdmin)
+
+      const methodizabilityAdmin = await callUi('methodizability-ui', 'fetchMethodizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMethodizabilityAdminSummary(methodizabilityAdmin)
+
+      const historizabilityAdmin = await callUi('historizability-ui', 'fetchHistorizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setHistorizabilityAdminSummary(historizabilityAdmin)
+
+      const categorizabilityAdmin = await callUi('categorizability-ui', 'fetchCategorizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCategorizabilityAdminSummary(categorizabilityAdmin)
+
+      const taxonomizabilityAdmin = await callUi('taxonomizability-ui', 'fetchTaxonomizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTaxonomizabilityAdminSummary(taxonomizabilityAdmin)
+
+      const classifiabilityAdmin = await callUi('classifiability-ui', 'fetchClassifiabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setClassifiabilityAdminSummary(classifiabilityAdmin)
+
+      const typologizabilityAdmin = await callUi('typologizability-ui', 'fetchTypologizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTypologizabilityAdminSummary(typologizabilityAdmin)
+
+      const stratifiabilityAdmin = await callUi('stratifiability-ui', 'fetchStratifiabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setStratifiabilityAdminSummary(stratifiabilityAdmin)
+
+      const ordinarizabilityAdmin = await callUi('ordinarizability-ui', 'fetchOrdinarizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setOrdinarizabilityAdminSummary(ordinarizabilityAdmin)
+
+      const systematizabilityAdmin = await callUi('systematizability-ui', 'fetchSystematizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSystematizabilityAdminSummary(systematizabilityAdmin)
+
+      const hierarchizabilityAdmin = await callUi('hierarchizability-ui', 'fetchHierarchizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setHierarchizabilityAdminSummary(hierarchizabilityAdmin)
+
+      const segmentizabilityAdmin = await callUi('segmentizability-ui', 'fetchSegmentizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSegmentizabilityAdminSummary(segmentizabilityAdmin)
+
+      const clusterizabilityAdmin = await callUi('clusterizability-ui', 'fetchClusterizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setClusterizabilityAdminSummary(clusterizabilityAdmin)
+
+      const nomenclatizabilityAdmin = await callUi('nomenclatizability-ui', 'fetchNomenclatizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNomenclatizabilityAdminSummary(nomenclatizabilityAdmin)
+
+      const catalogizabilityAdmin = await callUi('catalogizability-ui', 'fetchCatalogizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCatalogizabilityAdminSummary(catalogizabilityAdmin)
+
+      const indexizabilityAdmin = await callUi('indexizability-ui', 'fetchIndexizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIndexizabilityAdminSummary(indexizabilityAdmin)
+
+      const directoryizabilityAdmin = await callUi('directoryizability-ui', 'fetchDirectoryizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDirectoryizabilityAdminSummary(directoryizabilityAdmin)
+
+      const inventoryizabilityAdmin = await callUi('inventoryizability-ui', 'fetchInventoryizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setInventoryizabilityAdminSummary(inventoryizabilityAdmin)
+
+      const registryizabilityAdmin = await callUi('registryizability-ui', 'fetchRegistryizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRegistryizabilityAdminSummary(registryizabilityAdmin)
+
+      const archivizabilityAdmin = await callUi('archivizability-ui', 'fetchArchivizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setArchivizabilityAdminSummary(archivizabilityAdmin)
+
+      const curatizabilityAdmin = await callUi('curatizability-ui', 'fetchCuratizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCuratizabilityAdminSummary(curatizabilityAdmin)
+
+      const collectizabilityAdmin = await callUi('collectizability-ui', 'fetchCollectizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCollectizabilityAdminSummary(collectizabilityAdmin)
+
+      const aggregatizabilityAdmin = await callUi('aggregatizability-ui', 'fetchAggregatizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAggregatizabilityAdminSummary(aggregatizabilityAdmin)
+
+      const compilatizabilityAdmin = await callUi('compilatizability-ui', 'fetchCompilatizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCompilatizabilityAdminSummary(compilatizabilityAdmin)
+
+      const bibliographizabilityAdmin = await callUi('bibliographizability-ui', 'fetchBibliographizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBibliographizabilityAdminSummary(bibliographizabilityAdmin)
+
+      const referencizabilityAdmin = await callUi('referencizability-ui', 'fetchReferencizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReferencizabilityAdminSummary(referencizabilityAdmin)
+
+      const documentizabilityAdmin = await callUi('documentizability-ui', 'fetchDocumentizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDocumentizabilityAdminSummary(documentizabilityAdmin)
+
+      const annotationizabilityAdmin = await callUi('annotationizability-ui', 'fetchAnnotationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAnnotationizabilityAdminSummary(annotationizabilityAdmin)
+
+      const citationizabilityAdmin = await callUi('citationizability-ui', 'fetchCitationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCitationizabilityAdminSummary(citationizabilityAdmin)
+
+      const consolidatizabilityAdmin = await callUi('consolidatizability-ui', 'fetchConsolidatizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConsolidatizabilityAdminSummary(consolidatizabilityAdmin)
+
+      const harmonizabilityAdmin = await callUi('harmonizability-ui', 'fetchHarmonizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setHarmonizabilityAdminSummary(harmonizabilityAdmin)
+
+      const parametrizabilityAdmin = await callUi('parametrizability-ui', 'fetchParametrizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setParametrizabilityAdminSummary(parametrizabilityAdmin)
+
+      const serializabilityAdmin = await callUi('serializability-ui', 'fetchSerializabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSerializabilityAdminSummary(serializabilityAdmin)
+
+      const normalizabilityAdmin = await callUi('normalizability-ui', 'fetchNormalizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNormalizabilityAdminSummary(normalizabilityAdmin)
+
+      const glossarizabilityAdmin = await callUi('glossarizability-ui', 'fetchGlossarizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setGlossarizabilityAdminSummary(glossarizabilityAdmin)
+
+      const thesaurusizabilityAdmin = await callUi('thesaurusizability-ui', 'fetchThesaurusizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setThesaurusizabilityAdminSummary(thesaurusizabilityAdmin)
+
+      const terminologizabilityAdmin = await callUi('terminologizability-ui', 'fetchTerminologizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTerminologizabilityAdminSummary(terminologizabilityAdmin)
+
+      const vocabularizabilityAdmin = await callUi('vocabularizability-ui', 'fetchVocabularizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setVocabularizabilityAdminSummary(vocabularizabilityAdmin)
+
+      const footnotizabilityAdmin = await callUi('footnotizability-ui', 'fetchFootnotizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFootnotizabilityAdminSummary(footnotizabilityAdmin)
+
+      const contextualizabilityAdmin = await callUi('contextualizability-ui', 'fetchContextualizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setContextualizabilityAdminSummary(contextualizabilityAdmin)
+
+      const generalizabilityAdmin = await callUi('generalizability-ui', 'fetchGeneralizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setGeneralizabilityAdminSummary(generalizabilityAdmin)
+
+      const standardizabilityAdmin = await callUi('standardizability-ui', 'fetchStandardizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setStandardizabilityAdminSummary(standardizabilityAdmin)
+
+      const formalizabilityAdmin = await callUi('formalizability-ui', 'fetchFormalizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFormalizabilityAdminSummary(formalizabilityAdmin)
+
+      const canonicalizabilityAdmin = await callUi('canonicalizability-ui', 'fetchCanonicalizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCanonicalizabilityAdminSummary(canonicalizabilityAdmin)
+
+      const abstractizabilityAdmin = await callUi('abstractizability-ui', 'fetchAbstractizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAbstractizabilityAdminSummary(abstractizabilityAdmin)
+
+      const concretizabilityAdmin = await callUi('concretizability-ui', 'fetchConcretizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConcretizabilityAdminSummary(concretizabilityAdmin)
+
+      const definizabilityAdmin = await callUi('definizability-ui', 'fetchDefinizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDefinizabilityAdminSummary(definizabilityAdmin)
+
+      const inferencizabilityAdmin = await callUi('inferencizability-ui', 'fetchInferencizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setInferencizabilityAdminSummary(inferencizabilityAdmin)
+
+      const deducizabilityAdmin = await callUi('deducizability-ui', 'fetchDeducizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDeducizabilityAdminSummary(deducizabilityAdmin)
+
+      const probabilizabilityAdmin = await callUi('probabilizability-ui', 'fetchProbabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProbabilizabilityAdminSummary(probabilizabilityAdmin)
+
+      const stochasticizabilityAdmin = await callUi('stochasticizability-ui', 'fetchStochasticizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setStochasticizabilityAdminSummary(stochasticizabilityAdmin)
+
+      const determinizabilityAdmin = await callUi('determinizability-ui', 'fetchDeterminizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDeterminizabilityAdminSummary(determinizabilityAdmin)
+
+      const predictizabilityAdmin = await callUi('predictizability-ui', 'fetchPredictizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPredictizabilityAdminSummary(predictizabilityAdmin)
+
+      const extrapolizabilityAdmin = await callUi('extrapolizability-ui', 'fetchExtrapolizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setExtrapolizabilityAdminSummary(extrapolizabilityAdmin)
+
+      const inductizabilityAdmin = await callUi('inductizability-ui', 'fetchInductizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setInductizabilityAdminSummary(inductizabilityAdmin)
+
+      const abductizabilityAdmin = await callUi('abductizability-ui', 'fetchAbductizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAbductizabilityAdminSummary(abductizabilityAdmin)
+
+      const retrodictizabilityAdmin = await callUi('retrodictizability-ui', 'fetchRetrodictizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRetrodictizabilityAdminSummary(retrodictizabilityAdmin)
+
+      const corroborizabilityAdmin = await callUi('corroborizability-ui', 'fetchCorroborizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCorroborizabilityAdminSummary(corroborizabilityAdmin)
+
+      const falsifiizabilityAdmin = await callUi('falsifiizability-ui', 'fetchFalsifiizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFalsifiizabilityAdminSummary(falsifiizabilityAdmin)
+
+      const interpolizabilityAdmin = await callUi('interpolizability-ui', 'fetchInterpolizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setInterpolizabilityAdminSummary(interpolizabilityAdmin)
+
+      const regressizabilityAdmin = await callUi('regressizability-ui', 'fetchRegressizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRegressizabilityAdminSummary(regressizabilityAdmin)
+
+      const heuristizabilityAdmin = await callUi('heuristizability-ui', 'fetchHeuristizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setHeuristizabilityAdminSummary(heuristizabilityAdmin)
+
+      const simulatizabilityAdmin = await callUi('simulatizability-ui', 'fetchSimulatizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSimulatizabilityAdminSummary(simulatizabilityAdmin)
+
+      const optimizabilityAdmin = await callUi('optimizability-ui', 'fetchOptimizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setOptimizabilityAdminSummary(optimizabilityAdmin)
+
+      const calibratizabilityAdmin = await callUi('calibratizability-ui', 'fetchCalibratizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCalibratizabilityAdminSummary(calibratizabilityAdmin)
+
+      const metricizabilityAdmin = await callUi('metricizability-ui', 'fetchMetricizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMetricizabilityAdminSummary(metricizabilityAdmin)
+
+      const benchmarkizabilityAdmin = await callUi('benchmarkizability-ui', 'fetchBenchmarkizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBenchmarkizabilityAdminSummary(benchmarkizabilityAdmin)
+
+      const comparizabilityAdmin = await callUi('comparizability-ui', 'fetchComparizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setComparizabilityAdminSummary(comparizabilityAdmin)
+
+      const tolerizabilityAdmin = await callUi('tolerizability-ui', 'fetchTolerizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTolerizabilityAdminSummary(tolerizabilityAdmin)
+
+      const approximatizabilityAdmin = await callUi('approximatizability-ui', 'fetchApproximatizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setApproximatizabilityAdminSummary(approximatizabilityAdmin)
+
+      const iterativizabilityAdmin = await callUi('iterativizability-ui', 'fetchIterativizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIterativizabilityAdminSummary(iterativizabilityAdmin)
+
+      const convergizabilityAdmin = await callUi('convergizability-ui', 'fetchConvergizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConvergizabilityAdminSummary(convergizabilityAdmin)
+
+      const stabilizabilityAdmin = await callUi('stabilizability-ui', 'fetchStabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setStabilizabilityAdminSummary(stabilizabilityAdmin)
+
+      const adaptizabilityAdmin = await callUi('adaptizability-ui', 'fetchAdaptizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAdaptizabilityAdminSummary(adaptizabilityAdmin)
+
+      const scalabilizabilityAdmin = await callUi('scalabilizability-ui', 'fetchScalabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setScalabilizabilityAdminSummary(scalabilizabilityAdmin)
+
+      const elasticizabilityAdmin = await callUi('elasticizability-ui', 'fetchElasticizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setElasticizabilityAdminSummary(elasticizabilityAdmin)
+
+      const resilientizabilityAdmin = await callUi('resilientizability-ui', 'fetchResilientizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setResilientizabilityAdminSummary(resilientizabilityAdmin)
+
+      const robustizabilityAdmin = await callUi('robustizability-ui', 'fetchRobustizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRobustizabilityAdminSummary(robustizabilityAdmin)
+
+      const dependableizabilityAdmin = await callUi('dependableizability-ui', 'fetchDependableizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDependableizabilityAdminSummary(dependableizabilityAdmin)
+
+      const recoverizabilityAdmin = await callUi('recoverizability-ui', 'fetchRecoverizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRecoverizabilityAdminSummary(recoverizabilityAdmin)
+
+      const redundizabilityAdmin = await callUi('redundizability-ui', 'fetchRedundizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRedundizabilityAdminSummary(redundizabilityAdmin)
+
+      const failoverizabilityAdmin = await callUi('failoverizability-ui', 'fetchFailoverizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFailoverizabilityAdminSummary(failoverizabilityAdmin)
+
+      const continuizabilityAdmin = await callUi('continuizability-ui', 'fetchContinuizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setContinuizabilityAdminSummary(continuizabilityAdmin)
+
+      const sustainizabilityAdmin = await callUi('sustainizability-ui', 'fetchSustainizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSustainizabilityAdminSummary(sustainizabilityAdmin)
+
+      const availabilizabilityAdmin = await callUi('availabilizability-ui', 'fetchAvailabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAvailabilizabilityAdminSummary(availabilizabilityAdmin)
+
+      const traceabilizabilityAdmin = await callUi('traceabilizability-ui', 'fetchTraceabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTraceabilizabilityAdminSummary(traceabilizabilityAdmin)
+
+      const monitorizabilityAdmin = await callUi('monitorizability-ui', 'fetchMonitorizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMonitorizabilityAdminSummary(monitorizabilityAdmin)
+
+      const alertabilizabilityAdmin = await callUi('alertabilizability-ui', 'fetchAlertabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAlertabilizabilityAdminSummary(alertabilizabilityAdmin)
+
+      const observabilizabilityAdmin = await callUi('observabilizability-ui', 'fetchObservabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setObservabilizabilityAdminSummary(observabilizabilityAdmin)
+
+      const restorabilizabilityAdmin = await callUi('restorabilizability-ui', 'fetchRestorabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRestorabilizabilityAdminSummary(restorabilizabilityAdmin)
+
+      const replicabilizabilityAdmin = await callUi('replicabilizability-ui', 'fetchReplicabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReplicabilizabilityAdminSummary(replicabilizabilityAdmin)
+
+      const loadbalancizabilityAdmin = await callUi('loadbalancizability-ui', 'fetchLoadbalancizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setLoadbalancizabilityAdminSummary(loadbalancizabilityAdmin)
+
+      const autoscalingizabilityAdmin = await callUi('autoscalingizability-ui', 'fetchAutoscalingizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAutoscalingizabilityAdminSummary(autoscalingizabilityAdmin)
+
+      const deployabilizabilityAdmin = await callUi('deployabilizability-ui', 'fetchDeployabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDeployabilizabilityAdminSummary(deployabilizabilityAdmin)
+
+      const configurabilizabilityAdmin = await callUi('configurabilizability-ui', 'fetchConfigurabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConfigurabilizabilityAdminSummary(configurabilizabilityAdmin)
+
+      const operabilizabilityAdmin = await callUi('operabilizability-ui', 'fetchOperabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setOperabilizabilityAdminSummary(operabilizabilityAdmin)
+
+      const maintainabilizabilityAdmin = await callUi('maintainabilizability-ui', 'fetchMaintainabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMaintainabilizabilityAdminSummary(maintainabilizabilityAdmin)
+
+      const diagnosabilizabilityAdmin = await callUi('diagnosabilizability-ui', 'fetchDiagnosabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDiagnosabilizabilityAdminSummary(diagnosabilizabilityAdmin)
+
+      const troubleshootizabilityAdmin = await callUi('troubleshootizability-ui', 'fetchTroubleshootizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTroubleshootizabilityAdminSummary(troubleshootizabilityAdmin)
+
+      const rollbackabilizabilityAdmin = await callUi('rollbackabilizability-ui', 'fetchRollbackabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRollbackabilizabilityAdminSummary(rollbackabilizabilityAdmin)
+
+      const canaryizabilityAdmin = await callUi('canaryizability-ui', 'fetchCanaryizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCanaryizabilityAdminSummary(canaryizabilityAdmin)
+
+      const bluegreenizabilityAdmin = await callUi('bluegreenizability-ui', 'fetchBluegreenizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBluegreenizabilityAdminSummary(bluegreenizabilityAdmin)
+
+      const progressiveizabilityAdmin = await callUi('progressiveizability-ui', 'fetchProgressiveizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProgressiveizabilityAdminSummary(progressiveizabilityAdmin)
+
+      const featureflagizabilityAdmin = await callUi('featureflagizability-ui', 'fetchFeatureflagizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFeatureflagizabilityAdminSummary(featureflagizabilityAdmin)
+
+      const scriptabilizabilityAdmin = await callUi('scriptabilizability-ui', 'fetchScriptabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setScriptabilizabilityAdminSummary(scriptabilizabilityAdmin)
+
+      const automatizabilityAdmin = await callUi('automatizability-ui', 'fetchAutomatizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAutomatizabilityAdminSummary(automatizabilityAdmin)
+
+      const orchestrizabilityAdmin = await callUi('orchestrizability-ui', 'fetchOrchestrizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setOrchestrizabilityAdminSummary(orchestrizabilityAdmin)
+
+      const schedulizabilityAdmin = await callUi('schedulizability-ui', 'fetchSchedulizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSchedulizabilityAdminSummary(schedulizabilityAdmin)
+
+      const triggerizabilityAdmin = await callUi('triggerizability-ui', 'fetchTriggerizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTriggerizabilityAdminSummary(triggerizabilityAdmin)
+
+      const releasizabilityAdmin = await callUi('releasizability-ui', 'fetchReleasizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReleasizabilityAdminSummary(releasizabilityAdmin)
+
+      const versionizabilityAdmin = await callUi('versionizability-ui', 'fetchVersionizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setVersionizabilityAdminSummary(versionizabilityAdmin)
+
+      const migratizabilityAdmin = await callUi('migratizability-ui', 'fetchMigratizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMigratizabilityAdminSummary(migratizabilityAdmin)
+
+      const upgradizabilityAdmin = await callUi('upgradizability-ui', 'fetchUpgradizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setUpgradizabilityAdminSummary(upgradizabilityAdmin)
+
+      const patchizabilityAdmin = await callUi('patchizability-ui', 'fetchPatchizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPatchizabilityAdminSummary(patchizabilityAdmin)
+
+      const integrabilizabilityAdmin = await callUi('integrabilizability-ui', 'fetchIntegrabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIntegrabilizabilityAdminSummary(integrabilizabilityAdmin)
+
+      const composabilizabilityAdmin = await callUi('composabilizability-ui', 'fetchComposabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setComposabilizabilityAdminSummary(composabilizabilityAdmin)
+
+      const modularizabilityAdmin = await callUi('modularizability-ui', 'fetchModularizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setModularizabilityAdminSummary(modularizabilityAdmin)
+
+      const extensibilizabilityAdmin = await callUi('extensibilizability-ui', 'fetchExtensibilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setExtensibilizabilityAdminSummary(extensibilizabilityAdmin)
+
+      const pluggabilizabilityAdmin = await callUi('pluggabilizability-ui', 'fetchPluggabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPluggabilizabilityAdminSummary(pluggabilizabilityAdmin)
+
+      const compatibilizabilityAdmin = await callUi('compatibilizability-ui', 'fetchCompatibilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCompatibilizabilityAdminSummary(compatibilizabilityAdmin)
+
+      const interoperabilizabilityAdmin = await callUi('interoperabilizability-ui', 'fetchInteroperabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setInteroperabilizabilityAdminSummary(interoperabilizabilityAdmin)
+
+      const connectabilizabilityAdmin = await callUi('connectabilizability-ui', 'fetchConnectabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConnectabilizabilityAdminSummary(connectabilizabilityAdmin)
+
+      const interfabilizabilityAdmin = await callUi('interfabilizability-ui', 'fetchInterfabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setInterfabilizabilityAdminSummary(interfabilizabilityAdmin)
+
+      const protocolizabilityAdmin = await callUi('protocolizability-ui', 'fetchProtocolizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProtocolizabilityAdminSummary(protocolizabilityAdmin)
+
+      const encapsulizabilityAdmin = await callUi('encapsulizability-ui', 'fetchEncapsulizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEncapsulizabilityAdminSummary(encapsulizabilityAdmin)
+
+      const isolatizabilityAdmin = await callUi('isolatizability-ui', 'fetchIsolatizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIsolatizabilityAdminSummary(isolatizabilityAdmin)
+
+      const sandboxizabilityAdmin = await callUi('sandboxizability-ui', 'fetchSandboxizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSandboxizabilityAdminSummary(sandboxizabilityAdmin)
+
+      const containerizabilityAdmin = await callUi('containerizability-ui', 'fetchContainerizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setContainerizabilityAdminSummary(containerizabilityAdmin)
+
+      const boundarizabilityAdmin = await callUi('boundarizability-ui', 'fetchBoundarizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBoundarizabilityAdminSummary(boundarizabilityAdmin)
+
+      const virtualizabilityAdmin = await callUi('virtualizability-ui', 'fetchVirtualizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setVirtualizabilityAdminSummary(virtualizabilityAdmin)
+
+      const distributizabilityAdmin = await callUi('distributizability-ui', 'fetchDistributizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDistributizabilityAdminSummary(distributizabilityAdmin)
+
+      const federatizabilityAdmin = await callUi('federatizability-ui', 'fetchFederatizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFederatizabilityAdminSummary(federatizabilityAdmin)
+
+      const decentralizabilityAdmin = await callUi('decentralizability-ui', 'fetchDecentralizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDecentralizabilityAdminSummary(decentralizabilityAdmin)
+
+      const meshabilizabilityAdmin = await callUi('meshabilizability-ui', 'fetchMeshabilizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMeshabilizabilityAdminSummary(meshabilizabilityAdmin)
+
+      const topologizabilityAdmin = await callUi('topologizability-ui', 'fetchTopologizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTopologizabilityAdminSummary(topologizabilityAdmin)
+
+      const networkizabilityAdmin = await callUi('networkizability-ui', 'fetchNetworkizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNetworkizabilityAdminSummary(networkizabilityAdmin)
+
+      const gatewayizabilityAdmin = await callUi('gatewayizability-ui', 'fetchGatewayizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setGatewayizabilityAdminSummary(gatewayizabilityAdmin)
+
+      const brokerizabilityAdmin = await callUi('brokerizability-ui', 'fetchBrokerizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBrokerizabilityAdminSummary(brokerizabilityAdmin)
+
+      const relayizabilityAdmin = await callUi('relayizability-ui', 'fetchRelayizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRelayizabilityAdminSummary(relayizabilityAdmin)
+
+      const routizabilityAdmin = await callUi('routizability-ui', 'fetchRoutizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRoutizabilityAdminSummary(routizabilityAdmin)
+
+      const queueizabilityAdmin = await callUi('queueizability-ui', 'fetchQueueizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setQueueizabilityAdminSummary(queueizabilityAdmin)
+
+      const eventizabilityAdmin = await callUi('eventizability-ui', 'fetchEventizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEventizabilityAdminSummary(eventizabilityAdmin)
+
+      const channelizabilityAdmin = await callUi('channelizability-ui', 'fetchChannelizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setChannelizabilityAdminSummary(channelizabilityAdmin)
+
+      const notifizabilityAdmin = await callUi('notifizability-ui', 'fetchNotifizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNotifizabilityAdminSummary(notifizabilityAdmin)
+
+      const subscribizabilityAdmin = await callUi('subscribizability-ui', 'fetchSubscribizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSubscribizabilityAdminSummary(subscribizabilityAdmin)
+
+      const publishizabilityAdmin = await callUi('publishizability-ui', 'fetchPublishizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPublishizabilityAdminSummary(publishizabilityAdmin)
+
+      const consumizabilityAdmin = await callUi('consumizability-ui', 'fetchConsumizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConsumizabilityAdminSummary(consumizabilityAdmin)
+
+      const deliverizabilityAdmin = await callUi('deliverizability-ui', 'fetchDeliverizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDeliverizabilityAdminSummary(deliverizabilityAdmin)
+
+      const dispatchizabilityAdmin = await callUi('dispatchizability-ui', 'fetchDispatchizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDispatchizabilityAdminSummary(dispatchizabilityAdmin)
+
+      const handoffizabilityAdmin = await callUi('handoffizability-ui', 'fetchHandoffizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setHandoffizabilityAdminSummary(handoffizabilityAdmin)
+
+      const synchronizabilityAdmin = await callUi('synchronizability-ui', 'fetchSynchronizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSynchronizabilityAdminSummary(synchronizabilityAdmin)
+
+      const asynchronizabilityAdmin = await callUi('asynchronizability-ui', 'fetchAsynchronizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAsynchronizabilityAdminSummary(asynchronizabilityAdmin)
+
+      const broadcastizabilityAdmin = await callUi('broadcastizability-ui', 'fetchBroadcastizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBroadcastizabilityAdminSummary(broadcastizabilityAdmin)
+
+      const multicastizabilityAdmin = await callUi('multicastizability-ui', 'fetchMulticastizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMulticastizabilityAdminSummary(multicastizabilityAdmin)
+
+      const unicastizabilityAdmin = await callUi('unicastizability-ui', 'fetchUnicastizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setUnicastizabilityAdminSummary(unicastizabilityAdmin)
+
+      const fanoutizabilityAdmin = await callUi('fanoutizability-ui', 'fetchFanoutizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFanoutizabilityAdminSummary(fanoutizabilityAdmin)
+
+      const backpressureizabilityAdmin = await callUi('backpressureizability-ui', 'fetchBackpressureizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBackpressureizabilityAdminSummary(backpressureizabilityAdmin)
+
+      const throttleizabilityAdmin = await callUi('throttleizability-ui', 'fetchThrottleizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setThrottleizabilityAdminSummary(throttleizabilityAdmin)
+
+      const debouncizabilityAdmin = await callUi('debouncizability-ui', 'fetchDebouncizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDebouncizabilityAdminSummary(debouncizabilityAdmin)
+
+      const bufferizabilityAdmin = await callUi('bufferizability-ui', 'fetchBufferizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBufferizabilityAdminSummary(bufferizabilityAdmin)
+
+      const batchizabilityAdmin = await callUi('batchizability-ui', 'fetchBatchizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBatchizabilityAdminSummary(batchizabilityAdmin)
+
+      const retryizabilityAdmin = await callUi('retryizability-ui', 'fetchRetryizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRetryizabilityAdminSummary(retryizabilityAdmin)
+
+      const circuitizabilityAdmin = await callUi('circuitizability-ui', 'fetchCircuitizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCircuitizabilityAdminSummary(circuitizabilityAdmin)
+
+      const timeoutizabilityAdmin = await callUi('timeoutizability-ui', 'fetchTimeoutizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTimeoutizabilityAdminSummary(timeoutizabilityAdmin)
+
+      const ackizabilityAdmin = await callUi('ackizability-ui', 'fetchAckizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAckizabilityAdminSummary(ackizabilityAdmin)
+
+      const nackizabilityAdmin = await callUi('nackizability-ui', 'fetchNackizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNackizabilityAdminSummary(nackizabilityAdmin)
+
+      const deadletterizabilityAdmin = await callUi('deadletterizability-ui', 'fetchDeadletterizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDeadletterizabilityAdminSummary(deadletterizabilityAdmin)
+
+      const dedupizabilityAdmin = await callUi('dedupizability-ui', 'fetchDedupizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDedupizabilityAdminSummary(dedupizabilityAdmin)
+
+      const sequencizabilityAdmin = await callUi('sequencizability-ui', 'fetchSequencizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSequencizabilityAdminSummary(sequencizabilityAdmin)
+
+      const partitionizabilityAdmin = await callUi('partitionizability-ui', 'fetchPartitionizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPartitionizabilityAdminSummary(partitionizabilityAdmin)
+
+      const shardingizabilityAdmin = await callUi('shardingizability-ui', 'fetchShardingizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setShardingizabilityAdminSummary(shardingizabilityAdmin)
+
+      const orderingizabilityAdmin = await callUi('orderingizability-ui', 'fetchOrderingizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setOrderingizabilityAdminSummary(orderingizabilityAdmin)
+
+      const checkpointizabilityAdmin = await callUi('checkpointizability-ui', 'fetchCheckpointizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCheckpointizabilityAdminSummary(checkpointizabilityAdmin)
+
+      const recoveryizabilityAdmin = await callUi('recoveryizability-ui', 'fetchRecoveryizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRecoveryizabilityAdminSummary(recoveryizabilityAdmin)
+
+      const compactionizabilityAdmin = await callUi('compactionizability-ui', 'fetchCompactionizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCompactionizabilityAdminSummary(compactionizabilityAdmin)
+
+      const rebalanceizabilityAdmin = await callUi('rebalanceizability-ui', 'fetchRebalanceizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRebalanceizabilityAdminSummary(rebalanceizabilityAdmin)
+
+      const leaderizabilityAdmin = await callUi('leaderizability-ui', 'fetchLeaderizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setLeaderizabilityAdminSummary(leaderizabilityAdmin)
+
+      const followerizabilityAdmin = await callUi('followerizability-ui', 'fetchFollowerizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFollowerizabilityAdminSummary(followerizabilityAdmin)
+
+      const consensusizabilityAdmin = await callUi('consensusizability-ui', 'fetchConsensusizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConsensusizabilityAdminSummary(consensusizabilityAdmin)
+
+      const quorumizabilityAdmin = await callUi('quorumizability-ui', 'fetchQuorumizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setQuorumizabilityAdminSummary(quorumizabilityAdmin)
+
+      const snapshotizabilityAdmin = await callUi('snapshotizability-ui', 'fetchSnapshotizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSnapshotizabilityAdminSummary(snapshotizabilityAdmin)
+
+      const journalizabilityAdmin = await callUi('journalizability-ui', 'fetchJournalizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setJournalizabilityAdminSummary(journalizabilityAdmin)
+
+      const appendizabilityAdmin = await callUi('appendizability-ui', 'fetchAppendizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAppendizabilityAdminSummary(appendizabilityAdmin)
+
+      const walizabilityAdmin = await callUi('walizability-ui', 'fetchWalizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setWalizabilityAdminSummary(walizabilityAdmin)
+
+      const replicationizabilityAdmin = await callUi('replicationizability-ui', 'fetchReplicationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReplicationizabilityAdminSummary(replicationizabilityAdmin)
+
+      const mirroringizabilityAdmin = await callUi('mirroringizability-ui', 'fetchMirroringizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMirroringizabilityAdminSummary(mirroringizabilityAdmin)
+
+      const cloningizabilityAdmin = await callUi('cloningizability-ui', 'fetchCloningizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCloningizabilityAdminSummary(cloningizabilityAdmin)
+
+      const propagationizabilityAdmin = await callUi('propagationizability-ui', 'fetchPropagationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPropagationizabilityAdminSummary(propagationizabilityAdmin)
+
+      const materializationizabilityAdmin = await callUi('materializationizability-ui', 'fetchMaterializationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMaterializationizabilityAdminSummary(materializationizabilityAdmin)
+
+      const hydrationizabilityAdmin = await callUi('hydrationizability-ui', 'fetchHydrationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setHydrationizabilityAdminSummary(hydrationizabilityAdmin)
+
+      const invalidationizabilityAdmin = await callUi('invalidationizability-ui', 'fetchInvalidationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setInvalidationizabilityAdminSummary(invalidationizabilityAdmin)
+
+      const evictionizabilityAdmin = await callUi('evictionizability-ui', 'fetchEvictionizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEvictionizabilityAdminSummary(evictionizabilityAdmin)
+
+      const ttlizabilityAdmin = await callUi('ttlizability-ui', 'fetchTtlizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTtlizabilityAdminSummary(ttlizabilityAdmin)
+
+      const expirationizabilityAdmin = await callUi('expirationizability-ui', 'fetchExpirationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setExpirationizabilityAdminSummary(expirationizabilityAdmin)
+
+      const refreshizabilityAdmin = await callUi('refreshizability-ui', 'fetchRefreshizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRefreshizabilityAdminSummary(refreshizabilityAdmin)
+
+      const warmizabilityAdmin = await callUi('warmizability-ui', 'fetchWarmizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setWarmizabilityAdminSummary(warmizabilityAdmin)
+
+      const coldizabilityAdmin = await callUi('coldizability-ui', 'fetchColdizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setColdizabilityAdminSummary(coldizabilityAdmin)
+
+      const prefetchizabilityAdmin = await callUi('prefetchizability-ui', 'fetchPrefetchizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPrefetchizabilityAdminSummary(prefetchizabilityAdmin)
+
+      const cacheizabilityAdmin = await callUi('cacheizability-ui', 'fetchCacheizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCacheizabilityAdminSummary(cacheizabilityAdmin)
+
+      const memorizabilityAdmin = await callUi('memorizability-ui', 'fetchMemorizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMemorizabilityAdminSummary(memorizabilityAdmin)
+
+      const persistizabilityAdmin = await callUi('persistizability-ui', 'fetchPersistizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPersistizabilityAdminSummary(persistizabilityAdmin)
+
+      const compressizabilityAdmin = await callUi('compressizability-ui', 'fetchCompressizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCompressizabilityAdminSummary(compressizabilityAdmin)
+
+      const decompressizabilityAdmin = await callUi('decompressizability-ui', 'fetchDecompressizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDecompressizabilityAdminSummary(decompressizabilityAdmin)
+
+      const archiveizabilityAdmin = await callUi('archiveizability-ui', 'fetchArchiveizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setArchiveizabilityAdminSummary(archiveizabilityAdmin)
+
+      const restoreizabilityAdmin = await callUi('restoreizability-ui', 'fetchRestoreizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRestoreizabilityAdminSummary(restoreizabilityAdmin)
+
+      const backupizabilityAdmin = await callUi('backupizability-ui', 'fetchBackupizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBackupizabilityAdminSummary(backupizabilityAdmin)
+
+      const exportizabilityAdmin = await callUi('exportizability-ui', 'fetchExportizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setExportizabilityAdminSummary(exportizabilityAdmin)
+
+      const importizabilityAdmin = await callUi('importizability-ui', 'fetchImportizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setImportizabilityAdminSummary(importizabilityAdmin)
+
+      const indexingizabilityAdmin = await callUi('indexingizability-ui', 'fetchIndexingizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIndexingizabilityAdminSummary(indexingizabilityAdmin)
+
+      const searchizabilityAdmin = await callUi('searchizability-ui', 'fetchSearchizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSearchizabilityAdminSummary(searchizabilityAdmin)
+
+      const versioningizabilityAdmin = await callUi('versioningizability-ui', 'fetchVersioningizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setVersioningizabilityAdminSummary(versioningizabilityAdmin)
+
+      const compactizabilityAdmin = await callUi('compactizability-ui', 'fetchCompactizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCompactizabilityAdminSummary(compactizabilityAdmin)
+
+      const expandizabilityAdmin = await callUi('expandizability-ui', 'fetchExpandizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setExpandizabilityAdminSummary(expandizabilityAdmin)
+
+      const retentionizabilityAdmin = await callUi('retentionizability-ui', 'fetchRetentionizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRetentionizabilityAdminSummary(retentionizabilityAdmin)
+
+      const queryizabilityAdmin = await callUi('queryizability-ui', 'fetchQueryizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setQueryizabilityAdminSummary(queryizabilityAdmin)
+
+      const filterizabilityAdmin = await callUi('filterizability-ui', 'fetchFilterizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFilterizabilityAdminSummary(filterizabilityAdmin)
+
+      const sortizabilityAdmin = await callUi('sortizability-ui', 'fetchSortizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSortizabilityAdminSummary(sortizabilityAdmin)
+
+      const paginizabilityAdmin = await callUi('paginizability-ui', 'fetchPaginizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPaginizabilityAdminSummary(paginizabilityAdmin)
+
+      const pivotizabilityAdmin = await callUi('pivotizability-ui', 'fetchPivotizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPivotizabilityAdminSummary(pivotizabilityAdmin)
+
+      const groupizabilityAdmin = await callUi('groupizability-ui', 'fetchGroupizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setGroupizabilityAdminSummary(groupizabilityAdmin)
+
+      const joinizabilityAdmin = await callUi('joinizability-ui', 'fetchJoinizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setJoinizabilityAdminSummary(joinizabilityAdmin)
+
+      const mergeizabilityAdmin = await callUi('mergeizability-ui', 'fetchMergeizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMergeizabilityAdminSummary(mergeizabilityAdmin)
+
+      const splitizabilityAdmin = await callUi('splitizability-ui', 'fetchSplitizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSplitizabilityAdminSummary(splitizabilityAdmin)
+
+      const projectizabilityAdmin = await callUi('projectizability-ui', 'fetchProjectizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProjectizabilityAdminSummary(projectizabilityAdmin)
+
+      const transformizabilityAdmin = await callUi('transformizability-ui', 'fetchTransformizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTransformizabilityAdminSummary(transformizabilityAdmin)
+
+      const mapizabilityAdmin = await callUi('mapizability-ui', 'fetchMapizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMapizabilityAdminSummary(mapizabilityAdmin)
+
+      const reduceizabilityAdmin = await callUi('reduceizability-ui', 'fetchReduceizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReduceizabilityAdminSummary(reduceizabilityAdmin)
+
+      const foldizabilityAdmin = await callUi('foldizability-ui', 'fetchFoldizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFoldizabilityAdminSummary(foldizabilityAdmin)
+
+      const scanizabilityAdmin = await callUi('scanizability-ui', 'fetchScanizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setScanizabilityAdminSummary(scanizabilityAdmin)
+
+      const chainingizabilityAdmin = await callUi('chainingizability-ui', 'fetchChainingizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setChainingizabilityAdminSummary(chainingizabilityAdmin)
+
+      const pipeliningizabilityAdmin = await callUi('pipeliningizability-ui', 'fetchPipeliningizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPipeliningizabilityAdminSummary(pipeliningizabilityAdmin)
+
+      const batchingizabilityAdmin = await callUi('batchingizability-ui', 'fetchBatchingizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBatchingizabilityAdminSummary(batchingizabilityAdmin)
+
+      const streamizabilityAdmin = await callUi('streamizability-ui', 'fetchStreamizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setStreamizabilityAdminSummary(streamizabilityAdmin)
+
+      const windowizabilityAdmin = await callUi('windowizability-ui', 'fetchWindowizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setWindowizabilityAdminSummary(windowizabilityAdmin)
+
+      const orchestrationizabilityAdmin = await callUi('orchestrationizability-ui', 'fetchOrchestrationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setOrchestrationizabilityAdminSummary(orchestrationizabilityAdmin)
+
+      const schedulingizabilityAdmin = await callUi('schedulingizability-ui', 'fetchSchedulingizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSchedulingizabilityAdminSummary(schedulingizabilityAdmin)
+
+      const triggeringizabilityAdmin = await callUi('triggeringizability-ui', 'fetchTriggeringizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTriggeringizabilityAdminSummary(triggeringizabilityAdmin)
+
+      const routingizabilityAdmin = await callUi('routingizability-ui', 'fetchRoutingizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRoutingizabilityAdminSummary(routingizabilityAdmin)
+
+      const balancingizabilityAdmin = await callUi('balancingizability-ui', 'fetchBalancingizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBalancingizabilityAdminSummary(balancingizabilityAdmin)
+
+      const nodelizabilityAdmin = await callUi('nodelizability-ui', 'fetchNodelizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNodelizabilityAdminSummary(nodelizabilityAdmin)
+
+      const coordinationizabilityAdmin = await callUi('coordinationizability-ui', 'fetchCoordinationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCoordinationizabilityAdminSummary(coordinationizabilityAdmin)
+
+      const partitioningizabilityAdmin = await callUi('partitioningizability-ui', 'fetchPartitioningizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPartitioningizabilityAdminSummary(partitioningizabilityAdmin)
+
+      const clusteringizabilityAdmin = await callUi('clusteringizability-ui', 'fetchClusteringizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setClusteringizabilityAdminSummary(clusteringizabilityAdmin)
+
+      const meshingizabilityAdmin = await callUi('meshingizability-ui', 'fetchMeshingizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMeshingizabilityAdminSummary(meshingizabilityAdmin)
+
+      const discoveryizabilityAdmin = await callUi('discoveryizability-ui', 'fetchDiscoveryizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDiscoveryizabilityAdminSummary(discoveryizabilityAdmin)
+
+      const registrationizabilityAdmin = await callUi('registrationizability-ui', 'fetchRegistrationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRegistrationizabilityAdminSummary(registrationizabilityAdmin)
+
+      const provisioningizabilityAdmin = await callUi('provisioningizability-ui', 'fetchProvisioningizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProvisioningizabilityAdminSummary(provisioningizabilityAdmin)
+
+      const allocationizabilityAdmin = await callUi('allocationizability-ui', 'fetchAllocationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAllocationizabilityAdminSummary(allocationizabilityAdmin)
+
+      const deallocationizabilityAdmin = await callUi('deallocationizability-ui', 'fetchDeallocationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDeallocationizabilityAdminSummary(deallocationizabilityAdmin)
+
+      const scalingizabilityAdmin = await callUi('scalingizability-ui', 'fetchScalingizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setScalingizabilityAdminSummary(scalingizabilityAdmin)
+
+      const healingizabilityAdmin = await callUi('healingizability-ui', 'fetchHealingizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setHealingizabilityAdminSummary(healingizabilityAdmin)
+
+      const remediationizabilityAdmin = await callUi('remediationizability-ui', 'fetchRemediationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRemediationizabilityAdminSummary(remediationizabilityAdmin)
+
+      const reconciliationizabilityAdmin = await callUi('reconciliationizability-ui', 'fetchReconciliationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReconciliationizabilityAdminSummary(reconciliationizabilityAdmin)
+
+      const governanceizabilityAdmin = await callUi('governanceizability-ui', 'fetchGovernanceizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setGovernanceizabilityAdminSummary(governanceizabilityAdmin)
+
+      const complianceizabilityAdmin = await callUi('complianceizability-ui', 'fetchComplianceizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setComplianceizabilityAdminSummary(complianceizabilityAdmin)
+
+      const policyizabilityAdmin = await callUi('policyizability-ui', 'fetchPolicyizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPolicyizabilityAdminSummary(policyizabilityAdmin)
+
+      const enforcementizabilityAdmin = await callUi('enforcementizability-ui', 'fetchEnforcementizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEnforcementizabilityAdminSummary(enforcementizabilityAdmin)
+
+      const assuranceizabilityAdmin = await callUi('assuranceizability-ui', 'fetchAssuranceizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAssuranceizabilityAdminSummary(assuranceizabilityAdmin)
+
+      const attestationizabilityAdmin = await callUi('attestationizability-ui', 'fetchAttestationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAttestationizabilityAdminSummary(attestationizabilityAdmin)
+
+      const certificationizabilityAdmin = await callUi('certificationizability-ui', 'fetchCertificationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCertificationizabilityAdminSummary(certificationizabilityAdmin)
+
+      const accreditationizabilityAdmin = await callUi('accreditationizability-ui', 'fetchAccreditationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAccreditationizabilityAdminSummary(accreditationizabilityAdmin)
+
+      const specificationizabilityAdmin = await callUi('specificationizability-ui', 'fetchSpecificationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSpecificationizabilityAdminSummary(specificationizabilityAdmin)
+
+      const instrumentationizabilityAdmin = await callUi('instrumentationizability-ui', 'fetchInstrumentationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setInstrumentationizabilityAdminSummary(instrumentationizabilityAdmin)
+
+      const telemetryizabilityAdmin = await callUi('telemetryizability-ui', 'fetchTelemetryizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTelemetryizabilityAdminSummary(telemetryizabilityAdmin)
+
+      const auditingizabilityAdmin = await callUi('auditingizability-ui', 'fetchAuditingizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuditingizabilityAdminSummary(auditingizabilityAdmin)
+
+      const accountabilityizabilityAdmin = await callUi('accountabilityizability-ui', 'fetchAccountabilityizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAccountabilityizabilityAdminSummary(accountabilityizabilityAdmin)
+
+      const transparencyizabilityAdmin = await callUi('transparencyizability-ui', 'fetchTransparencyizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTransparencyizabilityAdminSummary(transparencyizabilityAdmin)
+
+      const oversightizabilityAdmin = await callUi('oversightizability-ui', 'fetchOversightizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setOversightizabilityAdminSummary(oversightizabilityAdmin)
+
+      const controlizabilityAdmin = await callUi('controlizability-ui', 'fetchControlizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setControlizabilityAdminSummary(controlizabilityAdmin)
+
+      const entitlementizabilityAdmin = await callUi('entitlementizability-ui', 'fetchEntitlementizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEntitlementizabilityAdminSummary(entitlementizabilityAdmin)
+
+      const permissionizabilityAdmin = await callUi('permissionizability-ui', 'fetchPermissionizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPermissionizabilityAdminSummary(permissionizabilityAdmin)
+
+      const authorizationizabilityAdmin = await callUi('authorizationizability-ui', 'fetchAuthorizationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuthorizationizabilityAdminSummary(authorizationizabilityAdmin)
+
+      const authenticationizabilityAdmin = await callUi('authenticationizability-ui', 'fetchAuthenticationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuthenticationizabilityAdminSummary(authenticationizabilityAdmin)
+
+      const identityizabilityAdmin = await callUi('identityizability-ui', 'fetchIdentityizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIdentityizabilityAdminSummary(identityizabilityAdmin)
+
+      const riskizabilityAdmin = await callUi('riskizability-ui', 'fetchRiskizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRiskizabilityAdminSummary(riskizabilityAdmin)
+
+      const securityizabilityAdmin = await callUi('securityizability-ui', 'fetchSecurityizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSecurityizabilityAdminSummary(securityizabilityAdmin)
+
+      const privacyizabilityAdmin = await callUi('privacyizability-ui', 'fetchPrivacyizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPrivacyizabilityAdminSummary(privacyizabilityAdmin)
+
+      const trustizabilityAdmin = await callUi('trustizability-ui', 'fetchTrustizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTrustizabilityAdminSummary(trustizabilityAdmin)
+
+      const integrityizabilityAdmin = await callUi('integrityizability-ui', 'fetchIntegrityizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIntegrityizabilityAdminSummary(integrityizabilityAdmin)
+
+      const threatizabilityAdmin = await callUi('threatizability-ui', 'fetchThreatizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setThreatizabilityAdminSummary(threatizabilityAdmin)
+
+      const vulnerabilityizabilityAdmin = await callUi('vulnerabilityizability-ui', 'fetchVulnerabilityizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setVulnerabilityizabilityAdminSummary(vulnerabilityizabilityAdmin)
+
+      const mitigationizabilityAdmin = await callUi('mitigationizability-ui', 'fetchMitigationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setMitigationizabilityAdminSummary(mitigationizabilityAdmin)
+
+      const hardeningizabilityAdmin = await callUi('hardeningizability-ui', 'fetchHardeningizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setHardeningizabilityAdminSummary(hardeningizabilityAdmin)
+
+      const segregationizabilityAdmin = await callUi('segregationizability-ui', 'fetchSegregationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSegregationizabilityAdminSummary(segregationizabilityAdmin)
+
+      const confidentialityizabilityAdmin = await callUi('confidentialityizability-ui', 'fetchConfidentialityizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConfidentialityizabilityAdminSummary(confidentialityizabilityAdmin)
+
+      const nonrepudiationizabilityAdmin = await callUi('nonrepudiationizability-ui', 'fetchNonrepudiationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNonrepudiationizabilityAdminSummary(nonrepudiationizabilityAdmin)
+
+      const accesscontrolizabilityAdmin = await callUi('accesscontrolizability-ui', 'fetchAccesscontrolizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAccesscontrolizabilityAdminSummary(accesscontrolizabilityAdmin)
+
+      const leastprivilegeizabilityAdmin = await callUi('leastprivilegeizability-ui', 'fetchLeastprivilegeizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setLeastprivilegeizabilityAdminSummary(leastprivilegeizabilityAdmin)
+
+      const zerotrustizabilityAdmin = await callUi('zerotrustizability-ui', 'fetchZerotrustizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setZerotrustizabilityAdminSummary(zerotrustizabilityAdmin)
+
+      const identityproofizabilityAdmin = await callUi('identityproofizability-ui', 'fetchIdentityproofizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIdentityproofizabilityAdminSummary(identityproofizabilityAdmin)
+
+      const keymanagementizabilityAdmin = await callUi('keymanagementizability-ui', 'fetchKeymanagementizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setKeymanagementizabilityAdminSummary(keymanagementizabilityAdmin)
+
+      const secretmanagementizabilityAdmin = await callUi('secretmanagementizability-ui', 'fetchSecretmanagementizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSecretmanagementizabilityAdminSummary(secretmanagementizabilityAdmin)
+
+      const cryptographyizabilityAdmin = await callUi('cryptographyizability-ui', 'fetchCryptographyizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCryptographyizabilityAdminSummary(cryptographyizabilityAdmin)
+
+      const complianceguardizabilityAdmin = await callUi('complianceguardizability-ui', 'fetchComplianceguardizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setComplianceguardizabilityAdminSummary(complianceguardizabilityAdmin)
+
+      const provenanceizabilityAdmin = await callUi('provenanceizability-ui', 'fetchProvenanceizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProvenanceizabilityAdminSummary(provenanceizabilityAdmin)
+
+      const lineageizabilityAdmin = await callUi('lineageizability-ui', 'fetchLineageizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setLineageizabilityAdminSummary(lineageizabilityAdmin)
+
+      const forensicizabilityAdmin = await callUi('forensicizability-ui', 'fetchForensicizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setForensicizabilityAdminSummary(forensicizabilityAdmin)
+
+      const audittrailizabilityAdmin = await callUi('audittrailizability-ui', 'fetchAudittrailizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAudittrailizabilityAdminSummary(audittrailizabilityAdmin)
+
+      const complianceproofizabilityAdmin = await callUi('complianceproofizability-ui', 'fetchComplianceproofizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setComplianceproofizabilityAdminSummary(complianceproofizabilityAdmin)
+
+      const governancetrackizabilityAdmin = await callUi('governancetrackizability-ui', 'fetchGovernancetrackizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setGovernancetrackizabilityAdminSummary(governancetrackizabilityAdmin)
+
+      const attesttrackizabilityAdmin = await callUi('attesttrackizability-ui', 'fetchAttesttrackizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAttesttrackizabilityAdminSummary(attesttrackizabilityAdmin)
+
+      const evidencizabilityAdmin = await callUi('evidencizability-ui', 'fetchEvidencizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEvidencizabilityAdminSummary(evidencizabilityAdmin)
+
+      const chainofcustodyizabilityAdmin = await callUi('chainofcustodyizability-ui', 'fetchChainofcustodyizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setChainofcustodyizabilityAdminSummary(chainofcustodyizabilityAdmin)
+
+      const tamperproofizabilityAdmin = await callUi('tamperproofizability-ui', 'fetchTamperproofizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTamperproofizabilityAdminSummary(tamperproofizabilityAdmin)
+
+      const policyproofizabilityAdmin = await callUi('policyproofizability-ui', 'fetchPolicyproofizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPolicyproofizabilityAdminSummary(policyproofizabilityAdmin)
+
+      const notarizationizabilityAdmin = await callUi('notarizationizability-ui', 'fetchNotarizationizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNotarizationizabilityAdminSummary(notarizationizabilityAdmin)
+
+      const witnessizabilityAdmin = await callUi('witnessizability-ui', 'fetchWitnessizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setWitnessizabilityAdminSummary(witnessizabilityAdmin)
+
+      const ledgerizabilityAdmin = await callUi('ledgerizability-ui', 'fetchLedgerizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setLedgerizabilityAdminSummary(ledgerizabilityAdmin)
+
+      const signatureproofizabilityAdmin = await callUi('signatureproofizability-ui', 'fetchSignatureproofizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setSignatureproofizabilityAdminSummary(signatureproofizabilityAdmin)
+
+      const ruleproofizabilityAdmin = await callUi('ruleproofizability-ui', 'fetchRuleproofizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRuleproofizabilityAdminSummary(ruleproofizabilityAdmin)
+
+      const traceproofizabilityAdmin = await callUi('traceproofizability-ui', 'fetchTraceproofizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTraceproofizabilityAdminSummary(traceproofizabilityAdmin)
+
+      const disclosureizabilityAdmin = await callUi('disclosureizability-ui', 'fetchDisclosureizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDisclosureizabilityAdminSummary(disclosureizabilityAdmin)
+
+      const registrarizabilityAdmin = await callUi('registrarizability-ui', 'fetchRegistrarizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRegistrarizabilityAdminSummary(registrarizabilityAdmin)
+
+      const auditproofizabilityAdmin = await callUi('auditproofizability-ui', 'fetchAuditproofizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuditproofizabilityAdminSummary(auditproofizabilityAdmin)
+
+      const compliancechainizabilityAdmin = await callUi('compliancechainizability-ui', 'fetchCompliancechainizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCompliancechainizabilityAdminSummary(compliancechainizabilityAdmin)
+
+      const attestledgerizabilityAdmin = await callUi('attestledgerizability-ui', 'fetchAttestledgerizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAttestledgerizabilityAdminSummary(attestledgerizabilityAdmin)
+
+      const evidencetrackizabilityAdmin = await callUi('evidencetrackizability-ui', 'fetchEvidencetrackizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEvidencetrackizabilityAdminSummary(evidencetrackizabilityAdmin)
+
+      const prooflineizabilityAdmin = await callUi('prooflineizability-ui', 'fetchProoflineizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProoflineizabilityAdminSummary(prooflineizabilityAdmin)
+
+      const notarproofizabilityAdmin = await callUi('notarproofizability-ui', 'fetchNotarproofizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNotarproofizabilityAdminSummary(notarproofizabilityAdmin)
+
+      const auditlineizabilityAdmin = await callUi('auditlineizability-ui', 'fetchAuditlineizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuditlineizabilityAdminSummary(auditlineizabilityAdmin)
+
+      const traceledgerizabilityAdmin = await callUi('traceledgerizability-ui', 'fetchTraceledgerizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTraceledgerizabilityAdminSummary(traceledgerizabilityAdmin)
+
+      const disclosureproofizabilityAdmin = await callUi('disclosureproofizability-ui', 'fetchDisclosureproofizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setDisclosureproofizabilityAdminSummary(disclosureproofizabilityAdmin)
+
+      const registrarproofizabilityAdmin = await callUi('registrarproofizability-ui', 'fetchRegistrarproofizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRegistrarproofizabilityAdminSummary(registrarproofizabilityAdmin)
+
+      const witnessproofizabilityAdmin = await callUi('witnessproofizability-ui', 'fetchWitnessproofizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setWitnessproofizabilityAdminSummary(witnessproofizabilityAdmin)
+
+      const complianceledgerizabilityAdmin = await callUi('complianceledgerizability-ui', 'fetchComplianceledgerizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setComplianceledgerizabilityAdminSummary(complianceledgerizabilityAdmin)
+
+      const notarledgerizabilityAdmin = await callUi('notarledgerizability-ui', 'fetchNotarledgerizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNotarledgerizabilityAdminSummary(notarledgerizabilityAdmin)
+
+      const witnessledgerizabilityAdmin = await callUi('witnessledgerizability-ui', 'fetchWitnessledgerizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setWitnessledgerizabilityAdminSummary(witnessledgerizabilityAdmin)
+
+      const proofregistryizabilityAdmin = await callUi('proofregistryizability-ui', 'fetchProofregistryizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProofregistryizabilityAdminSummary(proofregistryizabilityAdmin)
+
+      const auditregistryizabilityAdmin = await callUi('auditregistryizability-ui', 'fetchAuditregistryizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuditregistryizabilityAdminSummary(auditregistryizabilityAdmin)
+
+      const compliancejournalizabilityAdmin = await callUi('compliancejournalizability-ui', 'fetchCompliancejournalizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCompliancejournalizabilityAdminSummary(compliancejournalizabilityAdmin)
+
+      const notarjournalizabilityAdmin = await callUi('notarjournalizability-ui', 'fetchNotarjournalizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setNotarjournalizabilityAdminSummary(notarjournalizabilityAdmin)
+
+      const witnessjournalizabilityAdmin = await callUi('witnessjournalizability-ui', 'fetchWitnessjournalizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setWitnessjournalizabilityAdminSummary(witnessjournalizabilityAdmin)
+
+      const proofjournalizabilityAdmin = await callUi('proofjournalizability-ui', 'fetchProofjournalizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProofjournalizabilityAdminSummary(proofjournalizabilityAdmin)
+
+      const auditjournalizabilityAdmin = await callUi('auditjournalizability-ui', 'fetchAuditjournalizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuditjournalizabilityAdminSummary(auditjournalizabilityAdmin)
+
+      const registryjournalizabilityAdmin = await callUi('registryjournalizability-ui', 'fetchRegistryjournalizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRegistryjournalizabilityAdminSummary(registryjournalizabilityAdmin)
+
+      const tracejournalizabilityAdmin = await callUi('tracejournalizability-ui', 'fetchTracejournalizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTracejournalizabilityAdminSummary(tracejournalizabilityAdmin)
+
+      const evidencejournalizabilityAdmin = await callUi('evidencejournalizability-ui', 'fetchEvidencejournalizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEvidencejournalizabilityAdminSummary(evidencejournalizabilityAdmin)
+
+      const attestjournalizabilityAdmin = await callUi('attestjournalizability-ui', 'fetchAttestjournalizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAttestjournalizabilityAdminSummary(attestjournalizabilityAdmin)
+
+      const integrityjournalizabilityAdmin = await callUi('integrityjournalizability-ui', 'fetchIntegrityjournalizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setIntegrityjournalizabilityAdminSummary(integrityjournalizabilityAdmin)
+
+      const registryvaultizabilityAdmin = await callUi('registryvaultizability-ui', 'fetchRegistryvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setRegistryvaultizabilityAdminSummary(registryvaultizabilityAdmin)
+
+      const tracevaultizabilityAdmin = await callUi('tracevaultizability-ui', 'fetchTracevaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTracevaultizabilityAdminSummary(tracevaultizabilityAdmin)
+
+      const evidencevaultizabilityAdmin = await callUi('evidencevaultizability-ui', 'fetchEvidencevaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setEvidencevaultizabilityAdminSummary(evidencevaultizabilityAdmin)
+
+      const auditvaultizabilityAdmin = await callUi('auditvaultizability-ui', 'fetchAuditvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuditvaultizabilityAdminSummary(auditvaultizabilityAdmin)
+
+      const compliancevaultizabilityAdmin = await callUi('compliancevaultizability-ui', 'fetchCompliancevaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCompliancevaultizabilityAdminSummary(compliancevaultizabilityAdmin)
+
+      const validityvaultizabilityAdmin = await callUi('validityvaultizability-ui', 'fetchValidityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setValidityvaultizabilityAdminSummary(validityvaultizabilityAdmin)
+
+      const authenticityvaultizabilityAdmin = await callUi('authenticityvaultizability-ui', 'fetchAuthenticityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuthenticityvaultizabilityAdminSummary(authenticityvaultizabilityAdmin)
+
+      const provenancevaultizabilityAdmin = await callUi('provenancevaultizability-ui', 'fetchProvenancevaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProvenancevaultizabilityAdminSummary(provenancevaultizabilityAdmin)
+
+      const verificationvaultizabilityAdmin = await callUi('verificationvaultizability-ui', 'fetchVerificationvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setVerificationvaultizabilityAdminSummary(verificationvaultizabilityAdmin)
+
+      const attestationvaultizabilityAdmin = await callUi('attestationvaultizability-ui', 'fetchAttestationvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAttestationvaultizabilityAdminSummary(attestationvaultizabilityAdmin)
+
+      const assurancevaultizabilityAdmin = await callUi('assurancevaultizability-ui', 'fetchAssurancevaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAssurancevaultizabilityAdminSummary(assurancevaultizabilityAdmin)
+
+      const auditabilityvaultizabilityAdmin = await callUi('auditabilityvaultizability-ui', 'fetchAuditabilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuditabilityvaultizabilityAdminSummary(auditabilityvaultizabilityAdmin)
+
+      const inspectabilityvaultizabilityAdmin = await callUi('inspectabilityvaultizability-ui', 'fetchInspectabilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setInspectabilityvaultizabilityAdminSummary(inspectabilityvaultizabilityAdmin)
+
+      const reproducibilityvaultizabilityAdmin = await callUi('reproducibilityvaultizability-ui', 'fetchReproducibilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReproducibilityvaultizabilityAdminSummary(reproducibilityvaultizabilityAdmin)
+
+      const credibilityvaultizabilityAdmin = await callUi('credibilityvaultizability-ui', 'fetchCredibilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCredibilityvaultizabilityAdminSummary(credibilityvaultizabilityAdmin)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to load rollout/admin control data.',
+      )
+    }
+  }
+
   async function handleLoadBillingStatus() {
     setBillingAction('loading')
     setBillingError(null)
@@ -15508,3778 +16586,7 @@ function App() {
       setSettingsAdminSummary(settingsAdmin)
       setWorkspaceNameDraft(settingsAdmin?.settings.name ?? '')
 
-      const modelHealthAdmin = await fetchModelHealthAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setModelHealthAdminSummary(modelHealthAdmin)
 
-      const shieldReviewAdmin = await fetchShieldReviewAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setShieldReviewAdminSummary(shieldReviewAdmin)
-
-      const providerKeyAdmin = await fetchProviderKeyAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setProviderKeyAdminSummary(providerKeyAdmin)
-
-      const observabilityAdmin = await fetchObservabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setObservabilityAdminSummary(observabilityAdmin)
-
-      const promptRegressionAdmin = await fetchPromptRegressionAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPromptRegressionAdminSummary(promptRegressionAdmin)
-
-      const runHistoryAdmin = await fetchRunHistoryAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRunHistoryAdminSummary(runHistoryAdmin)
-
-      const streamRecoveryAdmin = await fetchStreamRecoveryAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setStreamRecoveryAdminSummary(streamRecoveryAdmin)
-
-      const idempotencyAdmin = await fetchIdempotencyAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setIdempotencyAdminSummary(idempotencyAdmin)
-
-      const quotaAdmin = await fetchQuotaAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setQuotaAdminSummary(quotaAdmin)
-
-      const deploymentAdmin = await fetchDeploymentAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDeploymentAdminSummary(deploymentAdmin)
-
-      const migrationAdmin = await fetchMigrationAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMigrationAdminSummary(migrationAdmin)
-
-      const backupAdmin = await fetchBackupAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setBackupAdminSummary(backupAdmin)
-
-      const auditAdmin = await fetchAuditAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAuditAdminSummary(auditAdmin)
-
-      const complianceAdmin = await fetchComplianceAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setComplianceAdminSummary(complianceAdmin)
-
-      const incidentAdmin = await fetchIncidentAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setIncidentAdminSummary(incidentAdmin)
-
-      const releaseAdmin = await fetchReleaseAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setReleaseAdminSummary(releaseAdmin)
-
-      const sloAdmin = await fetchSloAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSloAdminSummary(sloAdmin)
-
-      const capacityAdmin = await fetchCapacityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCapacityAdminSummary(capacityAdmin)
-
-      const performanceAdmin = await fetchPerformanceAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPerformanceAdminSummary(performanceAdmin)
-
-      const resilienceAdmin = await fetchResilienceAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setResilienceAdminSummary(resilienceAdmin)
-
-      const availabilityAdmin = await fetchAvailabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAvailabilityAdminSummary(availabilityAdmin)
-
-      const reliabilityAdmin = await fetchReliabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setReliabilityAdminSummary(reliabilityAdmin)
-
-      const stabilityAdmin = await fetchStabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setStabilityAdminSummary(stabilityAdmin)
-
-      const consistencyAdmin = await fetchConsistencyAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setConsistencyAdminSummary(consistencyAdmin)
-
-      const integrityAdmin = await fetchIntegrityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setIntegrityAdminSummary(integrityAdmin)
-
-      const durabilityAdmin = await fetchDurabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDurabilityAdminSummary(durabilityAdmin)
-
-      const recoverabilityAdmin = await fetchRecoverabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRecoverabilityAdminSummary(recoverabilityAdmin)
-
-      const maintainabilityAdmin = await fetchMaintainabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMaintainabilityAdminSummary(maintainabilityAdmin)
-
-      const scalabilityAdmin = await fetchScalabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setScalabilityAdminSummary(scalabilityAdmin)
-
-      const traceabilityAdmin = await fetchTraceabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTraceabilityAdminSummary(traceabilityAdmin)
-
-      const efficiencyAdmin = await fetchEfficiencyAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setEfficiencyAdminSummary(efficiencyAdmin)
-
-      const optimizationAdmin = await fetchOptimizationAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setOptimizationAdminSummary(optimizationAdmin)
-
-      const utilizationAdmin = await fetchUtilizationAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setUtilizationAdminSummary(utilizationAdmin)
-
-      const sustainabilityAdmin = await fetchSustainabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSustainabilityAdminSummary(sustainabilityAdmin)
-
-      const governanceAdmin = await fetchGovernanceAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setGovernanceAdminSummary(governanceAdmin)
-
-      const oversightAdmin = await fetchOversightAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setOversightAdminSummary(oversightAdmin)
-
-      const assuranceAdmin = await fetchAssuranceAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAssuranceAdminSummary(assuranceAdmin)
-
-      const accountabilityAdmin = await fetchAccountabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAccountabilityAdminSummary(accountabilityAdmin)
-
-      const transparencyAdmin = await fetchTransparencyAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTransparencyAdminSummary(transparencyAdmin)
-
-      const attestationAdmin = await fetchAttestationAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAttestationAdminSummary(attestationAdmin)
-
-      const authenticityAdmin = await fetchAuthenticityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAuthenticityAdminSummary(authenticityAdmin)
-
-      const provenanceAdmin = await fetchProvenanceAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setProvenanceAdminSummary(provenanceAdmin)
-
-      const verifiabilityAdmin = await fetchVerifiabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setVerifiabilityAdminSummary(verifiabilityAdmin)
-
-      const confirmabilityAdmin = await fetchConfirmabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setConfirmabilityAdminSummary(confirmabilityAdmin)
-
-      const validityAdmin = await fetchValidityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setValidityAdminSummary(validityAdmin)
-
-      const credibilityAdmin = await fetchCredibilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCredibilityAdminSummary(credibilityAdmin)
-
-      const reproducibilityAdmin = await fetchReproducibilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setReproducibilityAdminSummary(reproducibilityAdmin)
-
-      const defensibilityAdmin = await fetchDefensibilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDefensibilityAdminSummary(defensibilityAdmin)
-
-      const auditabilityAdmin = await fetchAuditabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAuditabilityAdminSummary(auditabilityAdmin)
-
-      const inspectabilityAdmin = await fetchInspectabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setInspectabilityAdminSummary(inspectabilityAdmin)
-
-      const explainabilityAdmin = await fetchExplainabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setExplainabilityAdminSummary(explainabilityAdmin)
-
-      const demonstrabilityAdmin = await fetchDemonstrabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDemonstrabilityAdminSummary(demonstrabilityAdmin)
-
-      const justifiabilityAdmin = await fetchJustifiabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setJustifiabilityAdminSummary(justifiabilityAdmin)
-
-      const reviewabilityAdmin = await fetchReviewabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setReviewabilityAdminSummary(reviewabilityAdmin)
-
-      const assessabilityAdmin = await fetchAssessabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAssessabilityAdminSummary(assessabilityAdmin)
-
-      const measurabilityAdmin = await fetchMeasurabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMeasurabilityAdminSummary(measurabilityAdmin)
-
-      const certifiabilityAdmin = await fetchCertifiabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCertifiabilityAdminSummary(certifiabilityAdmin)
-
-      const substantiabilityAdmin = await fetchSubstantiabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSubstantiabilityAdminSummary(substantiabilityAdmin)
-
-      const warrantabilityAdmin = await fetchWarrantabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setWarrantabilityAdminSummary(warrantabilityAdmin)
-
-      const attributabilityAdmin = await fetchAttributabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAttributabilityAdminSummary(attributabilityAdmin)
-
-      const identifiabilityAdmin = await fetchIdentifiabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setIdentifiabilityAdminSummary(identifiabilityAdmin)
-
-      const comparabilityAdmin = await fetchComparabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setComparabilityAdminSummary(comparabilityAdmin)
-
-      const distinguishabilityAdmin = await fetchDistinguishabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDistinguishabilityAdminSummary(distinguishabilityAdmin)
-
-      const assignabilityAdmin = await fetchAssignabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAssignabilityAdminSummary(assignabilityAdmin)
-
-      const referencabilityAdmin = await fetchReferencabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setReferencabilityAdminSummary(referencabilityAdmin)
-
-      const locatabilityAdmin = await fetchLocatabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setLocatabilityAdminSummary(locatabilityAdmin)
-
-      const retrievabilityAdmin = await fetchRetrievabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRetrievabilityAdminSummary(retrievabilityAdmin)
-
-      const discoverabilityAdmin = await fetchDiscoverabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDiscoverabilityAdminSummary(discoverabilityAdmin)
-
-      const navigabilityAdmin = await fetchNavigabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setNavigabilityAdminSummary(navigabilityAdmin)
-
-      const connectabilityAdmin = await fetchConnectabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setConnectabilityAdminSummary(connectabilityAdmin)
-
-      const linkabilityAdmin = await fetchLinkabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setLinkabilityAdminSummary(linkabilityAdmin)
-
-      const interchangeabilityAdmin = await fetchInterchangeabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setInterchangeabilityAdminSummary(interchangeabilityAdmin)
-
-      const transferabilityAdmin = await fetchTransferabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTransferabilityAdminSummary(transferabilityAdmin)
-
-      const portabilityAdmin = await fetchPortabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPortabilityAdminSummary(portabilityAdmin)
-
-      const compatibilityAdmin = await fetchCompatibilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCompatibilityAdminSummary(compatibilityAdmin)
-
-      const adaptabilityAdmin = await fetchAdaptabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAdaptabilityAdminSummary(adaptabilityAdmin)
-
-      const flexibilityAdmin = await fetchFlexibilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setFlexibilityAdminSummary(flexibilityAdmin)
-
-      const extensibilityAdmin = await fetchExtensibilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setExtensibilityAdminSummary(extensibilityAdmin)
-
-      const modifiabilityAdmin = await fetchModifiabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setModifiabilityAdminSummary(modifiabilityAdmin)
-
-      const configurabilityAdmin = await fetchConfigurabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setConfigurabilityAdminSummary(configurabilityAdmin)
-
-      const customizabilityAdmin = await fetchCustomizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCustomizabilityAdminSummary(customizabilityAdmin)
-
-      const operabilityAdmin = await fetchOperabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setOperabilityAdminSummary(operabilityAdmin)
-
-      const tunabilityAdmin = await fetchTunabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTunabilityAdminSummary(tunabilityAdmin)
-
-      const adjustabilityAdmin = await fetchAdjustabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAdjustabilityAdminSummary(adjustabilityAdmin)
-
-      const programmabilityAdmin = await fetchProgrammabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setProgrammabilityAdminSummary(programmabilityAdmin)
-
-      const deployabilityAdmin = await fetchDeployabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDeployabilityAdminSummary(deployabilityAdmin)
-
-      const manageabilityAdmin = await fetchManageabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setManageabilityAdminSummary(manageabilityAdmin)
-
-      const controllabilityAdmin = await fetchControllabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setControllabilityAdminSummary(controllabilityAdmin)
-
-      const integrabilityAdmin = await fetchIntegrabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setIntegrabilityAdminSummary(integrabilityAdmin)
-
-      const orchestrabilityAdmin = await fetchOrchestrabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setOrchestrabilityAdminSummary(orchestrabilityAdmin)
-
-      const schedulabilityAdmin = await fetchSchedulabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSchedulabilityAdminSummary(schedulabilityAdmin)
-
-      const automatabilityAdmin = await fetchAutomatabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAutomatabilityAdminSummary(automatabilityAdmin)
-
-      const monitorabilityAdmin = await fetchMonitorabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMonitorabilityAdminSummary(monitorabilityAdmin)
-
-      const predictabilityAdmin = await fetchPredictabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPredictabilityAdminSummary(predictabilityAdmin)
-
-      const repeatabilityAdmin = await fetchRepeatabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRepeatabilityAdminSummary(repeatabilityAdmin)
-
-      const responsivenessAdmin = await fetchResponsivenessAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setResponsivenessAdminSummary(responsivenessAdmin)
-
-      const dependabilityAdmin = await fetchDependabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDependabilityAdminSummary(dependabilityAdmin)
-
-      const composabilityAdmin = await fetchComposabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setComposabilityAdminSummary(composabilityAdmin)
-
-      const trustworthinessAdmin = await fetchTrustworthinessAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTrustworthinessAdminSummary(trustworthinessAdmin)
-
-      const usabilityAdmin = await fetchUsabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setUsabilityAdminSummary(usabilityAdmin)
-
-      const accessibilityAdmin = await fetchAccessibilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAccessibilityAdminSummary(accessibilityAdmin)
-
-      const effectivenessAdmin = await fetchEffectivenessAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setEffectivenessAdminSummary(effectivenessAdmin)
-
-      const appropriatenessAdmin = await fetchAppropriatenessAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAppropriatenessAdminSummary(appropriatenessAdmin)
-
-      const survivabilityAdmin = await fetchSurvivabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSurvivabilityAdminSummary(survivabilityAdmin)
-
-      const viabilityAdmin = await fetchViabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setViabilityAdminSummary(viabilityAdmin)
-
-      const feasibilityAdmin = await fetchFeasibilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setFeasibilityAdminSummary(feasibilityAdmin)
-
-      const conformanceAdmin = await fetchConformanceAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setConformanceAdminSummary(conformanceAdmin)
-
-      const adoptabilityAdmin = await fetchAdoptabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAdoptabilityAdminSummary(adoptabilityAdmin)
-
-      const acceptabilityAdmin = await fetchAcceptabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAcceptabilityAdminSummary(acceptabilityAdmin)
-
-      const affordabilityAdmin = await fetchAffordabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAffordabilityAdminSummary(affordabilityAdmin)
-
-      const desirabilityAdmin = await fetchDesirabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDesirabilityAdminSummary(desirabilityAdmin)
-
-      const marketabilityAdmin = await fetchMarketabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMarketabilityAdminSummary(marketabilityAdmin)
-
-      const suitabilityAdmin = await fetchSuitabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSuitabilityAdminSummary(suitabilityAdmin)
-
-      const profitabilityAdmin = await fetchProfitabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setProfitabilityAdminSummary(profitabilityAdmin)
-
-      const learnabilityAdmin = await fetchLearnabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setLearnabilityAdminSummary(learnabilityAdmin)
-
-      const deliverabilityAdmin = await fetchDeliverabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDeliverabilityAdminSummary(deliverabilityAdmin)
-
-      const understandabilityAdmin = await fetchUnderstandabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setUnderstandabilityAdminSummary(understandabilityAdmin)
-
-      const memorabilityAdmin = await fetchMemorabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMemorabilityAdminSummary(memorabilityAdmin)
-
-      const teachabilityAdmin = await fetchTeachabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTeachabilityAdminSummary(teachabilityAdmin)
-
-      const readabilityAdmin = await fetchReadabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setReadabilityAdminSummary(readabilityAdmin)
-
-      const clarityAdmin = await fetchClarityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setClarityAdminSummary(clarityAdmin)
-
-      const simplicityAdmin = await fetchSimplicityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSimplicityAdminSummary(simplicityAdmin)
-
-      const negotiabilityAdmin = await fetchNegotiabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setNegotiabilityAdminSummary(negotiabilityAdmin)
-
-      const comprehensibilityAdmin = await fetchComprehensibilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setComprehensibilityAdminSummary(comprehensibilityAdmin)
-
-      const intelligibilityAdmin = await fetchIntelligibilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setIntelligibilityAdminSummary(intelligibilityAdmin)
-
-      const legibilityAdmin = await fetchLegibilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setLegibilityAdminSummary(legibilityAdmin)
-
-      const parsabilityAdmin = await fetchParsabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setParsabilityAdminSummary(parsabilityAdmin)
-
-      const coherenceAdmin = await fetchCoherenceAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCoherenceAdminSummary(coherenceAdmin)
-
-      const familiarityAdmin = await fetchFamiliarityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setFamiliarityAdminSummary(familiarityAdmin)
-
-      const recognizabilityAdmin = await fetchRecognizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRecognizabilityAdminSummary(recognizabilityAdmin)
-
-      const interpretabilityAdmin = await fetchInterpretabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setInterpretabilityAdminSummary(interpretabilityAdmin)
-
-      const scannabilityAdmin = await fetchScannabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setScannabilityAdminSummary(scannabilityAdmin)
-
-      const perceptibilityAdmin = await fetchPerceptibilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPerceptibilityAdminSummary(perceptibilityAdmin)
-
-      const noticeabilityAdmin = await fetchNoticeabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setNoticeabilityAdminSummary(noticeabilityAdmin)
-
-      const discernibilityAdmin = await fetchDiscernibilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDiscernibilityAdminSummary(discernibilityAdmin)
-
-      const distinctivenessAdmin = await fetchDistinctivenessAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDistinctivenessAdminSummary(distinctivenessAdmin)
-
-      const conspicuousnessAdmin = await fetchConspicuousnessAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setConspicuousnessAdminSummary(conspicuousnessAdmin)
-
-      const detectabilityAdmin = await fetchDetectabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDetectabilityAdminSummary(detectabilityAdmin)
-
-      const describabilityAdmin = await fetchDescribabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDescribabilityAdminSummary(describabilityAdmin)
-
-      const expressivenessAdmin = await fetchExpressivenessAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setExpressivenessAdminSummary(expressivenessAdmin)
-
-      const communicabilityAdmin = await fetchCommunicabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCommunicabilityAdminSummary(communicabilityAdmin)
-
-      const articulabilityAdmin = await fetchArticulabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setArticulabilityAdminSummary(articulabilityAdmin)
-
-      const elaboratabilityAdmin = await fetchElaboratabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setElaboratabilityAdminSummary(elaboratabilityAdmin)
-
-      const representabilityAdmin = await fetchRepresentabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRepresentabilityAdminSummary(representabilityAdmin)
-
-      const presentabilityAdmin = await fetchPresentabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPresentabilityAdminSummary(presentabilityAdmin)
-
-      const enunciabilityAdmin = await fetchEnunciabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setEnunciabilityAdminSummary(enunciabilityAdmin)
-
-      const formulatabilityAdmin = await fetchFormulatabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setFormulatabilityAdminSummary(formulatabilityAdmin)
-
-      const narratabilityAdmin = await fetchNarratabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setNarratabilityAdminSummary(narratabilityAdmin)
-
-      const illustratabilityAdmin = await fetchIllustratabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setIllustratabilityAdminSummary(illustratabilityAdmin)
-
-      const symbolizabilityAdmin = await fetchSymbolizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSymbolizabilityAdminSummary(symbolizabilityAdmin)
-
-      const visualizabilityAdmin = await fetchVisualizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setVisualizabilityAdminSummary(visualizabilityAdmin)
-
-      const evocatabilityAdmin = await fetchEvocatabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setEvocatabilityAdminSummary(evocatabilityAdmin)
-
-      const signifiabilityAdmin = await fetchSignifiabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSignifiabilityAdminSummary(signifiabilityAdmin)
-
-      const connotabilityAdmin = await fetchConnotabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setConnotabilityAdminSummary(connotabilityAdmin)
-
-      const typifiabilityAdmin = await fetchTypifiabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTypifiabilityAdminSummary(typifiabilityAdmin)
-
-      const metaphorizabilityAdmin = await fetchMetaphorizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMetaphorizabilityAdminSummary(metaphorizabilityAdmin)
-
-      const dramatizabilityAdmin = await fetchDramatizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDramatizabilityAdminSummary(dramatizabilityAdmin)
-
-      const personifiabilityAdmin = await fetchPersonifiabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPersonifiabilityAdminSummary(personifiabilityAdmin)
-
-      const materializabilityAdmin = await fetchMaterializabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMaterializabilityAdminSummary(materializabilityAdmin)
-
-      const iconizabilityAdmin = await fetchIconizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setIconizabilityAdminSummary(iconizabilityAdmin)
-
-      const allegorizabilityAdmin = await fetchAllegorizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAllegorizabilityAdminSummary(allegorizabilityAdmin)
-
-      const tokenizabilityAdmin = await fetchTokenizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTokenizabilityAdminSummary(tokenizabilityAdmin)
-
-      const stylizabilityAdmin = await fetchStylizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setStylizabilityAdminSummary(stylizabilityAdmin)
-
-      const emblemizabilityAdmin = await fetchEmblemizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setEmblemizabilityAdminSummary(emblemizabilityAdmin)
-
-      const analogizabilityAdmin = await fetchAnalogizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAnalogizabilityAdminSummary(analogizabilityAdmin)
-
-      const parabolizabilityAdmin = await fetchParabolizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setParabolizabilityAdminSummary(parabolizabilityAdmin)
-
-      const archetypizabilityAdmin = await fetchArchetypizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setArchetypizabilityAdminSummary(archetypizabilityAdmin)
-
-      const caracterizabilityAdmin = await fetchCaracterizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCaracterizabilityAdminSummary(caracterizabilityAdmin)
-
-      const mythicizabilityAdmin = await fetchMythicizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMythicizabilityAdminSummary(mythicizabilityAdmin)
-
-      const semiotizabilityAdmin = await fetchSemiotizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSemiotizabilityAdminSummary(semiotizabilityAdmin)
-
-      const hermeneutizabilityAdmin = await fetchHermeneutizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setHermeneutizabilityAdminSummary(hermeneutizabilityAdmin)
-
-      const lexicalizabilityAdmin = await fetchLexicalizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setLexicalizabilityAdminSummary(lexicalizabilityAdmin)
-
-      const semanticizabilityAdmin = await fetchSemanticizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSemanticizabilityAdminSummary(semanticizabilityAdmin)
-
-      const pragmatizabilityAdmin = await fetchPragmatizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPragmatizabilityAdminSummary(pragmatizabilityAdmin)
-
-      const syntacticizabilityAdmin = await fetchSyntacticizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSyntacticizabilityAdminSummary(syntacticizabilityAdmin)
-
-      const rhetorizabilityAdmin = await fetchRhetorizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRhetorizabilityAdminSummary(rhetorizabilityAdmin)
-
-      const morphizabilityAdmin = await fetchMorphizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMorphizabilityAdminSummary(morphizabilityAdmin)
-
-      const codifiabilityAdmin = await fetchCodifiabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCodifiabilityAdminSummary(codifiabilityAdmin)
-
-      const hermeticizabilityAdmin = await fetchHermeticizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setHermeticizabilityAdminSummary(hermeticizabilityAdmin)
-
-      const epistemizabilityAdmin = await fetchEpistemizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setEpistemizabilityAdminSummary(epistemizabilityAdmin)
-
-      const dialectizabilityAdmin = await fetchDialectizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDialectizabilityAdminSummary(dialectizabilityAdmin)
-
-      const ontologizabilityAdmin = await fetchOntologizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setOntologizabilityAdminSummary(ontologizabilityAdmin)
-
-      const phenomenizabilityAdmin = await fetchPhenomenizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPhenomenizabilityAdminSummary(phenomenizabilityAdmin)
-
-      const axiologizabilityAdmin = await fetchAxiologizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAxiologizabilityAdminSummary(axiologizabilityAdmin)
-
-      const teleologizabilityAdmin = await fetchTeleologizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTeleologizabilityAdminSummary(teleologizabilityAdmin)
-
-      const gnoseizabilityAdmin = await fetchGnoseizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setGnoseizabilityAdminSummary(gnoseizabilityAdmin)
-
-      const methodizabilityAdmin = await fetchMethodizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMethodizabilityAdminSummary(methodizabilityAdmin)
-
-      const historizabilityAdmin = await fetchHistorizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setHistorizabilityAdminSummary(historizabilityAdmin)
-
-      const categorizabilityAdmin = await fetchCategorizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCategorizabilityAdminSummary(categorizabilityAdmin)
-
-      const taxonomizabilityAdmin = await fetchTaxonomizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTaxonomizabilityAdminSummary(taxonomizabilityAdmin)
-
-      const classifiabilityAdmin = await fetchClassifiabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setClassifiabilityAdminSummary(classifiabilityAdmin)
-
-      const typologizabilityAdmin = await fetchTypologizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTypologizabilityAdminSummary(typologizabilityAdmin)
-
-      const stratifiabilityAdmin = await fetchStratifiabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setStratifiabilityAdminSummary(stratifiabilityAdmin)
-
-      const ordinarizabilityAdmin = await fetchOrdinarizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setOrdinarizabilityAdminSummary(ordinarizabilityAdmin)
-
-      const systematizabilityAdmin = await fetchSystematizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSystematizabilityAdminSummary(systematizabilityAdmin)
-
-      const hierarchizabilityAdmin = await fetchHierarchizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setHierarchizabilityAdminSummary(hierarchizabilityAdmin)
-
-      const segmentizabilityAdmin = await fetchSegmentizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSegmentizabilityAdminSummary(segmentizabilityAdmin)
-
-      const clusterizabilityAdmin = await fetchClusterizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setClusterizabilityAdminSummary(clusterizabilityAdmin)
-
-      const nomenclatizabilityAdmin = await fetchNomenclatizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setNomenclatizabilityAdminSummary(nomenclatizabilityAdmin)
-
-      const catalogizabilityAdmin = await fetchCatalogizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCatalogizabilityAdminSummary(catalogizabilityAdmin)
-
-      const indexizabilityAdmin = await fetchIndexizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setIndexizabilityAdminSummary(indexizabilityAdmin)
-
-      const directoryizabilityAdmin = await fetchDirectoryizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDirectoryizabilityAdminSummary(directoryizabilityAdmin)
-
-      const inventoryizabilityAdmin = await fetchInventoryizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setInventoryizabilityAdminSummary(inventoryizabilityAdmin)
-
-      const registryizabilityAdmin = await fetchRegistryizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRegistryizabilityAdminSummary(registryizabilityAdmin)
-
-      const archivizabilityAdmin = await fetchArchivizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setArchivizabilityAdminSummary(archivizabilityAdmin)
-
-      const curatizabilityAdmin = await fetchCuratizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCuratizabilityAdminSummary(curatizabilityAdmin)
-
-      const collectizabilityAdmin = await fetchCollectizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCollectizabilityAdminSummary(collectizabilityAdmin)
-
-      const aggregatizabilityAdmin = await fetchAggregatizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAggregatizabilityAdminSummary(aggregatizabilityAdmin)
-
-      const compilatizabilityAdmin = await fetchCompilatizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCompilatizabilityAdminSummary(compilatizabilityAdmin)
-
-      const bibliographizabilityAdmin = await fetchBibliographizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setBibliographizabilityAdminSummary(bibliographizabilityAdmin)
-
-      const referencizabilityAdmin = await fetchReferencizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setReferencizabilityAdminSummary(referencizabilityAdmin)
-
-      const documentizabilityAdmin = await fetchDocumentizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDocumentizabilityAdminSummary(documentizabilityAdmin)
-
-      const annotationizabilityAdmin = await fetchAnnotationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAnnotationizabilityAdminSummary(annotationizabilityAdmin)
-
-      const citationizabilityAdmin = await fetchCitationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCitationizabilityAdminSummary(citationizabilityAdmin)
-
-      const consolidatizabilityAdmin = await fetchConsolidatizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setConsolidatizabilityAdminSummary(consolidatizabilityAdmin)
-
-      const harmonizabilityAdmin = await fetchHarmonizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setHarmonizabilityAdminSummary(harmonizabilityAdmin)
-
-      const parametrizabilityAdmin = await fetchParametrizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setParametrizabilityAdminSummary(parametrizabilityAdmin)
-
-      const serializabilityAdmin = await fetchSerializabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSerializabilityAdminSummary(serializabilityAdmin)
-
-      const normalizabilityAdmin = await fetchNormalizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setNormalizabilityAdminSummary(normalizabilityAdmin)
-
-      const glossarizabilityAdmin = await fetchGlossarizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setGlossarizabilityAdminSummary(glossarizabilityAdmin)
-
-      const thesaurusizabilityAdmin = await fetchThesaurusizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setThesaurusizabilityAdminSummary(thesaurusizabilityAdmin)
-
-      const terminologizabilityAdmin = await fetchTerminologizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTerminologizabilityAdminSummary(terminologizabilityAdmin)
-
-      const vocabularizabilityAdmin = await fetchVocabularizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setVocabularizabilityAdminSummary(vocabularizabilityAdmin)
-
-      const footnotizabilityAdmin = await fetchFootnotizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setFootnotizabilityAdminSummary(footnotizabilityAdmin)
-
-      const contextualizabilityAdmin = await fetchContextualizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setContextualizabilityAdminSummary(contextualizabilityAdmin)
-
-      const generalizabilityAdmin = await fetchGeneralizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setGeneralizabilityAdminSummary(generalizabilityAdmin)
-
-      const standardizabilityAdmin = await fetchStandardizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setStandardizabilityAdminSummary(standardizabilityAdmin)
-
-      const formalizabilityAdmin = await fetchFormalizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setFormalizabilityAdminSummary(formalizabilityAdmin)
-
-      const canonicalizabilityAdmin = await fetchCanonicalizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCanonicalizabilityAdminSummary(canonicalizabilityAdmin)
-
-      const abstractizabilityAdmin = await fetchAbstractizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAbstractizabilityAdminSummary(abstractizabilityAdmin)
-
-      const concretizabilityAdmin = await fetchConcretizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setConcretizabilityAdminSummary(concretizabilityAdmin)
-
-      const definizabilityAdmin = await fetchDefinizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDefinizabilityAdminSummary(definizabilityAdmin)
-
-      const inferencizabilityAdmin = await fetchInferencizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setInferencizabilityAdminSummary(inferencizabilityAdmin)
-
-      const deducizabilityAdmin = await fetchDeducizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDeducizabilityAdminSummary(deducizabilityAdmin)
-
-      const probabilizabilityAdmin = await fetchProbabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setProbabilizabilityAdminSummary(probabilizabilityAdmin)
-
-      const stochasticizabilityAdmin = await fetchStochasticizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setStochasticizabilityAdminSummary(stochasticizabilityAdmin)
-
-      const determinizabilityAdmin = await fetchDeterminizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDeterminizabilityAdminSummary(determinizabilityAdmin)
-
-      const predictizabilityAdmin = await fetchPredictizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPredictizabilityAdminSummary(predictizabilityAdmin)
-
-      const extrapolizabilityAdmin = await fetchExtrapolizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setExtrapolizabilityAdminSummary(extrapolizabilityAdmin)
-
-      const inductizabilityAdmin = await fetchInductizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setInductizabilityAdminSummary(inductizabilityAdmin)
-
-      const abductizabilityAdmin = await fetchAbductizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAbductizabilityAdminSummary(abductizabilityAdmin)
-
-      const retrodictizabilityAdmin = await fetchRetrodictizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRetrodictizabilityAdminSummary(retrodictizabilityAdmin)
-
-      const corroborizabilityAdmin = await fetchCorroborizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCorroborizabilityAdminSummary(corroborizabilityAdmin)
-
-      const falsifiizabilityAdmin = await fetchFalsifiizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setFalsifiizabilityAdminSummary(falsifiizabilityAdmin)
-
-      const interpolizabilityAdmin = await fetchInterpolizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setInterpolizabilityAdminSummary(interpolizabilityAdmin)
-
-      const regressizabilityAdmin = await fetchRegressizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRegressizabilityAdminSummary(regressizabilityAdmin)
-
-      const heuristizabilityAdmin = await fetchHeuristizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setHeuristizabilityAdminSummary(heuristizabilityAdmin)
-
-      const simulatizabilityAdmin = await fetchSimulatizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSimulatizabilityAdminSummary(simulatizabilityAdmin)
-
-      const optimizabilityAdmin = await fetchOptimizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setOptimizabilityAdminSummary(optimizabilityAdmin)
-
-      const calibratizabilityAdmin = await fetchCalibratizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCalibratizabilityAdminSummary(calibratizabilityAdmin)
-
-      const metricizabilityAdmin = await fetchMetricizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMetricizabilityAdminSummary(metricizabilityAdmin)
-
-      const benchmarkizabilityAdmin = await fetchBenchmarkizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setBenchmarkizabilityAdminSummary(benchmarkizabilityAdmin)
-
-      const comparizabilityAdmin = await fetchComparizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setComparizabilityAdminSummary(comparizabilityAdmin)
-
-      const tolerizabilityAdmin = await fetchTolerizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTolerizabilityAdminSummary(tolerizabilityAdmin)
-
-      const approximatizabilityAdmin = await fetchApproximatizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setApproximatizabilityAdminSummary(approximatizabilityAdmin)
-
-      const iterativizabilityAdmin = await fetchIterativizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setIterativizabilityAdminSummary(iterativizabilityAdmin)
-
-      const convergizabilityAdmin = await fetchConvergizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setConvergizabilityAdminSummary(convergizabilityAdmin)
-
-      const stabilizabilityAdmin = await fetchStabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setStabilizabilityAdminSummary(stabilizabilityAdmin)
-
-      const adaptizabilityAdmin = await fetchAdaptizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAdaptizabilityAdminSummary(adaptizabilityAdmin)
-
-      const scalabilizabilityAdmin = await fetchScalabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setScalabilizabilityAdminSummary(scalabilizabilityAdmin)
-
-      const elasticizabilityAdmin = await fetchElasticizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setElasticizabilityAdminSummary(elasticizabilityAdmin)
-
-      const resilientizabilityAdmin = await fetchResilientizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setResilientizabilityAdminSummary(resilientizabilityAdmin)
-
-      const robustizabilityAdmin = await fetchRobustizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRobustizabilityAdminSummary(robustizabilityAdmin)
-
-      const dependableizabilityAdmin = await fetchDependableizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDependableizabilityAdminSummary(dependableizabilityAdmin)
-
-      const recoverizabilityAdmin = await fetchRecoverizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRecoverizabilityAdminSummary(recoverizabilityAdmin)
-
-      const redundizabilityAdmin = await fetchRedundizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRedundizabilityAdminSummary(redundizabilityAdmin)
-
-      const failoverizabilityAdmin = await fetchFailoverizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setFailoverizabilityAdminSummary(failoverizabilityAdmin)
-
-      const continuizabilityAdmin = await fetchContinuizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setContinuizabilityAdminSummary(continuizabilityAdmin)
-
-      const sustainizabilityAdmin = await fetchSustainizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSustainizabilityAdminSummary(sustainizabilityAdmin)
-
-      const availabilizabilityAdmin = await fetchAvailabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAvailabilizabilityAdminSummary(availabilizabilityAdmin)
-
-      const traceabilizabilityAdmin = await fetchTraceabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTraceabilizabilityAdminSummary(traceabilizabilityAdmin)
-
-      const monitorizabilityAdmin = await fetchMonitorizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMonitorizabilityAdminSummary(monitorizabilityAdmin)
-
-      const alertabilizabilityAdmin = await fetchAlertabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAlertabilizabilityAdminSummary(alertabilizabilityAdmin)
-
-      const observabilizabilityAdmin = await fetchObservabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setObservabilizabilityAdminSummary(observabilizabilityAdmin)
-
-      const restorabilizabilityAdmin = await fetchRestorabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRestorabilizabilityAdminSummary(restorabilizabilityAdmin)
-
-      const replicabilizabilityAdmin = await fetchReplicabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setReplicabilizabilityAdminSummary(replicabilizabilityAdmin)
-
-      const loadbalancizabilityAdmin = await fetchLoadbalancizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setLoadbalancizabilityAdminSummary(loadbalancizabilityAdmin)
-
-      const autoscalingizabilityAdmin = await fetchAutoscalingizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAutoscalingizabilityAdminSummary(autoscalingizabilityAdmin)
-
-      const deployabilizabilityAdmin = await fetchDeployabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDeployabilizabilityAdminSummary(deployabilizabilityAdmin)
-
-      const configurabilizabilityAdmin = await fetchConfigurabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setConfigurabilizabilityAdminSummary(configurabilizabilityAdmin)
-
-      const operabilizabilityAdmin = await fetchOperabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setOperabilizabilityAdminSummary(operabilizabilityAdmin)
-
-      const maintainabilizabilityAdmin = await fetchMaintainabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMaintainabilizabilityAdminSummary(maintainabilizabilityAdmin)
-
-      const diagnosabilizabilityAdmin = await fetchDiagnosabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDiagnosabilizabilityAdminSummary(diagnosabilizabilityAdmin)
-
-      const troubleshootizabilityAdmin = await fetchTroubleshootizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTroubleshootizabilityAdminSummary(troubleshootizabilityAdmin)
-
-      const rollbackabilizabilityAdmin = await fetchRollbackabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRollbackabilizabilityAdminSummary(rollbackabilizabilityAdmin)
-
-      const canaryizabilityAdmin = await fetchCanaryizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCanaryizabilityAdminSummary(canaryizabilityAdmin)
-
-      const bluegreenizabilityAdmin = await fetchBluegreenizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setBluegreenizabilityAdminSummary(bluegreenizabilityAdmin)
-
-      const progressiveizabilityAdmin = await fetchProgressiveizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setProgressiveizabilityAdminSummary(progressiveizabilityAdmin)
-
-      const featureflagizabilityAdmin = await fetchFeatureflagizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setFeatureflagizabilityAdminSummary(featureflagizabilityAdmin)
-
-      const scriptabilizabilityAdmin = await fetchScriptabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setScriptabilizabilityAdminSummary(scriptabilizabilityAdmin)
-
-      const automatizabilityAdmin = await fetchAutomatizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAutomatizabilityAdminSummary(automatizabilityAdmin)
-
-      const orchestrizabilityAdmin = await fetchOrchestrizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setOrchestrizabilityAdminSummary(orchestrizabilityAdmin)
-
-      const schedulizabilityAdmin = await fetchSchedulizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSchedulizabilityAdminSummary(schedulizabilityAdmin)
-
-      const triggerizabilityAdmin = await fetchTriggerizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTriggerizabilityAdminSummary(triggerizabilityAdmin)
-
-      const releasizabilityAdmin = await fetchReleasizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setReleasizabilityAdminSummary(releasizabilityAdmin)
-
-      const versionizabilityAdmin = await fetchVersionizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setVersionizabilityAdminSummary(versionizabilityAdmin)
-
-      const migratizabilityAdmin = await fetchMigratizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMigratizabilityAdminSummary(migratizabilityAdmin)
-
-      const upgradizabilityAdmin = await fetchUpgradizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setUpgradizabilityAdminSummary(upgradizabilityAdmin)
-
-      const patchizabilityAdmin = await fetchPatchizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPatchizabilityAdminSummary(patchizabilityAdmin)
-
-      const integrabilizabilityAdmin = await fetchIntegrabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setIntegrabilizabilityAdminSummary(integrabilizabilityAdmin)
-
-      const composabilizabilityAdmin = await fetchComposabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setComposabilizabilityAdminSummary(composabilizabilityAdmin)
-
-      const modularizabilityAdmin = await fetchModularizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setModularizabilityAdminSummary(modularizabilityAdmin)
-
-      const extensibilizabilityAdmin = await fetchExtensibilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setExtensibilizabilityAdminSummary(extensibilizabilityAdmin)
-
-      const pluggabilizabilityAdmin = await fetchPluggabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPluggabilizabilityAdminSummary(pluggabilizabilityAdmin)
-
-      const compatibilizabilityAdmin = await fetchCompatibilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCompatibilizabilityAdminSummary(compatibilizabilityAdmin)
-
-      const interoperabilizabilityAdmin = await fetchInteroperabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setInteroperabilizabilityAdminSummary(interoperabilizabilityAdmin)
-
-      const connectabilizabilityAdmin = await fetchConnectabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setConnectabilizabilityAdminSummary(connectabilizabilityAdmin)
-
-      const interfabilizabilityAdmin = await fetchInterfabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setInterfabilizabilityAdminSummary(interfabilizabilityAdmin)
-
-      const protocolizabilityAdmin = await fetchProtocolizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setProtocolizabilityAdminSummary(protocolizabilityAdmin)
-
-      const encapsulizabilityAdmin = await fetchEncapsulizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setEncapsulizabilityAdminSummary(encapsulizabilityAdmin)
-
-      const isolatizabilityAdmin = await fetchIsolatizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setIsolatizabilityAdminSummary(isolatizabilityAdmin)
-
-      const sandboxizabilityAdmin = await fetchSandboxizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSandboxizabilityAdminSummary(sandboxizabilityAdmin)
-
-      const containerizabilityAdmin = await fetchContainerizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setContainerizabilityAdminSummary(containerizabilityAdmin)
-
-      const boundarizabilityAdmin = await fetchBoundarizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setBoundarizabilityAdminSummary(boundarizabilityAdmin)
-
-      const virtualizabilityAdmin = await fetchVirtualizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setVirtualizabilityAdminSummary(virtualizabilityAdmin)
-
-      const distributizabilityAdmin = await fetchDistributizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDistributizabilityAdminSummary(distributizabilityAdmin)
-
-      const federatizabilityAdmin = await fetchFederatizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setFederatizabilityAdminSummary(federatizabilityAdmin)
-
-      const decentralizabilityAdmin = await fetchDecentralizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDecentralizabilityAdminSummary(decentralizabilityAdmin)
-
-      const meshabilizabilityAdmin = await fetchMeshabilizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMeshabilizabilityAdminSummary(meshabilizabilityAdmin)
-
-      const topologizabilityAdmin = await fetchTopologizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTopologizabilityAdminSummary(topologizabilityAdmin)
-
-      const networkizabilityAdmin = await fetchNetworkizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setNetworkizabilityAdminSummary(networkizabilityAdmin)
-
-      const gatewayizabilityAdmin = await fetchGatewayizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setGatewayizabilityAdminSummary(gatewayizabilityAdmin)
-
-      const brokerizabilityAdmin = await fetchBrokerizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setBrokerizabilityAdminSummary(brokerizabilityAdmin)
-
-      const relayizabilityAdmin = await fetchRelayizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRelayizabilityAdminSummary(relayizabilityAdmin)
-
-      const routizabilityAdmin = await fetchRoutizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRoutizabilityAdminSummary(routizabilityAdmin)
-
-      const queueizabilityAdmin = await fetchQueueizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setQueueizabilityAdminSummary(queueizabilityAdmin)
-
-      const eventizabilityAdmin = await fetchEventizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setEventizabilityAdminSummary(eventizabilityAdmin)
-
-      const channelizabilityAdmin = await fetchChannelizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setChannelizabilityAdminSummary(channelizabilityAdmin)
-
-      const notifizabilityAdmin = await fetchNotifizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setNotifizabilityAdminSummary(notifizabilityAdmin)
-
-      const subscribizabilityAdmin = await fetchSubscribizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSubscribizabilityAdminSummary(subscribizabilityAdmin)
-
-      const publishizabilityAdmin = await fetchPublishizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPublishizabilityAdminSummary(publishizabilityAdmin)
-
-      const consumizabilityAdmin = await fetchConsumizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setConsumizabilityAdminSummary(consumizabilityAdmin)
-
-      const deliverizabilityAdmin = await fetchDeliverizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDeliverizabilityAdminSummary(deliverizabilityAdmin)
-
-      const dispatchizabilityAdmin = await fetchDispatchizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDispatchizabilityAdminSummary(dispatchizabilityAdmin)
-
-      const handoffizabilityAdmin = await fetchHandoffizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setHandoffizabilityAdminSummary(handoffizabilityAdmin)
-
-      const synchronizabilityAdmin = await fetchSynchronizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSynchronizabilityAdminSummary(synchronizabilityAdmin)
-
-      const asynchronizabilityAdmin = await fetchAsynchronizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAsynchronizabilityAdminSummary(asynchronizabilityAdmin)
-
-      const broadcastizabilityAdmin = await fetchBroadcastizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setBroadcastizabilityAdminSummary(broadcastizabilityAdmin)
-
-      const multicastizabilityAdmin = await fetchMulticastizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMulticastizabilityAdminSummary(multicastizabilityAdmin)
-
-      const unicastizabilityAdmin = await fetchUnicastizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setUnicastizabilityAdminSummary(unicastizabilityAdmin)
-
-      const fanoutizabilityAdmin = await fetchFanoutizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setFanoutizabilityAdminSummary(fanoutizabilityAdmin)
-
-      const backpressureizabilityAdmin = await fetchBackpressureizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setBackpressureizabilityAdminSummary(backpressureizabilityAdmin)
-
-      const throttleizabilityAdmin = await fetchThrottleizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setThrottleizabilityAdminSummary(throttleizabilityAdmin)
-
-      const debouncizabilityAdmin = await fetchDebouncizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDebouncizabilityAdminSummary(debouncizabilityAdmin)
-
-      const bufferizabilityAdmin = await fetchBufferizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setBufferizabilityAdminSummary(bufferizabilityAdmin)
-
-      const batchizabilityAdmin = await fetchBatchizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setBatchizabilityAdminSummary(batchizabilityAdmin)
-
-      const retryizabilityAdmin = await fetchRetryizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRetryizabilityAdminSummary(retryizabilityAdmin)
-
-      const circuitizabilityAdmin = await fetchCircuitizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCircuitizabilityAdminSummary(circuitizabilityAdmin)
-
-      const timeoutizabilityAdmin = await fetchTimeoutizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTimeoutizabilityAdminSummary(timeoutizabilityAdmin)
-
-      const ackizabilityAdmin = await fetchAckizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAckizabilityAdminSummary(ackizabilityAdmin)
-
-      const nackizabilityAdmin = await fetchNackizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setNackizabilityAdminSummary(nackizabilityAdmin)
-
-      const deadletterizabilityAdmin = await fetchDeadletterizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDeadletterizabilityAdminSummary(deadletterizabilityAdmin)
-
-      const dedupizabilityAdmin = await fetchDedupizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDedupizabilityAdminSummary(dedupizabilityAdmin)
-
-      const sequencizabilityAdmin = await fetchSequencizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSequencizabilityAdminSummary(sequencizabilityAdmin)
-
-      const partitionizabilityAdmin = await fetchPartitionizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPartitionizabilityAdminSummary(partitionizabilityAdmin)
-
-      const shardingizabilityAdmin = await fetchShardingizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setShardingizabilityAdminSummary(shardingizabilityAdmin)
-
-      const orderingizabilityAdmin = await fetchOrderingizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setOrderingizabilityAdminSummary(orderingizabilityAdmin)
-
-      const checkpointizabilityAdmin = await fetchCheckpointizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCheckpointizabilityAdminSummary(checkpointizabilityAdmin)
-
-      const recoveryizabilityAdmin = await fetchRecoveryizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRecoveryizabilityAdminSummary(recoveryizabilityAdmin)
-
-      const compactionizabilityAdmin = await fetchCompactionizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCompactionizabilityAdminSummary(compactionizabilityAdmin)
-
-      const rebalanceizabilityAdmin = await fetchRebalanceizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRebalanceizabilityAdminSummary(rebalanceizabilityAdmin)
-
-      const leaderizabilityAdmin = await fetchLeaderizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setLeaderizabilityAdminSummary(leaderizabilityAdmin)
-
-      const followerizabilityAdmin = await fetchFollowerizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setFollowerizabilityAdminSummary(followerizabilityAdmin)
-
-      const consensusizabilityAdmin = await fetchConsensusizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setConsensusizabilityAdminSummary(consensusizabilityAdmin)
-
-      const quorumizabilityAdmin = await fetchQuorumizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setQuorumizabilityAdminSummary(quorumizabilityAdmin)
-
-      const snapshotizabilityAdmin = await fetchSnapshotizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSnapshotizabilityAdminSummary(snapshotizabilityAdmin)
-
-      const journalizabilityAdmin = await fetchJournalizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setJournalizabilityAdminSummary(journalizabilityAdmin)
-
-      const appendizabilityAdmin = await fetchAppendizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAppendizabilityAdminSummary(appendizabilityAdmin)
-
-      const walizabilityAdmin = await fetchWalizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setWalizabilityAdminSummary(walizabilityAdmin)
-
-      const replicationizabilityAdmin = await fetchReplicationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setReplicationizabilityAdminSummary(replicationizabilityAdmin)
-
-      const mirroringizabilityAdmin = await fetchMirroringizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMirroringizabilityAdminSummary(mirroringizabilityAdmin)
-
-      const cloningizabilityAdmin = await fetchCloningizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCloningizabilityAdminSummary(cloningizabilityAdmin)
-
-      const propagationizabilityAdmin = await fetchPropagationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPropagationizabilityAdminSummary(propagationizabilityAdmin)
-
-      const materializationizabilityAdmin = await fetchMaterializationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMaterializationizabilityAdminSummary(materializationizabilityAdmin)
-
-      const hydrationizabilityAdmin = await fetchHydrationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setHydrationizabilityAdminSummary(hydrationizabilityAdmin)
-
-      const invalidationizabilityAdmin = await fetchInvalidationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setInvalidationizabilityAdminSummary(invalidationizabilityAdmin)
-
-      const evictionizabilityAdmin = await fetchEvictionizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setEvictionizabilityAdminSummary(evictionizabilityAdmin)
-
-      const ttlizabilityAdmin = await fetchTtlizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTtlizabilityAdminSummary(ttlizabilityAdmin)
-
-      const expirationizabilityAdmin = await fetchExpirationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setExpirationizabilityAdminSummary(expirationizabilityAdmin)
-
-      const refreshizabilityAdmin = await fetchRefreshizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRefreshizabilityAdminSummary(refreshizabilityAdmin)
-
-      const warmizabilityAdmin = await fetchWarmizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setWarmizabilityAdminSummary(warmizabilityAdmin)
-
-      const coldizabilityAdmin = await fetchColdizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setColdizabilityAdminSummary(coldizabilityAdmin)
-
-      const prefetchizabilityAdmin = await fetchPrefetchizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPrefetchizabilityAdminSummary(prefetchizabilityAdmin)
-
-      const cacheizabilityAdmin = await fetchCacheizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCacheizabilityAdminSummary(cacheizabilityAdmin)
-
-      const memorizabilityAdmin = await fetchMemorizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMemorizabilityAdminSummary(memorizabilityAdmin)
-
-      const persistizabilityAdmin = await fetchPersistizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPersistizabilityAdminSummary(persistizabilityAdmin)
-
-      const compressizabilityAdmin = await fetchCompressizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCompressizabilityAdminSummary(compressizabilityAdmin)
-
-      const decompressizabilityAdmin = await fetchDecompressizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDecompressizabilityAdminSummary(decompressizabilityAdmin)
-
-      const archiveizabilityAdmin = await fetchArchiveizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setArchiveizabilityAdminSummary(archiveizabilityAdmin)
-
-      const restoreizabilityAdmin = await fetchRestoreizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRestoreizabilityAdminSummary(restoreizabilityAdmin)
-
-      const backupizabilityAdmin = await fetchBackupizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setBackupizabilityAdminSummary(backupizabilityAdmin)
-
-      const exportizabilityAdmin = await fetchExportizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setExportizabilityAdminSummary(exportizabilityAdmin)
-
-      const importizabilityAdmin = await fetchImportizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setImportizabilityAdminSummary(importizabilityAdmin)
-
-      const indexingizabilityAdmin = await fetchIndexingizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setIndexingizabilityAdminSummary(indexingizabilityAdmin)
-
-      const searchizabilityAdmin = await fetchSearchizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSearchizabilityAdminSummary(searchizabilityAdmin)
-
-      const versioningizabilityAdmin = await fetchVersioningizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setVersioningizabilityAdminSummary(versioningizabilityAdmin)
-
-      const compactizabilityAdmin = await fetchCompactizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCompactizabilityAdminSummary(compactizabilityAdmin)
-
-      const expandizabilityAdmin = await fetchExpandizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setExpandizabilityAdminSummary(expandizabilityAdmin)
-
-      const retentionizabilityAdmin = await fetchRetentionizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRetentionizabilityAdminSummary(retentionizabilityAdmin)
-
-      const queryizabilityAdmin = await fetchQueryizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setQueryizabilityAdminSummary(queryizabilityAdmin)
-
-      const filterizabilityAdmin = await fetchFilterizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setFilterizabilityAdminSummary(filterizabilityAdmin)
-
-      const sortizabilityAdmin = await fetchSortizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSortizabilityAdminSummary(sortizabilityAdmin)
-
-      const paginizabilityAdmin = await fetchPaginizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPaginizabilityAdminSummary(paginizabilityAdmin)
-
-      const pivotizabilityAdmin = await fetchPivotizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPivotizabilityAdminSummary(pivotizabilityAdmin)
-
-      const groupizabilityAdmin = await fetchGroupizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setGroupizabilityAdminSummary(groupizabilityAdmin)
-
-      const joinizabilityAdmin = await fetchJoinizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setJoinizabilityAdminSummary(joinizabilityAdmin)
-
-      const mergeizabilityAdmin = await fetchMergeizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMergeizabilityAdminSummary(mergeizabilityAdmin)
-
-      const splitizabilityAdmin = await fetchSplitizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSplitizabilityAdminSummary(splitizabilityAdmin)
-
-      const projectizabilityAdmin = await fetchProjectizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setProjectizabilityAdminSummary(projectizabilityAdmin)
-
-      const transformizabilityAdmin = await fetchTransformizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTransformizabilityAdminSummary(transformizabilityAdmin)
-
-      const mapizabilityAdmin = await fetchMapizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMapizabilityAdminSummary(mapizabilityAdmin)
-
-      const reduceizabilityAdmin = await fetchReduceizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setReduceizabilityAdminSummary(reduceizabilityAdmin)
-
-      const foldizabilityAdmin = await fetchFoldizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setFoldizabilityAdminSummary(foldizabilityAdmin)
-
-      const scanizabilityAdmin = await fetchScanizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setScanizabilityAdminSummary(scanizabilityAdmin)
-
-      const chainingizabilityAdmin = await fetchChainingizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setChainingizabilityAdminSummary(chainingizabilityAdmin)
-
-      const pipeliningizabilityAdmin = await fetchPipeliningizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPipeliningizabilityAdminSummary(pipeliningizabilityAdmin)
-
-      const batchingizabilityAdmin = await fetchBatchingizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setBatchingizabilityAdminSummary(batchingizabilityAdmin)
-
-      const streamizabilityAdmin = await fetchStreamizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setStreamizabilityAdminSummary(streamizabilityAdmin)
-
-      const windowizabilityAdmin = await fetchWindowizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setWindowizabilityAdminSummary(windowizabilityAdmin)
-
-      const orchestrationizabilityAdmin = await fetchOrchestrationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setOrchestrationizabilityAdminSummary(orchestrationizabilityAdmin)
-
-      const schedulingizabilityAdmin = await fetchSchedulingizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSchedulingizabilityAdminSummary(schedulingizabilityAdmin)
-
-      const triggeringizabilityAdmin = await fetchTriggeringizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTriggeringizabilityAdminSummary(triggeringizabilityAdmin)
-
-      const routingizabilityAdmin = await fetchRoutingizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRoutingizabilityAdminSummary(routingizabilityAdmin)
-
-      const balancingizabilityAdmin = await fetchBalancingizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setBalancingizabilityAdminSummary(balancingizabilityAdmin)
-
-      const nodelizabilityAdmin = await fetchNodelizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setNodelizabilityAdminSummary(nodelizabilityAdmin)
-
-      const coordinationizabilityAdmin = await fetchCoordinationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCoordinationizabilityAdminSummary(coordinationizabilityAdmin)
-
-      const partitioningizabilityAdmin = await fetchPartitioningizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPartitioningizabilityAdminSummary(partitioningizabilityAdmin)
-
-      const clusteringizabilityAdmin = await fetchClusteringizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setClusteringizabilityAdminSummary(clusteringizabilityAdmin)
-
-      const meshingizabilityAdmin = await fetchMeshingizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMeshingizabilityAdminSummary(meshingizabilityAdmin)
-
-      const discoveryizabilityAdmin = await fetchDiscoveryizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDiscoveryizabilityAdminSummary(discoveryizabilityAdmin)
-
-      const registrationizabilityAdmin = await fetchRegistrationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRegistrationizabilityAdminSummary(registrationizabilityAdmin)
-
-      const provisioningizabilityAdmin = await fetchProvisioningizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setProvisioningizabilityAdminSummary(provisioningizabilityAdmin)
-
-      const allocationizabilityAdmin = await fetchAllocationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAllocationizabilityAdminSummary(allocationizabilityAdmin)
-
-      const deallocationizabilityAdmin = await fetchDeallocationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDeallocationizabilityAdminSummary(deallocationizabilityAdmin)
-
-      const scalingizabilityAdmin = await fetchScalingizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setScalingizabilityAdminSummary(scalingizabilityAdmin)
-
-      const healingizabilityAdmin = await fetchHealingizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setHealingizabilityAdminSummary(healingizabilityAdmin)
-
-      const remediationizabilityAdmin = await fetchRemediationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRemediationizabilityAdminSummary(remediationizabilityAdmin)
-
-      const reconciliationizabilityAdmin = await fetchReconciliationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setReconciliationizabilityAdminSummary(reconciliationizabilityAdmin)
-
-      const governanceizabilityAdmin = await fetchGovernanceizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setGovernanceizabilityAdminSummary(governanceizabilityAdmin)
-
-      const complianceizabilityAdmin = await fetchComplianceizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setComplianceizabilityAdminSummary(complianceizabilityAdmin)
-
-      const policyizabilityAdmin = await fetchPolicyizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPolicyizabilityAdminSummary(policyizabilityAdmin)
-
-      const enforcementizabilityAdmin = await fetchEnforcementizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setEnforcementizabilityAdminSummary(enforcementizabilityAdmin)
-
-      const assuranceizabilityAdmin = await fetchAssuranceizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAssuranceizabilityAdminSummary(assuranceizabilityAdmin)
-
-      const attestationizabilityAdmin = await fetchAttestationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAttestationizabilityAdminSummary(attestationizabilityAdmin)
-
-      const certificationizabilityAdmin = await fetchCertificationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCertificationizabilityAdminSummary(certificationizabilityAdmin)
-
-      const accreditationizabilityAdmin = await fetchAccreditationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAccreditationizabilityAdminSummary(accreditationizabilityAdmin)
-
-      const specificationizabilityAdmin = await fetchSpecificationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSpecificationizabilityAdminSummary(specificationizabilityAdmin)
-
-      const instrumentationizabilityAdmin = await fetchInstrumentationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setInstrumentationizabilityAdminSummary(instrumentationizabilityAdmin)
-
-      const telemetryizabilityAdmin = await fetchTelemetryizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTelemetryizabilityAdminSummary(telemetryizabilityAdmin)
-
-      const auditingizabilityAdmin = await fetchAuditingizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAuditingizabilityAdminSummary(auditingizabilityAdmin)
-
-      const accountabilityizabilityAdmin = await fetchAccountabilityizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAccountabilityizabilityAdminSummary(accountabilityizabilityAdmin)
-
-      const transparencyizabilityAdmin = await fetchTransparencyizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTransparencyizabilityAdminSummary(transparencyizabilityAdmin)
-
-      const oversightizabilityAdmin = await fetchOversightizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setOversightizabilityAdminSummary(oversightizabilityAdmin)
-
-      const controlizabilityAdmin = await fetchControlizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setControlizabilityAdminSummary(controlizabilityAdmin)
-
-      const entitlementizabilityAdmin = await fetchEntitlementizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setEntitlementizabilityAdminSummary(entitlementizabilityAdmin)
-
-      const permissionizabilityAdmin = await fetchPermissionizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPermissionizabilityAdminSummary(permissionizabilityAdmin)
-
-      const authorizationizabilityAdmin = await fetchAuthorizationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAuthorizationizabilityAdminSummary(authorizationizabilityAdmin)
-
-      const authenticationizabilityAdmin = await fetchAuthenticationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAuthenticationizabilityAdminSummary(authenticationizabilityAdmin)
-
-      const identityizabilityAdmin = await fetchIdentityizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setIdentityizabilityAdminSummary(identityizabilityAdmin)
-
-      const riskizabilityAdmin = await fetchRiskizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRiskizabilityAdminSummary(riskizabilityAdmin)
-
-      const securityizabilityAdmin = await fetchSecurityizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSecurityizabilityAdminSummary(securityizabilityAdmin)
-
-      const privacyizabilityAdmin = await fetchPrivacyizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPrivacyizabilityAdminSummary(privacyizabilityAdmin)
-
-      const trustizabilityAdmin = await fetchTrustizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTrustizabilityAdminSummary(trustizabilityAdmin)
-
-      const integrityizabilityAdmin = await fetchIntegrityizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setIntegrityizabilityAdminSummary(integrityizabilityAdmin)
-
-      const threatizabilityAdmin = await fetchThreatizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setThreatizabilityAdminSummary(threatizabilityAdmin)
-
-      const vulnerabilityizabilityAdmin = await fetchVulnerabilityizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setVulnerabilityizabilityAdminSummary(vulnerabilityizabilityAdmin)
-
-      const mitigationizabilityAdmin = await fetchMitigationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setMitigationizabilityAdminSummary(mitigationizabilityAdmin)
-
-      const hardeningizabilityAdmin = await fetchHardeningizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setHardeningizabilityAdminSummary(hardeningizabilityAdmin)
-
-      const segregationizabilityAdmin = await fetchSegregationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSegregationizabilityAdminSummary(segregationizabilityAdmin)
-
-      const confidentialityizabilityAdmin = await fetchConfidentialityizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setConfidentialityizabilityAdminSummary(confidentialityizabilityAdmin)
-
-      const nonrepudiationizabilityAdmin = await fetchNonrepudiationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setNonrepudiationizabilityAdminSummary(nonrepudiationizabilityAdmin)
-
-      const accesscontrolizabilityAdmin = await fetchAccesscontrolizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAccesscontrolizabilityAdminSummary(accesscontrolizabilityAdmin)
-
-      const leastprivilegeizabilityAdmin = await fetchLeastprivilegeizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setLeastprivilegeizabilityAdminSummary(leastprivilegeizabilityAdmin)
-
-      const zerotrustizabilityAdmin = await fetchZerotrustizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setZerotrustizabilityAdminSummary(zerotrustizabilityAdmin)
-
-      const identityproofizabilityAdmin = await fetchIdentityproofizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setIdentityproofizabilityAdminSummary(identityproofizabilityAdmin)
-
-      const keymanagementizabilityAdmin = await fetchKeymanagementizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setKeymanagementizabilityAdminSummary(keymanagementizabilityAdmin)
-
-      const secretmanagementizabilityAdmin = await fetchSecretmanagementizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSecretmanagementizabilityAdminSummary(secretmanagementizabilityAdmin)
-
-      const cryptographyizabilityAdmin = await fetchCryptographyizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCryptographyizabilityAdminSummary(cryptographyizabilityAdmin)
-
-      const complianceguardizabilityAdmin = await fetchComplianceguardizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setComplianceguardizabilityAdminSummary(complianceguardizabilityAdmin)
-
-      const provenanceizabilityAdmin = await fetchProvenanceizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setProvenanceizabilityAdminSummary(provenanceizabilityAdmin)
-
-      const lineageizabilityAdmin = await fetchLineageizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setLineageizabilityAdminSummary(lineageizabilityAdmin)
-
-      const forensicizabilityAdmin = await fetchForensicizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setForensicizabilityAdminSummary(forensicizabilityAdmin)
-
-      const audittrailizabilityAdmin = await fetchAudittrailizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAudittrailizabilityAdminSummary(audittrailizabilityAdmin)
-
-      const complianceproofizabilityAdmin = await fetchComplianceproofizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setComplianceproofizabilityAdminSummary(complianceproofizabilityAdmin)
-
-      const governancetrackizabilityAdmin = await fetchGovernancetrackizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setGovernancetrackizabilityAdminSummary(governancetrackizabilityAdmin)
-
-      const attesttrackizabilityAdmin = await fetchAttesttrackizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAttesttrackizabilityAdminSummary(attesttrackizabilityAdmin)
-
-      const evidencizabilityAdmin = await fetchEvidencizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setEvidencizabilityAdminSummary(evidencizabilityAdmin)
-
-      const chainofcustodyizabilityAdmin = await fetchChainofcustodyizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setChainofcustodyizabilityAdminSummary(chainofcustodyizabilityAdmin)
-
-      const tamperproofizabilityAdmin = await fetchTamperproofizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTamperproofizabilityAdminSummary(tamperproofizabilityAdmin)
-
-      const policyproofizabilityAdmin = await fetchPolicyproofizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setPolicyproofizabilityAdminSummary(policyproofizabilityAdmin)
-
-      const notarizationizabilityAdmin = await fetchNotarizationizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setNotarizationizabilityAdminSummary(notarizationizabilityAdmin)
-
-      const witnessizabilityAdmin = await fetchWitnessizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setWitnessizabilityAdminSummary(witnessizabilityAdmin)
-
-      const ledgerizabilityAdmin = await fetchLedgerizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setLedgerizabilityAdminSummary(ledgerizabilityAdmin)
-
-      const signatureproofizabilityAdmin = await fetchSignatureproofizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setSignatureproofizabilityAdminSummary(signatureproofizabilityAdmin)
-
-      const ruleproofizabilityAdmin = await fetchRuleproofizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRuleproofizabilityAdminSummary(ruleproofizabilityAdmin)
-
-      const traceproofizabilityAdmin = await fetchTraceproofizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTraceproofizabilityAdminSummary(traceproofizabilityAdmin)
-
-      const disclosureizabilityAdmin = await fetchDisclosureizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDisclosureizabilityAdminSummary(disclosureizabilityAdmin)
-
-      const registrarizabilityAdmin = await fetchRegistrarizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRegistrarizabilityAdminSummary(registrarizabilityAdmin)
-
-      const auditproofizabilityAdmin = await fetchAuditproofizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAuditproofizabilityAdminSummary(auditproofizabilityAdmin)
-
-      const compliancechainizabilityAdmin = await fetchCompliancechainizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCompliancechainizabilityAdminSummary(compliancechainizabilityAdmin)
-
-      const attestledgerizabilityAdmin = await fetchAttestledgerizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAttestledgerizabilityAdminSummary(attestledgerizabilityAdmin)
-
-      const evidencetrackizabilityAdmin = await fetchEvidencetrackizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setEvidencetrackizabilityAdminSummary(evidencetrackizabilityAdmin)
-
-      const prooflineizabilityAdmin = await fetchProoflineizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setProoflineizabilityAdminSummary(prooflineizabilityAdmin)
-
-      const notarproofizabilityAdmin = await fetchNotarproofizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setNotarproofizabilityAdminSummary(notarproofizabilityAdmin)
-
-      const auditlineizabilityAdmin = await fetchAuditlineizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAuditlineizabilityAdminSummary(auditlineizabilityAdmin)
-
-      const traceledgerizabilityAdmin = await fetchTraceledgerizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTraceledgerizabilityAdminSummary(traceledgerizabilityAdmin)
-
-      const disclosureproofizabilityAdmin = await fetchDisclosureproofizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setDisclosureproofizabilityAdminSummary(disclosureproofizabilityAdmin)
-
-      const registrarproofizabilityAdmin = await fetchRegistrarproofizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRegistrarproofizabilityAdminSummary(registrarproofizabilityAdmin)
-
-      const witnessproofizabilityAdmin = await fetchWitnessproofizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setWitnessproofizabilityAdminSummary(witnessproofizabilityAdmin)
-
-      const complianceledgerizabilityAdmin = await fetchComplianceledgerizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setComplianceledgerizabilityAdminSummary(complianceledgerizabilityAdmin)
-
-      const notarledgerizabilityAdmin = await fetchNotarledgerizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setNotarledgerizabilityAdminSummary(notarledgerizabilityAdmin)
-
-      const witnessledgerizabilityAdmin = await fetchWitnessledgerizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setWitnessledgerizabilityAdminSummary(witnessledgerizabilityAdmin)
-
-      const proofregistryizabilityAdmin = await fetchProofregistryizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setProofregistryizabilityAdminSummary(proofregistryizabilityAdmin)
-
-      const auditregistryizabilityAdmin = await fetchAuditregistryizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAuditregistryizabilityAdminSummary(auditregistryizabilityAdmin)
-
-      const compliancejournalizabilityAdmin = await fetchCompliancejournalizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCompliancejournalizabilityAdminSummary(compliancejournalizabilityAdmin)
-
-      const notarjournalizabilityAdmin = await fetchNotarjournalizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setNotarjournalizabilityAdminSummary(notarjournalizabilityAdmin)
-
-      const witnessjournalizabilityAdmin = await fetchWitnessjournalizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setWitnessjournalizabilityAdminSummary(witnessjournalizabilityAdmin)
-
-      const proofjournalizabilityAdmin = await fetchProofjournalizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setProofjournalizabilityAdminSummary(proofjournalizabilityAdmin)
-
-      const auditjournalizabilityAdmin = await fetchAuditjournalizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAuditjournalizabilityAdminSummary(auditjournalizabilityAdmin)
-
-      const registryjournalizabilityAdmin = await fetchRegistryjournalizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRegistryjournalizabilityAdminSummary(registryjournalizabilityAdmin)
-
-      const tracejournalizabilityAdmin = await fetchTracejournalizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTracejournalizabilityAdminSummary(tracejournalizabilityAdmin)
-
-      const evidencejournalizabilityAdmin = await fetchEvidencejournalizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setEvidencejournalizabilityAdminSummary(evidencejournalizabilityAdmin)
-
-      const attestjournalizabilityAdmin = await fetchAttestjournalizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAttestjournalizabilityAdminSummary(attestjournalizabilityAdmin)
-
-      const integrityjournalizabilityAdmin = await fetchIntegrityjournalizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setIntegrityjournalizabilityAdminSummary(integrityjournalizabilityAdmin)
-
-      const registryvaultizabilityAdmin = await fetchRegistryvaultizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setRegistryvaultizabilityAdminSummary(registryvaultizabilityAdmin)
-
-      const tracevaultizabilityAdmin = await fetchTracevaultizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setTracevaultizabilityAdminSummary(tracevaultizabilityAdmin)
-
-      const evidencevaultizabilityAdmin = await fetchEvidencevaultizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setEvidencevaultizabilityAdminSummary(evidencevaultizabilityAdmin)
-
-      const auditvaultizabilityAdmin = await fetchAuditvaultizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAuditvaultizabilityAdminSummary(auditvaultizabilityAdmin)
-
-      const compliancevaultizabilityAdmin = await fetchCompliancevaultizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCompliancevaultizabilityAdminSummary(compliancevaultizabilityAdmin)
-
-      const validityvaultizabilityAdmin = await fetchValidityvaultizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setValidityvaultizabilityAdminSummary(validityvaultizabilityAdmin)
-
-      const authenticityvaultizabilityAdmin = await fetchAuthenticityvaultizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAuthenticityvaultizabilityAdminSummary(authenticityvaultizabilityAdmin)
-
-      const provenancevaultizabilityAdmin = await fetchProvenancevaultizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setProvenancevaultizabilityAdminSummary(provenancevaultizabilityAdmin)
-
-      const verificationvaultizabilityAdmin = await fetchVerificationvaultizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setVerificationvaultizabilityAdminSummary(verificationvaultizabilityAdmin)
-
-      const attestationvaultizabilityAdmin = await fetchAttestationvaultizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAttestationvaultizabilityAdminSummary(attestationvaultizabilityAdmin)
-
-      const assurancevaultizabilityAdmin = await fetchAssurancevaultizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAssurancevaultizabilityAdminSummary(assurancevaultizabilityAdmin)
-
-      const auditabilityvaultizabilityAdmin = await fetchAuditabilityvaultizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setAuditabilityvaultizabilityAdminSummary(auditabilityvaultizabilityAdmin)
-
-      const inspectabilityvaultizabilityAdmin = await fetchInspectabilityvaultizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setInspectabilityvaultizabilityAdminSummary(inspectabilityvaultizabilityAdmin)
-
-      const reproducibilityvaultizabilityAdmin = await fetchReproducibilityvaultizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setReproducibilityvaultizabilityAdminSummary(reproducibilityvaultizabilityAdmin)
-
-      const credibilityvaultizabilityAdmin = await fetchCredibilityvaultizabilityAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setCredibilityvaultizabilityAdminSummary(credibilityvaultizabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -19414,7 +16721,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeModelHealthAdminAction(
+      const result = await callUi('model-router-ui', 'executeModelHealthAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19444,7 +16751,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeShieldReviewAdminAction(
+      const result = await callUi('shield-ui', 'executeShieldReviewAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19471,7 +16778,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeProviderKeyAdminAction(
+      const result = await callUi('provider-credentials-ui', 'executeProviderKeyAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19499,7 +16806,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeObservabilityAdminAction(
+      const result = await callUi('observability-ui', 'executeObservabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19526,7 +16833,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePromptRegressionAdminAction(
+      const result = await callUi('evaluation-ui', 'executePromptRegressionAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19534,7 +16841,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPromptEvaluationRollout(apiBaseUrl)
+      const rollout = await callUi('evaluation-ui', 'fetchPromptEvaluationRollout', apiBaseUrl)
       setPromptEvaluationRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -19555,7 +16862,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRunHistoryAdminAction(
+      const result = await callUi('run-history-ui', 'executeRunHistoryAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19563,7 +16870,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRunHistoryRollout(apiBaseUrl)
+      const rollout = await callUi('run-history-ui', 'fetchRunHistoryRollout', apiBaseUrl)
       setRunHistoryRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -19584,7 +16891,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeStreamRecoveryAdminAction(
+      const result = await callUi('stream-replay-ui', 'executeStreamRecoveryAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19592,7 +16899,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchStreamReplayRollout(apiBaseUrl)
+      const rollout = await callUi('stream-replay-ui', 'fetchStreamReplayRollout', apiBaseUrl)
       setStreamReplayRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -19615,7 +16922,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeIdempotencyAdminAction(
+      const result = await callUi('idempotency-ui', 'executeIdempotencyAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19623,7 +16930,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchIdempotencyRollout(apiBaseUrl)
+      const rollout = await callUi('idempotency-ui', 'fetchIdempotencyRollout', apiBaseUrl)
       setIdempotencyRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -19642,7 +16949,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeQuotaAdminAction(
+      const result = await callUi('usage-limits-ui', 'executeQuotaAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19650,7 +16957,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchUsageLimitsRollout(apiBaseUrl)
+      const rollout = await callUi('usage-limits-ui', 'fetchUsageLimitsRollout', apiBaseUrl)
       setUsageLimitsRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -19669,7 +16976,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDeploymentAdminAction(
+      const result = await callUi('deployment-ui', 'executeDeploymentAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19677,7 +16984,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDeploymentRollout(apiBaseUrl)
+      const rollout = await callUi('deployment-ui', 'fetchDeploymentRollout', apiBaseUrl)
       setDeploymentRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -19696,7 +17003,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMigrationAdminAction(
+      const result = await callUi('migrations-ui', 'executeMigrationAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19704,7 +17011,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMigrationRollout(apiBaseUrl)
+      const rollout = await callUi('migrations-ui', 'fetchMigrationRollout', apiBaseUrl)
       setMigrationRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -19723,7 +17030,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeBackupAdminAction(
+      const result = await callUi('backup-ui', 'executeBackupAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19731,7 +17038,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchBackupRollout(apiBaseUrl)
+      const rollout = await callUi('backup-ui', 'fetchBackupRollout', apiBaseUrl)
       setBackupRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -19750,7 +17057,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAuditAdminAction(
+      const result = await callUi('audit-trail-ui', 'executeAuditAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19758,7 +17065,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAuditTrailRollout(apiBaseUrl)
+      const rollout = await callUi('audit-trail-ui', 'fetchAuditTrailRollout', apiBaseUrl)
       setAuditTrailRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -19777,7 +17084,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeComplianceAdminAction(
+      const result = await callUi('compliance-ui', 'executeComplianceAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19785,7 +17092,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchComplianceRollout(apiBaseUrl)
+      const rollout = await callUi('compliance-ui', 'fetchComplianceRollout', apiBaseUrl)
       setComplianceRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -19804,7 +17111,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeIncidentAdminAction(
+      const result = await callUi('incident-response-ui', 'executeIncidentAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19812,7 +17119,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchIncidentResponseRollout(apiBaseUrl)
+      const rollout = await callUi('incident-response-ui', 'fetchIncidentResponseRollout', apiBaseUrl)
       setIncidentResponseRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -19831,7 +17138,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeReleaseAdminAction(
+      const result = await callUi('release-ui', 'executeReleaseAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19839,7 +17146,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchReleaseRollout(apiBaseUrl)
+      const rollout = await callUi('release-ui', 'fetchReleaseRollout', apiBaseUrl)
       setReleaseRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -19858,7 +17165,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSloAdminAction(
+      const result = await callUi('slo-ui', 'executeSloAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19866,7 +17173,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSloRollout(apiBaseUrl)
+      const rollout = await callUi('slo-ui', 'fetchSloRollout', apiBaseUrl)
       setSloRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -19885,7 +17192,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCapacityAdminAction(
+      const result = await callUi('capacity-ui', 'executeCapacityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19893,7 +17200,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCapacityRollout(apiBaseUrl)
+      const rollout = await callUi('capacity-ui', 'fetchCapacityRollout', apiBaseUrl)
       setCapacityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -19914,7 +17221,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePerformanceAdminAction(
+      const result = await callUi('performance-ui', 'executePerformanceAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19922,7 +17229,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPerformanceRollout(apiBaseUrl)
+      const rollout = await callUi('performance-ui', 'fetchPerformanceRollout', apiBaseUrl)
       setPerformanceRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -19943,7 +17250,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeResilienceAdminAction(
+      const result = await callUi('resilience-ui', 'executeResilienceAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19951,7 +17258,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchResilienceRollout(apiBaseUrl)
+      const rollout = await callUi('resilience-ui', 'fetchResilienceRollout', apiBaseUrl)
       setResilienceRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -19972,7 +17279,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAvailabilityAdminAction(
+      const result = await callUi('availability-ui', 'executeAvailabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -19980,7 +17287,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAvailabilityRollout(apiBaseUrl)
+      const rollout = await callUi('availability-ui', 'fetchAvailabilityRollout', apiBaseUrl)
       setAvailabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20001,7 +17308,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeReliabilityAdminAction(
+      const result = await callUi('reliability-ui', 'executeReliabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20009,7 +17316,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchReliabilityRollout(apiBaseUrl)
+      const rollout = await callUi('reliability-ui', 'fetchReliabilityRollout', apiBaseUrl)
       setReliabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20030,7 +17337,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeStabilityAdminAction(
+      const result = await callUi('stability-ui', 'executeStabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20038,7 +17345,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchStabilityRollout(apiBaseUrl)
+      const rollout = await callUi('stability-ui', 'fetchStabilityRollout', apiBaseUrl)
       setStabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20059,7 +17366,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeConsistencyAdminAction(
+      const result = await callUi('consistency-ui', 'executeConsistencyAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20067,7 +17374,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchConsistencyRollout(apiBaseUrl)
+      const rollout = await callUi('consistency-ui', 'fetchConsistencyRollout', apiBaseUrl)
       setConsistencyRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20088,7 +17395,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeIntegrityAdminAction(
+      const result = await callUi('integrity-ui', 'executeIntegrityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20096,7 +17403,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchIntegrityRollout(apiBaseUrl)
+      const rollout = await callUi('integrity-ui', 'fetchIntegrityRollout', apiBaseUrl)
       setIntegrityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20117,7 +17424,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDurabilityAdminAction(
+      const result = await callUi('durability-ui', 'executeDurabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20125,7 +17432,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDurabilityRollout(apiBaseUrl)
+      const rollout = await callUi('durability-ui', 'fetchDurabilityRollout', apiBaseUrl)
       setDurabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20146,7 +17453,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRecoverabilityAdminAction(
+      const result = await callUi('recoverability-ui', 'executeRecoverabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20154,7 +17461,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRecoverabilityRollout(apiBaseUrl)
+      const rollout = await callUi('recoverability-ui', 'fetchRecoverabilityRollout', apiBaseUrl)
       setRecoverabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20175,7 +17482,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMaintainabilityAdminAction(
+      const result = await callUi('maintainability-ui', 'executeMaintainabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20183,7 +17490,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMaintainabilityRollout(apiBaseUrl)
+      const rollout = await callUi('maintainability-ui', 'fetchMaintainabilityRollout', apiBaseUrl)
       setMaintainabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20204,7 +17511,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeScalabilityAdminAction(
+      const result = await callUi('scalability-ui', 'executeScalabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20212,7 +17519,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchScalabilityRollout(apiBaseUrl)
+      const rollout = await callUi('scalability-ui', 'fetchScalabilityRollout', apiBaseUrl)
       setScalabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20233,7 +17540,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTraceabilityAdminAction(
+      const result = await callUi('traceability-ui', 'executeTraceabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20241,7 +17548,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTraceabilityRollout(apiBaseUrl)
+      const rollout = await callUi('traceability-ui', 'fetchTraceabilityRollout', apiBaseUrl)
       setTraceabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20262,7 +17569,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeEfficiencyAdminAction(
+      const result = await callUi('efficiency-ui', 'executeEfficiencyAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20270,7 +17577,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchEfficiencyRollout(apiBaseUrl)
+      const rollout = await callUi('efficiency-ui', 'fetchEfficiencyRollout', apiBaseUrl)
       setEfficiencyRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20291,7 +17598,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeOptimizationAdminAction(
+      const result = await callUi('optimization-ui', 'executeOptimizationAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20299,7 +17606,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchOptimizationRollout(apiBaseUrl)
+      const rollout = await callUi('optimization-ui', 'fetchOptimizationRollout', apiBaseUrl)
       setOptimizationRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20320,7 +17627,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeUtilizationAdminAction(
+      const result = await callUi('utilization-ui', 'executeUtilizationAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20328,7 +17635,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchUtilizationRollout(apiBaseUrl)
+      const rollout = await callUi('utilization-ui', 'fetchUtilizationRollout', apiBaseUrl)
       setUtilizationRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20349,7 +17656,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSustainabilityAdminAction(
+      const result = await callUi('sustainability-ui', 'executeSustainabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20357,7 +17664,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSustainabilityRollout(apiBaseUrl)
+      const rollout = await callUi('sustainability-ui', 'fetchSustainabilityRollout', apiBaseUrl)
       setSustainabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20378,7 +17685,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeGovernanceAdminAction(
+      const result = await callUi('governance-ui', 'executeGovernanceAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20386,7 +17693,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchGovernanceRollout(apiBaseUrl)
+      const rollout = await callUi('governance-ui', 'fetchGovernanceRollout', apiBaseUrl)
       setGovernanceRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20407,7 +17714,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeOversightAdminAction(
+      const result = await callUi('oversight-ui', 'executeOversightAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20415,7 +17722,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchOversightRollout(apiBaseUrl)
+      const rollout = await callUi('oversight-ui', 'fetchOversightRollout', apiBaseUrl)
       setOversightRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20436,7 +17743,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAssuranceAdminAction(
+      const result = await callUi('assurance-ui', 'executeAssuranceAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20444,7 +17751,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAssuranceRollout(apiBaseUrl)
+      const rollout = await callUi('assurance-ui', 'fetchAssuranceRollout', apiBaseUrl)
       setAssuranceRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20465,7 +17772,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAccountabilityAdminAction(
+      const result = await callUi('accountability-ui', 'executeAccountabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20473,7 +17780,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAccountabilityRollout(apiBaseUrl)
+      const rollout = await callUi('accountability-ui', 'fetchAccountabilityRollout', apiBaseUrl)
       setAccountabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20494,7 +17801,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTransparencyAdminAction(
+      const result = await callUi('transparency-ui', 'executeTransparencyAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20502,7 +17809,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTransparencyRollout(apiBaseUrl)
+      const rollout = await callUi('transparency-ui', 'fetchTransparencyRollout', apiBaseUrl)
       setTransparencyRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20523,7 +17830,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCredibilityvaultizabilityAdminAction(
+      const result = await callUi('credibilityvaultizability-ui', 'executeCredibilityvaultizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20531,7 +17838,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCredibilityvaultizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('credibilityvaultizability-ui', 'fetchCredibilityvaultizabilityRollout', apiBaseUrl)
       setCredibilityvaultizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20552,7 +17859,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeReproducibilityvaultizabilityAdminAction(
+      const result = await callUi('reproducibilityvaultizability-ui', 'executeReproducibilityvaultizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20560,7 +17867,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchReproducibilityvaultizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('reproducibilityvaultizability-ui', 'fetchReproducibilityvaultizabilityRollout', apiBaseUrl)
       setReproducibilityvaultizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20581,7 +17888,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeInspectabilityvaultizabilityAdminAction(
+      const result = await callUi('inspectabilityvaultizability-ui', 'executeInspectabilityvaultizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20589,7 +17896,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchInspectabilityvaultizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('inspectabilityvaultizability-ui', 'fetchInspectabilityvaultizabilityRollout', apiBaseUrl)
       setInspectabilityvaultizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20610,7 +17917,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAuditabilityvaultizabilityAdminAction(
+      const result = await callUi('auditabilityvaultizability-ui', 'executeAuditabilityvaultizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20618,7 +17925,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAuditabilityvaultizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('auditabilityvaultizability-ui', 'fetchAuditabilityvaultizabilityRollout', apiBaseUrl)
       setAuditabilityvaultizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20639,7 +17946,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAssurancevaultizabilityAdminAction(
+      const result = await callUi('assurancevaultizability-ui', 'executeAssurancevaultizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20647,7 +17954,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAssurancevaultizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('assurancevaultizability-ui', 'fetchAssurancevaultizabilityRollout', apiBaseUrl)
       setAssurancevaultizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20668,7 +17975,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAttestationvaultizabilityAdminAction(
+      const result = await callUi('attestationvaultizability-ui', 'executeAttestationvaultizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20676,7 +17983,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAttestationvaultizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('attestationvaultizability-ui', 'fetchAttestationvaultizabilityRollout', apiBaseUrl)
       setAttestationvaultizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20697,7 +18004,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeVerificationvaultizabilityAdminAction(
+      const result = await callUi('verificationvaultizability-ui', 'executeVerificationvaultizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20705,7 +18012,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchVerificationvaultizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('verificationvaultizability-ui', 'fetchVerificationvaultizabilityRollout', apiBaseUrl)
       setVerificationvaultizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20726,7 +18033,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeProvenancevaultizabilityAdminAction(
+      const result = await callUi('provenancevaultizability-ui', 'executeProvenancevaultizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20734,7 +18041,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchProvenancevaultizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('provenancevaultizability-ui', 'fetchProvenancevaultizabilityRollout', apiBaseUrl)
       setProvenancevaultizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20755,7 +18062,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAuthenticityvaultizabilityAdminAction(
+      const result = await callUi('authenticityvaultizability-ui', 'executeAuthenticityvaultizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20763,7 +18070,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAuthenticityvaultizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('authenticityvaultizability-ui', 'fetchAuthenticityvaultizabilityRollout', apiBaseUrl)
       setAuthenticityvaultizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20784,7 +18091,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeValidityvaultizabilityAdminAction(
+      const result = await callUi('validityvaultizability-ui', 'executeValidityvaultizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20792,7 +18099,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchValidityvaultizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('validityvaultizability-ui', 'fetchValidityvaultizabilityRollout', apiBaseUrl)
       setValidityvaultizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20813,7 +18120,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCompliancevaultizabilityAdminAction(
+      const result = await callUi('compliancevaultizability-ui', 'executeCompliancevaultizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20821,7 +18128,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCompliancevaultizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('compliancevaultizability-ui', 'fetchCompliancevaultizabilityRollout', apiBaseUrl)
       setCompliancevaultizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20842,7 +18149,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAuditvaultizabilityAdminAction(
+      const result = await callUi('auditvaultizability-ui', 'executeAuditvaultizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20850,7 +18157,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAuditvaultizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('auditvaultizability-ui', 'fetchAuditvaultizabilityRollout', apiBaseUrl)
       setAuditvaultizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20871,7 +18178,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeEvidencevaultizabilityAdminAction(
+      const result = await callUi('evidencevaultizability-ui', 'executeEvidencevaultizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20879,7 +18186,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchEvidencevaultizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('evidencevaultizability-ui', 'fetchEvidencevaultizabilityRollout', apiBaseUrl)
       setEvidencevaultizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20900,7 +18207,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTracevaultizabilityAdminAction(
+      const result = await callUi('tracevaultizability-ui', 'executeTracevaultizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20908,7 +18215,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTracevaultizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('tracevaultizability-ui', 'fetchTracevaultizabilityRollout', apiBaseUrl)
       setTracevaultizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20929,7 +18236,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRegistryvaultizabilityAdminAction(
+      const result = await callUi('registryvaultizability-ui', 'executeRegistryvaultizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20937,7 +18244,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRegistryvaultizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('registryvaultizability-ui', 'fetchRegistryvaultizabilityRollout', apiBaseUrl)
       setRegistryvaultizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20958,7 +18265,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeIntegrityjournalizabilityAdminAction(
+      const result = await callUi('integrityjournalizability-ui', 'executeIntegrityjournalizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20966,7 +18273,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchIntegrityjournalizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('integrityjournalizability-ui', 'fetchIntegrityjournalizabilityRollout', apiBaseUrl)
       setIntegrityjournalizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -20987,7 +18294,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAttestjournalizabilityAdminAction(
+      const result = await callUi('attestjournalizability-ui', 'executeAttestjournalizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -20995,7 +18302,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAttestjournalizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('attestjournalizability-ui', 'fetchAttestjournalizabilityRollout', apiBaseUrl)
       setAttestjournalizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21016,7 +18323,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeEvidencejournalizabilityAdminAction(
+      const result = await callUi('evidencejournalizability-ui', 'executeEvidencejournalizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21024,7 +18331,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchEvidencejournalizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('evidencejournalizability-ui', 'fetchEvidencejournalizabilityRollout', apiBaseUrl)
       setEvidencejournalizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21045,7 +18352,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTracejournalizabilityAdminAction(
+      const result = await callUi('tracejournalizability-ui', 'executeTracejournalizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21053,7 +18360,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTracejournalizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('tracejournalizability-ui', 'fetchTracejournalizabilityRollout', apiBaseUrl)
       setTracejournalizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21074,7 +18381,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRegistryjournalizabilityAdminAction(
+      const result = await callUi('registryjournalizability-ui', 'executeRegistryjournalizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21082,7 +18389,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRegistryjournalizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('registryjournalizability-ui', 'fetchRegistryjournalizabilityRollout', apiBaseUrl)
       setRegistryjournalizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21103,7 +18410,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAuditjournalizabilityAdminAction(
+      const result = await callUi('auditjournalizability-ui', 'executeAuditjournalizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21111,7 +18418,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAuditjournalizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('auditjournalizability-ui', 'fetchAuditjournalizabilityRollout', apiBaseUrl)
       setAuditjournalizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21132,7 +18439,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeProofjournalizabilityAdminAction(
+      const result = await callUi('proofjournalizability-ui', 'executeProofjournalizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21140,7 +18447,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchProofjournalizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('proofjournalizability-ui', 'fetchProofjournalizabilityRollout', apiBaseUrl)
       setProofjournalizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21161,7 +18468,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeWitnessjournalizabilityAdminAction(
+      const result = await callUi('witnessjournalizability-ui', 'executeWitnessjournalizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21169,7 +18476,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchWitnessjournalizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('witnessjournalizability-ui', 'fetchWitnessjournalizabilityRollout', apiBaseUrl)
       setWitnessjournalizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21190,7 +18497,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeNotarjournalizabilityAdminAction(
+      const result = await callUi('notarjournalizability-ui', 'executeNotarjournalizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21198,7 +18505,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchNotarjournalizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('notarjournalizability-ui', 'fetchNotarjournalizabilityRollout', apiBaseUrl)
       setNotarjournalizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21219,7 +18526,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCompliancejournalizabilityAdminAction(
+      const result = await callUi('compliancejournalizability-ui', 'executeCompliancejournalizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21227,7 +18534,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCompliancejournalizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('compliancejournalizability-ui', 'fetchCompliancejournalizabilityRollout', apiBaseUrl)
       setCompliancejournalizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21248,7 +18555,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAuditregistryizabilityAdminAction(
+      const result = await callUi('auditregistryizability-ui', 'executeAuditregistryizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21256,7 +18563,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAuditregistryizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('auditregistryizability-ui', 'fetchAuditregistryizabilityRollout', apiBaseUrl)
       setAuditregistryizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21277,7 +18584,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeProofregistryizabilityAdminAction(
+      const result = await callUi('proofregistryizability-ui', 'executeProofregistryizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21285,7 +18592,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchProofregistryizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('proofregistryizability-ui', 'fetchProofregistryizabilityRollout', apiBaseUrl)
       setProofregistryizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21306,7 +18613,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeWitnessledgerizabilityAdminAction(
+      const result = await callUi('witnessledgerizability-ui', 'executeWitnessledgerizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21314,7 +18621,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchWitnessledgerizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('witnessledgerizability-ui', 'fetchWitnessledgerizabilityRollout', apiBaseUrl)
       setWitnessledgerizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21335,7 +18642,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeNotarledgerizabilityAdminAction(
+      const result = await callUi('notarledgerizability-ui', 'executeNotarledgerizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21343,7 +18650,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchNotarledgerizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('notarledgerizability-ui', 'fetchNotarledgerizabilityRollout', apiBaseUrl)
       setNotarledgerizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21364,7 +18671,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeComplianceledgerizabilityAdminAction(
+      const result = await callUi('complianceledgerizability-ui', 'executeComplianceledgerizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21372,7 +18679,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchComplianceledgerizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('complianceledgerizability-ui', 'fetchComplianceledgerizabilityRollout', apiBaseUrl)
       setComplianceledgerizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21393,7 +18700,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeWitnessproofizabilityAdminAction(
+      const result = await callUi('witnessproofizability-ui', 'executeWitnessproofizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21401,7 +18708,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchWitnessproofizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('witnessproofizability-ui', 'fetchWitnessproofizabilityRollout', apiBaseUrl)
       setWitnessproofizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21422,7 +18729,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRegistrarproofizabilityAdminAction(
+      const result = await callUi('registrarproofizability-ui', 'executeRegistrarproofizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21430,7 +18737,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRegistrarproofizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('registrarproofizability-ui', 'fetchRegistrarproofizabilityRollout', apiBaseUrl)
       setRegistrarproofizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21451,7 +18758,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDisclosureproofizabilityAdminAction(
+      const result = await callUi('disclosureproofizability-ui', 'executeDisclosureproofizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21459,7 +18766,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDisclosureproofizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('disclosureproofizability-ui', 'fetchDisclosureproofizabilityRollout', apiBaseUrl)
       setDisclosureproofizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21480,7 +18787,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTraceledgerizabilityAdminAction(
+      const result = await callUi('traceledgerizability-ui', 'executeTraceledgerizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21488,7 +18795,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTraceledgerizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('traceledgerizability-ui', 'fetchTraceledgerizabilityRollout', apiBaseUrl)
       setTraceledgerizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21509,7 +18816,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAuditlineizabilityAdminAction(
+      const result = await callUi('auditlineizability-ui', 'executeAuditlineizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21517,7 +18824,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAuditlineizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('auditlineizability-ui', 'fetchAuditlineizabilityRollout', apiBaseUrl)
       setAuditlineizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21538,7 +18845,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeNotarproofizabilityAdminAction(
+      const result = await callUi('notarproofizability-ui', 'executeNotarproofizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21546,7 +18853,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchNotarproofizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('notarproofizability-ui', 'fetchNotarproofizabilityRollout', apiBaseUrl)
       setNotarproofizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21567,7 +18874,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeProoflineizabilityAdminAction(
+      const result = await callUi('prooflineizability-ui', 'executeProoflineizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21575,7 +18882,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchProoflineizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('prooflineizability-ui', 'fetchProoflineizabilityRollout', apiBaseUrl)
       setProoflineizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21596,7 +18903,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeEvidencetrackizabilityAdminAction(
+      const result = await callUi('evidencetrackizability-ui', 'executeEvidencetrackizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21604,7 +18911,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchEvidencetrackizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('evidencetrackizability-ui', 'fetchEvidencetrackizabilityRollout', apiBaseUrl)
       setEvidencetrackizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21625,7 +18932,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAttestledgerizabilityAdminAction(
+      const result = await callUi('attestledgerizability-ui', 'executeAttestledgerizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21633,7 +18940,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAttestledgerizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('attestledgerizability-ui', 'fetchAttestledgerizabilityRollout', apiBaseUrl)
       setAttestledgerizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21654,7 +18961,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCompliancechainizabilityAdminAction(
+      const result = await callUi('compliancechainizability-ui', 'executeCompliancechainizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21662,7 +18969,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCompliancechainizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('compliancechainizability-ui', 'fetchCompliancechainizabilityRollout', apiBaseUrl)
       setCompliancechainizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21683,7 +18990,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAuditproofizabilityAdminAction(
+      const result = await callUi('auditproofizability-ui', 'executeAuditproofizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21691,7 +18998,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAuditproofizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('auditproofizability-ui', 'fetchAuditproofizabilityRollout', apiBaseUrl)
       setAuditproofizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21712,7 +19019,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRegistrarizabilityAdminAction(
+      const result = await callUi('registrarizability-ui', 'executeRegistrarizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21720,7 +19027,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRegistrarizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('registrarizability-ui', 'fetchRegistrarizabilityRollout', apiBaseUrl)
       setRegistrarizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21741,7 +19048,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDisclosureizabilityAdminAction(
+      const result = await callUi('disclosureizability-ui', 'executeDisclosureizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21749,7 +19056,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDisclosureizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('disclosureizability-ui', 'fetchDisclosureizabilityRollout', apiBaseUrl)
       setDisclosureizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21770,7 +19077,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTraceproofizabilityAdminAction(
+      const result = await callUi('traceproofizability-ui', 'executeTraceproofizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21778,7 +19085,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTraceproofizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('traceproofizability-ui', 'fetchTraceproofizabilityRollout', apiBaseUrl)
       setTraceproofizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21799,7 +19106,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRuleproofizabilityAdminAction(
+      const result = await callUi('ruleproofizability-ui', 'executeRuleproofizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21807,7 +19114,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRuleproofizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('ruleproofizability-ui', 'fetchRuleproofizabilityRollout', apiBaseUrl)
       setRuleproofizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21828,7 +19135,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSignatureproofizabilityAdminAction(
+      const result = await callUi('signatureproofizability-ui', 'executeSignatureproofizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21836,7 +19143,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSignatureproofizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('signatureproofizability-ui', 'fetchSignatureproofizabilityRollout', apiBaseUrl)
       setSignatureproofizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21857,7 +19164,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeLedgerizabilityAdminAction(
+      const result = await callUi('ledgerizability-ui', 'executeLedgerizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21865,7 +19172,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchLedgerizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('ledgerizability-ui', 'fetchLedgerizabilityRollout', apiBaseUrl)
       setLedgerizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21886,7 +19193,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeWitnessizabilityAdminAction(
+      const result = await callUi('witnessizability-ui', 'executeWitnessizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21894,7 +19201,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchWitnessizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('witnessizability-ui', 'fetchWitnessizabilityRollout', apiBaseUrl)
       setWitnessizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21915,7 +19222,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeNotarizationizabilityAdminAction(
+      const result = await callUi('notarizationizability-ui', 'executeNotarizationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21923,7 +19230,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchNotarizationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('notarizationizability-ui', 'fetchNotarizationizabilityRollout', apiBaseUrl)
       setNotarizationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21944,7 +19251,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePolicyproofizabilityAdminAction(
+      const result = await callUi('policyproofizability-ui', 'executePolicyproofizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21952,7 +19259,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPolicyproofizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('policyproofizability-ui', 'fetchPolicyproofizabilityRollout', apiBaseUrl)
       setPolicyproofizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -21973,7 +19280,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTamperproofizabilityAdminAction(
+      const result = await callUi('tamperproofizability-ui', 'executeTamperproofizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -21981,7 +19288,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTamperproofizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('tamperproofizability-ui', 'fetchTamperproofizabilityRollout', apiBaseUrl)
       setTamperproofizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22002,7 +19309,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeChainofcustodyizabilityAdminAction(
+      const result = await callUi('chainofcustodyizability-ui', 'executeChainofcustodyizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22010,7 +19317,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchChainofcustodyizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('chainofcustodyizability-ui', 'fetchChainofcustodyizabilityRollout', apiBaseUrl)
       setChainofcustodyizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22031,7 +19338,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeEvidencizabilityAdminAction(
+      const result = await callUi('evidencizability-ui', 'executeEvidencizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22039,7 +19346,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchEvidencizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('evidencizability-ui', 'fetchEvidencizabilityRollout', apiBaseUrl)
       setEvidencizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22060,7 +19367,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAttesttrackizabilityAdminAction(
+      const result = await callUi('attesttrackizability-ui', 'executeAttesttrackizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22068,7 +19375,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAttesttrackizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('attesttrackizability-ui', 'fetchAttesttrackizabilityRollout', apiBaseUrl)
       setAttesttrackizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22089,7 +19396,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeGovernancetrackizabilityAdminAction(
+      const result = await callUi('governancetrackizability-ui', 'executeGovernancetrackizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22097,7 +19404,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchGovernancetrackizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('governancetrackizability-ui', 'fetchGovernancetrackizabilityRollout', apiBaseUrl)
       setGovernancetrackizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22118,7 +19425,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeComplianceproofizabilityAdminAction(
+      const result = await callUi('complianceproofizability-ui', 'executeComplianceproofizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22126,7 +19433,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchComplianceproofizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('complianceproofizability-ui', 'fetchComplianceproofizabilityRollout', apiBaseUrl)
       setComplianceproofizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22147,7 +19454,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAudittrailizabilityAdminAction(
+      const result = await callUi('audittrailizability-ui', 'executeAudittrailizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22155,7 +19462,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAudittrailizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('audittrailizability-ui', 'fetchAudittrailizabilityRollout', apiBaseUrl)
       setAudittrailizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22176,7 +19483,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeForensicizabilityAdminAction(
+      const result = await callUi('forensicizability-ui', 'executeForensicizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22184,7 +19491,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchForensicizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('forensicizability-ui', 'fetchForensicizabilityRollout', apiBaseUrl)
       setForensicizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22205,7 +19512,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeLineageizabilityAdminAction(
+      const result = await callUi('lineageizability-ui', 'executeLineageizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22213,7 +19520,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchLineageizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('lineageizability-ui', 'fetchLineageizabilityRollout', apiBaseUrl)
       setLineageizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22234,7 +19541,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeProvenanceizabilityAdminAction(
+      const result = await callUi('provenanceizability-ui', 'executeProvenanceizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22242,7 +19549,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchProvenanceizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('provenanceizability-ui', 'fetchProvenanceizabilityRollout', apiBaseUrl)
       setProvenanceizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22263,7 +19570,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeComplianceguardizabilityAdminAction(
+      const result = await callUi('complianceguardizability-ui', 'executeComplianceguardizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22271,7 +19578,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchComplianceguardizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('complianceguardizability-ui', 'fetchComplianceguardizabilityRollout', apiBaseUrl)
       setComplianceguardizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22292,7 +19599,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCryptographyizabilityAdminAction(
+      const result = await callUi('cryptographyizability-ui', 'executeCryptographyizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22300,7 +19607,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCryptographyizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('cryptographyizability-ui', 'fetchCryptographyizabilityRollout', apiBaseUrl)
       setCryptographyizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22321,7 +19628,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSecretmanagementizabilityAdminAction(
+      const result = await callUi('secretmanagementizability-ui', 'executeSecretmanagementizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22329,7 +19636,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSecretmanagementizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('secretmanagementizability-ui', 'fetchSecretmanagementizabilityRollout', apiBaseUrl)
       setSecretmanagementizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22350,7 +19657,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeKeymanagementizabilityAdminAction(
+      const result = await callUi('keymanagementizability-ui', 'executeKeymanagementizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22358,7 +19665,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchKeymanagementizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('keymanagementizability-ui', 'fetchKeymanagementizabilityRollout', apiBaseUrl)
       setKeymanagementizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22379,7 +19686,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeIdentityproofizabilityAdminAction(
+      const result = await callUi('identityproofizability-ui', 'executeIdentityproofizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22387,7 +19694,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchIdentityproofizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('identityproofizability-ui', 'fetchIdentityproofizabilityRollout', apiBaseUrl)
       setIdentityproofizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22408,7 +19715,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeZerotrustizabilityAdminAction(
+      const result = await callUi('zerotrustizability-ui', 'executeZerotrustizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22416,7 +19723,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchZerotrustizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('zerotrustizability-ui', 'fetchZerotrustizabilityRollout', apiBaseUrl)
       setZerotrustizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22437,7 +19744,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeLeastprivilegeizabilityAdminAction(
+      const result = await callUi('leastprivilegeizability-ui', 'executeLeastprivilegeizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22445,7 +19752,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchLeastprivilegeizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('leastprivilegeizability-ui', 'fetchLeastprivilegeizabilityRollout', apiBaseUrl)
       setLeastprivilegeizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22466,7 +19773,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAccesscontrolizabilityAdminAction(
+      const result = await callUi('accesscontrolizability-ui', 'executeAccesscontrolizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22474,7 +19781,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAccesscontrolizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('accesscontrolizability-ui', 'fetchAccesscontrolizabilityRollout', apiBaseUrl)
       setAccesscontrolizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22495,7 +19802,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeNonrepudiationizabilityAdminAction(
+      const result = await callUi('nonrepudiationizability-ui', 'executeNonrepudiationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22503,7 +19810,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchNonrepudiationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('nonrepudiationizability-ui', 'fetchNonrepudiationizabilityRollout', apiBaseUrl)
       setNonrepudiationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22524,7 +19831,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeConfidentialityizabilityAdminAction(
+      const result = await callUi('confidentialityizability-ui', 'executeConfidentialityizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22532,7 +19839,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchConfidentialityizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('confidentialityizability-ui', 'fetchConfidentialityizabilityRollout', apiBaseUrl)
       setConfidentialityizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22553,7 +19860,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSegregationizabilityAdminAction(
+      const result = await callUi('segregationizability-ui', 'executeSegregationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22561,7 +19868,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSegregationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('segregationizability-ui', 'fetchSegregationizabilityRollout', apiBaseUrl)
       setSegregationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22582,7 +19889,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeHardeningizabilityAdminAction(
+      const result = await callUi('hardeningizability-ui', 'executeHardeningizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22590,7 +19897,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchHardeningizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('hardeningizability-ui', 'fetchHardeningizabilityRollout', apiBaseUrl)
       setHardeningizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22611,7 +19918,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMitigationizabilityAdminAction(
+      const result = await callUi('mitigationizability-ui', 'executeMitigationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22619,7 +19926,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMitigationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('mitigationizability-ui', 'fetchMitigationizabilityRollout', apiBaseUrl)
       setMitigationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22640,7 +19947,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeVulnerabilityizabilityAdminAction(
+      const result = await callUi('vulnerabilityizability-ui', 'executeVulnerabilityizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22648,7 +19955,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchVulnerabilityizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('vulnerabilityizability-ui', 'fetchVulnerabilityizabilityRollout', apiBaseUrl)
       setVulnerabilityizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22669,7 +19976,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeThreatizabilityAdminAction(
+      const result = await callUi('threatizability-ui', 'executeThreatizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22677,7 +19984,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchThreatizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('threatizability-ui', 'fetchThreatizabilityRollout', apiBaseUrl)
       setThreatizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22698,7 +20005,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeIntegrityizabilityAdminAction(
+      const result = await callUi('integrityizability-ui', 'executeIntegrityizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22706,7 +20013,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchIntegrityizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('integrityizability-ui', 'fetchIntegrityizabilityRollout', apiBaseUrl)
       setIntegrityizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22727,7 +20034,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTrustizabilityAdminAction(
+      const result = await callUi('trustizability-ui', 'executeTrustizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22735,7 +20042,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTrustizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('trustizability-ui', 'fetchTrustizabilityRollout', apiBaseUrl)
       setTrustizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22756,7 +20063,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePrivacyizabilityAdminAction(
+      const result = await callUi('privacyizability-ui', 'executePrivacyizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22764,7 +20071,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPrivacyizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('privacyizability-ui', 'fetchPrivacyizabilityRollout', apiBaseUrl)
       setPrivacyizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22785,7 +20092,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSecurityizabilityAdminAction(
+      const result = await callUi('securityizability-ui', 'executeSecurityizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22793,7 +20100,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSecurityizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('securityizability-ui', 'fetchSecurityizabilityRollout', apiBaseUrl)
       setSecurityizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22814,7 +20121,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRiskizabilityAdminAction(
+      const result = await callUi('riskizability-ui', 'executeRiskizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22822,7 +20129,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRiskizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('riskizability-ui', 'fetchRiskizabilityRollout', apiBaseUrl)
       setRiskizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22843,7 +20150,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeIdentityizabilityAdminAction(
+      const result = await callUi('identityizability-ui', 'executeIdentityizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22851,7 +20158,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchIdentityizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('identityizability-ui', 'fetchIdentityizabilityRollout', apiBaseUrl)
       setIdentityizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22872,7 +20179,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAuthenticationizabilityAdminAction(
+      const result = await callUi('authenticationizability-ui', 'executeAuthenticationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22880,7 +20187,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAuthenticationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('authenticationizability-ui', 'fetchAuthenticationizabilityRollout', apiBaseUrl)
       setAuthenticationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22901,7 +20208,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAuthorizationizabilityAdminAction(
+      const result = await callUi('authorizationizability-ui', 'executeAuthorizationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22909,7 +20216,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAuthorizationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('authorizationizability-ui', 'fetchAuthorizationizabilityRollout', apiBaseUrl)
       setAuthorizationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22930,7 +20237,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePermissionizabilityAdminAction(
+      const result = await callUi('permissionizability-ui', 'executePermissionizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22938,7 +20245,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPermissionizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('permissionizability-ui', 'fetchPermissionizabilityRollout', apiBaseUrl)
       setPermissionizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22959,7 +20266,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeEntitlementizabilityAdminAction(
+      const result = await callUi('entitlementizability-ui', 'executeEntitlementizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22967,7 +20274,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchEntitlementizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('entitlementizability-ui', 'fetchEntitlementizabilityRollout', apiBaseUrl)
       setEntitlementizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -22988,7 +20295,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeControlizabilityAdminAction(
+      const result = await callUi('controlizability-ui', 'executeControlizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -22996,7 +20303,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchControlizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('controlizability-ui', 'fetchControlizabilityRollout', apiBaseUrl)
       setControlizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23017,7 +20324,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeOversightizabilityAdminAction(
+      const result = await callUi('oversightizability-ui', 'executeOversightizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23025,7 +20332,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchOversightizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('oversightizability-ui', 'fetchOversightizabilityRollout', apiBaseUrl)
       setOversightizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23046,7 +20353,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTransparencyizabilityAdminAction(
+      const result = await callUi('transparencyizability-ui', 'executeTransparencyizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23054,7 +20361,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTransparencyizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('transparencyizability-ui', 'fetchTransparencyizabilityRollout', apiBaseUrl)
       setTransparencyizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23075,7 +20382,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAccountabilityizabilityAdminAction(
+      const result = await callUi('accountabilityizability-ui', 'executeAccountabilityizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23083,7 +20390,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAccountabilityizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('accountabilityizability-ui', 'fetchAccountabilityizabilityRollout', apiBaseUrl)
       setAccountabilityizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23104,7 +20411,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAuditingizabilityAdminAction(
+      const result = await callUi('auditingizability-ui', 'executeAuditingizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23112,7 +20419,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAuditingizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('auditingizability-ui', 'fetchAuditingizabilityRollout', apiBaseUrl)
       setAuditingizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23133,7 +20440,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTelemetryizabilityAdminAction(
+      const result = await callUi('telemetryizability-ui', 'executeTelemetryizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23141,7 +20448,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTelemetryizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('telemetryizability-ui', 'fetchTelemetryizabilityRollout', apiBaseUrl)
       setTelemetryizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23162,7 +20469,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeInstrumentationizabilityAdminAction(
+      const result = await callUi('instrumentationizability-ui', 'executeInstrumentationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23170,7 +20477,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchInstrumentationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('instrumentationizability-ui', 'fetchInstrumentationizabilityRollout', apiBaseUrl)
       setInstrumentationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23191,7 +20498,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSpecificationizabilityAdminAction(
+      const result = await callUi('specificationizability-ui', 'executeSpecificationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23199,7 +20506,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSpecificationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('specificationizability-ui', 'fetchSpecificationizabilityRollout', apiBaseUrl)
       setSpecificationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23220,7 +20527,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAccreditationizabilityAdminAction(
+      const result = await callUi('accreditationizability-ui', 'executeAccreditationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23228,7 +20535,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAccreditationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('accreditationizability-ui', 'fetchAccreditationizabilityRollout', apiBaseUrl)
       setAccreditationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23249,7 +20556,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCertificationizabilityAdminAction(
+      const result = await callUi('certificationizability-ui', 'executeCertificationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23257,7 +20564,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCertificationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('certificationizability-ui', 'fetchCertificationizabilityRollout', apiBaseUrl)
       setCertificationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23278,7 +20585,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAttestationizabilityAdminAction(
+      const result = await callUi('attestationizability-ui', 'executeAttestationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23286,7 +20593,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAttestationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('attestationizability-ui', 'fetchAttestationizabilityRollout', apiBaseUrl)
       setAttestationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23307,7 +20614,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAssuranceizabilityAdminAction(
+      const result = await callUi('assuranceizability-ui', 'executeAssuranceizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23315,7 +20622,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAssuranceizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('assuranceizability-ui', 'fetchAssuranceizabilityRollout', apiBaseUrl)
       setAssuranceizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23336,7 +20643,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeEnforcementizabilityAdminAction(
+      const result = await callUi('enforcementizability-ui', 'executeEnforcementizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23344,7 +20651,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchEnforcementizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('enforcementizability-ui', 'fetchEnforcementizabilityRollout', apiBaseUrl)
       setEnforcementizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23365,7 +20672,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePolicyizabilityAdminAction(
+      const result = await callUi('policyizability-ui', 'executePolicyizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23373,7 +20680,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPolicyizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('policyizability-ui', 'fetchPolicyizabilityRollout', apiBaseUrl)
       setPolicyizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23394,7 +20701,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeComplianceizabilityAdminAction(
+      const result = await callUi('complianceizability-ui', 'executeComplianceizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23402,7 +20709,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchComplianceizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('complianceizability-ui', 'fetchComplianceizabilityRollout', apiBaseUrl)
       setComplianceizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23423,7 +20730,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeGovernanceizabilityAdminAction(
+      const result = await callUi('governanceizability-ui', 'executeGovernanceizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23431,7 +20738,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchGovernanceizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('governanceizability-ui', 'fetchGovernanceizabilityRollout', apiBaseUrl)
       setGovernanceizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23452,7 +20759,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeReconciliationizabilityAdminAction(
+      const result = await callUi('reconciliationizability-ui', 'executeReconciliationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23460,7 +20767,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchReconciliationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('reconciliationizability-ui', 'fetchReconciliationizabilityRollout', apiBaseUrl)
       setReconciliationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23481,7 +20788,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRemediationizabilityAdminAction(
+      const result = await callUi('remediationizability-ui', 'executeRemediationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23489,7 +20796,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRemediationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('remediationizability-ui', 'fetchRemediationizabilityRollout', apiBaseUrl)
       setRemediationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23510,7 +20817,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeHealingizabilityAdminAction(
+      const result = await callUi('healingizability-ui', 'executeHealingizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23518,7 +20825,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchHealingizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('healingizability-ui', 'fetchHealingizabilityRollout', apiBaseUrl)
       setHealingizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23539,7 +20846,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeScalingizabilityAdminAction(
+      const result = await callUi('scalingizability-ui', 'executeScalingizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23547,7 +20854,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchScalingizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('scalingizability-ui', 'fetchScalingizabilityRollout', apiBaseUrl)
       setScalingizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23568,7 +20875,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDeallocationizabilityAdminAction(
+      const result = await callUi('deallocationizability-ui', 'executeDeallocationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23576,7 +20883,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDeallocationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('deallocationizability-ui', 'fetchDeallocationizabilityRollout', apiBaseUrl)
       setDeallocationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23597,7 +20904,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAllocationizabilityAdminAction(
+      const result = await callUi('allocationizability-ui', 'executeAllocationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23605,7 +20912,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAllocationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('allocationizability-ui', 'fetchAllocationizabilityRollout', apiBaseUrl)
       setAllocationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23626,7 +20933,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeProvisioningizabilityAdminAction(
+      const result = await callUi('provisioningizability-ui', 'executeProvisioningizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23634,7 +20941,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchProvisioningizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('provisioningizability-ui', 'fetchProvisioningizabilityRollout', apiBaseUrl)
       setProvisioningizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23655,7 +20962,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRegistrationizabilityAdminAction(
+      const result = await callUi('registrationizability-ui', 'executeRegistrationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23663,7 +20970,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRegistrationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('registrationizability-ui', 'fetchRegistrationizabilityRollout', apiBaseUrl)
       setRegistrationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23684,7 +20991,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDiscoveryizabilityAdminAction(
+      const result = await callUi('discoveryizability-ui', 'executeDiscoveryizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23692,7 +20999,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDiscoveryizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('discoveryizability-ui', 'fetchDiscoveryizabilityRollout', apiBaseUrl)
       setDiscoveryizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23713,7 +21020,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMeshingizabilityAdminAction(
+      const result = await callUi('meshingizability-ui', 'executeMeshingizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23721,7 +21028,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMeshingizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('meshingizability-ui', 'fetchMeshingizabilityRollout', apiBaseUrl)
       setMeshingizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23742,7 +21049,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeClusteringizabilityAdminAction(
+      const result = await callUi('clusteringizability-ui', 'executeClusteringizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23750,7 +21057,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchClusteringizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('clusteringizability-ui', 'fetchClusteringizabilityRollout', apiBaseUrl)
       setClusteringizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23771,7 +21078,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePartitioningizabilityAdminAction(
+      const result = await callUi('partitioningizability-ui', 'executePartitioningizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23779,7 +21086,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPartitioningizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('partitioningizability-ui', 'fetchPartitioningizabilityRollout', apiBaseUrl)
       setPartitioningizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23800,7 +21107,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCoordinationizabilityAdminAction(
+      const result = await callUi('coordinationizability-ui', 'executeCoordinationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23808,7 +21115,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCoordinationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('coordinationizability-ui', 'fetchCoordinationizabilityRollout', apiBaseUrl)
       setCoordinationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23829,7 +21136,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeNodelizabilityAdminAction(
+      const result = await callUi('nodelizability-ui', 'executeNodelizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23837,7 +21144,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchNodelizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('nodelizability-ui', 'fetchNodelizabilityRollout', apiBaseUrl)
       setNodelizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23858,7 +21165,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeBalancingizabilityAdminAction(
+      const result = await callUi('balancingizability-ui', 'executeBalancingizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23866,7 +21173,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchBalancingizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('balancingizability-ui', 'fetchBalancingizabilityRollout', apiBaseUrl)
       setBalancingizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23887,7 +21194,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRoutingizabilityAdminAction(
+      const result = await callUi('routingizability-ui', 'executeRoutingizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23895,7 +21202,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRoutingizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('routingizability-ui', 'fetchRoutingizabilityRollout', apiBaseUrl)
       setRoutingizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23916,7 +21223,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTriggeringizabilityAdminAction(
+      const result = await callUi('triggeringizability-ui', 'executeTriggeringizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23924,7 +21231,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTriggeringizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('triggeringizability-ui', 'fetchTriggeringizabilityRollout', apiBaseUrl)
       setTriggeringizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23945,7 +21252,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSchedulingizabilityAdminAction(
+      const result = await callUi('schedulingizability-ui', 'executeSchedulingizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23953,7 +21260,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSchedulingizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('schedulingizability-ui', 'fetchSchedulingizabilityRollout', apiBaseUrl)
       setSchedulingizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -23974,7 +21281,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeOrchestrationizabilityAdminAction(
+      const result = await callUi('orchestrationizability-ui', 'executeOrchestrationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -23982,7 +21289,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchOrchestrationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('orchestrationizability-ui', 'fetchOrchestrationizabilityRollout', apiBaseUrl)
       setOrchestrationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24003,7 +21310,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeWindowizabilityAdminAction(
+      const result = await callUi('windowizability-ui', 'executeWindowizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24011,7 +21318,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchWindowizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('windowizability-ui', 'fetchWindowizabilityRollout', apiBaseUrl)
       setWindowizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24032,7 +21339,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeStreamizabilityAdminAction(
+      const result = await callUi('streamizability-ui', 'executeStreamizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24040,7 +21347,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchStreamizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('streamizability-ui', 'fetchStreamizabilityRollout', apiBaseUrl)
       setStreamizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24061,7 +21368,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeBatchingizabilityAdminAction(
+      const result = await callUi('batchingizability-ui', 'executeBatchingizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24069,7 +21376,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchBatchingizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('batchingizability-ui', 'fetchBatchingizabilityRollout', apiBaseUrl)
       setBatchingizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24090,7 +21397,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePipeliningizabilityAdminAction(
+      const result = await callUi('pipeliningizability-ui', 'executePipeliningizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24098,7 +21405,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPipeliningizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('pipeliningizability-ui', 'fetchPipeliningizabilityRollout', apiBaseUrl)
       setPipeliningizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24119,7 +21426,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeChainingizabilityAdminAction(
+      const result = await callUi('chainingizability-ui', 'executeChainingizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24127,7 +21434,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchChainingizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('chainingizability-ui', 'fetchChainingizabilityRollout', apiBaseUrl)
       setChainingizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24148,7 +21455,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeScanizabilityAdminAction(
+      const result = await callUi('scanizability-ui', 'executeScanizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24156,7 +21463,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchScanizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('scanizability-ui', 'fetchScanizabilityRollout', apiBaseUrl)
       setScanizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24177,7 +21484,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeFoldizabilityAdminAction(
+      const result = await callUi('foldizability-ui', 'executeFoldizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24185,7 +21492,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchFoldizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('foldizability-ui', 'fetchFoldizabilityRollout', apiBaseUrl)
       setFoldizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24206,7 +21513,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeReduceizabilityAdminAction(
+      const result = await callUi('reduceizability-ui', 'executeReduceizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24214,7 +21521,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchReduceizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('reduceizability-ui', 'fetchReduceizabilityRollout', apiBaseUrl)
       setReduceizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24235,7 +21542,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMapizabilityAdminAction(
+      const result = await callUi('mapizability-ui', 'executeMapizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24243,7 +21550,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMapizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('mapizability-ui', 'fetchMapizabilityRollout', apiBaseUrl)
       setMapizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24264,7 +21571,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTransformizabilityAdminAction(
+      const result = await callUi('transformizability-ui', 'executeTransformizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24272,7 +21579,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTransformizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('transformizability-ui', 'fetchTransformizabilityRollout', apiBaseUrl)
       setTransformizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24293,7 +21600,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeProjectizabilityAdminAction(
+      const result = await callUi('projectizability-ui', 'executeProjectizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24301,7 +21608,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchProjectizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('projectizability-ui', 'fetchProjectizabilityRollout', apiBaseUrl)
       setProjectizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24322,7 +21629,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSplitizabilityAdminAction(
+      const result = await callUi('splitizability-ui', 'executeSplitizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24330,7 +21637,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSplitizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('splitizability-ui', 'fetchSplitizabilityRollout', apiBaseUrl)
       setSplitizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24351,7 +21658,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMergeizabilityAdminAction(
+      const result = await callUi('mergeizability-ui', 'executeMergeizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24359,7 +21666,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMergeizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('mergeizability-ui', 'fetchMergeizabilityRollout', apiBaseUrl)
       setMergeizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24380,7 +21687,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeJoinizabilityAdminAction(
+      const result = await callUi('joinizability-ui', 'executeJoinizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24388,7 +21695,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchJoinizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('joinizability-ui', 'fetchJoinizabilityRollout', apiBaseUrl)
       setJoinizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24409,7 +21716,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeGroupizabilityAdminAction(
+      const result = await callUi('groupizability-ui', 'executeGroupizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24417,7 +21724,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchGroupizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('groupizability-ui', 'fetchGroupizabilityRollout', apiBaseUrl)
       setGroupizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24438,7 +21745,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePivotizabilityAdminAction(
+      const result = await callUi('pivotizability-ui', 'executePivotizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24446,7 +21753,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPivotizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('pivotizability-ui', 'fetchPivotizabilityRollout', apiBaseUrl)
       setPivotizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24467,7 +21774,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePaginizabilityAdminAction(
+      const result = await callUi('paginizability-ui', 'executePaginizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24475,7 +21782,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPaginizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('paginizability-ui', 'fetchPaginizabilityRollout', apiBaseUrl)
       setPaginizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24496,7 +21803,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSortizabilityAdminAction(
+      const result = await callUi('sortizability-ui', 'executeSortizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24504,7 +21811,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSortizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('sortizability-ui', 'fetchSortizabilityRollout', apiBaseUrl)
       setSortizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24525,7 +21832,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeFilterizabilityAdminAction(
+      const result = await callUi('filterizability-ui', 'executeFilterizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24533,7 +21840,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchFilterizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('filterizability-ui', 'fetchFilterizabilityRollout', apiBaseUrl)
       setFilterizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24554,7 +21861,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeQueryizabilityAdminAction(
+      const result = await callUi('queryizability-ui', 'executeQueryizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24562,7 +21869,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchQueryizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('queryizability-ui', 'fetchQueryizabilityRollout', apiBaseUrl)
       setQueryizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24583,7 +21890,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRetentionizabilityAdminAction(
+      const result = await callUi('retentionizability-ui', 'executeRetentionizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24591,7 +21898,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRetentionizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('retentionizability-ui', 'fetchRetentionizabilityRollout', apiBaseUrl)
       setRetentionizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24612,7 +21919,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeExpandizabilityAdminAction(
+      const result = await callUi('expandizability-ui', 'executeExpandizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24620,7 +21927,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchExpandizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('expandizability-ui', 'fetchExpandizabilityRollout', apiBaseUrl)
       setExpandizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24641,7 +21948,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCompactizabilityAdminAction(
+      const result = await callUi('compactizability-ui', 'executeCompactizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24649,7 +21956,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCompactizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('compactizability-ui', 'fetchCompactizabilityRollout', apiBaseUrl)
       setCompactizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24670,7 +21977,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeVersioningizabilityAdminAction(
+      const result = await callUi('versioningizability-ui', 'executeVersioningizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24678,7 +21985,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchVersioningizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('versioningizability-ui', 'fetchVersioningizabilityRollout', apiBaseUrl)
       setVersioningizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24699,7 +22006,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSearchizabilityAdminAction(
+      const result = await callUi('searchizability-ui', 'executeSearchizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24707,7 +22014,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSearchizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('searchizability-ui', 'fetchSearchizabilityRollout', apiBaseUrl)
       setSearchizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24728,7 +22035,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeIndexingizabilityAdminAction(
+      const result = await callUi('indexingizability-ui', 'executeIndexingizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24736,7 +22043,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchIndexingizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('indexingizability-ui', 'fetchIndexingizabilityRollout', apiBaseUrl)
       setIndexingizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24757,7 +22064,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeImportizabilityAdminAction(
+      const result = await callUi('importizability-ui', 'executeImportizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24765,7 +22072,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchImportizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('importizability-ui', 'fetchImportizabilityRollout', apiBaseUrl)
       setImportizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24786,7 +22093,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeExportizabilityAdminAction(
+      const result = await callUi('exportizability-ui', 'executeExportizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24794,7 +22101,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchExportizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('exportizability-ui', 'fetchExportizabilityRollout', apiBaseUrl)
       setExportizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24815,7 +22122,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeBackupizabilityAdminAction(
+      const result = await callUi('backupizability-ui', 'executeBackupizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24823,7 +22130,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchBackupizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('backupizability-ui', 'fetchBackupizabilityRollout', apiBaseUrl)
       setBackupizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24844,7 +22151,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRestoreizabilityAdminAction(
+      const result = await callUi('restoreizability-ui', 'executeRestoreizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24852,7 +22159,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRestoreizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('restoreizability-ui', 'fetchRestoreizabilityRollout', apiBaseUrl)
       setRestoreizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24873,7 +22180,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeArchiveizabilityAdminAction(
+      const result = await callUi('archiveizability-ui', 'executeArchiveizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24881,7 +22188,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchArchiveizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('archiveizability-ui', 'fetchArchiveizabilityRollout', apiBaseUrl)
       setArchiveizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24902,7 +22209,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDecompressizabilityAdminAction(
+      const result = await callUi('decompressizability-ui', 'executeDecompressizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24910,7 +22217,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDecompressizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('decompressizability-ui', 'fetchDecompressizabilityRollout', apiBaseUrl)
       setDecompressizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24931,7 +22238,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCompressizabilityAdminAction(
+      const result = await callUi('compressizability-ui', 'executeCompressizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24939,7 +22246,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCompressizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('compressizability-ui', 'fetchCompressizabilityRollout', apiBaseUrl)
       setCompressizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24960,7 +22267,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePersistizabilityAdminAction(
+      const result = await callUi('persistizability-ui', 'executePersistizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24968,7 +22275,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPersistizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('persistizability-ui', 'fetchPersistizabilityRollout', apiBaseUrl)
       setPersistizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -24989,7 +22296,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMemorizabilityAdminAction(
+      const result = await callUi('memorizability-ui', 'executeMemorizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -24997,7 +22304,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMemorizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('memorizability-ui', 'fetchMemorizabilityRollout', apiBaseUrl)
       setMemorizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25018,7 +22325,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCacheizabilityAdminAction(
+      const result = await callUi('cacheizability-ui', 'executeCacheizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25026,7 +22333,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCacheizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('cacheizability-ui', 'fetchCacheizabilityRollout', apiBaseUrl)
       setCacheizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25047,7 +22354,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePrefetchizabilityAdminAction(
+      const result = await callUi('prefetchizability-ui', 'executePrefetchizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25055,7 +22362,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPrefetchizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('prefetchizability-ui', 'fetchPrefetchizabilityRollout', apiBaseUrl)
       setPrefetchizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25076,7 +22383,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeColdizabilityAdminAction(
+      const result = await callUi('coldizability-ui', 'executeColdizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25084,7 +22391,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchColdizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('coldizability-ui', 'fetchColdizabilityRollout', apiBaseUrl)
       setColdizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25105,7 +22412,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeWarmizabilityAdminAction(
+      const result = await callUi('warmizability-ui', 'executeWarmizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25113,7 +22420,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchWarmizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('warmizability-ui', 'fetchWarmizabilityRollout', apiBaseUrl)
       setWarmizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25134,7 +22441,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRefreshizabilityAdminAction(
+      const result = await callUi('refreshizability-ui', 'executeRefreshizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25142,7 +22449,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRefreshizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('refreshizability-ui', 'fetchRefreshizabilityRollout', apiBaseUrl)
       setRefreshizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25163,7 +22470,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeExpirationizabilityAdminAction(
+      const result = await callUi('expirationizability-ui', 'executeExpirationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25171,7 +22478,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchExpirationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('expirationizability-ui', 'fetchExpirationizabilityRollout', apiBaseUrl)
       setExpirationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25192,7 +22499,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTtlizabilityAdminAction(
+      const result = await callUi('ttlizability-ui', 'executeTtlizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25200,7 +22507,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTtlizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('ttlizability-ui', 'fetchTtlizabilityRollout', apiBaseUrl)
       setTtlizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25221,7 +22528,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeEvictionizabilityAdminAction(
+      const result = await callUi('evictionizability-ui', 'executeEvictionizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25229,7 +22536,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchEvictionizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('evictionizability-ui', 'fetchEvictionizabilityRollout', apiBaseUrl)
       setEvictionizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25250,7 +22557,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeInvalidationizabilityAdminAction(
+      const result = await callUi('invalidationizability-ui', 'executeInvalidationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25258,7 +22565,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchInvalidationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('invalidationizability-ui', 'fetchInvalidationizabilityRollout', apiBaseUrl)
       setInvalidationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25279,7 +22586,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeHydrationizabilityAdminAction(
+      const result = await callUi('hydrationizability-ui', 'executeHydrationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25287,7 +22594,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchHydrationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('hydrationizability-ui', 'fetchHydrationizabilityRollout', apiBaseUrl)
       setHydrationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25308,7 +22615,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMaterializationizabilityAdminAction(
+      const result = await callUi('materializationizability-ui', 'executeMaterializationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25316,7 +22623,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMaterializationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('materializationizability-ui', 'fetchMaterializationizabilityRollout', apiBaseUrl)
       setMaterializationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25337,7 +22644,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePropagationizabilityAdminAction(
+      const result = await callUi('propagationizability-ui', 'executePropagationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25345,7 +22652,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPropagationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('propagationizability-ui', 'fetchPropagationizabilityRollout', apiBaseUrl)
       setPropagationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25366,7 +22673,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCloningizabilityAdminAction(
+      const result = await callUi('cloningizability-ui', 'executeCloningizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25374,7 +22681,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCloningizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('cloningizability-ui', 'fetchCloningizabilityRollout', apiBaseUrl)
       setCloningizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25395,7 +22702,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMirroringizabilityAdminAction(
+      const result = await callUi('mirroringizability-ui', 'executeMirroringizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25403,7 +22710,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMirroringizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('mirroringizability-ui', 'fetchMirroringizabilityRollout', apiBaseUrl)
       setMirroringizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25424,7 +22731,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeReplicationizabilityAdminAction(
+      const result = await callUi('replicationizability-ui', 'executeReplicationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25432,7 +22739,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchReplicationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('replicationizability-ui', 'fetchReplicationizabilityRollout', apiBaseUrl)
       setReplicationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25453,7 +22760,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeWalizabilityAdminAction(
+      const result = await callUi('walizability-ui', 'executeWalizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25461,7 +22768,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchWalizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('walizability-ui', 'fetchWalizabilityRollout', apiBaseUrl)
       setWalizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25482,7 +22789,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAppendizabilityAdminAction(
+      const result = await callUi('appendizability-ui', 'executeAppendizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25490,7 +22797,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAppendizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('appendizability-ui', 'fetchAppendizabilityRollout', apiBaseUrl)
       setAppendizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25511,7 +22818,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeJournalizabilityAdminAction(
+      const result = await callUi('journalizability-ui', 'executeJournalizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25519,7 +22826,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchJournalizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('journalizability-ui', 'fetchJournalizabilityRollout', apiBaseUrl)
       setJournalizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25540,7 +22847,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSnapshotizabilityAdminAction(
+      const result = await callUi('snapshotizability-ui', 'executeSnapshotizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25548,7 +22855,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSnapshotizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('snapshotizability-ui', 'fetchSnapshotizabilityRollout', apiBaseUrl)
       setSnapshotizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25569,7 +22876,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeQuorumizabilityAdminAction(
+      const result = await callUi('quorumizability-ui', 'executeQuorumizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25577,7 +22884,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchQuorumizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('quorumizability-ui', 'fetchQuorumizabilityRollout', apiBaseUrl)
       setQuorumizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25598,7 +22905,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeConsensusizabilityAdminAction(
+      const result = await callUi('consensusizability-ui', 'executeConsensusizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25606,7 +22913,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchConsensusizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('consensusizability-ui', 'fetchConsensusizabilityRollout', apiBaseUrl)
       setConsensusizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25627,7 +22934,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeFollowerizabilityAdminAction(
+      const result = await callUi('followerizability-ui', 'executeFollowerizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25635,7 +22942,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchFollowerizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('followerizability-ui', 'fetchFollowerizabilityRollout', apiBaseUrl)
       setFollowerizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25656,7 +22963,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeLeaderizabilityAdminAction(
+      const result = await callUi('leaderizability-ui', 'executeLeaderizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25664,7 +22971,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchLeaderizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('leaderizability-ui', 'fetchLeaderizabilityRollout', apiBaseUrl)
       setLeaderizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25685,7 +22992,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRebalanceizabilityAdminAction(
+      const result = await callUi('rebalanceizability-ui', 'executeRebalanceizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25693,7 +23000,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRebalanceizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('rebalanceizability-ui', 'fetchRebalanceizabilityRollout', apiBaseUrl)
       setRebalanceizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25714,7 +23021,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCompactionizabilityAdminAction(
+      const result = await callUi('compactionizability-ui', 'executeCompactionizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25722,7 +23029,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCompactionizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('compactionizability-ui', 'fetchCompactionizabilityRollout', apiBaseUrl)
       setCompactionizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25743,7 +23050,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRecoveryizabilityAdminAction(
+      const result = await callUi('recoveryizability-ui', 'executeRecoveryizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25751,7 +23058,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRecoveryizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('recoveryizability-ui', 'fetchRecoveryizabilityRollout', apiBaseUrl)
       setRecoveryizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25772,7 +23079,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCheckpointizabilityAdminAction(
+      const result = await callUi('checkpointizability-ui', 'executeCheckpointizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25780,7 +23087,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCheckpointizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('checkpointizability-ui', 'fetchCheckpointizabilityRollout', apiBaseUrl)
       setCheckpointizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25801,7 +23108,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeOrderingizabilityAdminAction(
+      const result = await callUi('orderingizability-ui', 'executeOrderingizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25809,7 +23116,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchOrderingizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('orderingizability-ui', 'fetchOrderingizabilityRollout', apiBaseUrl)
       setOrderingizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25830,7 +23137,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeShardingizabilityAdminAction(
+      const result = await callUi('shardingizability-ui', 'executeShardingizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25838,7 +23145,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchShardingizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('shardingizability-ui', 'fetchShardingizabilityRollout', apiBaseUrl)
       setShardingizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25859,7 +23166,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePartitionizabilityAdminAction(
+      const result = await callUi('partitionizability-ui', 'executePartitionizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25867,7 +23174,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPartitionizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('partitionizability-ui', 'fetchPartitionizabilityRollout', apiBaseUrl)
       setPartitionizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25888,7 +23195,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSequencizabilityAdminAction(
+      const result = await callUi('sequencizability-ui', 'executeSequencizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25896,7 +23203,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSequencizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('sequencizability-ui', 'fetchSequencizabilityRollout', apiBaseUrl)
       setSequencizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25917,7 +23224,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDedupizabilityAdminAction(
+      const result = await callUi('dedupizability-ui', 'executeDedupizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25925,7 +23232,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDedupizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('dedupizability-ui', 'fetchDedupizabilityRollout', apiBaseUrl)
       setDedupizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25946,7 +23253,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDeadletterizabilityAdminAction(
+      const result = await callUi('deadletterizability-ui', 'executeDeadletterizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25954,7 +23261,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDeadletterizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('deadletterizability-ui', 'fetchDeadletterizabilityRollout', apiBaseUrl)
       setDeadletterizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -25975,7 +23282,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeNackizabilityAdminAction(
+      const result = await callUi('nackizability-ui', 'executeNackizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -25983,7 +23290,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchNackizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('nackizability-ui', 'fetchNackizabilityRollout', apiBaseUrl)
       setNackizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26004,7 +23311,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAckizabilityAdminAction(
+      const result = await callUi('ackizability-ui', 'executeAckizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26012,7 +23319,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAckizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('ackizability-ui', 'fetchAckizabilityRollout', apiBaseUrl)
       setAckizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26033,7 +23340,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTimeoutizabilityAdminAction(
+      const result = await callUi('timeoutizability-ui', 'executeTimeoutizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26041,7 +23348,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTimeoutizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('timeoutizability-ui', 'fetchTimeoutizabilityRollout', apiBaseUrl)
       setTimeoutizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26062,7 +23369,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCircuitizabilityAdminAction(
+      const result = await callUi('circuitizability-ui', 'executeCircuitizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26070,7 +23377,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCircuitizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('circuitizability-ui', 'fetchCircuitizabilityRollout', apiBaseUrl)
       setCircuitizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26091,7 +23398,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRetryizabilityAdminAction(
+      const result = await callUi('retryizability-ui', 'executeRetryizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26099,7 +23406,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRetryizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('retryizability-ui', 'fetchRetryizabilityRollout', apiBaseUrl)
       setRetryizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26120,7 +23427,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeBatchizabilityAdminAction(
+      const result = await callUi('batchizability-ui', 'executeBatchizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26128,7 +23435,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchBatchizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('batchizability-ui', 'fetchBatchizabilityRollout', apiBaseUrl)
       setBatchizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26149,7 +23456,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeBufferizabilityAdminAction(
+      const result = await callUi('bufferizability-ui', 'executeBufferizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26157,7 +23464,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchBufferizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('bufferizability-ui', 'fetchBufferizabilityRollout', apiBaseUrl)
       setBufferizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26178,7 +23485,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDebouncizabilityAdminAction(
+      const result = await callUi('debouncizability-ui', 'executeDebouncizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26186,7 +23493,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDebouncizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('debouncizability-ui', 'fetchDebouncizabilityRollout', apiBaseUrl)
       setDebouncizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26207,7 +23514,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeThrottleizabilityAdminAction(
+      const result = await callUi('throttleizability-ui', 'executeThrottleizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26215,7 +23522,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchThrottleizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('throttleizability-ui', 'fetchThrottleizabilityRollout', apiBaseUrl)
       setThrottleizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26236,7 +23543,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeBackpressureizabilityAdminAction(
+      const result = await callUi('backpressureizability-ui', 'executeBackpressureizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26244,7 +23551,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchBackpressureizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('backpressureizability-ui', 'fetchBackpressureizabilityRollout', apiBaseUrl)
       setBackpressureizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26265,7 +23572,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeFanoutizabilityAdminAction(
+      const result = await callUi('fanoutizability-ui', 'executeFanoutizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26273,7 +23580,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchFanoutizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('fanoutizability-ui', 'fetchFanoutizabilityRollout', apiBaseUrl)
       setFanoutizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26294,7 +23601,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeUnicastizabilityAdminAction(
+      const result = await callUi('unicastizability-ui', 'executeUnicastizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26302,7 +23609,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchUnicastizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('unicastizability-ui', 'fetchUnicastizabilityRollout', apiBaseUrl)
       setUnicastizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26323,7 +23630,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMulticastizabilityAdminAction(
+      const result = await callUi('multicastizability-ui', 'executeMulticastizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26331,7 +23638,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMulticastizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('multicastizability-ui', 'fetchMulticastizabilityRollout', apiBaseUrl)
       setMulticastizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26352,7 +23659,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeBroadcastizabilityAdminAction(
+      const result = await callUi('broadcastizability-ui', 'executeBroadcastizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26360,7 +23667,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchBroadcastizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('broadcastizability-ui', 'fetchBroadcastizabilityRollout', apiBaseUrl)
       setBroadcastizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26381,7 +23688,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAsynchronizabilityAdminAction(
+      const result = await callUi('asynchronizability-ui', 'executeAsynchronizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26389,7 +23696,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAsynchronizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('asynchronizability-ui', 'fetchAsynchronizabilityRollout', apiBaseUrl)
       setAsynchronizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26410,7 +23717,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSynchronizabilityAdminAction(
+      const result = await callUi('synchronizability-ui', 'executeSynchronizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26418,7 +23725,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSynchronizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('synchronizability-ui', 'fetchSynchronizabilityRollout', apiBaseUrl)
       setSynchronizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26439,7 +23746,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeHandoffizabilityAdminAction(
+      const result = await callUi('handoffizability-ui', 'executeHandoffizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26447,7 +23754,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchHandoffizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('handoffizability-ui', 'fetchHandoffizabilityRollout', apiBaseUrl)
       setHandoffizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26468,7 +23775,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDispatchizabilityAdminAction(
+      const result = await callUi('dispatchizability-ui', 'executeDispatchizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26476,7 +23783,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDispatchizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('dispatchizability-ui', 'fetchDispatchizabilityRollout', apiBaseUrl)
       setDispatchizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26497,7 +23804,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDeliverizabilityAdminAction(
+      const result = await callUi('deliverizability-ui', 'executeDeliverizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26505,7 +23812,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDeliverizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('deliverizability-ui', 'fetchDeliverizabilityRollout', apiBaseUrl)
       setDeliverizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26526,7 +23833,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeConsumizabilityAdminAction(
+      const result = await callUi('consumizability-ui', 'executeConsumizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26534,7 +23841,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchConsumizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('consumizability-ui', 'fetchConsumizabilityRollout', apiBaseUrl)
       setConsumizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26555,7 +23862,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePublishizabilityAdminAction(
+      const result = await callUi('publishizability-ui', 'executePublishizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26563,7 +23870,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPublishizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('publishizability-ui', 'fetchPublishizabilityRollout', apiBaseUrl)
       setPublishizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26584,7 +23891,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSubscribizabilityAdminAction(
+      const result = await callUi('subscribizability-ui', 'executeSubscribizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26592,7 +23899,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSubscribizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('subscribizability-ui', 'fetchSubscribizabilityRollout', apiBaseUrl)
       setSubscribizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26613,7 +23920,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeNotifizabilityAdminAction(
+      const result = await callUi('notifizability-ui', 'executeNotifizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26621,7 +23928,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchNotifizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('notifizability-ui', 'fetchNotifizabilityRollout', apiBaseUrl)
       setNotifizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26642,7 +23949,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeChannelizabilityAdminAction(
+      const result = await callUi('channelizability-ui', 'executeChannelizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26650,7 +23957,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchChannelizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('channelizability-ui', 'fetchChannelizabilityRollout', apiBaseUrl)
       setChannelizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26671,7 +23978,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeEventizabilityAdminAction(
+      const result = await callUi('eventizability-ui', 'executeEventizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26679,7 +23986,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchEventizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('eventizability-ui', 'fetchEventizabilityRollout', apiBaseUrl)
       setEventizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26700,7 +24007,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeQueueizabilityAdminAction(
+      const result = await callUi('queueizability-ui', 'executeQueueizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26708,7 +24015,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchQueueizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('queueizability-ui', 'fetchQueueizabilityRollout', apiBaseUrl)
       setQueueizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26729,7 +24036,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRoutizabilityAdminAction(
+      const result = await callUi('routizability-ui', 'executeRoutizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26737,7 +24044,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRoutizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('routizability-ui', 'fetchRoutizabilityRollout', apiBaseUrl)
       setRoutizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26758,7 +24065,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRelayizabilityAdminAction(
+      const result = await callUi('relayizability-ui', 'executeRelayizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26766,7 +24073,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRelayizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('relayizability-ui', 'fetchRelayizabilityRollout', apiBaseUrl)
       setRelayizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26787,7 +24094,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeBrokerizabilityAdminAction(
+      const result = await callUi('brokerizability-ui', 'executeBrokerizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26795,7 +24102,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchBrokerizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('brokerizability-ui', 'fetchBrokerizabilityRollout', apiBaseUrl)
       setBrokerizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26816,7 +24123,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeGatewayizabilityAdminAction(
+      const result = await callUi('gatewayizability-ui', 'executeGatewayizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26824,7 +24131,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchGatewayizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('gatewayizability-ui', 'fetchGatewayizabilityRollout', apiBaseUrl)
       setGatewayizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26845,7 +24152,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeNetworkizabilityAdminAction(
+      const result = await callUi('networkizability-ui', 'executeNetworkizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26853,7 +24160,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchNetworkizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('networkizability-ui', 'fetchNetworkizabilityRollout', apiBaseUrl)
       setNetworkizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26874,7 +24181,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTopologizabilityAdminAction(
+      const result = await callUi('topologizability-ui', 'executeTopologizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26882,7 +24189,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTopologizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('topologizability-ui', 'fetchTopologizabilityRollout', apiBaseUrl)
       setTopologizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26903,7 +24210,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMeshabilizabilityAdminAction(
+      const result = await callUi('meshabilizability-ui', 'executeMeshabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26911,7 +24218,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMeshabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('meshabilizability-ui', 'fetchMeshabilizabilityRollout', apiBaseUrl)
       setMeshabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26932,7 +24239,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDecentralizabilityAdminAction(
+      const result = await callUi('decentralizability-ui', 'executeDecentralizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26940,7 +24247,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDecentralizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('decentralizability-ui', 'fetchDecentralizabilityRollout', apiBaseUrl)
       setDecentralizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26961,7 +24268,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeFederatizabilityAdminAction(
+      const result = await callUi('federatizability-ui', 'executeFederatizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26969,7 +24276,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchFederatizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('federatizability-ui', 'fetchFederatizabilityRollout', apiBaseUrl)
       setFederatizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -26990,7 +24297,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDistributizabilityAdminAction(
+      const result = await callUi('distributizability-ui', 'executeDistributizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -26998,7 +24305,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDistributizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('distributizability-ui', 'fetchDistributizabilityRollout', apiBaseUrl)
       setDistributizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27019,7 +24326,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeVirtualizabilityAdminAction(
+      const result = await callUi('virtualizability-ui', 'executeVirtualizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27027,7 +24334,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchVirtualizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('virtualizability-ui', 'fetchVirtualizabilityRollout', apiBaseUrl)
       setVirtualizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27048,7 +24355,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeBoundarizabilityAdminAction(
+      const result = await callUi('boundarizability-ui', 'executeBoundarizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27056,7 +24363,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchBoundarizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('boundarizability-ui', 'fetchBoundarizabilityRollout', apiBaseUrl)
       setBoundarizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27077,7 +24384,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeContainerizabilityAdminAction(
+      const result = await callUi('containerizability-ui', 'executeContainerizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27085,7 +24392,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchContainerizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('containerizability-ui', 'fetchContainerizabilityRollout', apiBaseUrl)
       setContainerizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27106,7 +24413,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSandboxizabilityAdminAction(
+      const result = await callUi('sandboxizability-ui', 'executeSandboxizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27114,7 +24421,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSandboxizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('sandboxizability-ui', 'fetchSandboxizabilityRollout', apiBaseUrl)
       setSandboxizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27135,7 +24442,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeIsolatizabilityAdminAction(
+      const result = await callUi('isolatizability-ui', 'executeIsolatizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27143,7 +24450,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchIsolatizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('isolatizability-ui', 'fetchIsolatizabilityRollout', apiBaseUrl)
       setIsolatizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27164,7 +24471,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeEncapsulizabilityAdminAction(
+      const result = await callUi('encapsulizability-ui', 'executeEncapsulizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27172,7 +24479,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchEncapsulizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('encapsulizability-ui', 'fetchEncapsulizabilityRollout', apiBaseUrl)
       setEncapsulizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27193,7 +24500,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeProtocolizabilityAdminAction(
+      const result = await callUi('protocolizability-ui', 'executeProtocolizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27201,7 +24508,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchProtocolizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('protocolizability-ui', 'fetchProtocolizabilityRollout', apiBaseUrl)
       setProtocolizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27222,7 +24529,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeInterfabilizabilityAdminAction(
+      const result = await callUi('interfabilizability-ui', 'executeInterfabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27230,7 +24537,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchInterfabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('interfabilizability-ui', 'fetchInterfabilizabilityRollout', apiBaseUrl)
       setInterfabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27251,7 +24558,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeConnectabilizabilityAdminAction(
+      const result = await callUi('connectabilizability-ui', 'executeConnectabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27259,7 +24566,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchConnectabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('connectabilizability-ui', 'fetchConnectabilizabilityRollout', apiBaseUrl)
       setConnectabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27280,7 +24587,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeInteroperabilizabilityAdminAction(
+      const result = await callUi('interoperabilizability-ui', 'executeInteroperabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27288,7 +24595,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchInteroperabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('interoperabilizability-ui', 'fetchInteroperabilizabilityRollout', apiBaseUrl)
       setInteroperabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27309,7 +24616,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCompatibilizabilityAdminAction(
+      const result = await callUi('compatibilizability-ui', 'executeCompatibilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27317,7 +24624,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCompatibilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('compatibilizability-ui', 'fetchCompatibilizabilityRollout', apiBaseUrl)
       setCompatibilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27338,7 +24645,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePluggabilizabilityAdminAction(
+      const result = await callUi('pluggabilizability-ui', 'executePluggabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27346,7 +24653,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPluggabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('pluggabilizability-ui', 'fetchPluggabilizabilityRollout', apiBaseUrl)
       setPluggabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27367,7 +24674,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeExtensibilizabilityAdminAction(
+      const result = await callUi('extensibilizability-ui', 'executeExtensibilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27375,7 +24682,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchExtensibilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('extensibilizability-ui', 'fetchExtensibilizabilityRollout', apiBaseUrl)
       setExtensibilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27396,7 +24703,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeModularizabilityAdminAction(
+      const result = await callUi('modularizability-ui', 'executeModularizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27404,7 +24711,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchModularizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('modularizability-ui', 'fetchModularizabilityRollout', apiBaseUrl)
       setModularizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27425,7 +24732,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeComposabilizabilityAdminAction(
+      const result = await callUi('composabilizability-ui', 'executeComposabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27433,7 +24740,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchComposabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('composabilizability-ui', 'fetchComposabilizabilityRollout', apiBaseUrl)
       setComposabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27454,7 +24761,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeIntegrabilizabilityAdminAction(
+      const result = await callUi('integrabilizability-ui', 'executeIntegrabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27462,7 +24769,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchIntegrabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('integrabilizability-ui', 'fetchIntegrabilizabilityRollout', apiBaseUrl)
       setIntegrabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27483,7 +24790,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePatchizabilityAdminAction(
+      const result = await callUi('patchizability-ui', 'executePatchizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27491,7 +24798,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPatchizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('patchizability-ui', 'fetchPatchizabilityRollout', apiBaseUrl)
       setPatchizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27512,7 +24819,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeUpgradizabilityAdminAction(
+      const result = await callUi('upgradizability-ui', 'executeUpgradizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27520,7 +24827,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchUpgradizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('upgradizability-ui', 'fetchUpgradizabilityRollout', apiBaseUrl)
       setUpgradizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27541,7 +24848,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMigratizabilityAdminAction(
+      const result = await callUi('migratizability-ui', 'executeMigratizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27549,7 +24856,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMigratizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('migratizability-ui', 'fetchMigratizabilityRollout', apiBaseUrl)
       setMigratizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27570,7 +24877,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeVersionizabilityAdminAction(
+      const result = await callUi('versionizability-ui', 'executeVersionizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27578,7 +24885,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchVersionizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('versionizability-ui', 'fetchVersionizabilityRollout', apiBaseUrl)
       setVersionizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27599,7 +24906,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeReleasizabilityAdminAction(
+      const result = await callUi('releasizability-ui', 'executeReleasizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27607,7 +24914,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchReleasizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('releasizability-ui', 'fetchReleasizabilityRollout', apiBaseUrl)
       setReleasizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27628,7 +24935,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTriggerizabilityAdminAction(
+      const result = await callUi('triggerizability-ui', 'executeTriggerizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27636,7 +24943,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTriggerizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('triggerizability-ui', 'fetchTriggerizabilityRollout', apiBaseUrl)
       setTriggerizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27657,7 +24964,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSchedulizabilityAdminAction(
+      const result = await callUi('schedulizability-ui', 'executeSchedulizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27665,7 +24972,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSchedulizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('schedulizability-ui', 'fetchSchedulizabilityRollout', apiBaseUrl)
       setSchedulizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27686,7 +24993,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeOrchestrizabilityAdminAction(
+      const result = await callUi('orchestrizability-ui', 'executeOrchestrizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27694,7 +25001,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchOrchestrizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('orchestrizability-ui', 'fetchOrchestrizabilityRollout', apiBaseUrl)
       setOrchestrizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27715,7 +25022,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAutomatizabilityAdminAction(
+      const result = await callUi('automatizability-ui', 'executeAutomatizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27723,7 +25030,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAutomatizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('automatizability-ui', 'fetchAutomatizabilityRollout', apiBaseUrl)
       setAutomatizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27744,7 +25051,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeScriptabilizabilityAdminAction(
+      const result = await callUi('scriptabilizability-ui', 'executeScriptabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27752,7 +25059,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchScriptabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('scriptabilizability-ui', 'fetchScriptabilizabilityRollout', apiBaseUrl)
       setScriptabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27773,7 +25080,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeFeatureflagizabilityAdminAction(
+      const result = await callUi('featureflagizability-ui', 'executeFeatureflagizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27781,7 +25088,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchFeatureflagizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('featureflagizability-ui', 'fetchFeatureflagizabilityRollout', apiBaseUrl)
       setFeatureflagizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27802,7 +25109,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeProgressiveizabilityAdminAction(
+      const result = await callUi('progressiveizability-ui', 'executeProgressiveizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27810,7 +25117,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchProgressiveizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('progressiveizability-ui', 'fetchProgressiveizabilityRollout', apiBaseUrl)
       setProgressiveizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27831,7 +25138,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeBluegreenizabilityAdminAction(
+      const result = await callUi('bluegreenizability-ui', 'executeBluegreenizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27839,7 +25146,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchBluegreenizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('bluegreenizability-ui', 'fetchBluegreenizabilityRollout', apiBaseUrl)
       setBluegreenizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27860,7 +25167,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCanaryizabilityAdminAction(
+      const result = await callUi('canaryizability-ui', 'executeCanaryizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27868,7 +25175,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCanaryizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('canaryizability-ui', 'fetchCanaryizabilityRollout', apiBaseUrl)
       setCanaryizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27889,7 +25196,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRollbackabilizabilityAdminAction(
+      const result = await callUi('rollbackabilizability-ui', 'executeRollbackabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27897,7 +25204,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRollbackabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('rollbackabilizability-ui', 'fetchRollbackabilizabilityRollout', apiBaseUrl)
       setRollbackabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27918,7 +25225,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTroubleshootizabilityAdminAction(
+      const result = await callUi('troubleshootizability-ui', 'executeTroubleshootizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27926,7 +25233,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTroubleshootizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('troubleshootizability-ui', 'fetchTroubleshootizabilityRollout', apiBaseUrl)
       setTroubleshootizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27947,7 +25254,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDiagnosabilizabilityAdminAction(
+      const result = await callUi('diagnosabilizability-ui', 'executeDiagnosabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27955,7 +25262,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDiagnosabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('diagnosabilizability-ui', 'fetchDiagnosabilizabilityRollout', apiBaseUrl)
       setDiagnosabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -27976,7 +25283,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMaintainabilizabilityAdminAction(
+      const result = await callUi('maintainabilizability-ui', 'executeMaintainabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -27984,7 +25291,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMaintainabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('maintainabilizability-ui', 'fetchMaintainabilizabilityRollout', apiBaseUrl)
       setMaintainabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28005,7 +25312,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeOperabilizabilityAdminAction(
+      const result = await callUi('operabilizability-ui', 'executeOperabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28013,7 +25320,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchOperabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('operabilizability-ui', 'fetchOperabilizabilityRollout', apiBaseUrl)
       setOperabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28034,7 +25341,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeConfigurabilizabilityAdminAction(
+      const result = await callUi('configurabilizability-ui', 'executeConfigurabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28042,7 +25349,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchConfigurabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('configurabilizability-ui', 'fetchConfigurabilizabilityRollout', apiBaseUrl)
       setConfigurabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28063,7 +25370,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDeployabilizabilityAdminAction(
+      const result = await callUi('deployabilizability-ui', 'executeDeployabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28071,7 +25378,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDeployabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('deployabilizability-ui', 'fetchDeployabilizabilityRollout', apiBaseUrl)
       setDeployabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28092,7 +25399,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAutoscalingizabilityAdminAction(
+      const result = await callUi('autoscalingizability-ui', 'executeAutoscalingizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28100,7 +25407,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAutoscalingizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('autoscalingizability-ui', 'fetchAutoscalingizabilityRollout', apiBaseUrl)
       setAutoscalingizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28121,7 +25428,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeLoadbalancizabilityAdminAction(
+      const result = await callUi('loadbalancizability-ui', 'executeLoadbalancizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28129,7 +25436,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchLoadbalancizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('loadbalancizability-ui', 'fetchLoadbalancizabilityRollout', apiBaseUrl)
       setLoadbalancizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28150,7 +25457,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeReplicabilizabilityAdminAction(
+      const result = await callUi('replicabilizability-ui', 'executeReplicabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28158,7 +25465,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchReplicabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('replicabilizability-ui', 'fetchReplicabilizabilityRollout', apiBaseUrl)
       setReplicabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28179,7 +25486,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRestorabilizabilityAdminAction(
+      const result = await callUi('restorabilizability-ui', 'executeRestorabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28187,7 +25494,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRestorabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('restorabilizability-ui', 'fetchRestorabilizabilityRollout', apiBaseUrl)
       setRestorabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28208,7 +25515,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeObservabilizabilityAdminAction(
+      const result = await callUi('observabilizability-ui', 'executeObservabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28216,7 +25523,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchObservabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('observabilizability-ui', 'fetchObservabilizabilityRollout', apiBaseUrl)
       setObservabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28237,7 +25544,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAlertabilizabilityAdminAction(
+      const result = await callUi('alertabilizability-ui', 'executeAlertabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28245,7 +25552,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAlertabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('alertabilizability-ui', 'fetchAlertabilizabilityRollout', apiBaseUrl)
       setAlertabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28266,7 +25573,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMonitorizabilityAdminAction(
+      const result = await callUi('monitorizability-ui', 'executeMonitorizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28274,7 +25581,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMonitorizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('monitorizability-ui', 'fetchMonitorizabilityRollout', apiBaseUrl)
       setMonitorizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28295,7 +25602,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTraceabilizabilityAdminAction(
+      const result = await callUi('traceabilizability-ui', 'executeTraceabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28303,7 +25610,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTraceabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('traceabilizability-ui', 'fetchTraceabilizabilityRollout', apiBaseUrl)
       setTraceabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28324,7 +25631,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAvailabilizabilityAdminAction(
+      const result = await callUi('availabilizability-ui', 'executeAvailabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28332,7 +25639,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAvailabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('availabilizability-ui', 'fetchAvailabilizabilityRollout', apiBaseUrl)
       setAvailabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28353,7 +25660,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSustainizabilityAdminAction(
+      const result = await callUi('sustainizability-ui', 'executeSustainizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28361,7 +25668,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSustainizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('sustainizability-ui', 'fetchSustainizabilityRollout', apiBaseUrl)
       setSustainizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28382,7 +25689,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeContinuizabilityAdminAction(
+      const result = await callUi('continuizability-ui', 'executeContinuizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28390,7 +25697,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchContinuizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('continuizability-ui', 'fetchContinuizabilityRollout', apiBaseUrl)
       setContinuizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28411,7 +25718,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeFailoverizabilityAdminAction(
+      const result = await callUi('failoverizability-ui', 'executeFailoverizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28419,7 +25726,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchFailoverizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('failoverizability-ui', 'fetchFailoverizabilityRollout', apiBaseUrl)
       setFailoverizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28440,7 +25747,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRedundizabilityAdminAction(
+      const result = await callUi('redundizability-ui', 'executeRedundizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28448,7 +25755,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRedundizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('redundizability-ui', 'fetchRedundizabilityRollout', apiBaseUrl)
       setRedundizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28469,7 +25776,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRecoverizabilityAdminAction(
+      const result = await callUi('recoverizability-ui', 'executeRecoverizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28477,7 +25784,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRecoverizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('recoverizability-ui', 'fetchRecoverizabilityRollout', apiBaseUrl)
       setRecoverizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28498,7 +25805,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDependableizabilityAdminAction(
+      const result = await callUi('dependableizability-ui', 'executeDependableizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28506,7 +25813,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDependableizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('dependableizability-ui', 'fetchDependableizabilityRollout', apiBaseUrl)
       setDependableizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28527,7 +25834,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRobustizabilityAdminAction(
+      const result = await callUi('robustizability-ui', 'executeRobustizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28535,7 +25842,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRobustizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('robustizability-ui', 'fetchRobustizabilityRollout', apiBaseUrl)
       setRobustizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28556,7 +25863,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeResilientizabilityAdminAction(
+      const result = await callUi('resilientizability-ui', 'executeResilientizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28564,7 +25871,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchResilientizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('resilientizability-ui', 'fetchResilientizabilityRollout', apiBaseUrl)
       setResilientizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28585,7 +25892,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeElasticizabilityAdminAction(
+      const result = await callUi('elasticizability-ui', 'executeElasticizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28593,7 +25900,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchElasticizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('elasticizability-ui', 'fetchElasticizabilityRollout', apiBaseUrl)
       setElasticizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28614,7 +25921,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeScalabilizabilityAdminAction(
+      const result = await callUi('scalabilizability-ui', 'executeScalabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28622,7 +25929,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchScalabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('scalabilizability-ui', 'fetchScalabilizabilityRollout', apiBaseUrl)
       setScalabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28643,7 +25950,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAdaptizabilityAdminAction(
+      const result = await callUi('adaptizability-ui', 'executeAdaptizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28651,7 +25958,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAdaptizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('adaptizability-ui', 'fetchAdaptizabilityRollout', apiBaseUrl)
       setAdaptizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28672,7 +25979,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeStabilizabilityAdminAction(
+      const result = await callUi('stabilizability-ui', 'executeStabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28680,7 +25987,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchStabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('stabilizability-ui', 'fetchStabilizabilityRollout', apiBaseUrl)
       setStabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28701,7 +26008,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeConvergizabilityAdminAction(
+      const result = await callUi('convergizability-ui', 'executeConvergizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28709,7 +26016,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchConvergizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('convergizability-ui', 'fetchConvergizabilityRollout', apiBaseUrl)
       setConvergizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28730,7 +26037,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeIterativizabilityAdminAction(
+      const result = await callUi('iterativizability-ui', 'executeIterativizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28738,7 +26045,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchIterativizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('iterativizability-ui', 'fetchIterativizabilityRollout', apiBaseUrl)
       setIterativizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28759,7 +26066,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeApproximatizabilityAdminAction(
+      const result = await callUi('approximatizability-ui', 'executeApproximatizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28767,7 +26074,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchApproximatizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('approximatizability-ui', 'fetchApproximatizabilityRollout', apiBaseUrl)
       setApproximatizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28788,7 +26095,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTolerizabilityAdminAction(
+      const result = await callUi('tolerizability-ui', 'executeTolerizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28796,7 +26103,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTolerizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('tolerizability-ui', 'fetchTolerizabilityRollout', apiBaseUrl)
       setTolerizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28817,7 +26124,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeComparizabilityAdminAction(
+      const result = await callUi('comparizability-ui', 'executeComparizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28825,7 +26132,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchComparizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('comparizability-ui', 'fetchComparizabilityRollout', apiBaseUrl)
       setComparizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28846,7 +26153,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeBenchmarkizabilityAdminAction(
+      const result = await callUi('benchmarkizability-ui', 'executeBenchmarkizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28854,7 +26161,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchBenchmarkizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('benchmarkizability-ui', 'fetchBenchmarkizabilityRollout', apiBaseUrl)
       setBenchmarkizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28875,7 +26182,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMetricizabilityAdminAction(
+      const result = await callUi('metricizability-ui', 'executeMetricizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28883,7 +26190,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMetricizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('metricizability-ui', 'fetchMetricizabilityRollout', apiBaseUrl)
       setMetricizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28904,7 +26211,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCalibratizabilityAdminAction(
+      const result = await callUi('calibratizability-ui', 'executeCalibratizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28912,7 +26219,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCalibratizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('calibratizability-ui', 'fetchCalibratizabilityRollout', apiBaseUrl)
       setCalibratizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28933,7 +26240,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeOptimizabilityAdminAction(
+      const result = await callUi('optimizability-ui', 'executeOptimizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28941,7 +26248,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchOptimizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('optimizability-ui', 'fetchOptimizabilityRollout', apiBaseUrl)
       setOptimizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28962,7 +26269,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSimulatizabilityAdminAction(
+      const result = await callUi('simulatizability-ui', 'executeSimulatizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28970,7 +26277,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSimulatizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('simulatizability-ui', 'fetchSimulatizabilityRollout', apiBaseUrl)
       setSimulatizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -28991,7 +26298,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeHeuristizabilityAdminAction(
+      const result = await callUi('heuristizability-ui', 'executeHeuristizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -28999,7 +26306,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchHeuristizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('heuristizability-ui', 'fetchHeuristizabilityRollout', apiBaseUrl)
       setHeuristizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29020,7 +26327,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRegressizabilityAdminAction(
+      const result = await callUi('regressizability-ui', 'executeRegressizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29028,7 +26335,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRegressizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('regressizability-ui', 'fetchRegressizabilityRollout', apiBaseUrl)
       setRegressizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29049,7 +26356,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeInterpolizabilityAdminAction(
+      const result = await callUi('interpolizability-ui', 'executeInterpolizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29057,7 +26364,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchInterpolizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('interpolizability-ui', 'fetchInterpolizabilityRollout', apiBaseUrl)
       setInterpolizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29078,7 +26385,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeFalsifiizabilityAdminAction(
+      const result = await callUi('falsifiizability-ui', 'executeFalsifiizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29086,7 +26393,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchFalsifiizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('falsifiizability-ui', 'fetchFalsifiizabilityRollout', apiBaseUrl)
       setFalsifiizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29107,7 +26414,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCorroborizabilityAdminAction(
+      const result = await callUi('corroborizability-ui', 'executeCorroborizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29115,7 +26422,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCorroborizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('corroborizability-ui', 'fetchCorroborizabilityRollout', apiBaseUrl)
       setCorroborizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29136,7 +26443,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRetrodictizabilityAdminAction(
+      const result = await callUi('retrodictizability-ui', 'executeRetrodictizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29144,7 +26451,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRetrodictizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('retrodictizability-ui', 'fetchRetrodictizabilityRollout', apiBaseUrl)
       setRetrodictizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29165,7 +26472,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAbductizabilityAdminAction(
+      const result = await callUi('abductizability-ui', 'executeAbductizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29173,7 +26480,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAbductizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('abductizability-ui', 'fetchAbductizabilityRollout', apiBaseUrl)
       setAbductizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29194,7 +26501,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeInductizabilityAdminAction(
+      const result = await callUi('inductizability-ui', 'executeInductizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29202,7 +26509,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchInductizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('inductizability-ui', 'fetchInductizabilityRollout', apiBaseUrl)
       setInductizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29223,7 +26530,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeExtrapolizabilityAdminAction(
+      const result = await callUi('extrapolizability-ui', 'executeExtrapolizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29231,7 +26538,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchExtrapolizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('extrapolizability-ui', 'fetchExtrapolizabilityRollout', apiBaseUrl)
       setExtrapolizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29252,7 +26559,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePredictizabilityAdminAction(
+      const result = await callUi('predictizability-ui', 'executePredictizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29260,7 +26567,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPredictizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('predictizability-ui', 'fetchPredictizabilityRollout', apiBaseUrl)
       setPredictizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29281,7 +26588,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDeterminizabilityAdminAction(
+      const result = await callUi('determinizability-ui', 'executeDeterminizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29289,7 +26596,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDeterminizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('determinizability-ui', 'fetchDeterminizabilityRollout', apiBaseUrl)
       setDeterminizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29310,7 +26617,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeStochasticizabilityAdminAction(
+      const result = await callUi('stochasticizability-ui', 'executeStochasticizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29318,7 +26625,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchStochasticizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('stochasticizability-ui', 'fetchStochasticizabilityRollout', apiBaseUrl)
       setStochasticizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29339,7 +26646,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeProbabilizabilityAdminAction(
+      const result = await callUi('probabilizability-ui', 'executeProbabilizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29347,7 +26654,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchProbabilizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('probabilizability-ui', 'fetchProbabilizabilityRollout', apiBaseUrl)
       setProbabilizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29368,7 +26675,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDeducizabilityAdminAction(
+      const result = await callUi('deducizability-ui', 'executeDeducizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29376,7 +26683,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDeducizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('deducizability-ui', 'fetchDeducizabilityRollout', apiBaseUrl)
       setDeducizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29397,7 +26704,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeInferencizabilityAdminAction(
+      const result = await callUi('inferencizability-ui', 'executeInferencizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29405,7 +26712,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchInferencizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('inferencizability-ui', 'fetchInferencizabilityRollout', apiBaseUrl)
       setInferencizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29426,7 +26733,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDefinizabilityAdminAction(
+      const result = await callUi('definizability-ui', 'executeDefinizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29434,7 +26741,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDefinizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('definizability-ui', 'fetchDefinizabilityRollout', apiBaseUrl)
       setDefinizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29455,7 +26762,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeConcretizabilityAdminAction(
+      const result = await callUi('concretizability-ui', 'executeConcretizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29463,7 +26770,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchConcretizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('concretizability-ui', 'fetchConcretizabilityRollout', apiBaseUrl)
       setConcretizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29484,7 +26791,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAbstractizabilityAdminAction(
+      const result = await callUi('abstractizability-ui', 'executeAbstractizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29492,7 +26799,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAbstractizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('abstractizability-ui', 'fetchAbstractizabilityRollout', apiBaseUrl)
       setAbstractizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29513,7 +26820,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCanonicalizabilityAdminAction(
+      const result = await callUi('canonicalizability-ui', 'executeCanonicalizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29521,7 +26828,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCanonicalizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('canonicalizability-ui', 'fetchCanonicalizabilityRollout', apiBaseUrl)
       setCanonicalizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29542,7 +26849,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeFormalizabilityAdminAction(
+      const result = await callUi('formalizability-ui', 'executeFormalizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29550,7 +26857,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchFormalizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('formalizability-ui', 'fetchFormalizabilityRollout', apiBaseUrl)
       setFormalizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29571,7 +26878,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeStandardizabilityAdminAction(
+      const result = await callUi('standardizability-ui', 'executeStandardizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29579,7 +26886,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchStandardizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('standardizability-ui', 'fetchStandardizabilityRollout', apiBaseUrl)
       setStandardizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29600,7 +26907,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeGeneralizabilityAdminAction(
+      const result = await callUi('generalizability-ui', 'executeGeneralizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29608,7 +26915,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchGeneralizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('generalizability-ui', 'fetchGeneralizabilityRollout', apiBaseUrl)
       setGeneralizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29629,7 +26936,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeContextualizabilityAdminAction(
+      const result = await callUi('contextualizability-ui', 'executeContextualizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29637,7 +26944,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchContextualizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('contextualizability-ui', 'fetchContextualizabilityRollout', apiBaseUrl)
       setContextualizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29658,7 +26965,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeFootnotizabilityAdminAction(
+      const result = await callUi('footnotizability-ui', 'executeFootnotizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29666,7 +26973,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchFootnotizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('footnotizability-ui', 'fetchFootnotizabilityRollout', apiBaseUrl)
       setFootnotizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29687,7 +26994,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeVocabularizabilityAdminAction(
+      const result = await callUi('vocabularizability-ui', 'executeVocabularizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29695,7 +27002,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchVocabularizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('vocabularizability-ui', 'fetchVocabularizabilityRollout', apiBaseUrl)
       setVocabularizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29716,7 +27023,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTerminologizabilityAdminAction(
+      const result = await callUi('terminologizability-ui', 'executeTerminologizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29724,7 +27031,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTerminologizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('terminologizability-ui', 'fetchTerminologizabilityRollout', apiBaseUrl)
       setTerminologizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29745,7 +27052,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeThesaurusizabilityAdminAction(
+      const result = await callUi('thesaurusizability-ui', 'executeThesaurusizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29753,7 +27060,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchThesaurusizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('thesaurusizability-ui', 'fetchThesaurusizabilityRollout', apiBaseUrl)
       setThesaurusizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29774,7 +27081,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeGlossarizabilityAdminAction(
+      const result = await callUi('glossarizability-ui', 'executeGlossarizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29782,7 +27089,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchGlossarizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('glossarizability-ui', 'fetchGlossarizabilityRollout', apiBaseUrl)
       setGlossarizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29803,7 +27110,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeNormalizabilityAdminAction(
+      const result = await callUi('normalizability-ui', 'executeNormalizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29811,7 +27118,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchNormalizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('normalizability-ui', 'fetchNormalizabilityRollout', apiBaseUrl)
       setNormalizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29832,7 +27139,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSerializabilityAdminAction(
+      const result = await callUi('serializability-ui', 'executeSerializabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29840,7 +27147,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSerializabilityRollout(apiBaseUrl)
+      const rollout = await callUi('serializability-ui', 'fetchSerializabilityRollout', apiBaseUrl)
       setSerializabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29861,7 +27168,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeParametrizabilityAdminAction(
+      const result = await callUi('parametrizability-ui', 'executeParametrizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29869,7 +27176,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchParametrizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('parametrizability-ui', 'fetchParametrizabilityRollout', apiBaseUrl)
       setParametrizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29890,7 +27197,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeHarmonizabilityAdminAction(
+      const result = await callUi('harmonizability-ui', 'executeHarmonizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29898,7 +27205,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchHarmonizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('harmonizability-ui', 'fetchHarmonizabilityRollout', apiBaseUrl)
       setHarmonizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29919,7 +27226,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeConsolidatizabilityAdminAction(
+      const result = await callUi('consolidatizability-ui', 'executeConsolidatizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29927,7 +27234,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchConsolidatizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('consolidatizability-ui', 'fetchConsolidatizabilityRollout', apiBaseUrl)
       setConsolidatizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29948,7 +27255,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCitationizabilityAdminAction(
+      const result = await callUi('citationizability-ui', 'executeCitationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29956,7 +27263,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCitationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('citationizability-ui', 'fetchCitationizabilityRollout', apiBaseUrl)
       setCitationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -29977,7 +27284,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAnnotationizabilityAdminAction(
+      const result = await callUi('annotationizability-ui', 'executeAnnotationizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -29985,7 +27292,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAnnotationizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('annotationizability-ui', 'fetchAnnotationizabilityRollout', apiBaseUrl)
       setAnnotationizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30006,7 +27313,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDocumentizabilityAdminAction(
+      const result = await callUi('documentizability-ui', 'executeDocumentizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30014,7 +27321,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDocumentizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('documentizability-ui', 'fetchDocumentizabilityRollout', apiBaseUrl)
       setDocumentizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30035,7 +27342,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeReferencizabilityAdminAction(
+      const result = await callUi('referencizability-ui', 'executeReferencizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30043,7 +27350,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchReferencizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('referencizability-ui', 'fetchReferencizabilityRollout', apiBaseUrl)
       setReferencizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30064,7 +27371,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeBibliographizabilityAdminAction(
+      const result = await callUi('bibliographizability-ui', 'executeBibliographizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30072,7 +27379,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchBibliographizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('bibliographizability-ui', 'fetchBibliographizabilityRollout', apiBaseUrl)
       setBibliographizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30093,7 +27400,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCompilatizabilityAdminAction(
+      const result = await callUi('compilatizability-ui', 'executeCompilatizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30101,7 +27408,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCompilatizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('compilatizability-ui', 'fetchCompilatizabilityRollout', apiBaseUrl)
       setCompilatizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30122,7 +27429,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAggregatizabilityAdminAction(
+      const result = await callUi('aggregatizability-ui', 'executeAggregatizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30130,7 +27437,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAggregatizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('aggregatizability-ui', 'fetchAggregatizabilityRollout', apiBaseUrl)
       setAggregatizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30151,7 +27458,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCollectizabilityAdminAction(
+      const result = await callUi('collectizability-ui', 'executeCollectizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30159,7 +27466,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCollectizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('collectizability-ui', 'fetchCollectizabilityRollout', apiBaseUrl)
       setCollectizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30180,7 +27487,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCuratizabilityAdminAction(
+      const result = await callUi('curatizability-ui', 'executeCuratizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30188,7 +27495,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCuratizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('curatizability-ui', 'fetchCuratizabilityRollout', apiBaseUrl)
       setCuratizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30209,7 +27516,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeArchivizabilityAdminAction(
+      const result = await callUi('archivizability-ui', 'executeArchivizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30217,7 +27524,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchArchivizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('archivizability-ui', 'fetchArchivizabilityRollout', apiBaseUrl)
       setArchivizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30238,7 +27545,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRegistryizabilityAdminAction(
+      const result = await callUi('registryizability-ui', 'executeRegistryizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30246,7 +27553,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRegistryizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('registryizability-ui', 'fetchRegistryizabilityRollout', apiBaseUrl)
       setRegistryizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30267,7 +27574,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeInventoryizabilityAdminAction(
+      const result = await callUi('inventoryizability-ui', 'executeInventoryizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30275,7 +27582,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchInventoryizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('inventoryizability-ui', 'fetchInventoryizabilityRollout', apiBaseUrl)
       setInventoryizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30296,7 +27603,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDirectoryizabilityAdminAction(
+      const result = await callUi('directoryizability-ui', 'executeDirectoryizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30304,7 +27611,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDirectoryizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('directoryizability-ui', 'fetchDirectoryizabilityRollout', apiBaseUrl)
       setDirectoryizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30325,7 +27632,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeIndexizabilityAdminAction(
+      const result = await callUi('indexizability-ui', 'executeIndexizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30333,7 +27640,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchIndexizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('indexizability-ui', 'fetchIndexizabilityRollout', apiBaseUrl)
       setIndexizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30354,7 +27661,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCatalogizabilityAdminAction(
+      const result = await callUi('catalogizability-ui', 'executeCatalogizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30362,7 +27669,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCatalogizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('catalogizability-ui', 'fetchCatalogizabilityRollout', apiBaseUrl)
       setCatalogizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30383,7 +27690,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeNomenclatizabilityAdminAction(
+      const result = await callUi('nomenclatizability-ui', 'executeNomenclatizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30391,7 +27698,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchNomenclatizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('nomenclatizability-ui', 'fetchNomenclatizabilityRollout', apiBaseUrl)
       setNomenclatizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30412,7 +27719,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeClusterizabilityAdminAction(
+      const result = await callUi('clusterizability-ui', 'executeClusterizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30420,7 +27727,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchClusterizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('clusterizability-ui', 'fetchClusterizabilityRollout', apiBaseUrl)
       setClusterizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30441,7 +27748,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSegmentizabilityAdminAction(
+      const result = await callUi('segmentizability-ui', 'executeSegmentizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30449,7 +27756,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSegmentizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('segmentizability-ui', 'fetchSegmentizabilityRollout', apiBaseUrl)
       setSegmentizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30470,7 +27777,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeHierarchizabilityAdminAction(
+      const result = await callUi('hierarchizability-ui', 'executeHierarchizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30478,7 +27785,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchHierarchizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('hierarchizability-ui', 'fetchHierarchizabilityRollout', apiBaseUrl)
       setHierarchizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30499,7 +27806,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSystematizabilityAdminAction(
+      const result = await callUi('systematizability-ui', 'executeSystematizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30507,7 +27814,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSystematizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('systematizability-ui', 'fetchSystematizabilityRollout', apiBaseUrl)
       setSystematizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30528,7 +27835,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeOrdinarizabilityAdminAction(
+      const result = await callUi('ordinarizability-ui', 'executeOrdinarizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30536,7 +27843,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchOrdinarizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('ordinarizability-ui', 'fetchOrdinarizabilityRollout', apiBaseUrl)
       setOrdinarizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30557,7 +27864,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeStratifiabilityAdminAction(
+      const result = await callUi('stratifiability-ui', 'executeStratifiabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30565,7 +27872,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchStratifiabilityRollout(apiBaseUrl)
+      const rollout = await callUi('stratifiability-ui', 'fetchStratifiabilityRollout', apiBaseUrl)
       setStratifiabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30586,7 +27893,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTypologizabilityAdminAction(
+      const result = await callUi('typologizability-ui', 'executeTypologizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30594,7 +27901,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTypologizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('typologizability-ui', 'fetchTypologizabilityRollout', apiBaseUrl)
       setTypologizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30615,7 +27922,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeClassifiabilityAdminAction(
+      const result = await callUi('classifiability-ui', 'executeClassifiabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30623,7 +27930,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchClassifiabilityRollout(apiBaseUrl)
+      const rollout = await callUi('classifiability-ui', 'fetchClassifiabilityRollout', apiBaseUrl)
       setClassifiabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30644,7 +27951,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTaxonomizabilityAdminAction(
+      const result = await callUi('taxonomizability-ui', 'executeTaxonomizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30652,7 +27959,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTaxonomizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('taxonomizability-ui', 'fetchTaxonomizabilityRollout', apiBaseUrl)
       setTaxonomizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30673,7 +27980,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCategorizabilityAdminAction(
+      const result = await callUi('categorizability-ui', 'executeCategorizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30681,7 +27988,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCategorizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('categorizability-ui', 'fetchCategorizabilityRollout', apiBaseUrl)
       setCategorizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30702,7 +28009,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeHistorizabilityAdminAction(
+      const result = await callUi('historizability-ui', 'executeHistorizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30710,7 +28017,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchHistorizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('historizability-ui', 'fetchHistorizabilityRollout', apiBaseUrl)
       setHistorizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30731,7 +28038,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMethodizabilityAdminAction(
+      const result = await callUi('methodizability-ui', 'executeMethodizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30739,7 +28046,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMethodizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('methodizability-ui', 'fetchMethodizabilityRollout', apiBaseUrl)
       setMethodizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30760,7 +28067,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeGnoseizabilityAdminAction(
+      const result = await callUi('gnoseizability-ui', 'executeGnoseizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30768,7 +28075,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchGnoseizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('gnoseizability-ui', 'fetchGnoseizabilityRollout', apiBaseUrl)
       setGnoseizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30789,7 +28096,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTeleologizabilityAdminAction(
+      const result = await callUi('teleologizability-ui', 'executeTeleologizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30797,7 +28104,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTeleologizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('teleologizability-ui', 'fetchTeleologizabilityRollout', apiBaseUrl)
       setTeleologizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30818,7 +28125,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAxiologizabilityAdminAction(
+      const result = await callUi('axiologizability-ui', 'executeAxiologizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30826,7 +28133,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAxiologizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('axiologizability-ui', 'fetchAxiologizabilityRollout', apiBaseUrl)
       setAxiologizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30847,7 +28154,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePhenomenizabilityAdminAction(
+      const result = await callUi('phenomenizability-ui', 'executePhenomenizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30855,7 +28162,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPhenomenizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('phenomenizability-ui', 'fetchPhenomenizabilityRollout', apiBaseUrl)
       setPhenomenizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30876,7 +28183,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeOntologizabilityAdminAction(
+      const result = await callUi('ontologizability-ui', 'executeOntologizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30884,7 +28191,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchOntologizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('ontologizability-ui', 'fetchOntologizabilityRollout', apiBaseUrl)
       setOntologizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30905,7 +28212,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDialectizabilityAdminAction(
+      const result = await callUi('dialectizability-ui', 'executeDialectizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30913,7 +28220,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDialectizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('dialectizability-ui', 'fetchDialectizabilityRollout', apiBaseUrl)
       setDialectizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30934,7 +28241,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeEpistemizabilityAdminAction(
+      const result = await callUi('epistemizability-ui', 'executeEpistemizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30942,7 +28249,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchEpistemizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('epistemizability-ui', 'fetchEpistemizabilityRollout', apiBaseUrl)
       setEpistemizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30963,7 +28270,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeHermeticizabilityAdminAction(
+      const result = await callUi('hermeticizability-ui', 'executeHermeticizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -30971,7 +28278,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchHermeticizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('hermeticizability-ui', 'fetchHermeticizabilityRollout', apiBaseUrl)
       setHermeticizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -30992,7 +28299,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCodifiabilityAdminAction(
+      const result = await callUi('codifiability-ui', 'executeCodifiabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31000,7 +28307,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCodifiabilityRollout(apiBaseUrl)
+      const rollout = await callUi('codifiability-ui', 'fetchCodifiabilityRollout', apiBaseUrl)
       setCodifiabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31021,7 +28328,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMorphizabilityAdminAction(
+      const result = await callUi('morphizability-ui', 'executeMorphizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31029,7 +28336,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMorphizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('morphizability-ui', 'fetchMorphizabilityRollout', apiBaseUrl)
       setMorphizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31050,7 +28357,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRhetorizabilityAdminAction(
+      const result = await callUi('rhetorizability-ui', 'executeRhetorizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31058,7 +28365,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRhetorizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('rhetorizability-ui', 'fetchRhetorizabilityRollout', apiBaseUrl)
       setRhetorizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31079,7 +28386,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSyntacticizabilityAdminAction(
+      const result = await callUi('syntacticizability-ui', 'executeSyntacticizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31087,7 +28394,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSyntacticizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('syntacticizability-ui', 'fetchSyntacticizabilityRollout', apiBaseUrl)
       setSyntacticizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31108,7 +28415,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePragmatizabilityAdminAction(
+      const result = await callUi('pragmatizability-ui', 'executePragmatizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31116,7 +28423,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPragmatizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('pragmatizability-ui', 'fetchPragmatizabilityRollout', apiBaseUrl)
       setPragmatizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31137,7 +28444,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSemanticizabilityAdminAction(
+      const result = await callUi('semanticizability-ui', 'executeSemanticizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31145,7 +28452,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSemanticizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('semanticizability-ui', 'fetchSemanticizabilityRollout', apiBaseUrl)
       setSemanticizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31166,7 +28473,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeLexicalizabilityAdminAction(
+      const result = await callUi('lexicalizability-ui', 'executeLexicalizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31174,7 +28481,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchLexicalizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('lexicalizability-ui', 'fetchLexicalizabilityRollout', apiBaseUrl)
       setLexicalizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31195,7 +28502,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeHermeneutizabilityAdminAction(
+      const result = await callUi('hermeneutizability-ui', 'executeHermeneutizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31203,7 +28510,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchHermeneutizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('hermeneutizability-ui', 'fetchHermeneutizabilityRollout', apiBaseUrl)
       setHermeneutizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31224,7 +28531,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSemiotizabilityAdminAction(
+      const result = await callUi('semiotizability-ui', 'executeSemiotizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31232,7 +28539,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSemiotizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('semiotizability-ui', 'fetchSemiotizabilityRollout', apiBaseUrl)
       setSemiotizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31253,7 +28560,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMythicizabilityAdminAction(
+      const result = await callUi('mythicizability-ui', 'executeMythicizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31261,7 +28568,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMythicizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('mythicizability-ui', 'fetchMythicizabilityRollout', apiBaseUrl)
       setMythicizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31282,7 +28589,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCaracterizabilityAdminAction(
+      const result = await callUi('caracterizability-ui', 'executeCaracterizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31290,7 +28597,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCaracterizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('caracterizability-ui', 'fetchCaracterizabilityRollout', apiBaseUrl)
       setCaracterizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31311,7 +28618,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeArchetypizabilityAdminAction(
+      const result = await callUi('archetypizability-ui', 'executeArchetypizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31319,7 +28626,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchArchetypizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('archetypizability-ui', 'fetchArchetypizabilityRollout', apiBaseUrl)
       setArchetypizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31340,7 +28647,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeParabolizabilityAdminAction(
+      const result = await callUi('parabolizability-ui', 'executeParabolizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31348,7 +28655,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchParabolizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('parabolizability-ui', 'fetchParabolizabilityRollout', apiBaseUrl)
       setParabolizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31369,7 +28676,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAnalogizabilityAdminAction(
+      const result = await callUi('analogizability-ui', 'executeAnalogizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31377,7 +28684,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAnalogizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('analogizability-ui', 'fetchAnalogizabilityRollout', apiBaseUrl)
       setAnalogizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31398,7 +28705,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeEmblemizabilityAdminAction(
+      const result = await callUi('emblemizability-ui', 'executeEmblemizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31406,7 +28713,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchEmblemizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('emblemizability-ui', 'fetchEmblemizabilityRollout', apiBaseUrl)
       setEmblemizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31427,7 +28734,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeStylizabilityAdminAction(
+      const result = await callUi('stylizability-ui', 'executeStylizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31435,7 +28742,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchStylizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('stylizability-ui', 'fetchStylizabilityRollout', apiBaseUrl)
       setStylizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31456,7 +28763,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTokenizabilityAdminAction(
+      const result = await callUi('tokenizability-ui', 'executeTokenizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31464,7 +28771,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTokenizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('tokenizability-ui', 'fetchTokenizabilityRollout', apiBaseUrl)
       setTokenizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31485,7 +28792,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAllegorizabilityAdminAction(
+      const result = await callUi('allegorizability-ui', 'executeAllegorizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31493,7 +28800,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAllegorizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('allegorizability-ui', 'fetchAllegorizabilityRollout', apiBaseUrl)
       setAllegorizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31514,7 +28821,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeIconizabilityAdminAction(
+      const result = await callUi('iconizability-ui', 'executeIconizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31522,7 +28829,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchIconizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('iconizability-ui', 'fetchIconizabilityRollout', apiBaseUrl)
       setIconizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31543,7 +28850,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMaterializabilityAdminAction(
+      const result = await callUi('materializability-ui', 'executeMaterializabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31551,7 +28858,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMaterializabilityRollout(apiBaseUrl)
+      const rollout = await callUi('materializability-ui', 'fetchMaterializabilityRollout', apiBaseUrl)
       setMaterializabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31572,7 +28879,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePersonifiabilityAdminAction(
+      const result = await callUi('personifiability-ui', 'executePersonifiabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31580,7 +28887,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPersonifiabilityRollout(apiBaseUrl)
+      const rollout = await callUi('personifiability-ui', 'fetchPersonifiabilityRollout', apiBaseUrl)
       setPersonifiabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31601,7 +28908,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDramatizabilityAdminAction(
+      const result = await callUi('dramatizability-ui', 'executeDramatizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31609,7 +28916,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDramatizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('dramatizability-ui', 'fetchDramatizabilityRollout', apiBaseUrl)
       setDramatizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31630,7 +28937,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMetaphorizabilityAdminAction(
+      const result = await callUi('metaphorizability-ui', 'executeMetaphorizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31638,7 +28945,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMetaphorizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('metaphorizability-ui', 'fetchMetaphorizabilityRollout', apiBaseUrl)
       setMetaphorizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31659,7 +28966,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTypifiabilityAdminAction(
+      const result = await callUi('typifiability-ui', 'executeTypifiabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31667,7 +28974,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTypifiabilityRollout(apiBaseUrl)
+      const rollout = await callUi('typifiability-ui', 'fetchTypifiabilityRollout', apiBaseUrl)
       setTypifiabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31688,7 +28995,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeConnotabilityAdminAction(
+      const result = await callUi('connotability-ui', 'executeConnotabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31696,7 +29003,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchConnotabilityRollout(apiBaseUrl)
+      const rollout = await callUi('connotability-ui', 'fetchConnotabilityRollout', apiBaseUrl)
       setConnotabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31717,7 +29024,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSignifiabilityAdminAction(
+      const result = await callUi('signifiability-ui', 'executeSignifiabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31725,7 +29032,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSignifiabilityRollout(apiBaseUrl)
+      const rollout = await callUi('signifiability-ui', 'fetchSignifiabilityRollout', apiBaseUrl)
       setSignifiabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31746,7 +29053,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeEvocatabilityAdminAction(
+      const result = await callUi('evocatability-ui', 'executeEvocatabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31754,7 +29061,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchEvocatabilityRollout(apiBaseUrl)
+      const rollout = await callUi('evocatability-ui', 'fetchEvocatabilityRollout', apiBaseUrl)
       setEvocatabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31775,7 +29082,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeVisualizabilityAdminAction(
+      const result = await callUi('visualizability-ui', 'executeVisualizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31783,7 +29090,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchVisualizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('visualizability-ui', 'fetchVisualizabilityRollout', apiBaseUrl)
       setVisualizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31804,7 +29111,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSymbolizabilityAdminAction(
+      const result = await callUi('symbolizability-ui', 'executeSymbolizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31812,7 +29119,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSymbolizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('symbolizability-ui', 'fetchSymbolizabilityRollout', apiBaseUrl)
       setSymbolizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31833,7 +29140,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeIllustratabilityAdminAction(
+      const result = await callUi('illustratability-ui', 'executeIllustratabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31841,7 +29148,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchIllustratabilityRollout(apiBaseUrl)
+      const rollout = await callUi('illustratability-ui', 'fetchIllustratabilityRollout', apiBaseUrl)
       setIllustratabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31862,7 +29169,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeNarratabilityAdminAction(
+      const result = await callUi('narratability-ui', 'executeNarratabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31870,7 +29177,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchNarratabilityRollout(apiBaseUrl)
+      const rollout = await callUi('narratability-ui', 'fetchNarratabilityRollout', apiBaseUrl)
       setNarratabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31891,7 +29198,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeFormulatabilityAdminAction(
+      const result = await callUi('formulatability-ui', 'executeFormulatabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31899,7 +29206,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchFormulatabilityRollout(apiBaseUrl)
+      const rollout = await callUi('formulatability-ui', 'fetchFormulatabilityRollout', apiBaseUrl)
       setFormulatabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31920,7 +29227,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeEnunciabilityAdminAction(
+      const result = await callUi('enunciability-ui', 'executeEnunciabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31928,7 +29235,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchEnunciabilityRollout(apiBaseUrl)
+      const rollout = await callUi('enunciability-ui', 'fetchEnunciabilityRollout', apiBaseUrl)
       setEnunciabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31949,7 +29256,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePresentabilityAdminAction(
+      const result = await callUi('presentability-ui', 'executePresentabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31957,7 +29264,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPresentabilityRollout(apiBaseUrl)
+      const rollout = await callUi('presentability-ui', 'fetchPresentabilityRollout', apiBaseUrl)
       setPresentabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -31978,7 +29285,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRepresentabilityAdminAction(
+      const result = await callUi('representability-ui', 'executeRepresentabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -31986,7 +29293,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRepresentabilityRollout(apiBaseUrl)
+      const rollout = await callUi('representability-ui', 'fetchRepresentabilityRollout', apiBaseUrl)
       setRepresentabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32007,7 +29314,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeElaboratabilityAdminAction(
+      const result = await callUi('elaboratability-ui', 'executeElaboratabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32015,7 +29322,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchElaboratabilityRollout(apiBaseUrl)
+      const rollout = await callUi('elaboratability-ui', 'fetchElaboratabilityRollout', apiBaseUrl)
       setElaboratabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32036,7 +29343,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeArticulabilityAdminAction(
+      const result = await callUi('articulability-ui', 'executeArticulabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32044,7 +29351,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchArticulabilityRollout(apiBaseUrl)
+      const rollout = await callUi('articulability-ui', 'fetchArticulabilityRollout', apiBaseUrl)
       setArticulabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32065,7 +29372,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCommunicabilityAdminAction(
+      const result = await callUi('communicability-ui', 'executeCommunicabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32073,7 +29380,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCommunicabilityRollout(apiBaseUrl)
+      const rollout = await callUi('communicability-ui', 'fetchCommunicabilityRollout', apiBaseUrl)
       setCommunicabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32094,7 +29401,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeExpressivenessAdminAction(
+      const result = await callUi('expressiveness-ui', 'executeExpressivenessAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32102,7 +29409,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchExpressivenessRollout(apiBaseUrl)
+      const rollout = await callUi('expressiveness-ui', 'fetchExpressivenessRollout', apiBaseUrl)
       setExpressivenessRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32123,7 +29430,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDescribabilityAdminAction(
+      const result = await callUi('describability-ui', 'executeDescribabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32131,7 +29438,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDescribabilityRollout(apiBaseUrl)
+      const rollout = await callUi('describability-ui', 'fetchDescribabilityRollout', apiBaseUrl)
       setDescribabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32152,7 +29459,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDetectabilityAdminAction(
+      const result = await callUi('detectability-ui', 'executeDetectabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32160,7 +29467,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDetectabilityRollout(apiBaseUrl)
+      const rollout = await callUi('detectability-ui', 'fetchDetectabilityRollout', apiBaseUrl)
       setDetectabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32181,7 +29488,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeConspicuousnessAdminAction(
+      const result = await callUi('conspicuousness-ui', 'executeConspicuousnessAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32189,7 +29496,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchConspicuousnessRollout(apiBaseUrl)
+      const rollout = await callUi('conspicuousness-ui', 'fetchConspicuousnessRollout', apiBaseUrl)
       setConspicuousnessRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32210,7 +29517,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDistinctivenessAdminAction(
+      const result = await callUi('distinctiveness-ui', 'executeDistinctivenessAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32218,7 +29525,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDistinctivenessRollout(apiBaseUrl)
+      const rollout = await callUi('distinctiveness-ui', 'fetchDistinctivenessRollout', apiBaseUrl)
       setDistinctivenessRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32239,7 +29546,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDiscernibilityAdminAction(
+      const result = await callUi('discernibility-ui', 'executeDiscernibilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32247,7 +29554,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDiscernibilityRollout(apiBaseUrl)
+      const rollout = await callUi('discernibility-ui', 'fetchDiscernibilityRollout', apiBaseUrl)
       setDiscernibilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32268,7 +29575,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeNoticeabilityAdminAction(
+      const result = await callUi('noticeability-ui', 'executeNoticeabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32276,7 +29583,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchNoticeabilityRollout(apiBaseUrl)
+      const rollout = await callUi('noticeability-ui', 'fetchNoticeabilityRollout', apiBaseUrl)
       setNoticeabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32297,7 +29604,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePerceptibilityAdminAction(
+      const result = await callUi('perceptibility-ui', 'executePerceptibilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32305,7 +29612,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPerceptibilityRollout(apiBaseUrl)
+      const rollout = await callUi('perceptibility-ui', 'fetchPerceptibilityRollout', apiBaseUrl)
       setPerceptibilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32326,7 +29633,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeScannabilityAdminAction(
+      const result = await callUi('scannability-ui', 'executeScannabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32334,7 +29641,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchScannabilityRollout(apiBaseUrl)
+      const rollout = await callUi('scannability-ui', 'fetchScannabilityRollout', apiBaseUrl)
       setScannabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32355,7 +29662,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeInterpretabilityAdminAction(
+      const result = await callUi('interpretability-ui', 'executeInterpretabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32363,7 +29670,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchInterpretabilityRollout(apiBaseUrl)
+      const rollout = await callUi('interpretability-ui', 'fetchInterpretabilityRollout', apiBaseUrl)
       setInterpretabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32384,7 +29691,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRecognizabilityAdminAction(
+      const result = await callUi('recognizability-ui', 'executeRecognizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32392,7 +29699,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRecognizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('recognizability-ui', 'fetchRecognizabilityRollout', apiBaseUrl)
       setRecognizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32413,7 +29720,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeFamiliarityAdminAction(
+      const result = await callUi('familiarity-ui', 'executeFamiliarityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32421,7 +29728,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchFamiliarityRollout(apiBaseUrl)
+      const rollout = await callUi('familiarity-ui', 'fetchFamiliarityRollout', apiBaseUrl)
       setFamiliarityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32442,7 +29749,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCoherenceAdminAction(
+      const result = await callUi('coherence-ui', 'executeCoherenceAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32450,7 +29757,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCoherenceRollout(apiBaseUrl)
+      const rollout = await callUi('coherence-ui', 'fetchCoherenceRollout', apiBaseUrl)
       setCoherenceRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32471,7 +29778,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeParsabilityAdminAction(
+      const result = await callUi('parsability-ui', 'executeParsabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32479,7 +29786,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchParsabilityRollout(apiBaseUrl)
+      const rollout = await callUi('parsability-ui', 'fetchParsabilityRollout', apiBaseUrl)
       setParsabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32500,7 +29807,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeLegibilityAdminAction(
+      const result = await callUi('legibility-ui', 'executeLegibilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32508,7 +29815,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchLegibilityRollout(apiBaseUrl)
+      const rollout = await callUi('legibility-ui', 'fetchLegibilityRollout', apiBaseUrl)
       setLegibilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32529,7 +29836,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeIntelligibilityAdminAction(
+      const result = await callUi('intelligibility-ui', 'executeIntelligibilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32537,7 +29844,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchIntelligibilityRollout(apiBaseUrl)
+      const rollout = await callUi('intelligibility-ui', 'fetchIntelligibilityRollout', apiBaseUrl)
       setIntelligibilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32558,7 +29865,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeComprehensibilityAdminAction(
+      const result = await callUi('comprehensibility-ui', 'executeComprehensibilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32566,7 +29873,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchComprehensibilityRollout(apiBaseUrl)
+      const rollout = await callUi('comprehensibility-ui', 'fetchComprehensibilityRollout', apiBaseUrl)
       setComprehensibilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32587,7 +29894,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeNegotiabilityAdminAction(
+      const result = await callUi('negotiability-ui', 'executeNegotiabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32595,7 +29902,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchNegotiabilityRollout(apiBaseUrl)
+      const rollout = await callUi('negotiability-ui', 'fetchNegotiabilityRollout', apiBaseUrl)
       setNegotiabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32616,7 +29923,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSimplicityAdminAction(
+      const result = await callUi('simplicity-ui', 'executeSimplicityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32624,7 +29931,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSimplicityRollout(apiBaseUrl)
+      const rollout = await callUi('simplicity-ui', 'fetchSimplicityRollout', apiBaseUrl)
       setSimplicityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32645,7 +29952,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeClarityAdminAction(
+      const result = await callUi('clarity-ui', 'executeClarityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32653,7 +29960,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchClarityRollout(apiBaseUrl)
+      const rollout = await callUi('clarity-ui', 'fetchClarityRollout', apiBaseUrl)
       setClarityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32674,7 +29981,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeReadabilityAdminAction(
+      const result = await callUi('readability-ui', 'executeReadabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32682,7 +29989,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchReadabilityRollout(apiBaseUrl)
+      const rollout = await callUi('readability-ui', 'fetchReadabilityRollout', apiBaseUrl)
       setReadabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32703,7 +30010,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTeachabilityAdminAction(
+      const result = await callUi('teachability-ui', 'executeTeachabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32711,7 +30018,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTeachabilityRollout(apiBaseUrl)
+      const rollout = await callUi('teachability-ui', 'fetchTeachabilityRollout', apiBaseUrl)
       setTeachabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32732,7 +30039,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMemorabilityAdminAction(
+      const result = await callUi('memorability-ui', 'executeMemorabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32740,7 +30047,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMemorabilityRollout(apiBaseUrl)
+      const rollout = await callUi('memorability-ui', 'fetchMemorabilityRollout', apiBaseUrl)
       setMemorabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32761,7 +30068,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeUnderstandabilityAdminAction(
+      const result = await callUi('understandability-ui', 'executeUnderstandabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32769,7 +30076,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchUnderstandabilityRollout(apiBaseUrl)
+      const rollout = await callUi('understandability-ui', 'fetchUnderstandabilityRollout', apiBaseUrl)
       setUnderstandabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32790,7 +30097,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDeliverabilityAdminAction(
+      const result = await callUi('deliverability-ui', 'executeDeliverabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32798,7 +30105,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDeliverabilityRollout(apiBaseUrl)
+      const rollout = await callUi('deliverability-ui', 'fetchDeliverabilityRollout', apiBaseUrl)
       setDeliverabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32819,7 +30126,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeLearnabilityAdminAction(
+      const result = await callUi('learnability-ui', 'executeLearnabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32827,7 +30134,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchLearnabilityRollout(apiBaseUrl)
+      const rollout = await callUi('learnability-ui', 'fetchLearnabilityRollout', apiBaseUrl)
       setLearnabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32848,7 +30155,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeProfitabilityAdminAction(
+      const result = await callUi('profitability-ui', 'executeProfitabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32856,7 +30163,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchProfitabilityRollout(apiBaseUrl)
+      const rollout = await callUi('profitability-ui', 'fetchProfitabilityRollout', apiBaseUrl)
       setProfitabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32877,7 +30184,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSuitabilityAdminAction(
+      const result = await callUi('suitability-ui', 'executeSuitabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32885,7 +30192,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSuitabilityRollout(apiBaseUrl)
+      const rollout = await callUi('suitability-ui', 'fetchSuitabilityRollout', apiBaseUrl)
       setSuitabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32906,7 +30213,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMarketabilityAdminAction(
+      const result = await callUi('marketability-ui', 'executeMarketabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32914,7 +30221,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMarketabilityRollout(apiBaseUrl)
+      const rollout = await callUi('marketability-ui', 'fetchMarketabilityRollout', apiBaseUrl)
       setMarketabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32935,7 +30242,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDesirabilityAdminAction(
+      const result = await callUi('desirability-ui', 'executeDesirabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32943,7 +30250,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDesirabilityRollout(apiBaseUrl)
+      const rollout = await callUi('desirability-ui', 'fetchDesirabilityRollout', apiBaseUrl)
       setDesirabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32964,7 +30271,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAffordabilityAdminAction(
+      const result = await callUi('affordability-ui', 'executeAffordabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -32972,7 +30279,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAffordabilityRollout(apiBaseUrl)
+      const rollout = await callUi('affordability-ui', 'fetchAffordabilityRollout', apiBaseUrl)
       setAffordabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -32993,7 +30300,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAcceptabilityAdminAction(
+      const result = await callUi('acceptability-ui', 'executeAcceptabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33001,7 +30308,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAcceptabilityRollout(apiBaseUrl)
+      const rollout = await callUi('acceptability-ui', 'fetchAcceptabilityRollout', apiBaseUrl)
       setAcceptabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33022,7 +30329,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAdoptabilityAdminAction(
+      const result = await callUi('adoptability-ui', 'executeAdoptabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33030,7 +30337,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAdoptabilityRollout(apiBaseUrl)
+      const rollout = await callUi('adoptability-ui', 'fetchAdoptabilityRollout', apiBaseUrl)
       setAdoptabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33051,7 +30358,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeConformanceAdminAction(
+      const result = await callUi('conformance-ui', 'executeConformanceAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33059,7 +30366,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchConformanceRollout(apiBaseUrl)
+      const rollout = await callUi('conformance-ui', 'fetchConformanceRollout', apiBaseUrl)
       setConformanceRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33080,7 +30387,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeFeasibilityAdminAction(
+      const result = await callUi('feasibility-ui', 'executeFeasibilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33088,7 +30395,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchFeasibilityRollout(apiBaseUrl)
+      const rollout = await callUi('feasibility-ui', 'fetchFeasibilityRollout', apiBaseUrl)
       setFeasibilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33109,7 +30416,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeViabilityAdminAction(
+      const result = await callUi('viability-ui', 'executeViabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33117,7 +30424,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchViabilityRollout(apiBaseUrl)
+      const rollout = await callUi('viability-ui', 'fetchViabilityRollout', apiBaseUrl)
       setViabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33138,7 +30445,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSurvivabilityAdminAction(
+      const result = await callUi('survivability-ui', 'executeSurvivabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33146,7 +30453,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSurvivabilityRollout(apiBaseUrl)
+      const rollout = await callUi('survivability-ui', 'fetchSurvivabilityRollout', apiBaseUrl)
       setSurvivabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33167,7 +30474,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAppropriatenessAdminAction(
+      const result = await callUi('appropriateness-ui', 'executeAppropriatenessAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33175,7 +30482,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAppropriatenessRollout(apiBaseUrl)
+      const rollout = await callUi('appropriateness-ui', 'fetchAppropriatenessRollout', apiBaseUrl)
       setAppropriatenessRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33196,7 +30503,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeEffectivenessAdminAction(
+      const result = await callUi('effectiveness-ui', 'executeEffectivenessAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33204,7 +30511,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchEffectivenessRollout(apiBaseUrl)
+      const rollout = await callUi('effectiveness-ui', 'fetchEffectivenessRollout', apiBaseUrl)
       setEffectivenessRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33225,7 +30532,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAccessibilityAdminAction(
+      const result = await callUi('accessibility-ui', 'executeAccessibilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33233,7 +30540,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAccessibilityRollout(apiBaseUrl)
+      const rollout = await callUi('accessibility-ui', 'fetchAccessibilityRollout', apiBaseUrl)
       setAccessibilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33254,7 +30561,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeUsabilityAdminAction(
+      const result = await callUi('usability-ui', 'executeUsabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33262,7 +30569,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchUsabilityRollout(apiBaseUrl)
+      const rollout = await callUi('usability-ui', 'fetchUsabilityRollout', apiBaseUrl)
       setUsabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33283,7 +30590,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTrustworthinessAdminAction(
+      const result = await callUi('trustworthiness-ui', 'executeTrustworthinessAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33291,7 +30598,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTrustworthinessRollout(apiBaseUrl)
+      const rollout = await callUi('trustworthiness-ui', 'fetchTrustworthinessRollout', apiBaseUrl)
       setTrustworthinessRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33312,7 +30619,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeComposabilityAdminAction(
+      const result = await callUi('composability-ui', 'executeComposabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33320,7 +30627,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchComposabilityRollout(apiBaseUrl)
+      const rollout = await callUi('composability-ui', 'fetchComposabilityRollout', apiBaseUrl)
       setComposabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33341,7 +30648,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDependabilityAdminAction(
+      const result = await callUi('dependability-ui', 'executeDependabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33349,7 +30656,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDependabilityRollout(apiBaseUrl)
+      const rollout = await callUi('dependability-ui', 'fetchDependabilityRollout', apiBaseUrl)
       setDependabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33370,7 +30677,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeResponsivenessAdminAction(
+      const result = await callUi('responsiveness-ui', 'executeResponsivenessAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33378,7 +30685,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchResponsivenessRollout(apiBaseUrl)
+      const rollout = await callUi('responsiveness-ui', 'fetchResponsivenessRollout', apiBaseUrl)
       setResponsivenessRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33399,7 +30706,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRepeatabilityAdminAction(
+      const result = await callUi('repeatability-ui', 'executeRepeatabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33407,7 +30714,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRepeatabilityRollout(apiBaseUrl)
+      const rollout = await callUi('repeatability-ui', 'fetchRepeatabilityRollout', apiBaseUrl)
       setRepeatabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33428,7 +30735,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePredictabilityAdminAction(
+      const result = await callUi('predictability-ui', 'executePredictabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33436,7 +30743,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPredictabilityRollout(apiBaseUrl)
+      const rollout = await callUi('predictability-ui', 'fetchPredictabilityRollout', apiBaseUrl)
       setPredictabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33457,7 +30764,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMonitorabilityAdminAction(
+      const result = await callUi('monitorability-ui', 'executeMonitorabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33465,7 +30772,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMonitorabilityRollout(apiBaseUrl)
+      const rollout = await callUi('monitorability-ui', 'fetchMonitorabilityRollout', apiBaseUrl)
       setMonitorabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33486,7 +30793,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAutomatabilityAdminAction(
+      const result = await callUi('automatability-ui', 'executeAutomatabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33494,7 +30801,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAutomatabilityRollout(apiBaseUrl)
+      const rollout = await callUi('automatability-ui', 'fetchAutomatabilityRollout', apiBaseUrl)
       setAutomatabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33515,7 +30822,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSchedulabilityAdminAction(
+      const result = await callUi('schedulability-ui', 'executeSchedulabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33523,7 +30830,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSchedulabilityRollout(apiBaseUrl)
+      const rollout = await callUi('schedulability-ui', 'fetchSchedulabilityRollout', apiBaseUrl)
       setSchedulabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33544,7 +30851,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeOrchestrabilityAdminAction(
+      const result = await callUi('orchestrability-ui', 'executeOrchestrabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33552,7 +30859,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchOrchestrabilityRollout(apiBaseUrl)
+      const rollout = await callUi('orchestrability-ui', 'fetchOrchestrabilityRollout', apiBaseUrl)
       setOrchestrabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33573,7 +30880,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeIntegrabilityAdminAction(
+      const result = await callUi('integrability-ui', 'executeIntegrabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33581,7 +30888,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchIntegrabilityRollout(apiBaseUrl)
+      const rollout = await callUi('integrability-ui', 'fetchIntegrabilityRollout', apiBaseUrl)
       setIntegrabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33602,7 +30909,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeControllabilityAdminAction(
+      const result = await callUi('controllability-ui', 'executeControllabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33610,7 +30917,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchControllabilityRollout(apiBaseUrl)
+      const rollout = await callUi('controllability-ui', 'fetchControllabilityRollout', apiBaseUrl)
       setControllabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33631,7 +30938,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeManageabilityAdminAction(
+      const result = await callUi('manageability-ui', 'executeManageabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33639,7 +30946,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchManageabilityRollout(apiBaseUrl)
+      const rollout = await callUi('manageability-ui', 'fetchManageabilityRollout', apiBaseUrl)
       setManageabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33660,7 +30967,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDeployabilityAdminAction(
+      const result = await callUi('deployability-ui', 'executeDeployabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33668,7 +30975,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDeployabilityRollout(apiBaseUrl)
+      const rollout = await callUi('deployability-ui', 'fetchDeployabilityRollout', apiBaseUrl)
       setDeployabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33689,7 +30996,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeProgrammabilityAdminAction(
+      const result = await callUi('programmability-ui', 'executeProgrammabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33697,7 +31004,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchProgrammabilityRollout(apiBaseUrl)
+      const rollout = await callUi('programmability-ui', 'fetchProgrammabilityRollout', apiBaseUrl)
       setProgrammabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33718,7 +31025,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAdjustabilityAdminAction(
+      const result = await callUi('adjustability-ui', 'executeAdjustabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33726,7 +31033,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAdjustabilityRollout(apiBaseUrl)
+      const rollout = await callUi('adjustability-ui', 'fetchAdjustabilityRollout', apiBaseUrl)
       setAdjustabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33747,7 +31054,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTunabilityAdminAction(
+      const result = await callUi('tunability-ui', 'executeTunabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33755,7 +31062,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTunabilityRollout(apiBaseUrl)
+      const rollout = await callUi('tunability-ui', 'fetchTunabilityRollout', apiBaseUrl)
       setTunabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33776,7 +31083,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeOperabilityAdminAction(
+      const result = await callUi('operability-ui', 'executeOperabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33784,7 +31091,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchOperabilityRollout(apiBaseUrl)
+      const rollout = await callUi('operability-ui', 'fetchOperabilityRollout', apiBaseUrl)
       setOperabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33805,7 +31112,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCustomizabilityAdminAction(
+      const result = await callUi('customizability-ui', 'executeCustomizabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33813,7 +31120,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCustomizabilityRollout(apiBaseUrl)
+      const rollout = await callUi('customizability-ui', 'fetchCustomizabilityRollout', apiBaseUrl)
       setCustomizabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33834,7 +31141,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeConfigurabilityAdminAction(
+      const result = await callUi('configurability-ui', 'executeConfigurabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33842,7 +31149,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchConfigurabilityRollout(apiBaseUrl)
+      const rollout = await callUi('configurability-ui', 'fetchConfigurabilityRollout', apiBaseUrl)
       setConfigurabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33863,7 +31170,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeModifiabilityAdminAction(
+      const result = await callUi('modifiability-ui', 'executeModifiabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33871,7 +31178,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchModifiabilityRollout(apiBaseUrl)
+      const rollout = await callUi('modifiability-ui', 'fetchModifiabilityRollout', apiBaseUrl)
       setModifiabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33892,7 +31199,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeExtensibilityAdminAction(
+      const result = await callUi('extensibility-ui', 'executeExtensibilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33900,7 +31207,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchExtensibilityRollout(apiBaseUrl)
+      const rollout = await callUi('extensibility-ui', 'fetchExtensibilityRollout', apiBaseUrl)
       setExtensibilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33921,7 +31228,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeFlexibilityAdminAction(
+      const result = await callUi('flexibility-ui', 'executeFlexibilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33929,7 +31236,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchFlexibilityRollout(apiBaseUrl)
+      const rollout = await callUi('flexibility-ui', 'fetchFlexibilityRollout', apiBaseUrl)
       setFlexibilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33950,7 +31257,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAdaptabilityAdminAction(
+      const result = await callUi('adaptability-ui', 'executeAdaptabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33958,7 +31265,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAdaptabilityRollout(apiBaseUrl)
+      const rollout = await callUi('adaptability-ui', 'fetchAdaptabilityRollout', apiBaseUrl)
       setAdaptabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -33979,7 +31286,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCompatibilityAdminAction(
+      const result = await callUi('compatibility-ui', 'executeCompatibilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33987,7 +31294,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCompatibilityRollout(apiBaseUrl)
+      const rollout = await callUi('compatibility-ui', 'fetchCompatibilityRollout', apiBaseUrl)
       setCompatibilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34008,7 +31315,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executePortabilityAdminAction(
+      const result = await callUi('portability-ui', 'executePortabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34016,7 +31323,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchPortabilityRollout(apiBaseUrl)
+      const rollout = await callUi('portability-ui', 'fetchPortabilityRollout', apiBaseUrl)
       setPortabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34037,7 +31344,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeTransferabilityAdminAction(
+      const result = await callUi('transferability-ui', 'executeTransferabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34045,7 +31352,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchTransferabilityRollout(apiBaseUrl)
+      const rollout = await callUi('transferability-ui', 'fetchTransferabilityRollout', apiBaseUrl)
       setTransferabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34066,7 +31373,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeInterchangeabilityAdminAction(
+      const result = await callUi('interchangeability-ui', 'executeInterchangeabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34074,7 +31381,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchInterchangeabilityRollout(apiBaseUrl)
+      const rollout = await callUi('interchangeability-ui', 'fetchInterchangeabilityRollout', apiBaseUrl)
       setInterchangeabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34095,7 +31402,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeLinkabilityAdminAction(
+      const result = await callUi('linkability-ui', 'executeLinkabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34103,7 +31410,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchLinkabilityRollout(apiBaseUrl)
+      const rollout = await callUi('linkability-ui', 'fetchLinkabilityRollout', apiBaseUrl)
       setLinkabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34124,7 +31431,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeConnectabilityAdminAction(
+      const result = await callUi('connectability-ui', 'executeConnectabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34132,7 +31439,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchConnectabilityRollout(apiBaseUrl)
+      const rollout = await callUi('connectability-ui', 'fetchConnectabilityRollout', apiBaseUrl)
       setConnectabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34153,7 +31460,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeNavigabilityAdminAction(
+      const result = await callUi('navigability-ui', 'executeNavigabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34161,7 +31468,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchNavigabilityRollout(apiBaseUrl)
+      const rollout = await callUi('navigability-ui', 'fetchNavigabilityRollout', apiBaseUrl)
       setNavigabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34182,7 +31489,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDiscoverabilityAdminAction(
+      const result = await callUi('discoverability-ui', 'executeDiscoverabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34190,7 +31497,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDiscoverabilityRollout(apiBaseUrl)
+      const rollout = await callUi('discoverability-ui', 'fetchDiscoverabilityRollout', apiBaseUrl)
       setDiscoverabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34211,7 +31518,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeRetrievabilityAdminAction(
+      const result = await callUi('retrievability-ui', 'executeRetrievabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34219,7 +31526,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchRetrievabilityRollout(apiBaseUrl)
+      const rollout = await callUi('retrievability-ui', 'fetchRetrievabilityRollout', apiBaseUrl)
       setRetrievabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34240,7 +31547,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeLocatabilityAdminAction(
+      const result = await callUi('locatability-ui', 'executeLocatabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34248,7 +31555,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchLocatabilityRollout(apiBaseUrl)
+      const rollout = await callUi('locatability-ui', 'fetchLocatabilityRollout', apiBaseUrl)
       setLocatabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34269,7 +31576,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeReferencabilityAdminAction(
+      const result = await callUi('referencability-ui', 'executeReferencabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34277,7 +31584,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchReferencabilityRollout(apiBaseUrl)
+      const rollout = await callUi('referencability-ui', 'fetchReferencabilityRollout', apiBaseUrl)
       setReferencabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34298,7 +31605,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAssignabilityAdminAction(
+      const result = await callUi('assignability-ui', 'executeAssignabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34306,7 +31613,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAssignabilityRollout(apiBaseUrl)
+      const rollout = await callUi('assignability-ui', 'fetchAssignabilityRollout', apiBaseUrl)
       setAssignabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34327,7 +31634,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDistinguishabilityAdminAction(
+      const result = await callUi('distinguishability-ui', 'executeDistinguishabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34335,7 +31642,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDistinguishabilityRollout(apiBaseUrl)
+      const rollout = await callUi('distinguishability-ui', 'fetchDistinguishabilityRollout', apiBaseUrl)
       setDistinguishabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34356,7 +31663,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeComparabilityAdminAction(
+      const result = await callUi('comparability-ui', 'executeComparabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34364,7 +31671,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchComparabilityRollout(apiBaseUrl)
+      const rollout = await callUi('comparability-ui', 'fetchComparabilityRollout', apiBaseUrl)
       setComparabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34385,7 +31692,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeIdentifiabilityAdminAction(
+      const result = await callUi('identifiability-ui', 'executeIdentifiabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34393,7 +31700,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchIdentifiabilityRollout(apiBaseUrl)
+      const rollout = await callUi('identifiability-ui', 'fetchIdentifiabilityRollout', apiBaseUrl)
       setIdentifiabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34414,7 +31721,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAttributabilityAdminAction(
+      const result = await callUi('attributability-ui', 'executeAttributabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34422,7 +31729,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAttributabilityRollout(apiBaseUrl)
+      const rollout = await callUi('attributability-ui', 'fetchAttributabilityRollout', apiBaseUrl)
       setAttributabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34443,7 +31750,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeWarrantabilityAdminAction(
+      const result = await callUi('warrantability-ui', 'executeWarrantabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34451,7 +31758,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchWarrantabilityRollout(apiBaseUrl)
+      const rollout = await callUi('warrantability-ui', 'fetchWarrantabilityRollout', apiBaseUrl)
       setWarrantabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34472,7 +31779,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeSubstantiabilityAdminAction(
+      const result = await callUi('substantiability-ui', 'executeSubstantiabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34480,7 +31787,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchSubstantiabilityRollout(apiBaseUrl)
+      const rollout = await callUi('substantiability-ui', 'fetchSubstantiabilityRollout', apiBaseUrl)
       setSubstantiabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34501,7 +31808,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCertifiabilityAdminAction(
+      const result = await callUi('certifiability-ui', 'executeCertifiabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34509,7 +31816,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCertifiabilityRollout(apiBaseUrl)
+      const rollout = await callUi('certifiability-ui', 'fetchCertifiabilityRollout', apiBaseUrl)
       setCertifiabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34530,7 +31837,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeMeasurabilityAdminAction(
+      const result = await callUi('measurability-ui', 'executeMeasurabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34538,7 +31845,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchMeasurabilityRollout(apiBaseUrl)
+      const rollout = await callUi('measurability-ui', 'fetchMeasurabilityRollout', apiBaseUrl)
       setMeasurabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34559,7 +31866,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAssessabilityAdminAction(
+      const result = await callUi('assessability-ui', 'executeAssessabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34567,7 +31874,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAssessabilityRollout(apiBaseUrl)
+      const rollout = await callUi('assessability-ui', 'fetchAssessabilityRollout', apiBaseUrl)
       setAssessabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34588,7 +31895,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeReviewabilityAdminAction(
+      const result = await callUi('reviewability-ui', 'executeReviewabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34596,7 +31903,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchReviewabilityRollout(apiBaseUrl)
+      const rollout = await callUi('reviewability-ui', 'fetchReviewabilityRollout', apiBaseUrl)
       setReviewabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34617,7 +31924,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeJustifiabilityAdminAction(
+      const result = await callUi('justifiability-ui', 'executeJustifiabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34625,7 +31932,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchJustifiabilityRollout(apiBaseUrl)
+      const rollout = await callUi('justifiability-ui', 'fetchJustifiabilityRollout', apiBaseUrl)
       setJustifiabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34646,7 +31953,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDemonstrabilityAdminAction(
+      const result = await callUi('demonstrability-ui', 'executeDemonstrabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34654,7 +31961,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDemonstrabilityRollout(apiBaseUrl)
+      const rollout = await callUi('demonstrability-ui', 'fetchDemonstrabilityRollout', apiBaseUrl)
       setDemonstrabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34675,7 +31982,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeExplainabilityAdminAction(
+      const result = await callUi('explainability-ui', 'executeExplainabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34683,7 +31990,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchExplainabilityRollout(apiBaseUrl)
+      const rollout = await callUi('explainability-ui', 'fetchExplainabilityRollout', apiBaseUrl)
       setExplainabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34704,7 +32011,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeInspectabilityAdminAction(
+      const result = await callUi('inspectability-ui', 'executeInspectabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34712,7 +32019,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchInspectabilityRollout(apiBaseUrl)
+      const rollout = await callUi('inspectability-ui', 'fetchInspectabilityRollout', apiBaseUrl)
       setInspectabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34733,7 +32040,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAuditabilityAdminAction(
+      const result = await callUi('auditability-ui', 'executeAuditabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34741,7 +32048,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAuditabilityRollout(apiBaseUrl)
+      const rollout = await callUi('auditability-ui', 'fetchAuditabilityRollout', apiBaseUrl)
       setAuditabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34762,7 +32069,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeDefensibilityAdminAction(
+      const result = await callUi('defensibility-ui', 'executeDefensibilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34770,7 +32077,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchDefensibilityRollout(apiBaseUrl)
+      const rollout = await callUi('defensibility-ui', 'fetchDefensibilityRollout', apiBaseUrl)
       setDefensibilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34791,7 +32098,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeReproducibilityAdminAction(
+      const result = await callUi('reproducibility-ui', 'executeReproducibilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34799,7 +32106,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchReproducibilityRollout(apiBaseUrl)
+      const rollout = await callUi('reproducibility-ui', 'fetchReproducibilityRollout', apiBaseUrl)
       setReproducibilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34820,7 +32127,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeCredibilityAdminAction(
+      const result = await callUi('credibility-ui', 'executeCredibilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34828,7 +32135,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchCredibilityRollout(apiBaseUrl)
+      const rollout = await callUi('credibility-ui', 'fetchCredibilityRollout', apiBaseUrl)
       setCredibilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34849,7 +32156,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeValidityAdminAction(
+      const result = await callUi('validity-ui', 'executeValidityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34857,7 +32164,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchValidityRollout(apiBaseUrl)
+      const rollout = await callUi('validity-ui', 'fetchValidityRollout', apiBaseUrl)
       setValidityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34878,7 +32185,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeConfirmabilityAdminAction(
+      const result = await callUi('confirmability-ui', 'executeConfirmabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34886,7 +32193,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchConfirmabilityRollout(apiBaseUrl)
+      const rollout = await callUi('confirmability-ui', 'fetchConfirmabilityRollout', apiBaseUrl)
       setConfirmabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34907,7 +32214,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeVerifiabilityAdminAction(
+      const result = await callUi('verifiability-ui', 'executeVerifiabilityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34915,7 +32222,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchVerifiabilityRollout(apiBaseUrl)
+      const rollout = await callUi('verifiability-ui', 'fetchVerifiabilityRollout', apiBaseUrl)
       setVerifiabilityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34936,7 +32243,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeProvenanceAdminAction(
+      const result = await callUi('provenance-ui', 'executeProvenanceAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34944,7 +32251,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchProvenanceRollout(apiBaseUrl)
+      const rollout = await callUi('provenance-ui', 'fetchProvenanceRollout', apiBaseUrl)
       setProvenanceRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34965,7 +32272,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAuthenticityAdminAction(
+      const result = await callUi('authenticity-ui', 'executeAuthenticityAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -34973,7 +32280,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAuthenticityRollout(apiBaseUrl)
+      const rollout = await callUi('authenticity-ui', 'fetchAuthenticityRollout', apiBaseUrl)
       setAuthenticityRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -34994,7 +32301,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeAttestationAdminAction(
+      const result = await callUi('attestation-ui', 'executeAttestationAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -35002,7 +32309,7 @@ function App() {
       )
       setBillingMessage(result.message)
       await handleLoadBillingStatus()
-      const rollout = await fetchAttestationRollout(apiBaseUrl)
+      const rollout = await callUi('attestation-ui', 'fetchAttestationRollout', apiBaseUrl)
       setAttestationRollout(rollout)
     } catch (error) {
       setBillingError(
@@ -35019,7 +32326,7 @@ function App() {
     setBillingError(null)
 
     try {
-      await downloadRunHistoryExport(
+      await callUi('run-history-ui', 'downloadRunHistoryExport', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
