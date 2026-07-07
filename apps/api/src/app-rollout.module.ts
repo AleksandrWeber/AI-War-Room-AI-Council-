@@ -363,6 +363,16 @@ import { NotarjournalizabilityModule } from './notarjournalizability/notarjourna
 import { WitnessjournalizabilityModule } from './witnessjournalizability/witnessjournalizability.module.js'
 import { ProofjournalizabilityModule } from './proofjournalizability/proofjournalizability.module.js'
 import { AuditjournalizabilityModule } from './auditjournalizability/auditjournalizability.module.js'
+import { RegistryjournalizabilityModule } from './registryjournalizability/registryjournalizability.module.js'
+import { TracejournalizabilityModule } from './tracejournalizability/tracejournalizability.module.js'
+import { EvidencejournalizabilityModule } from './evidencejournalizability/evidencejournalizability.module.js'
+import { AttestjournalizabilityModule } from './attestjournalizability/attestjournalizability.module.js'
+import { IntegrityjournalizabilityModule } from './integrityjournalizability/integrityjournalizability.module.js'
+import { RegistryvaultizabilityModule } from './registryvaultizability/registryvaultizability.module.js'
+import { TracevaultizabilityModule } from './tracevaultizability/tracevaultizability.module.js'
+import { EvidencevaultizabilityModule } from './evidencevaultizability/evidencevaultizability.module.js'
+import { AuditvaultizabilityModule } from './auditvaultizability/auditvaultizability.module.js'
+import { CompliancevaultizabilityModule } from './compliancevaultizability/compliancevaultizability.module.js'
 
 @Module({
   imports: [
@@ -730,6 +740,16 @@ import { AuditjournalizabilityModule } from './auditjournalizability/auditjourna
     WitnessjournalizabilityModule,
     ProofjournalizabilityModule,
     AuditjournalizabilityModule,
+    RegistryjournalizabilityModule,
+    TracejournalizabilityModule,
+    EvidencejournalizabilityModule,
+    AttestjournalizabilityModule,
+    IntegrityjournalizabilityModule,
+    RegistryvaultizabilityModule,
+    TracevaultizabilityModule,
+    EvidencevaultizabilityModule,
+    AuditvaultizabilityModule,
+    CompliancevaultizabilityModule,
   ],
   exports: [
     CustomizabilityModule,

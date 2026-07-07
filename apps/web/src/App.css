@@ -14225,6 +14225,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-registryjournalizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-registryjournalizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-registryjournalizability-card p,
+.workspace-registryjournalizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-registryjournalizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-registryjournalizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-tracejournalizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-tracejournalizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-tracejournalizability-card p,
+.workspace-tracejournalizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-tracejournalizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-tracejournalizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-evidencejournalizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-evidencejournalizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-evidencejournalizability-card p,
+.workspace-evidencejournalizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-evidencejournalizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-evidencejournalizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-attestjournalizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-attestjournalizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-attestjournalizability-card p,
+.workspace-attestjournalizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-attestjournalizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-attestjournalizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-integrityjournalizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-integrityjournalizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-integrityjournalizability-card p,
+.workspace-integrityjournalizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-integrityjournalizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-integrityjournalizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-registryvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-registryvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-registryvaultizability-card p,
+.workspace-registryvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-registryvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-registryvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-tracevaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-tracevaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-tracevaultizability-card p,
+.workspace-tracevaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-tracevaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-tracevaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-evidencevaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-evidencevaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-evidencevaultizability-card p,
+.workspace-evidencevaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-evidencevaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-evidencevaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-auditvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-auditvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-auditvaultizability-card p,
+.workspace-auditvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-auditvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-auditvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-compliancevaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-compliancevaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-compliancevaultizability-card p,
+.workspace-compliancevaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-compliancevaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-compliancevaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;
