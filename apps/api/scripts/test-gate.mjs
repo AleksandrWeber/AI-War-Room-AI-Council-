@@ -18,6 +18,7 @@ const run = spawnSync(
     'run',
     '--fileParallelism=false',
     '--retry=2',
+    '--pool=forks',
     '--reporter=json',
     '--outputFile',
     reportPath,
