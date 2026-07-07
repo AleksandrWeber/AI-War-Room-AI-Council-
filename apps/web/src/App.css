@@ -12925,6 +12925,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-confidentialityizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-confidentialityizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-confidentialityizability-card p,
+.workspace-confidentialityizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-confidentialityizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-confidentialityizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-nonrepudiationizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-nonrepudiationizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-nonrepudiationizability-card p,
+.workspace-nonrepudiationizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-nonrepudiationizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-nonrepudiationizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-accesscontrolizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-accesscontrolizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-accesscontrolizability-card p,
+.workspace-accesscontrolizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-accesscontrolizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-accesscontrolizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-leastprivilegeizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-leastprivilegeizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-leastprivilegeizability-card p,
+.workspace-leastprivilegeizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-leastprivilegeizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-leastprivilegeizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-zerotrustizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-zerotrustizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-zerotrustizability-card p,
+.workspace-zerotrustizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-zerotrustizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-zerotrustizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-identityproofizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-identityproofizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-identityproofizability-card p,
+.workspace-identityproofizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-identityproofizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-identityproofizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-keymanagementizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-keymanagementizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-keymanagementizability-card p,
+.workspace-keymanagementizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-keymanagementizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-keymanagementizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-secretmanagementizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-secretmanagementizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-secretmanagementizability-card p,
+.workspace-secretmanagementizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-secretmanagementizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-secretmanagementizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-cryptographyizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-cryptographyizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-cryptographyizability-card p,
+.workspace-cryptographyizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-cryptographyizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-cryptographyizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-complianceguardizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-complianceguardizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-complianceguardizability-card p,
+.workspace-complianceguardizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-complianceguardizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-complianceguardizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

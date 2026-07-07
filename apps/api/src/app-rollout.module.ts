@@ -313,6 +313,16 @@ import { VulnerabilityizabilityModule } from './vulnerabilityizability/vulnerabi
 import { MitigationizabilityModule } from './mitigationizability/mitigationizability.module.js'
 import { HardeningizabilityModule } from './hardeningizability/hardeningizability.module.js'
 import { SegregationizabilityModule } from './segregationizability/segregationizability.module.js'
+import { ConfidentialityizabilityModule } from './confidentialityizability/confidentialityizability.module.js'
+import { NonrepudiationizabilityModule } from './nonrepudiationizability/nonrepudiationizability.module.js'
+import { AccesscontrolizabilityModule } from './accesscontrolizability/accesscontrolizability.module.js'
+import { LeastprivilegeizabilityModule } from './leastprivilegeizability/leastprivilegeizability.module.js'
+import { ZerotrustizabilityModule } from './zerotrustizability/zerotrustizability.module.js'
+import { IdentityproofizabilityModule } from './identityproofizability/identityproofizability.module.js'
+import { KeymanagementizabilityModule } from './keymanagementizability/keymanagementizability.module.js'
+import { SecretmanagementizabilityModule } from './secretmanagementizability/secretmanagementizability.module.js'
+import { CryptographyizabilityModule } from './cryptographyizability/cryptographyizability.module.js'
+import { ComplianceguardizabilityModule } from './complianceguardizability/complianceguardizability.module.js'
 
 @Module({
   imports: [
@@ -630,6 +640,16 @@ import { SegregationizabilityModule } from './segregationizability/segregationiz
     MitigationizabilityModule,
     HardeningizabilityModule,
     SegregationizabilityModule,
+    ConfidentialityizabilityModule,
+    NonrepudiationizabilityModule,
+    AccesscontrolizabilityModule,
+    LeastprivilegeizabilityModule,
+    ZerotrustizabilityModule,
+    IdentityproofizabilityModule,
+    KeymanagementizabilityModule,
+    SecretmanagementizabilityModule,
+    CryptographyizabilityModule,
+    ComplianceguardizabilityModule,
   ],
   exports: [
     CustomizabilityModule,

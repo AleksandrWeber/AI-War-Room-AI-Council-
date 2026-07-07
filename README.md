@@ -1456,7 +1456,19 @@ Current `v5.326` behavior:
 - Workspace owners and admins can inspect workspace compatibilizability metrics from `GET /api/compatibilizability/workspace/:workspaceId/admin`.
 - The web billing panel shows compatibilizability rollout checks and workspace compatibilizability admin tools.
 
-Current `v5.490` behavior:
+Current `v5.500` behavior:
+
+- Production complianceguardizability rollout readiness validates complianceguardizability coverage and readiness through `GET /api/complianceguardizability/readiness`.
+- Workspace owners and admins can inspect workspace complianceguardizability metrics from `GET /api/complianceguardizability/workspace/:workspaceId/admin`.
+- The web billing panel shows complianceguardizability rollout checks and workspace complianceguardizability admin tools.
+
+Current `v5.330` behavior:
+
+- Production zerotrustizability rollout readiness validates zerotrustizability coverage and readiness through `GET /api/zerotrustizability/readiness`.
+- Workspace owners and admins can inspect workspace zerotrustizability metrics from `GET /api/zerotrustizability/workspace/:workspaceId/admin`.
+- The web billing panel shows zerotrustizability rollout checks and workspace zerotrustizability admin tools.
+
+Current `v5.330` behavior:
 
 - Production segregationizability rollout readiness validates segregationizability coverage and readiness through `GET /api/segregationizability/readiness`.
 - Workspace owners and admins can inspect workspace segregationizability metrics from `GET /api/segregationizability/workspace/:workspaceId/admin`.
