@@ -4,6 +4,9 @@ import {
   workspaceSettingsAdminActionResponseSchema,
   workspaceSettingsAdminSummaryResponseSchema,
 } from '@ai-war-room/schemas'
+import { formatWorkspaceRole } from '@ai-war-room/web-blocks'
+
+export { formatWorkspaceRole }
 
 export async function fetchWorkspaceMemberAdminSummary(
   apiBaseUrl: string,
@@ -114,10 +117,6 @@ export async function executeWorkspaceSettingsAdminAction(
   }
 
   return workspaceSettingsAdminActionResponseSchema.parse(await response.json())
-}
-
-export function formatWorkspaceRole(role: string) {
-  return role.charAt(0).toUpperCase() + role.slice(1)
 }
 
 function readContentDispositionFilename(contentDisposition: string | null) {

@@ -1102,6 +1102,7 @@ import type {
   WorkspaceSettingsAdminSummaryResponse,
 } from '@ai-war-room/schemas'
 import { BillingWorkspacePanel } from '@ai-war-room/web-blocks'
+import { RolloutAdminLazyGate, WorkspaceAdminLazySection } from './features/RolloutAdminLazySection'
 import './App.css'
 import {
   fetchAuthRollout,
@@ -6018,7 +6019,6 @@ import {
   downloadWorkspaceAuditExport,
   fetchWorkspaceMemberAdminSummary,
   fetchWorkspaceSettingsAdminSummary,
-  formatWorkspaceRole,
 } from './workspace-ui'
 import {
   type TemporalRunStartResponse,
@@ -37797,6 +37797,7 @@ function App() {
           </p>
         </div>
 
+        <RolloutAdminLazyGate enabled={rolloutControlsEnabled}>
         {authCapabilities?.supportsAuthRollout && authRollout ? (
           <div className="billing-rollout">
             <div className="billing-rollout__header">
@@ -53528,6 +53529,8 @@ function App() {
           </div>
         ) : null}
 
+        </RolloutAdminLazyGate>
+
         <BillingWorkspacePanel
           mode="overview"
           workspaceId={defaultWorkspaceId}
@@ -53599,79 +53602,31 @@ function App() {
           </div>
         ) : null}
 
-        {settingsAdminSummary ? (
-          <div className="billing-admin workspace-settings-admin">
-            <div className="billing-admin__header">
-              <span>Workspace settings admin</span>
-              <strong>{settingsAdminSummary.role}</strong>
-            </div>
-            <p>{settingsAdminSummary.guidance}</p>
-            <div className="billing-admin__stats">
-              <article className="billing-admin-stat">
-                <span>Workspace name</span>
-                <strong>{settingsAdminSummary.settings.name}</strong>
-                <small>{settingsAdminSummary.settings.workspaceId}</small>
-              </article>
-              <article className="billing-admin-stat">
-                <span>Created</span>
-                <strong>{settingsAdminSummary.settings.createdAt.slice(0, 10)}</strong>
-                <small>UTC timestamp</small>
-              </article>
-            </div>
-            {settingsAdminSummary.availableActions.includes(
-              'update_workspace_name',
-            ) ? (
-              <form
-                className="workspace-settings-form"
-                onSubmit={(event) => {
-                  event.preventDefault()
-                  if (!workspaceNameDraft.trim()) {
-                    return
-                  }
-                  void handleSettingsAdminAction({
-                    action: 'update_workspace_name',
-                    name: workspaceNameDraft.trim(),
-                  })
-                }}
-              >
-                <label>
-                  Workspace name
-                  <input
-                    value={workspaceNameDraft}
-                    onChange={(event) => setWorkspaceNameDraft(event.target.value)}
-                  />
-                </label>
-                <button
-                  type="submit"
-                  disabled={
-                    settingsAdminAction !== 'idle' ||
-                    !workspaceNameDraft.trim() ||
-                    workspaceNameDraft.trim() ===
-                      settingsAdminSummary.settings.name
-                  }
-                >
-                  Save workspace name
-                </button>
-              </form>
-            ) : null}
-            {settingsAdminSummary.availableActions.includes(
-              'reset_workspace_name',
-            ) ? (
-              <button
-                className="secondary-button"
-                type="button"
-                disabled={settingsAdminAction !== 'idle'}
-                onClick={() =>
-                  void handleSettingsAdminAction({
-                    action: 'reset_workspace_name',
-                  })
-                }
-              >
-                Reset workspace name
-              </button>
-            ) : null}
-          </div>
-        ) : null}
+        <WorkspaceAdminLazySection
+          mode="settings"
+          settingsAdminSummary={settingsAdminSummary}
+          memberAdminSummary={null}
+          workspaceNameDraft={workspaceNameDraft}
+          settingsAdminAction={settingsAdminAction}
+          newMemberForm={newMemberForm}
+          memberAdminAction={memberAdminAction}
+          billingAction={billingAction}
+          onWorkspaceNameDraftChange={setWorkspaceNameDraft}
+          onUpdateWorkspaceName={(name) =>
+            void handleSettingsAdminAction({
+              action: 'update_workspace_name',
+              name,
+            })
+          }
+          onResetWorkspaceName={() =>
+            void handleSettingsAdminAction({
+              action: 'reset_workspace_name',
+            })
+          }
+          onNewMemberFormChange={setNewMemberForm}
+          onMemberAdminAction={(input) => void handleMemberAdminAction(input)}
+          onExportAudit={(format) => void handleExportWorkspaceAudit(format)}
+        />
 
         {modelHealthAdminSummary ? (
           <div className="billing-admin workspace-model-health-admin">
@@ -88707,163 +88662,31 @@ function App() {
           </div>
         ) : null}
 
-        {memberAdminSummary ? (
-          <div className="billing-admin workspace-member-admin">
-            <div className="billing-admin__header">
-              <span>Member admin tools</span>
-              <strong>{memberAdminSummary.role}</strong>
-            </div>
-            <p>{memberAdminSummary.guidance}</p>
-            <div className="billing-admin__stats">
-              <article className="billing-admin-stat">
-                <span>Members</span>
-                <strong>{memberAdminSummary.stats.memberCount}</strong>
-                <small>{memberAdminSummary.stats.ownerCount} owners</small>
-              </article>
-              <article className="billing-admin-stat">
-                <span>Admins</span>
-                <strong>{memberAdminSummary.stats.adminCount}</strong>
-                <small>Role-managed access</small>
-              </article>
-            </div>
-            <div className="workspace-member-list">
-              {memberAdminSummary.members.map((member) => (
-                <article className="workspace-member-card" key={member.userId}>
-                  <div>
-                    <strong>{member.userId}</strong>
-                    <p>{formatWorkspaceRole(member.role)}</p>
-                    {member.email ? <small>{member.email}</small> : null}
-                  </div>
-                  <div className="workspace-member-card__actions">
-                    {memberAdminSummary.availableActions.includes(
-                      'update_member_role',
-                    ) && member.role !== 'owner' ? (
-                      <button
-                        className="secondary-button"
-                        type="button"
-                        disabled={memberAdminAction !== 'idle'}
-                        onClick={() =>
-                          void handleMemberAdminAction({
-                            action: 'update_member_role',
-                            userId: member.userId,
-                            role: 'admin',
-                          })
-                        }
-                      >
-                        Make admin
-                      </button>
-                    ) : null}
-                    {memberAdminSummary.availableActions.includes(
-                      'remove_member',
-                    ) ? (
-                      <button
-                        className="danger-button"
-                        type="button"
-                        disabled={memberAdminAction !== 'idle'}
-                        onClick={() =>
-                          void handleMemberAdminAction({
-                            action: 'remove_member',
-                            userId: member.userId,
-                          })
-                        }
-                      >
-                        Remove
-                      </button>
-                    ) : null}
-                  </div>
-                </article>
-              ))}
-            </div>
-            {memberAdminSummary.availableActions.includes('add_member') ? (
-              <form
-                className="workspace-member-form"
-                onSubmit={(event) => {
-                  event.preventDefault()
-                  if (!newMemberForm.userId.trim()) {
-                    return
-                  }
-                  void handleMemberAdminAction({
-                    action: 'add_member',
-                    userId: newMemberForm.userId.trim(),
-                    role: newMemberForm.role,
-                    email: newMemberForm.email.trim() || undefined,
-                  })
-                }}
-              >
-                <label>
-                  User id
-                  <input
-                    value={newMemberForm.userId}
-                    onChange={(event) =>
-                      setNewMemberForm((current) => ({
-                        ...current,
-                        userId: event.target.value,
-                      }))
-                    }
-                  />
-                </label>
-                <label>
-                  Role
-                  <select
-                    value={newMemberForm.role}
-                    onChange={(event) =>
-                      setNewMemberForm((current) => ({
-                        ...current,
-                        role: event.target.value as typeof current.role,
-                      }))
-                    }
-                  >
-                    <option value="viewer">Viewer</option>
-                    <option value="member">Member</option>
-                    <option value="admin">Admin</option>
-                    <option value="owner">Owner</option>
-                  </select>
-                </label>
-                <label>
-                  Email
-                  <input
-                    value={newMemberForm.email}
-                    onChange={(event) =>
-                      setNewMemberForm((current) => ({
-                        ...current,
-                        email: event.target.value,
-                      }))
-                    }
-                  />
-                </label>
-                <button
-                  type="submit"
-                  disabled={
-                    memberAdminAction !== 'idle' || !newMemberForm.userId.trim()
-                  }
-                >
-                  Add test member
-                </button>
-              </form>
-            ) : null}
-            <div className="workspace-audit-export">
-              <span>Workspace audit export</span>
-              <div className="billing-export-actions">
-                <button
-                  className="secondary-button"
-                  type="button"
-                  disabled={billingAction !== 'idle' || memberAdminAction !== 'idle'}
-                  onClick={() => void handleExportWorkspaceAudit('csv')}
-                >
-                  Export audit CSV
-                </button>
-                <button
-                  className="secondary-button"
-                  type="button"
-                  disabled={billingAction !== 'idle' || memberAdminAction !== 'idle'}
-                  onClick={() => void handleExportWorkspaceAudit('json')}
-                >
-                  Export audit JSON
-                </button>
-              </div>
-            </div>
-          </div>
-        ) : null}
+        <WorkspaceAdminLazySection
+          mode="member"
+          settingsAdminSummary={null}
+          memberAdminSummary={memberAdminSummary}
+          workspaceNameDraft={workspaceNameDraft}
+          settingsAdminAction={settingsAdminAction}
+          newMemberForm={newMemberForm}
+          memberAdminAction={memberAdminAction}
+          billingAction={billingAction}
+          onWorkspaceNameDraftChange={setWorkspaceNameDraft}
+          onUpdateWorkspaceName={(name) =>
+            void handleSettingsAdminAction({
+              action: 'update_workspace_name',
+              name,
+            })
+          }
+          onResetWorkspaceName={() =>
+            void handleSettingsAdminAction({
+              action: 'reset_workspace_name',
+            })
+          }
+          onNewMemberFormChange={setNewMemberForm}
+          onMemberAdminAction={(input) => void handleMemberAdminAction(input)}
+          onExportAudit={(format) => void handleExportWorkspaceAudit(format)}
+        />
 
         <BillingWorkspacePanel
           mode="details"

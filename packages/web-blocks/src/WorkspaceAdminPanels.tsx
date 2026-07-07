@@ -1,0 +1,73 @@
+import type { WorkspaceMemberAdminSummaryResponse } from '@ai-war-room/schemas'
+import type { WorkspaceSettingsAdminSummaryResponse } from '@ai-war-room/schemas'
+import {
+  WorkspaceMemberAdminPanel,
+  type WorkspaceMemberFormState,
+} from './WorkspaceMemberAdminPanel.js'
+import { WorkspaceSettingsAdminPanel } from './WorkspaceSettingsAdminPanel.js'
+
+export type WorkspaceAdminPanelsProps = {
+  settingsAdminSummary: WorkspaceSettingsAdminSummaryResponse | null
+  memberAdminSummary: WorkspaceMemberAdminSummaryResponse | null
+  workspaceNameDraft: string
+  settingsAdminAction: 'idle' | 'running'
+  newMemberForm: WorkspaceMemberFormState
+  memberAdminAction: 'idle' | 'running'
+  billingAction: 'idle' | 'loading' | 'upgrading' | 'portal' | 'canceling'
+  onWorkspaceNameDraftChange: (value: string) => void
+  onUpdateWorkspaceName: (name: string) => void
+  onResetWorkspaceName: () => void
+  onNewMemberFormChange: (value: WorkspaceMemberFormState) => void
+  onMemberAdminAction: (input: {
+    action: 'update_member_role' | 'remove_member' | 'add_member'
+    userId: string
+    role?: WorkspaceMemberFormState['role']
+    email?: string
+  }) => void
+  onExportAudit: (format: 'csv' | 'json') => void
+}
+
+export function WorkspaceAdminPanels({
+  settingsAdminSummary,
+  memberAdminSummary,
+  workspaceNameDraft,
+  settingsAdminAction,
+  newMemberForm,
+  memberAdminAction,
+  billingAction,
+  onWorkspaceNameDraftChange,
+  onUpdateWorkspaceName,
+  onResetWorkspaceName,
+  onNewMemberFormChange,
+  onMemberAdminAction,
+  onExportAudit,
+  mode = 'all',
+}: WorkspaceAdminPanelsProps & {
+  mode?: 'all' | 'settings' | 'member'
+}) {
+  return (
+    <>
+      {(mode === 'all' || mode === 'settings') && settingsAdminSummary ? (
+        <WorkspaceSettingsAdminPanel
+          summary={settingsAdminSummary}
+          workspaceNameDraft={workspaceNameDraft}
+          settingsAdminAction={settingsAdminAction}
+          onWorkspaceNameDraftChange={onWorkspaceNameDraftChange}
+          onUpdateWorkspaceName={onUpdateWorkspaceName}
+          onResetWorkspaceName={onResetWorkspaceName}
+        />
+      ) : null}
+      {(mode === 'all' || mode === 'member') && memberAdminSummary ? (
+        <WorkspaceMemberAdminPanel
+          summary={memberAdminSummary}
+          newMemberForm={newMemberForm}
+          memberAdminAction={memberAdminAction}
+          billingAction={billingAction}
+          onNewMemberFormChange={onNewMemberFormChange}
+          onMemberAdminAction={onMemberAdminAction}
+          onExportAudit={onExportAudit}
+        />
+      ) : null}
+    </>
+  )
+}
