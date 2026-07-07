@@ -383,6 +383,16 @@ import { AuditabilityvaultizabilityModule } from './auditabilityvaultizability/a
 import { InspectabilityvaultizabilityModule } from './inspectabilityvaultizability/inspectabilityvaultizability.module.js'
 import { ReproducibilityvaultizabilityModule } from './reproducibilityvaultizability/reproducibilityvaultizability.module.js'
 import { CredibilityvaultizabilityModule } from './credibilityvaultizability/credibilityvaultizability.module.js'
+import { DefensibilityvaultizabilityModule } from './defensibilityvaultizability/defensibilityvaultizability.module.js'
+import { ExplainabilityvaultizabilityModule } from './explainabilityvaultizability/explainabilityvaultizability.module.js'
+import { DemonstrabilityvaultizabilityModule } from './demonstrabilityvaultizability/demonstrabilityvaultizability.module.js'
+import { JustifiabilityvaultizabilityModule } from './justifiabilityvaultizability/justifiabilityvaultizability.module.js'
+import { ReviewabilityvaultizabilityModule } from './reviewabilityvaultizability/reviewabilityvaultizability.module.js'
+import { AssessabilityvaultizabilityModule } from './assessabilityvaultizability/assessabilityvaultizability.module.js'
+import { MeasurabilityvaultizabilityModule } from './measurabilityvaultizability/measurabilityvaultizability.module.js'
+import { CertifiabilityvaultizabilityModule } from './certifiabilityvaultizability/certifiabilityvaultizability.module.js'
+import { SubstantiabilityvaultizabilityModule } from './substantiabilityvaultizability/substantiabilityvaultizability.module.js'
+import { WarrantabilityvaultizabilityModule } from './warrantabilityvaultizability/warrantabilityvaultizability.module.js'
 
 @Module({
   imports: [
@@ -770,6 +780,16 @@ import { CredibilityvaultizabilityModule } from './credibilityvaultizability/cre
     InspectabilityvaultizabilityModule,
     ReproducibilityvaultizabilityModule,
     CredibilityvaultizabilityModule,
+    DefensibilityvaultizabilityModule,
+    ExplainabilityvaultizabilityModule,
+    DemonstrabilityvaultizabilityModule,
+    JustifiabilityvaultizabilityModule,
+    ReviewabilityvaultizabilityModule,
+    AssessabilityvaultizabilityModule,
+    MeasurabilityvaultizabilityModule,
+    CertifiabilityvaultizabilityModule,
+    SubstantiabilityvaultizabilityModule,
+    WarrantabilityvaultizabilityModule,
   ],
   exports: [
     CustomizabilityModule,
