@@ -1,13 +1,8 @@
 import type {
-  BillingCapabilitiesResponse,
-  BillingInvoiceStatus,
-  BillingStatus,
   CheckoutPaidTier,
   MockCustomerPortalResponse,
-  PaidTier,
 } from '@ai-war-room/schemas'
 import {
-  PAID_TIER_LIMITS,
   billingAdminActionResponseSchema,
   billingAdminSummaryResponseSchema,
   billingCapabilitiesResponseSchema,
@@ -23,40 +18,28 @@ import {
   customerPortalSessionResponseSchema,
   mockCustomerPortalResponseSchema,
 } from '@ai-war-room/schemas'
+import {
+  canOpenCustomerPortal,
+  describeBillingCapabilities,
+  formatBillingAdminAction,
+  formatBillingAlertSeverity,
+  formatBillingNotificationStatus,
+  formatBillingRolloutCheckStatus,
+  formatBillingRolloutStatus,
+  formatBillingStatus,
+  formatInvoiceAmount,
+  formatInvoiceStatus,
+  formatMeterUsageReportStatus,
+  formatPaidTier,
+  formatTierLimits,
+  formatUsageCostLabel,
+  formatUsageMeterLabel,
+  formatUsagePercent,
+} from '@ai-war-room/web-blocks'
 
 export const defaultWorkspaceId = 'local_workspace'
 
 export type BillingReturnHint = 'success' | 'cancel' | 'portal'
-
-export function formatPaidTier(tier: PaidTier) {
-  switch (tier) {
-    case 'free':
-      return 'Free'
-    case 'pro':
-      return 'Pro'
-    case 'business':
-      return 'Business'
-  }
-}
-
-export function formatBillingStatus(status: BillingStatus) {
-  switch (status) {
-    case 'draft':
-      return 'Draft'
-    case 'active':
-      return 'Active'
-    case 'past_due':
-      return 'Past due'
-    case 'canceled':
-      return 'Canceled'
-  }
-}
-
-export function formatTierLimits(tier: PaidTier) {
-  const limits = PAID_TIER_LIMITS[tier]
-
-  return `${limits.dailyTokenLimit.toLocaleString()} tokens / $${limits.dailyCostLimitUsd} daily`
-}
 
 export function readBillingReturnHint(): BillingReturnHint | null {
   const url = new URL(window.location.href)
@@ -120,32 +103,6 @@ export async function fetchBillingRollout(apiBaseUrl: string) {
   return billingRolloutResponseSchema.parse(await response.json())
 }
 
-export function formatBillingRolloutStatus(
-  status: 'ready' | 'not_ready' | 'disabled',
-) {
-  switch (status) {
-    case 'ready':
-      return 'Ready'
-    case 'not_ready':
-      return 'Not ready'
-    case 'disabled':
-      return 'Disabled'
-  }
-}
-
-export function formatBillingRolloutCheckStatus(
-  status: 'pass' | 'fail' | 'skip',
-) {
-  switch (status) {
-    case 'pass':
-      return 'Pass'
-    case 'fail':
-      return 'Fail'
-    case 'skip':
-      return 'Skip'
-  }
-}
-
 export async function fetchBillingAdminSummary(
   apiBaseUrl: string,
   workspaceId: string,
@@ -195,17 +152,6 @@ export async function executeBillingAdminAction(
   }
 
   return billingAdminActionResponseSchema.parse(await response.json())
-}
-
-export function formatBillingAdminAction(
-  action: 'sync_notifications' | 'reset_mock_billing',
-) {
-  switch (action) {
-    case 'sync_notifications':
-      return 'Sync notifications'
-    case 'reset_mock_billing':
-      return 'Reset mock billing'
-  }
 }
 
 export async function fetchBillingWorkspaceStatus(
@@ -303,19 +249,6 @@ export async function fetchBillingMeterUsageReports(
   return billingMeterUsageReportsResponseSchema.parse(await response.json())
 }
 
-export function formatMeterUsageReportStatus(
-  status: 'reported' | 'skipped' | 'failed',
-) {
-  switch (status) {
-    case 'reported':
-      return 'Reported'
-    case 'skipped':
-      return 'Skipped'
-    case 'failed':
-      return 'Failed'
-  }
-}
-
 export async function fetchBillingNotifications(
   apiBaseUrl: string,
   workspaceId: string,
@@ -333,48 +266,6 @@ export async function fetchBillingNotifications(
   }
 
   return billingNotificationsResponseSchema.parse(await response.json())
-}
-
-export function formatBillingNotificationStatus(
-  status: 'pending' | 'delivered' | 'failed',
-) {
-  switch (status) {
-    case 'pending':
-      return 'Pending'
-    case 'delivered':
-      return 'Delivered'
-    case 'failed':
-      return 'Failed'
-  }
-}
-
-export function formatBillingAlertSeverity(
-  severity: 'info' | 'warning' | 'critical',
-) {
-  switch (severity) {
-    case 'info':
-      return 'Info'
-    case 'warning':
-      return 'Warning'
-    case 'critical':
-      return 'Critical'
-  }
-}
-
-export function formatUsagePercent(used: number, limit: number) {
-  if (limit <= 0) {
-    return 0
-  }
-
-  return Math.min(100, Math.round((used / limit) * 100))
-}
-
-export function formatUsageMeterLabel(used: number, limit: number, unit: string) {
-  return `${used.toLocaleString()} / ${limit.toLocaleString()} ${unit}`
-}
-
-export function formatUsageCostLabel(usedUsd: number, limitUsd: number) {
-  return `$${usedUsd.toFixed(2)} / $${limitUsd.toFixed(2)} daily`
 }
 
 function readContentDispositionFilename(contentDisposition: string | null) {
@@ -414,30 +305,6 @@ export async function downloadBillingInvoiceExport(
   link.download = filename
   link.click()
   URL.revokeObjectURL(url)
-}
-
-export function formatInvoiceStatus(status: BillingInvoiceStatus) {
-  switch (status) {
-    case 'draft':
-      return 'Draft'
-    case 'open':
-      return 'Open'
-    case 'paid':
-      return 'Paid'
-    case 'void':
-      return 'Void'
-    case 'uncollectible':
-      return 'Uncollectible'
-    case 'failed':
-      return 'Failed'
-  }
-}
-
-export function formatInvoiceAmount(amountTotalUsd: number, currency: string) {
-  return new Intl.NumberFormat(undefined, {
-    style: 'currency',
-    currency: currency.toUpperCase(),
-  }).format(amountTotalUsd)
 }
 
 export async function fetchBillingWebhookEvents(
@@ -550,23 +417,23 @@ export async function completeMockBillingCheckout(checkoutUrl: string) {
   return billingWorkspaceStatusResponseSchema.parse(await response.json())
 }
 
-export function describeBillingCapabilities(
-  capabilities: BillingCapabilitiesResponse | null,
-) {
-  if (!capabilities) {
-    return 'Billing capabilities are unavailable while the API is offline.'
-  }
-
-  return capabilities.guidance
-}
-
-export function canOpenCustomerPortal(
-  capabilities: BillingCapabilitiesResponse | null,
-  externalCustomerId: string | null | undefined,
-) {
-  return Boolean(
-    capabilities?.supportsCustomerPortal && externalCustomerId,
-  )
+export {
+  canOpenCustomerPortal,
+  describeBillingCapabilities,
+  formatBillingAdminAction,
+  formatBillingAlertSeverity,
+  formatBillingNotificationStatus,
+  formatBillingRolloutCheckStatus,
+  formatBillingRolloutStatus,
+  formatBillingStatus,
+  formatInvoiceAmount,
+  formatInvoiceStatus,
+  formatMeterUsageReportStatus,
+  formatPaidTier,
+  formatTierLimits,
+  formatUsageCostLabel,
+  formatUsageMeterLabel,
+  formatUsagePercent,
 }
 
 export type { MockCustomerPortalResponse }

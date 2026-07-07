@@ -1101,6 +1101,7 @@ import type {
   WorkspaceMemberAdminSummaryResponse,
   WorkspaceSettingsAdminSummaryResponse,
 } from '@ai-war-room/schemas'
+import { BillingWorkspacePanel } from '@ai-war-room/web-blocks'
 import './App.css'
 import {
   fetchAuthRollout,
@@ -5987,9 +5988,7 @@ import {
   createBillingCheckoutSession,
   createCustomerPortalSession,
   cancelMockCustomerPortalSubscription,
-  canOpenCustomerPortal,
   defaultWorkspaceId,
-  describeBillingCapabilities,
   executeBillingAdminAction,
   fetchBillingAdminSummary,
   fetchBillingCapabilities,
@@ -6002,21 +6001,8 @@ import {
   fetchBillingWebhookEvents,
   fetchBillingWorkspaceStatus,
   downloadBillingInvoiceExport,
-  formatInvoiceAmount,
-  formatInvoiceStatus,
-  formatUsageCostLabel,
-  formatUsageMeterLabel,
-  formatUsagePercent,
   fetchMockCustomerPortal,
-  formatBillingStatus,
-  formatBillingAlertSeverity,
-  formatBillingAdminAction,
-  formatBillingNotificationStatus,
-  formatBillingRolloutCheckStatus,
-  formatBillingRolloutStatus,
-  formatMeterUsageReportStatus,
   formatPaidTier,
-  formatTierLimits,
   readBillingReturnHint,
   type MockCustomerPortalResponse,
 } from './billing-ui'
@@ -10394,6 +10380,7 @@ function App() {
   const [activeArtifactType, setActiveArtifactType] =
     useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
   const [rolloutControlsEnabled, setRolloutControlsEnabled] = useState(false)
+  const didBootstrapFetchRef = useRef(false)
 
   useEffect(() => {
     if (!useTemporalWorkflowRuntime) {
@@ -10438,32 +10425,36 @@ function App() {
   useEffect(() => {
     const controller = new AbortController()
 
-    fetch(`${apiBaseUrl}/health`, {
-      signal: controller.signal,
-    })
-      .then((response) => {
-        setApiHealth(response.ok ? 'online' : 'offline')
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) {
-          setApiHealth('offline')
-        }
-      })
+    if (!didBootstrapFetchRef.current) {
+      didBootstrapFetchRef.current = true
 
-    fetch(`${apiBaseUrl}/auth/capabilities`, {
-      signal: controller.signal,
-    })
-      .then((response) => (response.ok ? response.json() : null))
-      .then((capabilities) => {
-        if (capabilities && !controller.signal.aborted) {
-          setAuthCapabilities(capabilities as AuthCapabilitiesResponse)
-        }
+      fetch(`${apiBaseUrl}/health`, {
+        signal: controller.signal,
       })
-      .catch(() => {
-        if (!controller.signal.aborted) {
-          setAuthCapabilities(null)
-        }
+        .then((response) => {
+          setApiHealth(response.ok ? 'online' : 'offline')
+        })
+        .catch(() => {
+          if (!controller.signal.aborted) {
+            setApiHealth('offline')
+          }
+        })
+
+      fetch(`${apiBaseUrl}/auth/capabilities`, {
+        signal: controller.signal,
       })
+        .then((response) => (response.ok ? response.json() : null))
+        .then((capabilities) => {
+          if (capabilities && !controller.signal.aborted) {
+            setAuthCapabilities(capabilities as AuthCapabilitiesResponse)
+          }
+        })
+        .catch(() => {
+          if (!controller.signal.aborted) {
+            setAuthCapabilities(null)
+          }
+        })
+    }
 
     if (!rolloutControlsEnabled) {
       return () => {
@@ -53537,284 +53528,24 @@ function App() {
           </div>
         ) : null}
 
-        {billingCapabilities?.supportsBillingRollout && billingRollout ? (
-          <div className="billing-rollout">
-            <div className="billing-rollout__header">
-              <span>Billing rollout readiness</span>
-              <strong
-                className={`billing-rollout__status billing-rollout__status--${billingRollout.status}`}
-              >
-                {formatBillingRolloutStatus(billingRollout.status)}
-              </strong>
-            </div>
-            <p>{billingRollout.guidance}</p>
-            <div className="billing-rollout__checks">
-              {billingRollout.checks.map((check) => (
-                <article
-                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
-                  key={check.name}
-                >
-                  <strong>{check.label}</strong>
-                  <span>{formatBillingRolloutCheckStatus(check.status)}</span>
-                  <p>{check.detail}</p>
-                </article>
-              ))}
-            </div>
-            <small>Checked at {billingRollout.checkedAt}</small>
-          </div>
-        ) : null}
-
-        {billingCapabilities?.supportsBillingAlerts && billingAlerts.length ? (
-          <div className="billing-alerts">
-            <span>Billing alerts</span>
-            {billingAlerts.map((alert) => (
-              <article
-                className={`billing-alert-card billing-alert-card--${alert.severity}`}
-                key={alert.billingAlertId}
-              >
-                <strong>{formatBillingAlertSeverity(alert.severity)}</strong>
-                <p>{alert.message}</p>
-                <small>{alert.type.replaceAll('_', ' ')}</small>
-              </article>
-            ))}
-          </div>
-        ) : null}
-
-        <div className="billing-summary">
-          <article className="billing-status-card">
-            <span>Current workspace</span>
-            <strong>{defaultWorkspaceId}</strong>
-            <p>
-              Tier:{' '}
-              {billingStatus?.billingRecord
-                ? formatPaidTier(billingStatus.billingRecord.paidTier)
-                : 'Unknown'}
-            </p>
-            <p>
-              Status:{' '}
-              {billingStatus?.billingRecord
-                ? formatBillingStatus(billingStatus.billingRecord.status)
-                : billingAction === 'loading'
-                  ? 'Loading...'
-                  : 'Unavailable'}
-            </p>
-            {billingStatus?.billingRecord?.externalCustomerId ? (
-              <small>
-                Customer: {billingStatus.billingRecord.externalCustomerId}
-              </small>
-            ) : null}
-          </article>
-
-          <article className="billing-guidance-card">
-            <span>Billing mode</span>
-            <strong>
-              {billingCapabilities?.enabled
-                ? billingCapabilities.adapter === 'mock'
-                  ? 'Mock checkout'
-                  : 'Stripe checkout'
-                : 'Disabled'}
-            </strong>
-            <p>{describeBillingCapabilities(billingCapabilities)}</p>
-            <div className="billing-actions">
-              <button
-                className="secondary-button"
-                type="button"
-                disabled={billingAction !== 'idle'}
-                onClick={() => void handleLoadBillingStatus()}
-              >
-                Refresh billing status
-              </button>
-              {canOpenCustomerPortal(
-                billingCapabilities,
-                billingStatus?.billingRecord?.externalCustomerId,
-              ) ? (
-                <button
-                  type="button"
-                  disabled={billingAction !== 'idle'}
-                  onClick={() => void handleOpenCustomerPortal()}
-                >
-                  {billingAction === 'portal'
-                    ? 'Opening portal...'
-                    : 'Manage subscription'}
-                </button>
-              ) : null}
-            </div>
-          </article>
-        </div>
-
-        {mockCustomerPortal ? (
-          <div className="billing-portal-card">
-            <span>Mock customer portal</span>
-            <strong>
-              {formatPaidTier(mockCustomerPortal.paidTier)} ·{' '}
-              {formatBillingStatus(mockCustomerPortal.status)}
-            </strong>
-            <p>
-              Customer {mockCustomerPortal.externalCustomerId} can manage the
-              workspace subscription here during local development.
-            </p>
-            <ul className="billing-portal-actions">
-              {mockCustomerPortal.availableActions.includes(
-                'update_payment_method',
-              ) ? (
-                <li>Update payment method (Stripe only in production)</li>
-              ) : null}
-              {mockCustomerPortal.availableActions.includes(
-                'cancel_subscription',
-              ) ? (
-                <li>
-                  <button
-                    className="danger-button"
-                    type="button"
-                    disabled={billingAction !== 'idle'}
-                    onClick={() => void handleCancelMockSubscription()}
-                  >
-                    {billingAction === 'canceling'
-                      ? 'Canceling...'
-                      : 'Cancel subscription'}
-                  </button>
-                </li>
-              ) : null}
-            </ul>
-            <button
-              className="secondary-button"
-              type="button"
-              onClick={() => setMockCustomerPortal(null)}
-            >
-              Close portal
-            </button>
-          </div>
-        ) : null}
-
-        {billingMessage ? (
-          <div className="billing-alert billing-alert--success">
-            <strong>{billingMessage}</strong>
-          </div>
-        ) : null}
-
-        {billingError ? (
-          <p className="form-error">{billingError}</p>
-        ) : null}
-
-        <div className="billing-grid">
-          {(['free', 'pro', 'business'] as const).map((tier) => {
-            const currentTier = billingStatus?.billingRecord?.paidTier ?? 'free'
-            const isCurrent = currentTier === tier
-            const isUpgradeTarget =
-              billingCapabilities?.checkoutTiers.includes(
-                tier as CheckoutPaidTier,
-              ) ?? false
-
-            return (
-              <article
-                className={`billing-tier-card${isCurrent ? ' billing-tier-card--current' : ''}`}
-                key={tier}
-              >
-                <span>{formatPaidTier(tier)}</span>
-                <strong>{formatTierLimits(tier)}</strong>
-                <p>
-                  {tier === 'free'
-                    ? 'Default local tier with core planning flow.'
-                    : tier === 'pro'
-                      ? 'Unlocks Market Research and higher daily limits.'
-                      : 'Highest limits for teams running frequent deep runs.'}
-                </p>
-                {isCurrent ? (
-                  <p className="billing-tier-badge">Current tier</p>
-                ) : tier !== 'free' &&
-                  isUpgradeTarget &&
-                  billingCapabilities?.supportsCheckout ? (
-                  <button
-                    type="button"
-                    disabled={billingAction === 'upgrading'}
-                    onClick={() => void handleUpgradeBillingTier(tier)}
-                  >
-                    {billingAction === 'upgrading'
-                      ? 'Starting checkout...'
-                      : `Upgrade to ${formatPaidTier(tier)}`}
-                  </button>
-                ) : (
-                  <p className="clear-copy">
-                    {billingCapabilities?.enabled
-                      ? 'Checkout unavailable for this tier.'
-                      : 'Enable STRIPE_ENABLED=true on the API to start checkout.'}
-                  </p>
-                )}
-              </article>
-            )
-          })}
-        </div>
-
-        {billingCapabilities?.supportsUsageSummary && billingUsageSummary ? (
-          <div className="billing-usage-summary">
-            <span>Daily usage</span>
-            <p className="clear-copy">
-              UTC period ending{' '}
-              {new Date(billingUsageSummary.usagePeriodEnd).toLocaleString()}
-            </p>
-            <div className="billing-usage-meters">
-              <article className="billing-usage-meter">
-                <div className="billing-usage-meter__header">
-                  <strong>Tokens</strong>
-                  <small>
-                    {formatUsageMeterLabel(
-                      billingUsageSummary.dailyUsage.totalTokens,
-                      billingUsageSummary.dailyTokenLimit,
-                      'tokens',
-                    )}
-                  </small>
-                </div>
-                <div
-                  className="billing-usage-meter__track"
-                  role="progressbar"
-                  aria-valuemin={0}
-                  aria-valuemax={billingUsageSummary.dailyTokenLimit}
-                  aria-valuenow={billingUsageSummary.dailyUsage.totalTokens}
-                  aria-label="Daily token usage"
-                >
-                  <div
-                    className="billing-usage-meter__fill"
-                    style={{
-                      width: `${formatUsagePercent(
-                        billingUsageSummary.dailyUsage.totalTokens,
-                        billingUsageSummary.dailyTokenLimit,
-                      )}%`,
-                    }}
-                  />
-                </div>
-              </article>
-              <article className="billing-usage-meter">
-                <div className="billing-usage-meter__header">
-                  <strong>Estimated cost</strong>
-                  <small>
-                    {formatUsageCostLabel(
-                      billingUsageSummary.dailyUsage.estimatedCostUsd,
-                      billingUsageSummary.dailyCostLimitUsd,
-                    )}
-                  </small>
-                </div>
-                <div
-                  className="billing-usage-meter__track"
-                  role="progressbar"
-                  aria-valuemin={0}
-                  aria-valuemax={billingUsageSummary.dailyCostLimitUsd}
-                  aria-valuenow={billingUsageSummary.dailyUsage.estimatedCostUsd}
-                  aria-label="Daily estimated cost usage"
-                >
-                  <div
-                    className="billing-usage-meter__fill billing-usage-meter__fill--cost"
-                    style={{
-                      width: `${formatUsagePercent(
-                        billingUsageSummary.dailyUsage.estimatedCostUsd,
-                        billingUsageSummary.dailyCostLimitUsd,
-                      )}%`,
-                    }}
-                  />
-                </div>
-              </article>
-            </div>
-          </div>
-        ) : null}
+        <BillingWorkspacePanel
+          mode="overview"
+          workspaceId={defaultWorkspaceId}
+          capabilities={billingCapabilities}
+          rollout={billingRollout}
+          status={billingStatus}
+          alerts={billingAlerts}
+          usageSummary={billingUsageSummary}
+          mockCustomerPortal={mockCustomerPortal}
+          billingAction={billingAction}
+          billingMessage={billingMessage}
+          billingError={billingError}
+          onRefreshStatus={() => void handleLoadBillingStatus()}
+          onOpenCustomerPortal={() => void handleOpenCustomerPortal()}
+          onUpgradeTier={(tier) => void handleUpgradeBillingTier(tier)}
+          onCloseMockPortal={() => setMockCustomerPortal(null)}
+          onCancelMockSubscription={() => void handleCancelMockSubscription()}
+        />
 
         {usageCapabilities?.supportsUsageAdminTools && usageAdminSummary ? (
           <div className="billing-admin">
@@ -89134,197 +88865,21 @@ function App() {
           </div>
         ) : null}
 
-        {billingCapabilities?.supportsMeteredUsage ? (
-          <div className="billing-meter-usage">
-            <span>Metered usage reports</span>
-            {billingMeterUsageReports.length ? (
-              billingMeterUsageReports.map((report) => (
-                <article
-                  className="billing-meter-usage-card"
-                  key={report.billingMeterUsageReportId}
-                >
-                  <strong>
-                    {report.quantity.toLocaleString()} {report.metric}
-                  </strong>
-                  <p>{formatMeterUsageReportStatus(report.status)}</p>
-                  <small>
-                    {report.runId ? `Run ${report.runId}` : 'Manual report'}
-                    {report.externalUsageRecordId
-                      ? ` · ${report.externalUsageRecordId}`
-                      : ''}
-                  </small>
-                </article>
-              ))
-            ) : (
-              <p className="clear-copy">
-                No metered usage reports recorded for this workspace yet.
-              </p>
-            )}
-          </div>
-        ) : null}
+        <BillingWorkspacePanel
+          mode="details"
+          workspaceId={defaultWorkspaceId}
+          capabilities={billingCapabilities}
+          billingAction={billingAction}
+          meterUsageReports={billingMeterUsageReports}
+          notifications={billingNotifications}
+          adminSummary={billingAdminSummary}
+          billingAdminAction={billingAdminAction}
+          webhookEvents={billingWebhookEvents}
+          invoices={billingInvoices}
+          onBillingAdminAction={(action) => void handleBillingAdminAction(action)}
+          onExportInvoices={(format) => handleExportBillingInvoices(format)}
+        />
 
-        {billingCapabilities?.supportsBillingNotifications ? (
-          <div className="billing-notifications">
-            <span>Notification delivery</span>
-            {billingNotifications.length ? (
-              billingNotifications.map((notification) => (
-                <article
-                  className={`billing-notification-card billing-notification-card--${notification.status}`}
-                  key={notification.billingNotificationId}
-                >
-                  <strong>{formatBillingAlertSeverity(notification.severity)}</strong>
-                  <p>{notification.message}</p>
-                  <small>
-                    {formatBillingNotificationStatus(notification.status)} ·{' '}
-                    {notification.channel}
-                    {notification.deliveryReference
-                      ? ` · ${notification.deliveryReference}`
-                      : ''}
-                  </small>
-                </article>
-              ))
-            ) : (
-              <p className="clear-copy">
-                No billing notifications have been delivered for this workspace yet.
-              </p>
-            )}
-          </div>
-        ) : null}
-
-        {billingCapabilities?.supportsBillingAdminTools &&
-        billingAdminSummary ? (
-          <div className="billing-admin">
-            <div className="billing-admin__header">
-              <span>Billing admin tools</span>
-              <strong>{billingAdminSummary.role}</strong>
-            </div>
-            <p>{billingAdminSummary.guidance}</p>
-            <div className="billing-admin__stats">
-              <article className="billing-admin-stat">
-                <span>Alerts</span>
-                <strong>{billingAdminSummary.stats.alertCount}</strong>
-                <small>
-                  {billingAdminSummary.stats.criticalAlertCount} critical
-                </small>
-              </article>
-              <article className="billing-admin-stat">
-                <span>Invoices</span>
-                <strong>{billingAdminSummary.stats.invoiceCount}</strong>
-                <small>
-                  ${billingAdminSummary.stats.paidInvoiceTotalUsd.toFixed(2)} paid
-                </small>
-              </article>
-              <article className="billing-admin-stat">
-                <span>Webhooks</span>
-                <strong>{billingAdminSummary.stats.webhookEventCount}</strong>
-                <small>
-                  {billingAdminSummary.stats.failedWebhookEventCount} failed
-                </small>
-              </article>
-              <article className="billing-admin-stat">
-                <span>Notifications</span>
-                <strong>{billingAdminSummary.stats.notificationCount}</strong>
-                <small>
-                  {billingAdminSummary.stats.failedNotificationCount} failed
-                </small>
-              </article>
-            </div>
-            {billingAdminSummary.availableActions.length ? (
-              <div className="billing-admin__actions">
-                {billingAdminSummary.availableActions.map((action) => (
-                  <button
-                    key={action}
-                    className={
-                      action === 'reset_mock_billing'
-                        ? 'danger-button'
-                        : 'secondary-button'
-                    }
-                    type="button"
-                    disabled={
-                      billingAction !== 'idle' || billingAdminAction !== 'idle'
-                    }
-                    onClick={() => void handleBillingAdminAction(action)}
-                  >
-                    {formatBillingAdminAction(action)}
-                  </button>
-                ))}
-              </div>
-            ) : null}
-          </div>
-        ) : null}
-
-        {billingCapabilities?.supportsWebhookAudit ? (
-          <div className="billing-webhook-events">
-            <span>Recent webhook events</span>
-            {billingWebhookEvents.length ? (
-              billingWebhookEvents.map((event) => (
-                <article className="billing-webhook-event" key={event.billingWebhookEventId}>
-                  <strong>{event.eventType}</strong>
-                  <p>
-                    {event.status} · {event.externalEventId}
-                  </p>
-                  <small>{new Date(event.receivedAt).toLocaleString()}</small>
-                </article>
-              ))
-            ) : (
-              <p className="clear-copy">No webhook events recorded for this workspace yet.</p>
-            )}
-          </div>
-        ) : null}
-
-        {billingCapabilities?.supportsInvoiceHistory ? (
-          <div className="billing-invoice-history">
-            <div className="billing-invoice-history__header">
-              <span>Invoice history</span>
-              {billingCapabilities.supportsBillingExport ? (
-                <div className="billing-export-actions">
-                  <button
-                    type="button"
-                    onClick={() => handleExportBillingInvoices('csv')}
-                    disabled={billingAction !== 'idle'}
-                  >
-                    Export CSV
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleExportBillingInvoices('json')}
-                    disabled={billingAction !== 'idle'}
-                  >
-                    Export JSON
-                  </button>
-                </div>
-              ) : null}
-            </div>
-            {billingInvoices.length ? (
-              billingInvoices.map((invoice) => (
-                <article className="billing-invoice-card" key={invoice.billingInvoiceId}>
-                  <div>
-                    <strong>
-                      {formatInvoiceAmount(invoice.amountTotalUsd, invoice.currency)}
-                    </strong>
-                    <p>
-                      {formatInvoiceStatus(invoice.status)}
-                      {invoice.paidTier
-                        ? ` · ${formatPaidTier(invoice.paidTier)}`
-                        : ''}
-                    </p>
-                    <small>{invoice.externalInvoiceId}</small>
-                  </div>
-                  <div className="billing-invoice-meta">
-                    <small>{new Date(invoice.createdAt).toLocaleString()}</small>
-                    {invoice.hostedInvoiceUrl ? (
-                      <a href={invoice.hostedInvoiceUrl} target="_blank" rel="noreferrer">
-                        View invoice
-                      </a>
-                    ) : null}
-                  </div>
-                </article>
-              ))
-            ) : (
-              <p className="clear-copy">No invoices recorded for this workspace yet.</p>
-            )}
-          </div>
-        ) : null}
       </section>
 
       {draftRun && reviewDraft ? (

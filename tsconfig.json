@@ -5,6 +5,9 @@
       "path": "./packages/schemas"
     },
     {
+      "path": "./packages/web-blocks"
+    },
+    {
       "path": "./apps/web"
     },
     {
