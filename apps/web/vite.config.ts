@@ -13,11 +13,7 @@ export default defineConfig({
           }
 
           if (id.includes('/apps/web/src/') && id.endsWith('-ui.ts')) {
-            if (
-              id.includes('billing-ui.ts') ||
-              id.includes('workspace-ui.ts') ||
-              id.includes('usage-ui.ts')
-            ) {
+            if (id.includes('billing-ui.ts') || id.includes('workspace-ui.ts')) {
               return 'app-ui'
             }
 

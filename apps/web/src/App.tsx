@@ -1139,7 +1139,6 @@ import {
 } from './billing-ui'
 import {
   executeUsageAdminAction,
-  fetchUsageAdminSummary,
   formatUsageAdminAction,
 } from './usage-ui'
 import {
@@ -12722,6 +12721,13 @@ function App() {
 
   async function loadDeferredAdminControlsData() {
     try {
+      const usageAdmin = await callUi('usage-ui', 'fetchUsageAdminSummary',
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setUsageAdminSummary(usageAdmin)
+
       const modelHealthAdmin = await callUi('model-router-ui', 'fetchModelHealthAdminSummary', 
         apiBaseUrl,
         defaultWorkspaceId,
@@ -16563,13 +16569,6 @@ function App() {
         workspaceAuthHeaders,
       )
       setBillingAdminSummary(adminSummary)
-
-      const usageAdmin = await fetchUsageAdminSummary(
-        apiBaseUrl,
-        defaultWorkspaceId,
-        workspaceAuthHeaders,
-      )
-      setUsageAdminSummary(usageAdmin)
 
       const membersAdmin = await fetchWorkspaceMemberAdminSummary(
         apiBaseUrl,
