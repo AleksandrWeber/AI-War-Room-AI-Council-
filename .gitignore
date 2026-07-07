@@ -20,3 +20,6 @@ coverage
 # System files
 .DS_Store
 
+# Codegen snapshots
+apps/web/scripts/.app-source-snapshot.tsx
+

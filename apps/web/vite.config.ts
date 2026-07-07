@@ -8,12 +8,25 @@ export default defineConfig({
     rollupOptions: {
       output: {
         manualChunks(id) {
-          if (id.includes('/apps/web/src/') && id.endsWith('-ui.ts')) {
-            return 'rollout-ui'
-          }
           if (id.includes('/node_modules/')) {
             return 'vendor'
           }
+
+          if (
+            id.includes('/features/rollout-admin/') ||
+            id.includes('/features/domain-admin/') ||
+            id.includes('/features/operations-admin/')
+          ) {
+            return undefined
+          }
+
+          if (id.includes('/apps/web/src/') && id.endsWith('-ui.ts')) {
+            if (id.includes('/features/')) {
+              return undefined
+            }
+            return 'app-ui'
+          }
+
           return undefined
         },
       },
