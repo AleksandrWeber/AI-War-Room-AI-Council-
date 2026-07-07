@@ -2,7 +2,7 @@
 import { mkdirSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 
-import { patchMeta } from './milestones-v1096-v1100.mjs'
+import { patchMeta } from './milestones-v1106-v1110.mjs'
 
 const milestones = patchMeta
 

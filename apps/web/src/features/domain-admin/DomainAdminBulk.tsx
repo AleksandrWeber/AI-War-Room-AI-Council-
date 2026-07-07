@@ -600,6 +600,46 @@ import {
   formatIntegrabilityvaultizabilityDomain,
 } from '../../integrabilityvaultizability-ui'
 import {
+  formatPredictabilityvaultizabilityAdminAction,
+  formatPredictabilityvaultizabilityDomain,
+} from '../../predictabilityvaultizability-ui'
+import {
+  formatTrustworthinessvaultizabilityAdminAction,
+  formatTrustworthinessvaultizabilityDomain,
+} from '../../trustworthinessvaultizability-ui'
+import {
+  formatComposabilityvaultizabilityAdminAction,
+  formatComposabilityvaultizabilityDomain,
+} from '../../composabilityvaultizability-ui'
+import {
+  formatDependabilityvaultizabilityAdminAction,
+  formatDependabilityvaultizabilityDomain,
+} from '../../dependabilityvaultizability-ui'
+import {
+  formatResponsivenessvaultizabilityAdminAction,
+  formatResponsivenessvaultizabilityDomain,
+} from '../../responsivenessvaultizability-ui'
+import {
+  formatRepeatabilityvaultizabilityAdminAction,
+  formatRepeatabilityvaultizabilityDomain,
+} from '../../repeatabilityvaultizability-ui'
+import {
+  formatMonitorabilityvaultizabilityAdminAction,
+  formatMonitorabilityvaultizabilityDomain,
+} from '../../monitorabilityvaultizability-ui'
+import {
+  formatAutomatabilityvaultizabilityAdminAction,
+  formatAutomatabilityvaultizabilityDomain,
+} from '../../automatabilityvaultizability-ui'
+import {
+  formatSchedulabilityvaultizabilityAdminAction,
+  formatSchedulabilityvaultizabilityDomain,
+} from '../../schedulabilityvaultizability-ui'
+import {
+  formatOrchestrabilityvaultizabilityAdminAction,
+  formatOrchestrabilityvaultizabilityDomain,
+} from '../../orchestrabilityvaultizability-ui'
+import {
   formatControllabilityvaultizabilityAdminAction,
   formatControllabilityvaultizabilityDomain,
 } from '../../controllabilityvaultizability-ui'
@@ -22159,6 +22199,356 @@ export default function DomainAdminBulk(props: DomainAdminBulkProps) {
             formatAdminAction={formatIntegrabilityvaultizabilityAdminAction as (action: string) => string}
             onRefresh={() =>
               void props.handleIntegrabilityvaultizabilityAdminAction('refresh_integrabilityvaultizability_summary')
+            }
+          />
+        ) : null}
+
+        {props.orchestrabilityvaultizabilityAdminSummary ? (
+          <DomainCoverageAdminPanel
+            title="Orchestrabilityvaultizability admin"
+            panelClassName="workspace-orchestrabilityvaultizability-admin"
+            listClassName="workspace-orchestrabilityvaultizability-list"
+            cardClassName="workspace-orchestrabilityvaultizability-card"
+            role={props.orchestrabilityvaultizabilityAdminSummary.role}
+            guidance={props.orchestrabilityvaultizabilityAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Billing invoice orchestrabilityvaultizability',
+              value: `${props.orchestrabilityvaultizabilityAdminSummary.stats.orchestrabilityvaultizabilityPercent}%`,
+              detail: <>{props.orchestrabilityvaultizabilityAdminSummary.stats.coveredDomains}/
+                  {props.orchestrabilityvaultizabilityAdminSummary.stats.totalDomains} domains covered</>,
+            },
+            {
+              label: 'Orchestrabilityvaultizability signals',
+              value: props.orchestrabilityvaultizabilityAdminSummary.stats.totalRecords,
+              detail: <>{props.orchestrabilityvaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}</>,
+            }
+            ]}
+            records={props.orchestrabilityvaultizabilityAdminSummary.records}
+            availableActions={props.orchestrabilityvaultizabilityAdminSummary.availableActions}
+            refreshAction="refresh_orchestrabilityvaultizability_summary"
+            actionBusy={props.orchestrabilityvaultizabilityAdminAction !== 'idle'}
+            formatDomain={formatOrchestrabilityvaultizabilityDomain as (domain: string) => string}
+            formatAdminAction={formatOrchestrabilityvaultizabilityAdminAction as (action: string) => string}
+            onRefresh={() =>
+              void props.handleOrchestrabilityvaultizabilityAdminAction('refresh_orchestrabilityvaultizability_summary')
+            }
+          />
+        ) : null}
+
+        {props.schedulabilityvaultizabilityAdminSummary ? (
+          <DomainCoverageAdminPanel
+            title="Schedulabilityvaultizability admin"
+            panelClassName="workspace-schedulabilityvaultizability-admin"
+            listClassName="workspace-schedulabilityvaultizability-list"
+            cardClassName="workspace-schedulabilityvaultizability-card"
+            role={props.schedulabilityvaultizabilityAdminSummary.role}
+            guidance={props.schedulabilityvaultizabilityAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Membership schedulabilityvaultizability',
+              value: `${props.schedulabilityvaultizabilityAdminSummary.stats.schedulabilityvaultizabilityPercent}%`,
+              detail: <>{props.schedulabilityvaultizabilityAdminSummary.stats.coveredDomains}/
+                  {props.schedulabilityvaultizabilityAdminSummary.stats.totalDomains} domains covered</>,
+            },
+            {
+              label: 'Schedulabilityvaultizability signals',
+              value: props.schedulabilityvaultizabilityAdminSummary.stats.totalRecords,
+              detail: <>{props.schedulabilityvaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}</>,
+            }
+            ]}
+            records={props.schedulabilityvaultizabilityAdminSummary.records}
+            availableActions={props.schedulabilityvaultizabilityAdminSummary.availableActions}
+            refreshAction="refresh_schedulabilityvaultizability_summary"
+            actionBusy={props.schedulabilityvaultizabilityAdminAction !== 'idle'}
+            formatDomain={formatSchedulabilityvaultizabilityDomain as (domain: string) => string}
+            formatAdminAction={formatSchedulabilityvaultizabilityAdminAction as (action: string) => string}
+            onRefresh={() =>
+              void props.handleSchedulabilityvaultizabilityAdminAction('refresh_schedulabilityvaultizability_summary')
+            }
+          />
+        ) : null}
+
+        {props.automatabilityvaultizabilityAdminSummary ? (
+          <DomainCoverageAdminPanel
+            title="Automatabilityvaultizability admin"
+            panelClassName="workspace-automatabilityvaultizability-admin"
+            listClassName="workspace-automatabilityvaultizability-list"
+            cardClassName="workspace-automatabilityvaultizability-card"
+            role={props.automatabilityvaultizabilityAdminSummary.role}
+            guidance={props.automatabilityvaultizabilityAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Idempotency key automatabilityvaultizability',
+              value: `${props.automatabilityvaultizabilityAdminSummary.stats.automatabilityvaultizabilityPercent}%`,
+              detail: <>{props.automatabilityvaultizabilityAdminSummary.stats.coveredDomains}/
+                  {props.automatabilityvaultizabilityAdminSummary.stats.totalDomains} domains covered</>,
+            },
+            {
+              label: 'Automatabilityvaultizability signals',
+              value: props.automatabilityvaultizabilityAdminSummary.stats.totalRecords,
+              detail: <>{props.automatabilityvaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}</>,
+            }
+            ]}
+            records={props.automatabilityvaultizabilityAdminSummary.records}
+            availableActions={props.automatabilityvaultizabilityAdminSummary.availableActions}
+            refreshAction="refresh_automatabilityvaultizability_summary"
+            actionBusy={props.automatabilityvaultizabilityAdminAction !== 'idle'}
+            formatDomain={formatAutomatabilityvaultizabilityDomain as (domain: string) => string}
+            formatAdminAction={formatAutomatabilityvaultizabilityAdminAction as (action: string) => string}
+            onRefresh={() =>
+              void props.handleAutomatabilityvaultizabilityAdminAction('refresh_automatabilityvaultizability_summary')
+            }
+          />
+        ) : null}
+
+        {props.monitorabilityvaultizabilityAdminSummary ? (
+          <DomainCoverageAdminPanel
+            title="Monitorabilityvaultizability admin"
+            panelClassName="workspace-monitorabilityvaultizability-admin"
+            listClassName="workspace-monitorabilityvaultizability-list"
+            cardClassName="workspace-monitorabilityvaultizability-card"
+            role={props.monitorabilityvaultizabilityAdminSummary.role}
+            guidance={props.monitorabilityvaultizabilityAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Shield scan monitorabilityvaultizability',
+              value: `${props.monitorabilityvaultizabilityAdminSummary.stats.monitorabilityvaultizabilityPercent}%`,
+              detail: <>{props.monitorabilityvaultizabilityAdminSummary.stats.coveredDomains}/
+                  {props.monitorabilityvaultizabilityAdminSummary.stats.totalDomains} domains covered</>,
+            },
+            {
+              label: 'Monitorabilityvaultizability signals',
+              value: props.monitorabilityvaultizabilityAdminSummary.stats.totalRecords,
+              detail: <>{props.monitorabilityvaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}</>,
+            }
+            ]}
+            records={props.monitorabilityvaultizabilityAdminSummary.records}
+            availableActions={props.monitorabilityvaultizabilityAdminSummary.availableActions}
+            refreshAction="refresh_monitorabilityvaultizability_summary"
+            actionBusy={props.monitorabilityvaultizabilityAdminAction !== 'idle'}
+            formatDomain={formatMonitorabilityvaultizabilityDomain as (domain: string) => string}
+            formatAdminAction={formatMonitorabilityvaultizabilityAdminAction as (action: string) => string}
+            onRefresh={() =>
+              void props.handleMonitorabilityvaultizabilityAdminAction('refresh_monitorabilityvaultizability_summary')
+            }
+          />
+        ) : null}
+
+        {props.predictabilityvaultizabilityAdminSummary ? (
+          <DomainCoverageAdminPanel
+            title="Predictabilityvaultizability admin"
+            panelClassName="workspace-predictabilityvaultizability-admin"
+            listClassName="workspace-predictabilityvaultizability-list"
+            cardClassName="workspace-predictabilityvaultizability-card"
+            role={props.predictabilityvaultizabilityAdminSummary.role}
+            guidance={props.predictabilityvaultizabilityAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Billing notification predictabilityvaultizability',
+              value: `${props.predictabilityvaultizabilityAdminSummary.stats.predictabilityvaultizabilityPercent}%`,
+              detail: <>{props.predictabilityvaultizabilityAdminSummary.stats.coveredDomains}/
+                  {props.predictabilityvaultizabilityAdminSummary.stats.totalDomains} domains covered</>,
+            },
+            {
+              label: 'Predictabilityvaultizability signals',
+              value: props.predictabilityvaultizabilityAdminSummary.stats.totalRecords,
+              detail: <>{props.predictabilityvaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}</>,
+            }
+            ]}
+            records={props.predictabilityvaultizabilityAdminSummary.records}
+            availableActions={props.predictabilityvaultizabilityAdminSummary.availableActions}
+            refreshAction="refresh_predictabilityvaultizability_summary"
+            actionBusy={props.predictabilityvaultizabilityAdminAction !== 'idle'}
+            formatDomain={formatPredictabilityvaultizabilityDomain as (domain: string) => string}
+            formatAdminAction={formatPredictabilityvaultizabilityAdminAction as (action: string) => string}
+            onRefresh={() =>
+              void props.handlePredictabilityvaultizabilityAdminAction('refresh_predictabilityvaultizability_summary')
+            }
+          />
+        ) : null}
+
+        {props.repeatabilityvaultizabilityAdminSummary ? (
+          <DomainCoverageAdminPanel
+            title="Repeatabilityvaultizability admin"
+            panelClassName="workspace-repeatabilityvaultizability-admin"
+            listClassName="workspace-repeatabilityvaultizability-list"
+            cardClassName="workspace-repeatabilityvaultizability-card"
+            role={props.repeatabilityvaultizabilityAdminSummary.role}
+            guidance={props.repeatabilityvaultizabilityAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Billing invoice repeatabilityvaultizability',
+              value: `${props.repeatabilityvaultizabilityAdminSummary.stats.repeatabilityvaultizabilityPercent}%`,
+              detail: <>{props.repeatabilityvaultizabilityAdminSummary.stats.coveredDomains}/
+                  {props.repeatabilityvaultizabilityAdminSummary.stats.totalDomains} domains covered</>,
+            },
+            {
+              label: 'Repeatabilityvaultizability signals',
+              value: props.repeatabilityvaultizabilityAdminSummary.stats.totalRecords,
+              detail: <>{props.repeatabilityvaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}</>,
+            }
+            ]}
+            records={props.repeatabilityvaultizabilityAdminSummary.records}
+            availableActions={props.repeatabilityvaultizabilityAdminSummary.availableActions}
+            refreshAction="refresh_repeatabilityvaultizability_summary"
+            actionBusy={props.repeatabilityvaultizabilityAdminAction !== 'idle'}
+            formatDomain={formatRepeatabilityvaultizabilityDomain as (domain: string) => string}
+            formatAdminAction={formatRepeatabilityvaultizabilityAdminAction as (action: string) => string}
+            onRefresh={() =>
+              void props.handleRepeatabilityvaultizabilityAdminAction('refresh_repeatabilityvaultizability_summary')
+            }
+          />
+        ) : null}
+
+        {props.responsivenessvaultizabilityAdminSummary ? (
+          <DomainCoverageAdminPanel
+            title="Responsivenessvaultizability admin"
+            panelClassName="workspace-responsivenessvaultizability-admin"
+            listClassName="workspace-responsivenessvaultizability-list"
+            cardClassName="workspace-responsivenessvaultizability-card"
+            role={props.responsivenessvaultizabilityAdminSummary.role}
+            guidance={props.responsivenessvaultizabilityAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Membership responsivenessvaultizability',
+              value: `${props.responsivenessvaultizabilityAdminSummary.stats.responsivenessvaultizabilityPercent}%`,
+              detail: <>{props.responsivenessvaultizabilityAdminSummary.stats.coveredDomains}/
+                  {props.responsivenessvaultizabilityAdminSummary.stats.totalDomains} domains covered</>,
+            },
+            {
+              label: 'Responsivenessvaultizability signals',
+              value: props.responsivenessvaultizabilityAdminSummary.stats.totalRecords,
+              detail: <>{props.responsivenessvaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}</>,
+            }
+            ]}
+            records={props.responsivenessvaultizabilityAdminSummary.records}
+            availableActions={props.responsivenessvaultizabilityAdminSummary.availableActions}
+            refreshAction="refresh_responsivenessvaultizability_summary"
+            actionBusy={props.responsivenessvaultizabilityAdminAction !== 'idle'}
+            formatDomain={formatResponsivenessvaultizabilityDomain as (domain: string) => string}
+            formatAdminAction={formatResponsivenessvaultizabilityAdminAction as (action: string) => string}
+            onRefresh={() =>
+              void props.handleResponsivenessvaultizabilityAdminAction('refresh_responsivenessvaultizability_summary')
+            }
+          />
+        ) : null}
+
+        {props.dependabilityvaultizabilityAdminSummary ? (
+          <DomainCoverageAdminPanel
+            title="Dependabilityvaultizability admin"
+            panelClassName="workspace-dependabilityvaultizability-admin"
+            listClassName="workspace-dependabilityvaultizability-list"
+            cardClassName="workspace-dependabilityvaultizability-card"
+            role={props.dependabilityvaultizabilityAdminSummary.role}
+            guidance={props.dependabilityvaultizabilityAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Idempotency key dependabilityvaultizability',
+              value: `${props.dependabilityvaultizabilityAdminSummary.stats.dependabilityvaultizabilityPercent}%`,
+              detail: <>{props.dependabilityvaultizabilityAdminSummary.stats.coveredDomains}/
+                  {props.dependabilityvaultizabilityAdminSummary.stats.totalDomains} domains covered</>,
+            },
+            {
+              label: 'Dependabilityvaultizability signals',
+              value: props.dependabilityvaultizabilityAdminSummary.stats.totalRecords,
+              detail: <>{props.dependabilityvaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}</>,
+            }
+            ]}
+            records={props.dependabilityvaultizabilityAdminSummary.records}
+            availableActions={props.dependabilityvaultizabilityAdminSummary.availableActions}
+            refreshAction="refresh_dependabilityvaultizability_summary"
+            actionBusy={props.dependabilityvaultizabilityAdminAction !== 'idle'}
+            formatDomain={formatDependabilityvaultizabilityDomain as (domain: string) => string}
+            formatAdminAction={formatDependabilityvaultizabilityAdminAction as (action: string) => string}
+            onRefresh={() =>
+              void props.handleDependabilityvaultizabilityAdminAction('refresh_dependabilityvaultizability_summary')
+            }
+          />
+        ) : null}
+
+        {props.composabilityvaultizabilityAdminSummary ? (
+          <DomainCoverageAdminPanel
+            title="Composabilityvaultizability admin"
+            panelClassName="workspace-composabilityvaultizability-admin"
+            listClassName="workspace-composabilityvaultizability-list"
+            cardClassName="workspace-composabilityvaultizability-card"
+            role={props.composabilityvaultizabilityAdminSummary.role}
+            guidance={props.composabilityvaultizabilityAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Shield scan composabilityvaultizability',
+              value: `${props.composabilityvaultizabilityAdminSummary.stats.composabilityvaultizabilityPercent}%`,
+              detail: <>{props.composabilityvaultizabilityAdminSummary.stats.coveredDomains}/
+                  {props.composabilityvaultizabilityAdminSummary.stats.totalDomains} domains covered</>,
+            },
+            {
+              label: 'Composabilityvaultizability signals',
+              value: props.composabilityvaultizabilityAdminSummary.stats.totalRecords,
+              detail: <>{props.composabilityvaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}</>,
+            }
+            ]}
+            records={props.composabilityvaultizabilityAdminSummary.records}
+            availableActions={props.composabilityvaultizabilityAdminSummary.availableActions}
+            refreshAction="refresh_composabilityvaultizability_summary"
+            actionBusy={props.composabilityvaultizabilityAdminAction !== 'idle'}
+            formatDomain={formatComposabilityvaultizabilityDomain as (domain: string) => string}
+            formatAdminAction={formatComposabilityvaultizabilityAdminAction as (action: string) => string}
+            onRefresh={() =>
+              void props.handleComposabilityvaultizabilityAdminAction('refresh_composabilityvaultizability_summary')
+            }
+          />
+        ) : null}
+
+        {props.trustworthinessvaultizabilityAdminSummary ? (
+          <DomainCoverageAdminPanel
+            title="Trustworthinessvaultizability admin"
+            panelClassName="workspace-trustworthinessvaultizability-admin"
+            listClassName="workspace-trustworthinessvaultizability-list"
+            cardClassName="workspace-trustworthinessvaultizability-card"
+            role={props.trustworthinessvaultizabilityAdminSummary.role}
+            guidance={props.trustworthinessvaultizabilityAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Billing notification trustworthinessvaultizability',
+              value: `${props.trustworthinessvaultizabilityAdminSummary.stats.trustworthinessvaultizabilityPercent}%`,
+              detail: <>{props.trustworthinessvaultizabilityAdminSummary.stats.coveredDomains}/
+                  {props.trustworthinessvaultizabilityAdminSummary.stats.totalDomains} domains covered</>,
+            },
+            {
+              label: 'Trustworthinessvaultizability signals',
+              value: props.trustworthinessvaultizabilityAdminSummary.stats.totalRecords,
+              detail: <>{props.trustworthinessvaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}</>,
+            }
+            ]}
+            records={props.trustworthinessvaultizabilityAdminSummary.records}
+            availableActions={props.trustworthinessvaultizabilityAdminSummary.availableActions}
+            refreshAction="refresh_trustworthinessvaultizability_summary"
+            actionBusy={props.trustworthinessvaultizabilityAdminAction !== 'idle'}
+            formatDomain={formatTrustworthinessvaultizabilityDomain as (domain: string) => string}
+            formatAdminAction={formatTrustworthinessvaultizabilityAdminAction as (action: string) => string}
+            onRefresh={() =>
+              void props.handleTrustworthinessvaultizabilityAdminAction('refresh_trustworthinessvaultizability_summary')
             }
           />
         ) : null}

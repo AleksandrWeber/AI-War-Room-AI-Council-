@@ -604,6 +604,46 @@ import {
   formatIntegrabilityvaultizabilityRolloutStatus,
 } from '../../integrabilityvaultizability-ui'
 import {
+  formatPredictabilityvaultizabilityRolloutCheckStatus,
+  formatPredictabilityvaultizabilityRolloutStatus,
+} from '../../predictabilityvaultizability-ui'
+import {
+  formatTrustworthinessvaultizabilityRolloutCheckStatus,
+  formatTrustworthinessvaultizabilityRolloutStatus,
+} from '../../trustworthinessvaultizability-ui'
+import {
+  formatComposabilityvaultizabilityRolloutCheckStatus,
+  formatComposabilityvaultizabilityRolloutStatus,
+} from '../../composabilityvaultizability-ui'
+import {
+  formatDependabilityvaultizabilityRolloutCheckStatus,
+  formatDependabilityvaultizabilityRolloutStatus,
+} from '../../dependabilityvaultizability-ui'
+import {
+  formatResponsivenessvaultizabilityRolloutCheckStatus,
+  formatResponsivenessvaultizabilityRolloutStatus,
+} from '../../responsivenessvaultizability-ui'
+import {
+  formatRepeatabilityvaultizabilityRolloutCheckStatus,
+  formatRepeatabilityvaultizabilityRolloutStatus,
+} from '../../repeatabilityvaultizability-ui'
+import {
+  formatMonitorabilityvaultizabilityRolloutCheckStatus,
+  formatMonitorabilityvaultizabilityRolloutStatus,
+} from '../../monitorabilityvaultizability-ui'
+import {
+  formatAutomatabilityvaultizabilityRolloutCheckStatus,
+  formatAutomatabilityvaultizabilityRolloutStatus,
+} from '../../automatabilityvaultizability-ui'
+import {
+  formatSchedulabilityvaultizabilityRolloutCheckStatus,
+  formatSchedulabilityvaultizabilityRolloutStatus,
+} from '../../schedulabilityvaultizability-ui'
+import {
+  formatOrchestrabilityvaultizabilityRolloutCheckStatus,
+  formatOrchestrabilityvaultizabilityRolloutStatus,
+} from '../../orchestrabilityvaultizability-ui'
+import {
   formatControllabilityvaultizabilityRolloutCheckStatus,
   formatControllabilityvaultizabilityRolloutStatus,
 } from '../../controllabilityvaultizability-ui'
@@ -7585,6 +7625,96 @@ export default function RolloutAdminBulk(props: RolloutAdminBulkProps) {
             rollout={props.integrabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
             formatStatus={formatIntegrabilityvaultizabilityRolloutStatus as (status: string) => string}
             formatCheckStatus={formatIntegrabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.orchestrabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production orchestrabilityvaultizability rollout readiness"
+            rollout={props.orchestrabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatOrchestrabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatOrchestrabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.schedulabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production schedulabilityvaultizability rollout readiness"
+            rollout={props.schedulabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatSchedulabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatSchedulabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.automatabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production automatabilityvaultizability rollout readiness"
+            rollout={props.automatabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatAutomatabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatAutomatabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.monitorabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production monitorabilityvaultizability rollout readiness"
+            rollout={props.monitorabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatMonitorabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatMonitorabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.predictabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production predictabilityvaultizability rollout readiness"
+            rollout={props.predictabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatPredictabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatPredictabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.repeatabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production repeatabilityvaultizability rollout readiness"
+            rollout={props.repeatabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatRepeatabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatRepeatabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.responsivenessvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production responsivenessvaultizability rollout readiness"
+            rollout={props.responsivenessvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatResponsivenessvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatResponsivenessvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.dependabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production dependabilityvaultizability rollout readiness"
+            rollout={props.dependabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatDependabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatDependabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.composabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production composabilityvaultizability rollout readiness"
+            rollout={props.composabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatComposabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatComposabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.trustworthinessvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production trustworthinessvaultizability rollout readiness"
+            rollout={props.trustworthinessvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatTrustworthinessvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatTrustworthinessvaultizabilityRolloutCheckStatus as (status: string) => string}
           />
         ) : null}
     </>
