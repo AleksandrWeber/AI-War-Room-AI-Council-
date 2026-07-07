@@ -1135,6 +1135,26 @@ import type {
   DiscoverabilityvaultizabilityAdminSummaryResponse,
   NavigabilityvaultizabilityRolloutResponse,
   NavigabilityvaultizabilityAdminSummaryResponse,
+  ConnectabilityvaultizabilityRolloutResponse,
+  ConnectabilityvaultizabilityAdminSummaryResponse,
+  LinkabilityvaultizabilityRolloutResponse,
+  LinkabilityvaultizabilityAdminSummaryResponse,
+  InterchangeabilityvaultizabilityRolloutResponse,
+  InterchangeabilityvaultizabilityAdminSummaryResponse,
+  TransferabilityvaultizabilityRolloutResponse,
+  TransferabilityvaultizabilityAdminSummaryResponse,
+  PortabilityvaultizabilityRolloutResponse,
+  PortabilityvaultizabilityAdminSummaryResponse,
+  CompatibilityvaultizabilityRolloutResponse,
+  CompatibilityvaultizabilityAdminSummaryResponse,
+  AdaptabilityvaultizabilityRolloutResponse,
+  AdaptabilityvaultizabilityAdminSummaryResponse,
+  FlexibilityvaultizabilityRolloutResponse,
+  FlexibilityvaultizabilityAdminSummaryResponse,
+  ExtensibilityvaultizabilityRolloutResponse,
+  ExtensibilityvaultizabilityAdminSummaryResponse,
+  ModifiabilityvaultizabilityRolloutResponse,
+  ModifiabilityvaultizabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -2795,6 +2815,26 @@ function App() {
     useState<DiscoverabilityvaultizabilityRolloutResponse | null>(null)
   const [navigabilityvaultizabilityRollout, setNavigabilityvaultizabilityRollout] =
     useState<NavigabilityvaultizabilityRolloutResponse | null>(null)
+  const [connectabilityvaultizabilityRollout, setConnectabilityvaultizabilityRollout] =
+    useState<ConnectabilityvaultizabilityRolloutResponse | null>(null)
+  const [linkabilityvaultizabilityRollout, setLinkabilityvaultizabilityRollout] =
+    useState<LinkabilityvaultizabilityRolloutResponse | null>(null)
+  const [interchangeabilityvaultizabilityRollout, setInterchangeabilityvaultizabilityRollout] =
+    useState<InterchangeabilityvaultizabilityRolloutResponse | null>(null)
+  const [transferabilityvaultizabilityRollout, setTransferabilityvaultizabilityRollout] =
+    useState<TransferabilityvaultizabilityRolloutResponse | null>(null)
+  const [portabilityvaultizabilityRollout, setPortabilityvaultizabilityRollout] =
+    useState<PortabilityvaultizabilityRolloutResponse | null>(null)
+  const [compatibilityvaultizabilityRollout, setCompatibilityvaultizabilityRollout] =
+    useState<CompatibilityvaultizabilityRolloutResponse | null>(null)
+  const [adaptabilityvaultizabilityRollout, setAdaptabilityvaultizabilityRollout] =
+    useState<AdaptabilityvaultizabilityRolloutResponse | null>(null)
+  const [flexibilityvaultizabilityRollout, setFlexibilityvaultizabilityRollout] =
+    useState<FlexibilityvaultizabilityRolloutResponse | null>(null)
+  const [extensibilityvaultizabilityRollout, setExtensibilityvaultizabilityRollout] =
+    useState<ExtensibilityvaultizabilityRolloutResponse | null>(null)
+  const [modifiabilityvaultizabilityRollout, setModifiabilityvaultizabilityRollout] =
+    useState<ModifiabilityvaultizabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -3992,6 +4032,26 @@ function App() {
     useState<DiscoverabilityvaultizabilityAdminSummaryResponse | null>(null)
   const [navigabilityvaultizabilityAdminSummary, setNavigabilityvaultizabilityAdminSummary] =
     useState<NavigabilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [connectabilityvaultizabilityAdminSummary, setConnectabilityvaultizabilityAdminSummary] =
+    useState<ConnectabilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [linkabilityvaultizabilityAdminSummary, setLinkabilityvaultizabilityAdminSummary] =
+    useState<LinkabilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [interchangeabilityvaultizabilityAdminSummary, setInterchangeabilityvaultizabilityAdminSummary] =
+    useState<InterchangeabilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [transferabilityvaultizabilityAdminSummary, setTransferabilityvaultizabilityAdminSummary] =
+    useState<TransferabilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [portabilityvaultizabilityAdminSummary, setPortabilityvaultizabilityAdminSummary] =
+    useState<PortabilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [compatibilityvaultizabilityAdminSummary, setCompatibilityvaultizabilityAdminSummary] =
+    useState<CompatibilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [adaptabilityvaultizabilityAdminSummary, setAdaptabilityvaultizabilityAdminSummary] =
+    useState<AdaptabilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [flexibilityvaultizabilityAdminSummary, setFlexibilityvaultizabilityAdminSummary] =
+    useState<FlexibilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [extensibilityvaultizabilityAdminSummary, setExtensibilityvaultizabilityAdminSummary] =
+    useState<ExtensibilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [modifiabilityvaultizabilityAdminSummary, setModifiabilityvaultizabilityAdminSummary] =
+    useState<ModifiabilityvaultizabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -5670,6 +5730,36 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [navigabilityvaultizabilityAdminAction, setNavigabilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [connectabilityvaultizabilityAdminAction, setConnectabilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [linkabilityvaultizabilityAdminAction, setLinkabilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [interchangeabilityvaultizabilityAdminAction, setInterchangeabilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [transferabilityvaultizabilityAdminAction, setTransferabilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [portabilityvaultizabilityAdminAction, setPortabilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [compatibilityvaultizabilityAdminAction, setCompatibilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [adaptabilityvaultizabilityAdminAction, setAdaptabilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [flexibilityvaultizabilityAdminAction, setFlexibilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [extensibilityvaultizabilityAdminAction, setExtensibilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [modifiabilityvaultizabilityAdminAction, setModifiabilityvaultizabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -12525,6 +12615,126 @@ function App() {
         }
       })
 
+    callUi('connectabilityvaultizability-ui', 'fetchConnectabilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setConnectabilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setConnectabilityvaultizabilityRollout(null)
+        }
+      })
+
+    callUi('linkabilityvaultizability-ui', 'fetchLinkabilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setLinkabilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setLinkabilityvaultizabilityRollout(null)
+        }
+      })
+
+    callUi('interchangeabilityvaultizability-ui', 'fetchInterchangeabilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setInterchangeabilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setInterchangeabilityvaultizabilityRollout(null)
+        }
+      })
+
+    callUi('transferabilityvaultizability-ui', 'fetchTransferabilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setTransferabilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setTransferabilityvaultizabilityRollout(null)
+        }
+      })
+
+    callUi('portabilityvaultizability-ui', 'fetchPortabilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setPortabilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setPortabilityvaultizabilityRollout(null)
+        }
+      })
+
+    callUi('compatibilityvaultizability-ui', 'fetchCompatibilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setCompatibilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setCompatibilityvaultizabilityRollout(null)
+        }
+      })
+
+    callUi('adaptabilityvaultizability-ui', 'fetchAdaptabilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAdaptabilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAdaptabilityvaultizabilityRollout(null)
+        }
+      })
+
+    callUi('flexibilityvaultizability-ui', 'fetchFlexibilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setFlexibilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setFlexibilityvaultizabilityRollout(null)
+        }
+      })
+
+    callUi('extensibilityvaultizability-ui', 'fetchExtensibilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setExtensibilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setExtensibilityvaultizabilityRollout(null)
+        }
+      })
+
+    callUi('modifiabilityvaultizability-ui', 'fetchModifiabilityvaultizabilityRollout', apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setModifiabilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setModifiabilityvaultizabilityRollout(null)
+        }
+      })
+
     fetchUsageCapabilities(apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
@@ -17057,6 +17267,76 @@ function App() {
         workspaceAuthHeaders,
       )
       setNavigabilityvaultizabilityAdminSummary(navigabilityvaultizabilityAdmin)
+
+      const connectabilityvaultizabilityAdmin = await callUi('connectabilityvaultizability-ui', 'fetchConnectabilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setConnectabilityvaultizabilityAdminSummary(connectabilityvaultizabilityAdmin)
+
+      const linkabilityvaultizabilityAdmin = await callUi('linkabilityvaultizability-ui', 'fetchLinkabilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setLinkabilityvaultizabilityAdminSummary(linkabilityvaultizabilityAdmin)
+
+      const interchangeabilityvaultizabilityAdmin = await callUi('interchangeabilityvaultizability-ui', 'fetchInterchangeabilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setInterchangeabilityvaultizabilityAdminSummary(interchangeabilityvaultizabilityAdmin)
+
+      const transferabilityvaultizabilityAdmin = await callUi('transferabilityvaultizability-ui', 'fetchTransferabilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setTransferabilityvaultizabilityAdminSummary(transferabilityvaultizabilityAdmin)
+
+      const portabilityvaultizabilityAdmin = await callUi('portabilityvaultizability-ui', 'fetchPortabilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setPortabilityvaultizabilityAdminSummary(portabilityvaultizabilityAdmin)
+
+      const compatibilityvaultizabilityAdmin = await callUi('compatibilityvaultizability-ui', 'fetchCompatibilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCompatibilityvaultizabilityAdminSummary(compatibilityvaultizabilityAdmin)
+
+      const adaptabilityvaultizabilityAdmin = await callUi('adaptabilityvaultizability-ui', 'fetchAdaptabilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAdaptabilityvaultizabilityAdminSummary(adaptabilityvaultizabilityAdmin)
+
+      const flexibilityvaultizabilityAdmin = await callUi('flexibilityvaultizability-ui', 'fetchFlexibilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setFlexibilityvaultizabilityAdminSummary(flexibilityvaultizabilityAdmin)
+
+      const extensibilityvaultizabilityAdmin = await callUi('extensibilityvaultizability-ui', 'fetchExtensibilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setExtensibilityvaultizabilityAdminSummary(extensibilityvaultizabilityAdmin)
+
+      const modifiabilityvaultizabilityAdmin = await callUi('modifiabilityvaultizability-ui', 'fetchModifiabilityvaultizabilityAdminSummary', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setModifiabilityvaultizabilityAdminSummary(modifiabilityvaultizabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -18375,6 +18655,296 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleModifiabilityvaultizabilityAdminAction(
+    action: 'refresh_modifiabilityvaultizability_summary',
+  ) {
+    setModifiabilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('modifiabilityvaultizability-ui', 'executeModifiabilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('modifiabilityvaultizability-ui', 'fetchModifiabilityvaultizabilityRollout', apiBaseUrl)
+      setModifiabilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run modifiabilityvaultizability admin action.',
+      )
+    } finally {
+      setModifiabilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleExtensibilityvaultizabilityAdminAction(
+    action: 'refresh_extensibilityvaultizability_summary',
+  ) {
+    setExtensibilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('extensibilityvaultizability-ui', 'executeExtensibilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('extensibilityvaultizability-ui', 'fetchExtensibilityvaultizabilityRollout', apiBaseUrl)
+      setExtensibilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run extensibilityvaultizability admin action.',
+      )
+    } finally {
+      setExtensibilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleFlexibilityvaultizabilityAdminAction(
+    action: 'refresh_flexibilityvaultizability_summary',
+  ) {
+    setFlexibilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('flexibilityvaultizability-ui', 'executeFlexibilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('flexibilityvaultizability-ui', 'fetchFlexibilityvaultizabilityRollout', apiBaseUrl)
+      setFlexibilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run flexibilityvaultizability admin action.',
+      )
+    } finally {
+      setFlexibilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAdaptabilityvaultizabilityAdminAction(
+    action: 'refresh_adaptabilityvaultizability_summary',
+  ) {
+    setAdaptabilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('adaptabilityvaultizability-ui', 'executeAdaptabilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('adaptabilityvaultizability-ui', 'fetchAdaptabilityvaultizabilityRollout', apiBaseUrl)
+      setAdaptabilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run adaptabilityvaultizability admin action.',
+      )
+    } finally {
+      setAdaptabilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleCompatibilityvaultizabilityAdminAction(
+    action: 'refresh_compatibilityvaultizability_summary',
+  ) {
+    setCompatibilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('compatibilityvaultizability-ui', 'executeCompatibilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('compatibilityvaultizability-ui', 'fetchCompatibilityvaultizabilityRollout', apiBaseUrl)
+      setCompatibilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run compatibilityvaultizability admin action.',
+      )
+    } finally {
+      setCompatibilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handlePortabilityvaultizabilityAdminAction(
+    action: 'refresh_portabilityvaultizability_summary',
+  ) {
+    setPortabilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('portabilityvaultizability-ui', 'executePortabilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('portabilityvaultizability-ui', 'fetchPortabilityvaultizabilityRollout', apiBaseUrl)
+      setPortabilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run portabilityvaultizability admin action.',
+      )
+    } finally {
+      setPortabilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleTransferabilityvaultizabilityAdminAction(
+    action: 'refresh_transferabilityvaultizability_summary',
+  ) {
+    setTransferabilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('transferabilityvaultizability-ui', 'executeTransferabilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('transferabilityvaultizability-ui', 'fetchTransferabilityvaultizabilityRollout', apiBaseUrl)
+      setTransferabilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run transferabilityvaultizability admin action.',
+      )
+    } finally {
+      setTransferabilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleInterchangeabilityvaultizabilityAdminAction(
+    action: 'refresh_interchangeabilityvaultizability_summary',
+  ) {
+    setInterchangeabilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('interchangeabilityvaultizability-ui', 'executeInterchangeabilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('interchangeabilityvaultizability-ui', 'fetchInterchangeabilityvaultizabilityRollout', apiBaseUrl)
+      setInterchangeabilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run interchangeabilityvaultizability admin action.',
+      )
+    } finally {
+      setInterchangeabilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleLinkabilityvaultizabilityAdminAction(
+    action: 'refresh_linkabilityvaultizability_summary',
+  ) {
+    setLinkabilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('linkabilityvaultizability-ui', 'executeLinkabilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('linkabilityvaultizability-ui', 'fetchLinkabilityvaultizabilityRollout', apiBaseUrl)
+      setLinkabilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run linkabilityvaultizability admin action.',
+      )
+    } finally {
+      setLinkabilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleConnectabilityvaultizabilityAdminAction(
+    action: 'refresh_connectabilityvaultizability_summary',
+  ) {
+    setConnectabilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi('connectabilityvaultizability-ui', 'executeConnectabilityvaultizabilityAdminAction', 
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await callUi('connectabilityvaultizability-ui', 'fetchConnectabilityvaultizabilityRollout', apiBaseUrl)
+      setConnectabilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run connectabilityvaultizability admin action.',
+      )
+    } finally {
+      setConnectabilityvaultizabilityAdminAction('idle')
     }
   }
 
@@ -34090,6 +34660,7 @@ function App() {
             accreditationizabilityRollout,
             ackizabilityRollout,
             adaptabilityRollout,
+            adaptabilityvaultizabilityRollout,
             adaptizabilityRollout,
             adjustabilityRollout,
             adoptabilityRollout,
@@ -34190,6 +34761,7 @@ function App() {
             comparabilityvaultizabilityRollout,
             comparizabilityRollout,
             compatibilityRollout,
+            compatibilityvaultizabilityRollout,
             compatibilizabilityRollout,
             compilatizabilityRollout,
             complianceRollout,
@@ -34211,6 +34783,7 @@ function App() {
             confirmabilityRollout,
             conformanceRollout,
             connectabilityRollout,
+            connectabilityvaultizabilityRollout,
             connectabilizabilityRollout,
             connotabilityRollout,
             consensusizabilityRollout,
@@ -34295,6 +34868,7 @@ function App() {
             exportizabilityRollout,
             expressivenessRollout,
             extensibilityRollout,
+            extensibilityvaultizabilityRollout,
             extensibilizabilityRollout,
             extrapolizabilityRollout,
             failoverizabilityRollout,
@@ -34306,6 +34880,7 @@ function App() {
             federatizabilityRollout,
             filterizabilityRollout,
             flexibilityRollout,
+            flexibilityvaultizabilityRollout,
             foldizabilityRollout,
             followerizabilityRollout,
             footnotizabilityRollout,
@@ -34353,6 +34928,7 @@ function App() {
             integrityjournalizabilityRollout,
             intelligibilityRollout,
             interchangeabilityRollout,
+            interchangeabilityvaultizabilityRollout,
             interfabilizabilityRollout,
             interoperabilizabilityRollout,
             interpolizabilityRollout,
@@ -34374,6 +34950,7 @@ function App() {
             lexicalizabilityRollout,
             lineageizabilityRollout,
             linkabilityRollout,
+            linkabilityvaultizabilityRollout,
             llmRollout,
             loadbalancizabilityRollout,
             locatabilityRollout,
@@ -34401,6 +34978,7 @@ function App() {
             mitigationizabilityRollout,
             modelRouterRollout,
             modifiabilityRollout,
+            modifiabilityvaultizabilityRollout,
             modularizabilityRollout,
             monitorabilityRollout,
             monitorizabilityRollout,
@@ -34456,6 +35034,7 @@ function App() {
             policyizabilityRollout,
             policyproofizabilityRollout,
             portabilityRollout,
+            portabilityvaultizabilityRollout,
             pragmatizabilityRollout,
             predictabilityRollout,
             predictizabilityRollout,
@@ -34604,6 +35183,7 @@ function App() {
             traceproofizabilityRollout,
             tracevaultizabilityRollout,
             transferabilityRollout,
+            transferabilityvaultizabilityRollout,
             transformizabilityRollout,
             transparencyRollout,
             transparencyizabilityRollout,
@@ -34770,7 +35350,9 @@ function App() {
             ackizabilityAdminAction,
             ackizabilityAdminSummary,
             adaptabilityAdminAction,
+            adaptabilityvaultizabilityAdminAction,
             adaptabilityAdminSummary,
+            adaptabilityvaultizabilityAdminSummary,
             adaptizabilityAdminAction,
             adaptizabilityAdminSummary,
             adjustabilityAdminAction,
@@ -34968,7 +35550,9 @@ function App() {
             comparizabilityAdminAction,
             comparizabilityAdminSummary,
             compatibilityAdminAction,
+            compatibilityvaultizabilityAdminAction,
             compatibilityAdminSummary,
+            compatibilityvaultizabilityAdminSummary,
             compatibilizabilityAdminAction,
             compatibilizabilityAdminSummary,
             compilatizabilityAdminAction,
@@ -35010,7 +35594,9 @@ function App() {
             conformanceAdminAction,
             conformanceAdminSummary,
             connectabilityAdminAction,
+            connectabilityvaultizabilityAdminAction,
             connectabilityAdminSummary,
+            connectabilityvaultizabilityAdminSummary,
             connectabilizabilityAdminAction,
             connectabilizabilityAdminSummary,
             connotabilityAdminAction,
@@ -35176,7 +35762,9 @@ function App() {
             expressivenessAdminAction,
             expressivenessAdminSummary,
             extensibilityAdminAction,
+            extensibilityvaultizabilityAdminAction,
             extensibilityAdminSummary,
+            extensibilityvaultizabilityAdminSummary,
             extensibilizabilityAdminAction,
             extensibilizabilityAdminSummary,
             extrapolizabilityAdminAction,
@@ -35198,7 +35786,9 @@ function App() {
             filterizabilityAdminAction,
             filterizabilityAdminSummary,
             flexibilityAdminAction,
+            flexibilityvaultizabilityAdminAction,
             flexibilityAdminSummary,
+            flexibilityvaultizabilityAdminSummary,
             foldizabilityAdminAction,
             foldizabilityAdminSummary,
             followerizabilityAdminAction,
@@ -35237,6 +35827,7 @@ function App() {
             handleAccreditationizabilityAdminAction,
             handleAckizabilityAdminAction,
             handleAdaptabilityAdminAction,
+            handleAdaptabilityvaultizabilityAdminAction,
             handleAdaptizabilityAdminAction,
             handleAdjustabilityAdminAction,
             handleAdoptabilityAdminAction,
@@ -35336,6 +35927,7 @@ function App() {
             handleComparabilityvaultizabilityAdminAction,
             handleComparizabilityAdminAction,
             handleCompatibilityAdminAction,
+            handleCompatibilityvaultizabilityAdminAction,
             handleCompatibilizabilityAdminAction,
             handleCompilatizabilityAdminAction,
             handleComplianceAdminAction,
@@ -35357,6 +35949,7 @@ function App() {
             handleConfirmabilityAdminAction,
             handleConformanceAdminAction,
             handleConnectabilityAdminAction,
+            handleConnectabilityvaultizabilityAdminAction,
             handleConnectabilizabilityAdminAction,
             handleConnotabilityAdminAction,
             handleConsensusizabilityAdminAction,
@@ -35440,6 +36033,7 @@ function App() {
             handleExportizabilityAdminAction,
             handleExpressivenessAdminAction,
             handleExtensibilityAdminAction,
+            handleExtensibilityvaultizabilityAdminAction,
             handleExtensibilizabilityAdminAction,
             handleExtrapolizabilityAdminAction,
             handleFailoverizabilityAdminAction,
@@ -35451,6 +36045,7 @@ function App() {
             handleFederatizabilityAdminAction,
             handleFilterizabilityAdminAction,
             handleFlexibilityAdminAction,
+            handleFlexibilityvaultizabilityAdminAction,
             handleFoldizabilityAdminAction,
             handleFollowerizabilityAdminAction,
             handleFootnotizabilityAdminAction,
@@ -35497,6 +36092,7 @@ function App() {
             handleIntegrityjournalizabilityAdminAction,
             handleIntelligibilityAdminAction,
             handleInterchangeabilityAdminAction,
+            handleInterchangeabilityvaultizabilityAdminAction,
             handleInterfabilizabilityAdminAction,
             handleInteroperabilizabilityAdminAction,
             handleInterpolizabilityAdminAction,
@@ -35518,6 +36114,7 @@ function App() {
             handleLexicalizabilityAdminAction,
             handleLineageizabilityAdminAction,
             handleLinkabilityAdminAction,
+            handleLinkabilityvaultizabilityAdminAction,
             handleLoadbalancizabilityAdminAction,
             handleLocatabilityAdminAction,
             handleLocatabilityvaultizabilityAdminAction,
@@ -35542,6 +36139,7 @@ function App() {
             handleMirroringizabilityAdminAction,
             handleMitigationizabilityAdminAction,
             handleModifiabilityAdminAction,
+            handleModifiabilityvaultizabilityAdminAction,
             handleModularizabilityAdminAction,
             handleMonitorabilityAdminAction,
             handleMonitorizabilityAdminAction,
@@ -35596,6 +36194,7 @@ function App() {
             handlePolicyizabilityAdminAction,
             handlePolicyproofizabilityAdminAction,
             handlePortabilityAdminAction,
+            handlePortabilityvaultizabilityAdminAction,
             handlePragmatizabilityAdminAction,
             handlePredictabilityAdminAction,
             handlePredictizabilityAdminAction,
@@ -35737,6 +36336,7 @@ function App() {
             handleTraceproofizabilityAdminAction,
             handleTracevaultizabilityAdminAction,
             handleTransferabilityAdminAction,
+            handleTransferabilityvaultizabilityAdminAction,
             handleTransformizabilityAdminAction,
             handleTransparencyAdminAction,
             handleTransparencyizabilityAdminAction,
@@ -35838,7 +36438,9 @@ function App() {
             intelligibilityAdminAction,
             intelligibilityAdminSummary,
             interchangeabilityAdminAction,
+            interchangeabilityvaultizabilityAdminAction,
             interchangeabilityAdminSummary,
+            interchangeabilityvaultizabilityAdminSummary,
             interfabilizabilityAdminAction,
             interfabilizabilityAdminSummary,
             interoperabilizabilityAdminAction,
@@ -35880,7 +36482,9 @@ function App() {
             lineageizabilityAdminAction,
             lineageizabilityAdminSummary,
             linkabilityAdminAction,
+            linkabilityvaultizabilityAdminAction,
             linkabilityAdminSummary,
+            linkabilityvaultizabilityAdminSummary,
             loadbalancizabilityAdminAction,
             loadbalancizabilityAdminSummary,
             locatabilityAdminAction,
@@ -35928,7 +36532,9 @@ function App() {
             mitigationizabilityAdminAction,
             mitigationizabilityAdminSummary,
             modifiabilityAdminAction,
+            modifiabilityvaultizabilityAdminAction,
             modifiabilityAdminSummary,
+            modifiabilityvaultizabilityAdminSummary,
             modularizabilityAdminAction,
             modularizabilityAdminSummary,
             monitorabilityAdminAction,
@@ -36036,7 +36642,9 @@ function App() {
             policyproofizabilityAdminAction,
             policyproofizabilityAdminSummary,
             portabilityAdminAction,
+            portabilityvaultizabilityAdminAction,
             portabilityAdminSummary,
+            portabilityvaultizabilityAdminSummary,
             pragmatizabilityAdminAction,
             pragmatizabilityAdminSummary,
             predictabilityAdminAction,
@@ -36318,7 +36926,9 @@ function App() {
             tracevaultizabilityAdminAction,
             tracevaultizabilityAdminSummary,
             transferabilityAdminAction,
+            transferabilityvaultizabilityAdminAction,
             transferabilityAdminSummary,
+            transferabilityvaultizabilityAdminSummary,
             transformizabilityAdminAction,
             transformizabilityAdminSummary,
             transparencyAdminAction,

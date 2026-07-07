@@ -588,6 +588,46 @@ import {
   formatNavigabilityvaultizabilityRolloutStatus,
 } from '../../navigabilityvaultizability-ui'
 import {
+  formatPortabilityvaultizabilityRolloutCheckStatus,
+  formatPortabilityvaultizabilityRolloutStatus,
+} from '../../portabilityvaultizability-ui'
+import {
+  formatModifiabilityvaultizabilityRolloutCheckStatus,
+  formatModifiabilityvaultizabilityRolloutStatus,
+} from '../../modifiabilityvaultizability-ui'
+import {
+  formatExtensibilityvaultizabilityRolloutCheckStatus,
+  formatExtensibilityvaultizabilityRolloutStatus,
+} from '../../extensibilityvaultizability-ui'
+import {
+  formatFlexibilityvaultizabilityRolloutCheckStatus,
+  formatFlexibilityvaultizabilityRolloutStatus,
+} from '../../flexibilityvaultizability-ui'
+import {
+  formatAdaptabilityvaultizabilityRolloutCheckStatus,
+  formatAdaptabilityvaultizabilityRolloutStatus,
+} from '../../adaptabilityvaultizability-ui'
+import {
+  formatCompatibilityvaultizabilityRolloutCheckStatus,
+  formatCompatibilityvaultizabilityRolloutStatus,
+} from '../../compatibilityvaultizability-ui'
+import {
+  formatTransferabilityvaultizabilityRolloutCheckStatus,
+  formatTransferabilityvaultizabilityRolloutStatus,
+} from '../../transferabilityvaultizability-ui'
+import {
+  formatInterchangeabilityvaultizabilityRolloutCheckStatus,
+  formatInterchangeabilityvaultizabilityRolloutStatus,
+} from '../../interchangeabilityvaultizability-ui'
+import {
+  formatLinkabilityvaultizabilityRolloutCheckStatus,
+  formatLinkabilityvaultizabilityRolloutStatus,
+} from '../../linkabilityvaultizability-ui'
+import {
+  formatConnectabilityvaultizabilityRolloutCheckStatus,
+  formatConnectabilityvaultizabilityRolloutStatus,
+} from '../../connectabilityvaultizability-ui'
+import {
   formatDiscoverabilityvaultizabilityRolloutCheckStatus,
   formatDiscoverabilityvaultizabilityRolloutStatus,
 } from '../../discoverabilityvaultizability-ui'
@@ -7325,6 +7365,96 @@ export default function RolloutAdminBulk(props: RolloutAdminBulkProps) {
             rollout={props.navigabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
             formatStatus={formatNavigabilityvaultizabilityRolloutStatus as (status: string) => string}
             formatCheckStatus={formatNavigabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.connectabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production connectabilityvaultizability rollout readiness"
+            rollout={props.connectabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatConnectabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatConnectabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.linkabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production linkabilityvaultizability rollout readiness"
+            rollout={props.linkabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatLinkabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatLinkabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.interchangeabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production interchangeabilityvaultizability rollout readiness"
+            rollout={props.interchangeabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatInterchangeabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatInterchangeabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.transferabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production transferabilityvaultizability rollout readiness"
+            rollout={props.transferabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatTransferabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatTransferabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.portabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production portabilityvaultizability rollout readiness"
+            rollout={props.portabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatPortabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatPortabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.compatibilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production compatibilityvaultizability rollout readiness"
+            rollout={props.compatibilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatCompatibilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatCompatibilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.adaptabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production adaptabilityvaultizability rollout readiness"
+            rollout={props.adaptabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatAdaptabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatAdaptabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.flexibilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production flexibilityvaultizability rollout readiness"
+            rollout={props.flexibilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatFlexibilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatFlexibilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.extensibilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production extensibilityvaultizability rollout readiness"
+            rollout={props.extensibilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatExtensibilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatExtensibilityvaultizabilityRolloutCheckStatus as (status: string) => string}
+          />
+        ) : null}
+
+        {props.modifiabilityvaultizabilityRollout ? (
+          <RolloutReadinessCard
+            title="Production modifiabilityvaultizability rollout readiness"
+            rollout={props.modifiabilityvaultizabilityRollout as import('@ai-war-room/web-blocks').RolloutReadinessSnapshot}
+            formatStatus={formatModifiabilityvaultizabilityRolloutStatus as (status: string) => string}
+            formatCheckStatus={formatModifiabilityvaultizabilityRolloutCheckStatus as (status: string) => string}
           />
         ) : null}
     </>

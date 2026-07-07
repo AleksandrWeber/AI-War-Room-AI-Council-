@@ -53,6 +53,30 @@ const batches = [
       ['warrantabilityvaultizability', 'navigabilityvaultizability'],
     ],
   },
+  {
+    source: 'milestones-v1071-v1075.mjs',
+    target: 'milestones-v1081-v1085.mjs',
+    versionBase: 581,
+    replacements: [
+      ['attributabilityvaultizability', 'connectabilityvaultizability'],
+      ['identifiabilityvaultizability', 'linkabilityvaultizability'],
+      ['comparabilityvaultizability', 'interchangeabilityvaultizability'],
+      ['distinguishabilityvaultizability', 'transferabilityvaultizability'],
+      ['assignabilityvaultizability', 'portabilityvaultizability'],
+    ],
+  },
+  {
+    source: 'milestones-v1076-v1080.mjs',
+    target: 'milestones-v1086-v1090.mjs',
+    versionBase: 586,
+    replacements: [
+      ['referencabilityvaultizability', 'compatibilityvaultizability'],
+      ['locatabilityvaultizability', 'adaptabilityvaultizability'],
+      ['retrievabilityvaultizability', 'flexibilityvaultizability'],
+      ['discoverabilityvaultizability', 'extensibilityvaultizability'],
+      ['navigabilityvaultizability', 'modifiabilityvaultizability'],
+    ],
+  },
 ]
 
 function capitalizeModule(name) {

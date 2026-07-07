@@ -1,0 +1,75 @@
+import type {
+  CompatibilityvaultizabilityAdminAction,
+  CompatibilityvaultizabilityAdminRecord,
+  CompatibilityvaultizabilityAdminStats,
+} from '@ai-war-room/schemas'
+
+export type WorkspaceCompatibilityvaultizabilityDomainInventory = {
+  domain: CompatibilityvaultizabilityAdminRecord['domain']
+  tableName: string
+  recordCount: number
+  tableExists: boolean
+}
+
+export function buildCompatibilityvaultizabilityAdminRecords(
+  inventory: WorkspaceCompatibilityvaultizabilityDomainInventory[],
+): CompatibilityvaultizabilityAdminRecord[] {
+  return inventory.map((entry) => ({
+    domain: entry.domain,
+    tableName: entry.tableName,
+    recordCount: entry.recordCount,
+    tableExists: entry.tableExists,
+  }))
+}
+
+export function buildCompatibilityvaultizabilityAdminStats(input: {
+  records: CompatibilityvaultizabilityAdminRecord[]
+  postgresConnectivity: boolean
+}): CompatibilityvaultizabilityAdminStats {
+  const coveredDomains = input.records.filter(
+    (record) => record.tableExists,
+  ).length
+  const completedRuns =
+    input.records.find((record) => record.domain === 'completed_runs')
+      ?.recordCount ?? 0
+  const metricRecords =
+    input.records.find((record) => record.domain === 'billing_invoices')
+      ?.recordCount ?? 0
+  const compatibilityvaultizabilityPercent =
+    completedRuns === 0
+      ? 100
+      : Math.min(100, Math.round((metricRecords / completedRuns) * 100))
+
+  return {
+    totalRecords: input.records.reduce(
+      (total, record) => total + record.recordCount,
+      0,
+    ),
+    coveredDomains,
+    totalDomains: input.records.length,
+    postgresConnectivity: input.postgresConnectivity,
+    compatibilityvaultizabilityPercent,
+  }
+}
+
+export function getCompatibilityvaultizabilityAdminGuidance(input: {
+  stats: CompatibilityvaultizabilityAdminStats
+}) {
+  if (!input.stats.postgresConnectivity) {
+    return 'Workspace owners and admins can inspect compatibilityvaultizability metrics once PostgreSQL connectivity is available.'
+  }
+
+  if (input.stats.coveredDomains < input.stats.totalDomains) {
+    return 'Workspace owners and admins can inspect partial compatibilityvaultizability coverage and refresh the compatibilityvaultizability summary.'
+  }
+
+  if (input.stats.compatibilityvaultizabilityPercent < 95) {
+    return 'Workspace owners and admins can inspect billing invoice compatibilityvaultizability below the 95% target and refresh the compatibilityvaultizability summary.'
+  }
+
+  return 'Workspace owners and admins can inspect workspace compatibilityvaultizability coverage and refresh the compatibilityvaultizability summary.'
+}
+
+export function resolveCompatibilityvaultizabilityAdminActions(): CompatibilityvaultizabilityAdminAction[] {
+  return ['refresh_compatibilityvaultizability_summary']
+}

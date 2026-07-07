@@ -403,6 +403,16 @@ import { LocatabilityvaultizabilityModule } from './locatabilityvaultizability/l
 import { RetrievabilityvaultizabilityModule } from './retrievabilityvaultizability/retrievabilityvaultizability.module.js'
 import { DiscoverabilityvaultizabilityModule } from './discoverabilityvaultizability/discoverabilityvaultizability.module.js'
 import { NavigabilityvaultizabilityModule } from './navigabilityvaultizability/navigabilityvaultizability.module.js'
+import { ConnectabilityvaultizabilityModule } from './connectabilityvaultizability/connectabilityvaultizability.module.js'
+import { LinkabilityvaultizabilityModule } from './linkabilityvaultizability/linkabilityvaultizability.module.js'
+import { InterchangeabilityvaultizabilityModule } from './interchangeabilityvaultizability/interchangeabilityvaultizability.module.js'
+import { TransferabilityvaultizabilityModule } from './transferabilityvaultizability/transferabilityvaultizability.module.js'
+import { PortabilityvaultizabilityModule } from './portabilityvaultizability/portabilityvaultizability.module.js'
+import { CompatibilityvaultizabilityModule } from './compatibilityvaultizability/compatibilityvaultizability.module.js'
+import { AdaptabilityvaultizabilityModule } from './adaptabilityvaultizability/adaptabilityvaultizability.module.js'
+import { FlexibilityvaultizabilityModule } from './flexibilityvaultizability/flexibilityvaultizability.module.js'
+import { ExtensibilityvaultizabilityModule } from './extensibilityvaultizability/extensibilityvaultizability.module.js'
+import { ModifiabilityvaultizabilityModule } from './modifiabilityvaultizability/modifiabilityvaultizability.module.js'
 
 @Module({
   imports: [
@@ -810,6 +820,16 @@ import { NavigabilityvaultizabilityModule } from './navigabilityvaultizability/n
     RetrievabilityvaultizabilityModule,
     DiscoverabilityvaultizabilityModule,
     NavigabilityvaultizabilityModule,
+    ConnectabilityvaultizabilityModule,
+    LinkabilityvaultizabilityModule,
+    InterchangeabilityvaultizabilityModule,
+    TransferabilityvaultizabilityModule,
+    PortabilityvaultizabilityModule,
+    CompatibilityvaultizabilityModule,
+    AdaptabilityvaultizabilityModule,
+    FlexibilityvaultizabilityModule,
+    ExtensibilityvaultizabilityModule,
+    ModifiabilityvaultizabilityModule,
   ],
   exports: [
     CustomizabilityModule,

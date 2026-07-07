@@ -1,26 +1,26 @@
 
-describe('referencabilityvaultizability rollout integration', () => {
-  it('reports referencabilityvaultizability capabilities and rollout readiness', async () => {
+describe('compatibilityvaultizability rollout integration', () => {
+  it('reports compatibilityvaultizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app.getHttpServer())
-      .get('/api/referencabilityvaultizability/capabilities')
+      .get('/api/compatibilityvaultizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsReferencabilityvaultizabilityRollout: true,
-      supportsReferencabilityvaultizabilityAdminTools: true,
-      supportsBillingInvoiceReferencabilityvaultizabilitySignals: true,
+      supportsCompatibilityvaultizabilityRollout: true,
+      supportsCompatibilityvaultizabilityAdminTools: true,
+      supportsBillingInvoiceCompatibilityvaultizabilitySignals: true,
     })
 
     const rollout = await request(app.getHttpServer())
-      .get('/api/referencabilityvaultizability/readiness')
+      .get('/api/compatibilityvaultizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns referencabilityvaultizability admin summary for owners', async () => {
+  it('returns compatibilityvaultizability admin summary for owners', async () => {
     const response = await request(app.getHttpServer())
-      .get('/api/referencabilityvaultizability/workspace/workspace_1/admin')
+      .get('/api/compatibilityvaultizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -30,14 +30,14 @@ describe('referencabilityvaultizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        referencabilityvaultizabilityPercent: expect.any(Number),
+        compatibilityvaultizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects referencabilityvaultizability admin tools for members', async () => {
+  it('rejects compatibilityvaultizability admin tools for members', async () => {
     await request(app.getHttpServer())
-      .get('/api/referencabilityvaultizability/workspace/workspace_1/admin')
+      .get('/api/compatibilityvaultizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -47,28 +47,28 @@ describe('referencabilityvaultizability rollout integration', () => {
 })
 
 
-describe('locatabilityvaultizability rollout integration', () => {
-  it('reports locatabilityvaultizability capabilities and rollout readiness', async () => {
+describe('adaptabilityvaultizability rollout integration', () => {
+  it('reports adaptabilityvaultizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app.getHttpServer())
-      .get('/api/locatabilityvaultizability/capabilities')
+      .get('/api/adaptabilityvaultizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsLocatabilityvaultizabilityRollout: true,
-      supportsLocatabilityvaultizabilityAdminTools: true,
-      supportsMembershipLocatabilityvaultizabilitySignals: true,
+      supportsAdaptabilityvaultizabilityRollout: true,
+      supportsAdaptabilityvaultizabilityAdminTools: true,
+      supportsMembershipAdaptabilityvaultizabilitySignals: true,
     })
 
     const rollout = await request(app.getHttpServer())
-      .get('/api/locatabilityvaultizability/readiness')
+      .get('/api/adaptabilityvaultizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns locatabilityvaultizability admin summary for owners', async () => {
+  it('returns adaptabilityvaultizability admin summary for owners', async () => {
     const response = await request(app.getHttpServer())
-      .get('/api/locatabilityvaultizability/workspace/workspace_1/admin')
+      .get('/api/adaptabilityvaultizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -78,14 +78,14 @@ describe('locatabilityvaultizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        locatabilityvaultizabilityPercent: expect.any(Number),
+        adaptabilityvaultizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects locatabilityvaultizability admin tools for members', async () => {
+  it('rejects adaptabilityvaultizability admin tools for members', async () => {
     await request(app.getHttpServer())
-      .get('/api/locatabilityvaultizability/workspace/workspace_1/admin')
+      .get('/api/adaptabilityvaultizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -95,28 +95,28 @@ describe('locatabilityvaultizability rollout integration', () => {
 })
 
 
-describe('retrievabilityvaultizability rollout integration', () => {
-  it('reports retrievabilityvaultizability capabilities and rollout readiness', async () => {
+describe('flexibilityvaultizability rollout integration', () => {
+  it('reports flexibilityvaultizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app.getHttpServer())
-      .get('/api/retrievabilityvaultizability/capabilities')
+      .get('/api/flexibilityvaultizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsRetrievabilityvaultizabilityRollout: true,
-      supportsRetrievabilityvaultizabilityAdminTools: true,
-      supportsIdempotencyKeyRetrievabilityvaultizabilitySignals: true,
+      supportsFlexibilityvaultizabilityRollout: true,
+      supportsFlexibilityvaultizabilityAdminTools: true,
+      supportsIdempotencyKeyFlexibilityvaultizabilitySignals: true,
     })
 
     const rollout = await request(app.getHttpServer())
-      .get('/api/retrievabilityvaultizability/readiness')
+      .get('/api/flexibilityvaultizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns retrievabilityvaultizability admin summary for owners', async () => {
+  it('returns flexibilityvaultizability admin summary for owners', async () => {
     const response = await request(app.getHttpServer())
-      .get('/api/retrievabilityvaultizability/workspace/workspace_1/admin')
+      .get('/api/flexibilityvaultizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -126,14 +126,14 @@ describe('retrievabilityvaultizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        retrievabilityvaultizabilityPercent: expect.any(Number),
+        flexibilityvaultizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects retrievabilityvaultizability admin tools for members', async () => {
+  it('rejects flexibilityvaultizability admin tools for members', async () => {
     await request(app.getHttpServer())
-      .get('/api/retrievabilityvaultizability/workspace/workspace_1/admin')
+      .get('/api/flexibilityvaultizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -143,28 +143,28 @@ describe('retrievabilityvaultizability rollout integration', () => {
 })
 
 
-describe('discoverabilityvaultizability rollout integration', () => {
-  it('reports discoverabilityvaultizability capabilities and rollout readiness', async () => {
+describe('extensibilityvaultizability rollout integration', () => {
+  it('reports extensibilityvaultizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app.getHttpServer())
-      .get('/api/discoverabilityvaultizability/capabilities')
+      .get('/api/extensibilityvaultizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsDiscoverabilityvaultizabilityRollout: true,
-      supportsDiscoverabilityvaultizabilityAdminTools: true,
-      supportsShieldScanDiscoverabilityvaultizabilitySignals: true,
+      supportsExtensibilityvaultizabilityRollout: true,
+      supportsExtensibilityvaultizabilityAdminTools: true,
+      supportsShieldScanExtensibilityvaultizabilitySignals: true,
     })
 
     const rollout = await request(app.getHttpServer())
-      .get('/api/discoverabilityvaultizability/readiness')
+      .get('/api/extensibilityvaultizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns discoverabilityvaultizability admin summary for owners', async () => {
+  it('returns extensibilityvaultizability admin summary for owners', async () => {
     const response = await request(app.getHttpServer())
-      .get('/api/discoverabilityvaultizability/workspace/workspace_1/admin')
+      .get('/api/extensibilityvaultizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -174,14 +174,14 @@ describe('discoverabilityvaultizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        discoverabilityvaultizabilityPercent: expect.any(Number),
+        extensibilityvaultizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects discoverabilityvaultizability admin tools for members', async () => {
+  it('rejects extensibilityvaultizability admin tools for members', async () => {
     await request(app.getHttpServer())
-      .get('/api/discoverabilityvaultizability/workspace/workspace_1/admin')
+      .get('/api/extensibilityvaultizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
@@ -191,28 +191,28 @@ describe('discoverabilityvaultizability rollout integration', () => {
 })
 
 
-describe('navigabilityvaultizability rollout integration', () => {
-  it('reports navigabilityvaultizability capabilities and rollout readiness', async () => {
+describe('modifiabilityvaultizability rollout integration', () => {
+  it('reports modifiabilityvaultizability capabilities and rollout readiness', async () => {
     const capabilities = await request(app.getHttpServer())
-      .get('/api/navigabilityvaultizability/capabilities')
+      .get('/api/modifiabilityvaultizability/capabilities')
       .expect(200)
 
     expect(capabilities.body).toMatchObject({
-      supportsNavigabilityvaultizabilityRollout: true,
-      supportsNavigabilityvaultizabilityAdminTools: true,
-      supportsBillingNotificationNavigabilityvaultizabilitySignals: true,
+      supportsModifiabilityvaultizabilityRollout: true,
+      supportsModifiabilityvaultizabilityAdminTools: true,
+      supportsBillingNotificationModifiabilityvaultizabilitySignals: true,
     })
 
     const rollout = await request(app.getHttpServer())
-      .get('/api/navigabilityvaultizability/readiness')
+      .get('/api/modifiabilityvaultizability/readiness')
       .expect(200)
 
     expect(rollout.body.status).toBe('ready')
   })
 
-  it('returns navigabilityvaultizability admin summary for owners', async () => {
+  it('returns modifiabilityvaultizability admin summary for owners', async () => {
     const response = await request(app.getHttpServer())
-      .get('/api/navigabilityvaultizability/workspace/workspace_1/admin')
+      .get('/api/modifiabilityvaultizability/workspace/workspace_1/admin')
       .set(authHeaders)
       .expect(200)
 
@@ -222,14 +222,14 @@ describe('navigabilityvaultizability rollout integration', () => {
       stats: {
         totalDomains: 4,
         coveredDomains: expect.any(Number),
-        navigabilityvaultizabilityPercent: expect.any(Number),
+        modifiabilityvaultizabilityPercent: expect.any(Number),
       },
     })
   })
 
-  it('rejects navigabilityvaultizability admin tools for members', async () => {
+  it('rejects modifiabilityvaultizability admin tools for members', async () => {
     await request(app.getHttpServer())
-      .get('/api/navigabilityvaultizability/workspace/workspace_1/admin')
+      .get('/api/modifiabilityvaultizability/workspace/workspace_1/admin')
       .set({
         'x-user-id': 'user_member',
         'x-workspace-id': 'workspace_1',
