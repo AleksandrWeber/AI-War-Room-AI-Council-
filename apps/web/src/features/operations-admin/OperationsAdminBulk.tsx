@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { AdminExportActions, BillingAdminPanel } from '@ai-war-room/web-blocks'
 import {
   formatDependencyName,
   formatDependencyStatus,
@@ -51,29 +52,25 @@ export default function OperationsAdminBulk(props: OperationsAdminBulkProps) {
   return (
     <>
         {props.modelHealthAdminSummary ? (
-          <div className="billing-admin workspace-model-health-admin">
-            <div className="billing-admin__header">
-              <span>Model health admin</span>
-              <strong>{props.modelHealthAdminSummary.role}</strong>
-            </div>
-            <p>{props.modelHealthAdminSummary.guidance}</p>
-            <div className="billing-admin__stats">
-              <article className="billing-admin-stat">
-                <span>Active models</span>
-                <strong>{props.modelHealthAdminSummary.stats.activeModels}</strong>
-                <small>
-                  {props.modelHealthAdminSummary.stats.totalModels} total in registry
-                </small>
-              </article>
-              <article className="billing-admin-stat">
-                <span>Degraded models</span>
-                <strong>{props.modelHealthAdminSummary.stats.degradedModels}</strong>
-                <small>
-                  {props.modelHealthAdminSummary.stats.candidateModels} candidates
-                </small>
-              </article>
-            </div>
-            <div className="workspace-model-health-list">
+          <BillingAdminPanel
+            title="Model health admin"
+            panelClassName="workspace-model-health-admin"
+            role={props.modelHealthAdminSummary.role}
+            guidance={props.modelHealthAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Active models',
+              value: props.modelHealthAdminSummary.stats.activeModels,
+              detail: <>{props.modelHealthAdminSummary.stats.totalModels} total in registry</>,
+            },
+            {
+              label: 'Degraded models',
+              value: props.modelHealthAdminSummary.stats.degradedModels,
+              detail: <>{props.modelHealthAdminSummary.stats.candidateModels} candidates</>,
+            }
+            ]}
+          >
+<div className="workspace-model-health-list">
               {props.modelHealthAdminSummary.models.map((model) => (
                 <article
                   className={`workspace-model-health-card workspace-model-health-card--${model.healthStatus}`}
@@ -109,34 +106,32 @@ export default function OperationsAdminBulk(props: OperationsAdminBulkProps) {
                 </article>
               ))}
             </div>
-          </div>
+          </BillingAdminPanel>
         ) : null}
 
         {props.shieldReviewAdminSummary ? (
-          <div className="billing-admin workspace-shield-review-admin">
-            <div className="billing-admin__header">
-              <span>Shield review admin</span>
-              <strong>{props.shieldReviewAdminSummary.role}</strong>
-            </div>
-            <p>{props.shieldReviewAdminSummary.guidance}</p>
-            <div className="billing-admin__stats">
-              <article className="billing-admin-stat">
-                <span>Review cases</span>
-                <strong>{props.shieldReviewAdminSummary.stats.totalCases}</strong>
-                <small>{props.shieldReviewAdminSummary.stats.passedCases} passed</small>
-              </article>
-              <article className="billing-admin-stat">
-                <span>False positives</span>
-                <strong>{props.shieldReviewAdminSummary.stats.falsePositiveCount}</strong>
-                <small>
-                  {formatFalsePositiveRate(
+          <BillingAdminPanel
+            title="Shield review admin"
+            panelClassName="workspace-shield-review-admin"
+            role={props.shieldReviewAdminSummary.role}
+            guidance={props.shieldReviewAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Review cases',
+              value: props.shieldReviewAdminSummary.stats.totalCases,
+              detail: <>{props.shieldReviewAdminSummary.stats.passedCases} passed</>,
+            },
+            {
+              label: 'False positives',
+              value: props.shieldReviewAdminSummary.stats.falsePositiveCount,
+              detail: <>{formatFalsePositiveRate(
                     props.shieldReviewAdminSummary.stats.falsePositiveRate,
                   )}{' '}
-                  rate
-                </small>
-              </article>
-            </div>
-            <p className="clear-copy">
+                  rate</>,
+            }
+            ]}
+          >
+<p className="clear-copy">
               Classifier: {props.shieldReviewAdminSummary.classifierId}
             </p>
             <div className="workspace-shield-review-list">
@@ -170,33 +165,29 @@ export default function OperationsAdminBulk(props: OperationsAdminBulkProps) {
                 {formatShieldReviewAdminAction('rerun_review_summary')}
               </button>
             ) : null}
-          </div>
+          </BillingAdminPanel>
         ) : null}
 
         {props.providerKeyAdminSummary ? (
-          <div className="billing-admin workspace-provider-key-admin">
-            <div className="billing-admin__header">
-              <span>Provider key admin</span>
-              <strong>{props.providerKeyAdminSummary.role}</strong>
-            </div>
-            <p>{props.providerKeyAdminSummary.guidance}</p>
-            <div className="billing-admin__stats">
-              <article className="billing-admin-stat">
-                <span>Workspace keys</span>
-                <strong>{props.providerKeyAdminSummary.stats.totalCredentials}</strong>
-                <small>
-                  {props.providerKeyAdminSummary.stats.passedCredentials} passed
-                </small>
-              </article>
-              <article className="billing-admin-stat">
-                <span>Failed / untested</span>
-                <strong>{props.providerKeyAdminSummary.stats.failedCredentials}</strong>
-                <small>
-                  {props.providerKeyAdminSummary.stats.untestedCredentials} untested
-                </small>
-              </article>
-            </div>
-            <div className="workspace-provider-key-list">
+          <BillingAdminPanel
+            title="Provider key admin"
+            panelClassName="workspace-provider-key-admin"
+            role={props.providerKeyAdminSummary.role}
+            guidance={props.providerKeyAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Workspace keys',
+              value: props.providerKeyAdminSummary.stats.totalCredentials,
+              detail: <>{props.providerKeyAdminSummary.stats.passedCredentials} passed</>,
+            },
+            {
+              label: 'Failed / untested',
+              value: props.providerKeyAdminSummary.stats.failedCredentials,
+              detail: <>{props.providerKeyAdminSummary.stats.untestedCredentials} untested</>,
+            }
+            ]}
+          >
+<div className="workspace-provider-key-list">
               {props.providerKeyAdminSummary.credentials.length ? (
                 props.providerKeyAdminSummary.credentials.map((credential) => (
                   <article
@@ -239,31 +230,29 @@ export default function OperationsAdminBulk(props: OperationsAdminBulkProps) {
                 ))}
               </div>
             ) : null}
-          </div>
+          </BillingAdminPanel>
         ) : null}
 
         {props.observabilityAdminSummary ? (
-          <div className="billing-admin workspace-observability-admin">
-            <div className="billing-admin__header">
-              <span>Observability admin</span>
-              <strong>{props.observabilityAdminSummary.role}</strong>
-            </div>
-            <p>{props.observabilityAdminSummary.guidance}</p>
-            <div className="billing-admin__stats">
-              <article className="billing-admin-stat">
-                <span>Recent events</span>
-                <strong>{props.observabilityAdminSummary.stats.totalEvents}</strong>
-                <small>
-                  {props.observabilityAdminSummary.stats.pipelinePhaseEvents} pipeline
-                </small>
-              </article>
-              <article className="billing-admin-stat">
-                <span>Errors / warnings</span>
-                <strong>{props.observabilityAdminSummary.stats.errorEvents}</strong>
-                <small>{props.observabilityAdminSummary.stats.warnEvents} warnings</small>
-              </article>
-            </div>
-            <div className="workspace-observability-event-list">
+          <BillingAdminPanel
+            title="Observability admin"
+            panelClassName="workspace-observability-admin"
+            role={props.observabilityAdminSummary.role}
+            guidance={props.observabilityAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Recent events',
+              value: props.observabilityAdminSummary.stats.totalEvents,
+              detail: <>{props.observabilityAdminSummary.stats.pipelinePhaseEvents} pipeline</>,
+            },
+            {
+              label: 'Errors / warnings',
+              value: props.observabilityAdminSummary.stats.errorEvents,
+              detail: <>{props.observabilityAdminSummary.stats.warnEvents} warnings</>,
+            }
+            ]}
+          >
+<div className="workspace-observability-event-list">
               {props.observabilityAdminSummary.events.length ? (
                 props.observabilityAdminSummary.events.map((event) => (
                   <article
@@ -305,31 +294,29 @@ export default function OperationsAdminBulk(props: OperationsAdminBulkProps) {
                 ))}
               </div>
             ) : null}
-          </div>
+          </BillingAdminPanel>
         ) : null}
 
         {props.promptRegressionAdminSummary ? (
-          <div className="billing-admin workspace-prompt-regression-admin">
-            <div className="billing-admin__header">
-              <span>Prompt regression admin</span>
-              <strong>{props.promptRegressionAdminSummary.role}</strong>
-            </div>
-            <p>{props.promptRegressionAdminSummary.guidance}</p>
-            <div className="billing-admin__stats">
-              <article className="billing-admin-stat">
-                <span>Regression cases</span>
-                <strong>{props.promptRegressionAdminSummary.stats.totalCases}</strong>
-                <small>{props.promptRegressionAdminSummary.stats.passedCases} passed</small>
-              </article>
-              <article className="billing-admin-stat">
-                <span>Failures / drift</span>
-                <strong>{props.promptRegressionAdminSummary.stats.failedCases}</strong>
-                <small>
-                  {props.promptRegressionAdminSummary.stats.promptVersionDriftCount} drift
-                </small>
-              </article>
-            </div>
-            <p className="clear-copy">
+          <BillingAdminPanel
+            title="Prompt regression admin"
+            panelClassName="workspace-prompt-regression-admin"
+            role={props.promptRegressionAdminSummary.role}
+            guidance={props.promptRegressionAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Regression cases',
+              value: props.promptRegressionAdminSummary.stats.totalCases,
+              detail: <>{props.promptRegressionAdminSummary.stats.passedCases} passed</>,
+            },
+            {
+              label: 'Failures / drift',
+              value: props.promptRegressionAdminSummary.stats.failedCases,
+              detail: <>{props.promptRegressionAdminSummary.stats.promptVersionDriftCount} drift</>,
+            }
+            ]}
+          >
+<p className="clear-copy">
               Generated at {props.promptRegressionAdminSummary.generatedAt.slice(0, 19).replace('T', ' ')}
             </p>
             <div className="workspace-prompt-regression-list">
@@ -367,32 +354,30 @@ export default function OperationsAdminBulk(props: OperationsAdminBulkProps) {
                 {formatPromptRegressionAdminAction('rerun_prompt_regression')}
               </button>
             ) : null}
-          </div>
+          </BillingAdminPanel>
         ) : null}
 
         {props.runHistoryAdminSummary ? (
-          <div className="billing-admin workspace-run-history-admin">
-            <div className="billing-admin__header">
-              <span>Run history admin</span>
-              <strong>{props.runHistoryAdminSummary.role}</strong>
-            </div>
-            <p>{props.runHistoryAdminSummary.guidance}</p>
-            <div className="billing-admin__stats">
-              <article className="billing-admin-stat">
-                <span>Artifacts</span>
-                <strong>{props.runHistoryAdminSummary.stats.totalArtifacts}</strong>
-                <small>{props.runHistoryAdminSummary.stats.uniqueRunCount} runs</small>
-              </article>
-              <article className="billing-admin-stat">
-                <span>Artifact mix</span>
-                <strong>{props.runHistoryAdminSummary.stats.executiveSummaryCount}</strong>
-                <small>
-                  {props.runHistoryAdminSummary.stats.prdCount} PRD ·{' '}
-                  {props.runHistoryAdminSummary.stats.developmentPromptCount} dev prompt
-                </small>
-              </article>
-            </div>
-            <div className="workspace-run-history-list">
+          <BillingAdminPanel
+            title="Run history admin"
+            panelClassName="workspace-run-history-admin"
+            role={props.runHistoryAdminSummary.role}
+            guidance={props.runHistoryAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Artifacts',
+              value: props.runHistoryAdminSummary.stats.totalArtifacts,
+              detail: <>{props.runHistoryAdminSummary.stats.uniqueRunCount} runs</>,
+            },
+            {
+              label: 'Artifact mix',
+              value: props.runHistoryAdminSummary.stats.executiveSummaryCount,
+              detail: <>{props.runHistoryAdminSummary.stats.prdCount} PRD ·{' '}
+                  {props.runHistoryAdminSummary.stats.developmentPromptCount} dev prompt</>,
+            }
+            ]}
+          >
+<div className="workspace-run-history-list">
               {props.runHistoryAdminSummary.artifacts.length ? (
                 props.runHistoryAdminSummary.artifacts.map((artifact) => (
                   <article
@@ -416,24 +401,20 @@ export default function OperationsAdminBulk(props: OperationsAdminBulkProps) {
                 </p>
               )}
             </div>
-            <div className="billing-export-actions">
-              <button
-                className="secondary-button"
-                type="button"
-                disabled={props.runHistoryAdminAction !== 'idle'}
-                onClick={() => void props.handleExportRunHistory('csv')}
-              >
-                Export run history CSV
-              </button>
-              <button
-                className="secondary-button"
-                type="button"
-                disabled={props.runHistoryAdminAction !== 'idle'}
-                onClick={() => void props.handleExportRunHistory('json')}
-              >
-                Export run history JSON
-              </button>
-            </div>
+            <AdminExportActions
+              actions={[
+                {
+                  label: 'Export run history CSV',
+                  disabled: props.runHistoryAdminAction !== 'idle',
+                  onClick: () => void props.handleExportRunHistory('csv'),
+                },
+                {
+                  label: 'Export run history JSON',
+                  disabled: props.runHistoryAdminAction !== 'idle',
+                  onClick: () => void props.handleExportRunHistory('json'),
+                },
+              ]}
+            />
             {props.runHistoryAdminSummary.availableActions.includes(
               'refresh_run_history_summary',
             ) ? (
@@ -448,33 +429,29 @@ export default function OperationsAdminBulk(props: OperationsAdminBulkProps) {
                 {formatRunHistoryAdminAction('refresh_run_history_summary')}
               </button>
             ) : null}
-          </div>
+          </BillingAdminPanel>
         ) : null}
 
         {props.streamRecoveryAdminSummary ? (
-          <div className="billing-admin workspace-stream-recovery-admin">
-            <div className="billing-admin__header">
-              <span>Stream recovery admin</span>
-              <strong>{props.streamRecoveryAdminSummary.role}</strong>
-            </div>
-            <p>{props.streamRecoveryAdminSummary.guidance}</p>
-            <div className="billing-admin__stats">
-              <article className="billing-admin-stat">
-                <span>Buffered runs</span>
-                <strong>{props.streamRecoveryAdminSummary.stats.bufferedRunCount}</strong>
-                <small>
-                  {props.streamRecoveryAdminSummary.stats.totalBufferedEvents} events
-                </small>
-              </article>
-              <article className="billing-admin-stat">
-                <span>Active / terminal</span>
-                <strong>{props.streamRecoveryAdminSummary.stats.activeRunCount}</strong>
-                <small>
-                  {props.streamRecoveryAdminSummary.stats.terminalRunCount} terminal
-                </small>
-              </article>
-            </div>
-            <div className="workspace-stream-recovery-list">
+          <BillingAdminPanel
+            title="Stream recovery admin"
+            panelClassName="workspace-stream-recovery-admin"
+            role={props.streamRecoveryAdminSummary.role}
+            guidance={props.streamRecoveryAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Buffered runs',
+              value: props.streamRecoveryAdminSummary.stats.bufferedRunCount,
+              detail: <>{props.streamRecoveryAdminSummary.stats.totalBufferedEvents} events</>,
+            },
+            {
+              label: 'Active / terminal',
+              value: props.streamRecoveryAdminSummary.stats.activeRunCount,
+              detail: <>{props.streamRecoveryAdminSummary.stats.terminalRunCount} terminal</>,
+            }
+            ]}
+          >
+<div className="workspace-stream-recovery-list">
               {props.streamRecoveryAdminSummary.bufferedRuns.length ? (
                 props.streamRecoveryAdminSummary.bufferedRuns.map((bufferedRun) => (
                   <article
@@ -535,31 +512,29 @@ export default function OperationsAdminBulk(props: OperationsAdminBulkProps) {
                 {formatStreamRecoveryAdminAction('clear_workspace_stream_buffers')}
               </button>
             ) : null}
-          </div>
+          </BillingAdminPanel>
         ) : null}
 
         {props.idempotencyAdminSummary ? (
-          <div className="billing-admin workspace-idempotency-admin">
-            <div className="billing-admin__header">
-              <span>Idempotency admin</span>
-              <strong>{props.idempotencyAdminSummary.role}</strong>
-            </div>
-            <p>{props.idempotencyAdminSummary.guidance}</p>
-            <div className="billing-admin__stats">
-              <article className="billing-admin-stat">
-                <span>Idempotency keys</span>
-                <strong>{props.idempotencyAdminSummary.stats.totalKeys}</strong>
-                <small>
-                  {props.idempotencyAdminSummary.stats.activeReservations} active
-                </small>
-              </article>
-              <article className="billing-admin-stat">
-                <span>Runs / expired</span>
-                <strong>{props.idempotencyAdminSummary.stats.linkedRunCount}</strong>
-                <small>{props.idempotencyAdminSummary.stats.expiredKeys} expired</small>
-              </article>
-            </div>
-            <div className="workspace-idempotency-list">
+          <BillingAdminPanel
+            title="Idempotency admin"
+            panelClassName="workspace-idempotency-admin"
+            role={props.idempotencyAdminSummary.role}
+            guidance={props.idempotencyAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Idempotency keys',
+              value: props.idempotencyAdminSummary.stats.totalKeys,
+              detail: <>{props.idempotencyAdminSummary.stats.activeReservations} active</>,
+            },
+            {
+              label: 'Runs / expired',
+              value: props.idempotencyAdminSummary.stats.linkedRunCount,
+              detail: <>{props.idempotencyAdminSummary.stats.expiredKeys} expired</>,
+            }
+            ]}
+          >
+<div className="workspace-idempotency-list">
               {props.idempotencyAdminSummary.records.length ? (
                 props.idempotencyAdminSummary.records.map((record) => (
                   <article
@@ -617,36 +592,32 @@ export default function OperationsAdminBulk(props: OperationsAdminBulkProps) {
                 )}
               </button>
             ) : null}
-          </div>
+          </BillingAdminPanel>
         ) : null}
 
         {props.quotaAdminSummary ? (
-          <div className="billing-admin workspace-quota-admin">
-            <div className="billing-admin__header">
-              <span>Quota admin</span>
-              <strong>{props.quotaAdminSummary.role}</strong>
-            </div>
-            <p>{props.quotaAdminSummary.guidance}</p>
-            <div className="billing-admin__stats">
-              <article className="billing-admin-stat">
-                <span>Token quota</span>
-                <strong>{props.quotaAdminSummary.stats.tokenUtilizationPercent}%</strong>
-                <small>
-                  {props.quotaAdminSummary.usage.dailyUsage.totalTokens.toLocaleString()} /{' '}
-                  {props.quotaAdminSummary.usage.dailyTokenLimit.toLocaleString()}
-                </small>
-              </article>
-              <article className="billing-admin-stat">
-                <span>Cost quota</span>
-                <strong>{props.quotaAdminSummary.stats.costUtilizationPercent}%</strong>
-                <small>
-                  ${props.quotaAdminSummary.usage.dailyUsage.estimatedCostUsd.toFixed(2)} / $
+          <BillingAdminPanel
+            title="Quota admin"
+            panelClassName="workspace-quota-admin"
+            role={props.quotaAdminSummary.role}
+            guidance={props.quotaAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Token quota',
+              value: `${props.quotaAdminSummary.stats.tokenUtilizationPercent}%`,
+              detail: <>{props.quotaAdminSummary.usage.dailyUsage.totalTokens.toLocaleString()} /{' '}
+                  {props.quotaAdminSummary.usage.dailyTokenLimit.toLocaleString()}</>,
+            },
+            {
+              label: 'Cost quota',
+              value: `${props.quotaAdminSummary.stats.costUtilizationPercent}%`,
+              detail: <>${props.quotaAdminSummary.usage.dailyUsage.estimatedCostUsd.toFixed(2)} / $
                   {props.quotaAdminSummary.usage.dailyCostLimitUsd.toFixed(2)}
-                  {props.quotaAdminSummary.stats.quotaExceeded ? ' · Exceeded' : ''}
-                </small>
-              </article>
-            </div>
-            <div className="workspace-quota-list">
+                  {props.quotaAdminSummary.stats.quotaExceeded ? ' · Exceeded' : ''}</>,
+            }
+            ]}
+          >
+<div className="workspace-quota-list">
               {props.quotaAdminSummary.records.length ? (
                 props.quotaAdminSummary.records.map((record) => (
                   <article className="workspace-quota-card" key={record.usageEventId}>
@@ -678,32 +649,30 @@ export default function OperationsAdminBulk(props: OperationsAdminBulkProps) {
                 {formatQuotaAdminAction('refresh_quota_summary')}
               </button>
             ) : null}
-          </div>
+          </BillingAdminPanel>
         ) : null}
 
         {props.deploymentAdminSummary ? (
-          <div className="billing-admin workspace-deployment-admin">
-            <div className="billing-admin__header">
-              <span>Deployment admin</span>
-              <strong>{props.deploymentAdminSummary.role}</strong>
-            </div>
-            <p>{props.deploymentAdminSummary.guidance}</p>
-            <div className="billing-admin__stats">
-              <article className="billing-admin-stat">
-                <span>Readiness</span>
-                <strong>{props.deploymentAdminSummary.readinessStatus}</strong>
-                <small>
-                  {props.deploymentAdminSummary.stats.healthyDependencyCount}/
-                  {props.deploymentAdminSummary.stats.totalDependencies} dependencies
-                </small>
-              </article>
-              <article className="billing-admin-stat">
-                <span>API version</span>
-                <strong>{props.deploymentAdminSummary.stats.apiVersion}</strong>
-                <small>{props.deploymentAdminSummary.nodeEnv} · {props.deploymentAdminSummary.webOrigin}</small>
-              </article>
-            </div>
-            <div className="workspace-deployment-list">
+          <BillingAdminPanel
+            title="Deployment admin"
+            panelClassName="workspace-deployment-admin"
+            role={props.deploymentAdminSummary.role}
+            guidance={props.deploymentAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Readiness',
+              value: props.deploymentAdminSummary.readinessStatus,
+              detail: <>{props.deploymentAdminSummary.stats.healthyDependencyCount}/
+                  {props.deploymentAdminSummary.stats.totalDependencies} dependencies</>,
+            },
+            {
+              label: 'API version',
+              value: props.deploymentAdminSummary.stats.apiVersion,
+              detail: <>{props.deploymentAdminSummary.nodeEnv} · {props.deploymentAdminSummary.webOrigin}</>,
+            }
+            ]}
+          >
+<div className="workspace-deployment-list">
               {props.deploymentAdminSummary.dependencies.map((dependency) => (
                 <article
                   className={`workspace-deployment-card workspace-deployment-card--${dependency.status}`}
@@ -734,36 +703,32 @@ export default function OperationsAdminBulk(props: OperationsAdminBulkProps) {
                 {formatDeploymentAdminAction('refresh_deployment_summary')}
               </button>
             ) : null}
-          </div>
+          </BillingAdminPanel>
         ) : null}
 
         {props.migrationAdminSummary ? (
-          <div className="billing-admin workspace-migration-admin">
-            <div className="billing-admin__header">
-              <span>Migration admin</span>
-              <strong>{props.migrationAdminSummary.role}</strong>
-            </div>
-            <p>{props.migrationAdminSummary.guidance}</p>
-            <div className="billing-admin__stats">
-              <article className="billing-admin-stat">
-                <span>Applied</span>
-                <strong>{props.migrationAdminSummary.stats.appliedCount}</strong>
-                <small>
-                  {props.migrationAdminSummary.stats.pendingCount} pending of{' '}
-                  {props.migrationAdminSummary.stats.totalMigrations}
-                </small>
-              </article>
-              <article className="billing-admin-stat">
-                <span>Schema table</span>
-                <strong>
-                  {props.migrationAdminSummary.stats.schemaMigrationsTableExists
+          <BillingAdminPanel
+            title="Migration admin"
+            panelClassName="workspace-migration-admin"
+            role={props.migrationAdminSummary.role}
+            guidance={props.migrationAdminSummary.guidance}
+            stats={[
+            {
+              label: 'Applied',
+              value: props.migrationAdminSummary.stats.appliedCount,
+              detail: <>{props.migrationAdminSummary.stats.pendingCount} pending of{' '}
+                  {props.migrationAdminSummary.stats.totalMigrations}</>,
+            },
+            {
+              label: 'Schema table',
+              value: props.migrationAdminSummary.stats.schemaMigrationsTableExists
                     ? 'Ready'
-                    : 'Missing'}
-                </strong>
-                <small>schema_migrations tracking</small>
-              </article>
-            </div>
-            <div className="workspace-migration-list">
+                    : 'Missing',
+              detail: 'schema_migrations tracking',
+            }
+            ]}
+          >
+<div className="workspace-migration-list">
               {props.migrationAdminSummary.records.length ? (
                 props.migrationAdminSummary.records.map((record) => (
                   <article
@@ -799,7 +764,7 @@ export default function OperationsAdminBulk(props: OperationsAdminBulkProps) {
                 {formatMigrationAdminAction('refresh_migration_summary')}
               </button>
             ) : null}
-          </div>
+          </BillingAdminPanel>
         ) : null}
     </>
   )

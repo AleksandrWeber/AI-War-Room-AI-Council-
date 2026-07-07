@@ -1,5 +1,7 @@
 import type { WorkspaceMemberAdminSummaryResponse } from '@ai-war-room/schemas'
 import { formatWorkspaceRole } from './admin.js'
+import { AdminExportActions } from './AdminExportActions.js'
+import { BillingAdminPanel } from './BillingAdminPanel.js'
 
 type MemberRole = 'owner' | 'admin' | 'member' | 'viewer'
 
@@ -34,24 +36,24 @@ export function WorkspaceMemberAdminPanel({
   onExportAudit,
 }: WorkspaceMemberAdminPanelProps) {
   return (
-    <div className="billing-admin workspace-member-admin">
-      <div className="billing-admin__header">
-        <span>Member admin tools</span>
-        <strong>{summary.role}</strong>
-      </div>
-      <p>{summary.guidance}</p>
-      <div className="billing-admin__stats">
-        <article className="billing-admin-stat">
-          <span>Members</span>
-          <strong>{summary.stats.memberCount}</strong>
-          <small>{summary.stats.ownerCount} owners</small>
-        </article>
-        <article className="billing-admin-stat">
-          <span>Admins</span>
-          <strong>{summary.stats.adminCount}</strong>
-          <small>Role-managed access</small>
-        </article>
-      </div>
+    <BillingAdminPanel
+      title="Member admin tools"
+      panelClassName="workspace-member-admin"
+      role={summary.role}
+      guidance={summary.guidance}
+      stats={[
+        {
+          label: 'Members',
+          value: summary.stats.memberCount,
+          detail: `${summary.stats.ownerCount} owners`,
+        },
+        {
+          label: 'Admins',
+          value: summary.stats.adminCount,
+          detail: 'Role-managed access',
+        },
+      ]}
+    >
       <div className="workspace-member-list">
         {summary.members.map((member) => (
           <article className="workspace-member-card" key={member.userId}>
@@ -162,27 +164,21 @@ export function WorkspaceMemberAdminPanel({
           </button>
         </form>
       ) : null}
-      <div className="workspace-audit-export">
-        <span>Workspace audit export</span>
-        <div className="billing-export-actions">
-          <button
-            className="secondary-button"
-            type="button"
-            disabled={billingAction !== 'idle' || memberAdminAction !== 'idle'}
-            onClick={() => onExportAudit('csv')}
-          >
-            Export audit CSV
-          </button>
-          <button
-            className="secondary-button"
-            type="button"
-            disabled={billingAction !== 'idle' || memberAdminAction !== 'idle'}
-            onClick={() => onExportAudit('json')}
-          >
-            Export audit JSON
-          </button>
-        </div>
-      </div>
-    </div>
+      <AdminExportActions
+        title="Workspace audit export"
+        actions={[
+          {
+            label: 'Export audit CSV',
+            disabled: billingAction !== 'idle' || memberAdminAction !== 'idle',
+            onClick: () => onExportAudit('csv'),
+          },
+          {
+            label: 'Export audit JSON',
+            disabled: billingAction !== 'idle' || memberAdminAction !== 'idle',
+            onClick: () => onExportAudit('json'),
+          },
+        ]}
+      />
+    </BillingAdminPanel>
   )
 }

@@ -1,4 +1,6 @@
 import type { WorkspaceSettingsAdminSummaryResponse } from '@ai-war-room/schemas'
+import { BillingAdminPanel } from './BillingAdminPanel.js'
+import { AdminRefreshButton } from './AdminRefreshButton.js'
 
 export type WorkspaceSettingsAdminPanelProps = {
   summary: WorkspaceSettingsAdminSummaryResponse
@@ -18,24 +20,24 @@ export function WorkspaceSettingsAdminPanel({
   onResetWorkspaceName,
 }: WorkspaceSettingsAdminPanelProps) {
   return (
-    <div className="billing-admin workspace-settings-admin">
-      <div className="billing-admin__header">
-        <span>Workspace settings admin</span>
-        <strong>{summary.role}</strong>
-      </div>
-      <p>{summary.guidance}</p>
-      <div className="billing-admin__stats">
-        <article className="billing-admin-stat">
-          <span>Workspace name</span>
-          <strong>{summary.settings.name}</strong>
-          <small>{summary.settings.workspaceId}</small>
-        </article>
-        <article className="billing-admin-stat">
-          <span>Created</span>
-          <strong>{summary.settings.createdAt.slice(0, 10)}</strong>
-          <small>UTC timestamp</small>
-        </article>
-      </div>
+    <BillingAdminPanel
+      title="Workspace settings admin"
+      panelClassName="workspace-settings-admin"
+      role={summary.role}
+      guidance={summary.guidance}
+      stats={[
+        {
+          label: 'Workspace name',
+          value: summary.settings.name,
+          detail: summary.settings.workspaceId,
+        },
+        {
+          label: 'Created',
+          value: summary.settings.createdAt.slice(0, 10),
+          detail: 'UTC timestamp',
+        },
+      ]}
+    >
       {summary.availableActions.includes('update_workspace_name') ? (
         <form
           className="workspace-settings-form"
@@ -66,16 +68,12 @@ export function WorkspaceSettingsAdminPanel({
           </button>
         </form>
       ) : null}
-      {summary.availableActions.includes('reset_workspace_name') ? (
-        <button
-          className="secondary-button"
-          type="button"
-          disabled={settingsAdminAction !== 'idle'}
-          onClick={onResetWorkspaceName}
-        >
-          Reset workspace name
-        </button>
-      ) : null}
-    </div>
+      <AdminRefreshButton
+        visible={summary.availableActions.includes('reset_workspace_name')}
+        disabled={settingsAdminAction !== 'idle'}
+        label="Reset workspace name"
+        onClick={onResetWorkspaceName}
+      />
+    </BillingAdminPanel>
   )
 }

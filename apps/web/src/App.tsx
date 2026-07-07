@@ -1102,8 +1102,9 @@ import type {
   WorkspaceMemberAdminSummaryResponse,
   WorkspaceSettingsAdminSummaryResponse,
 } from '@ai-war-room/schemas'
-import { BillingWorkspacePanel, UsageAdminPanel } from '@ai-war-room/web-blocks'
+import { BillingWorkspacePanel } from '@ai-war-room/web-blocks'
 import { CoreOperationsAdminLazyGate, DomainAdminLazyGate } from './features/AdminLazySection'
+import { UsageAdminLazySection } from './features/UsageAdminLazySection'
 import { RolloutAdminLazyGate, WorkspaceAdminLazySection } from './features/RolloutAdminLazySection'
 import './App.css'
 import { callUi } from './lazy-ui'
@@ -1137,10 +1138,6 @@ import {
   readBillingReturnHint,
   type MockCustomerPortalResponse,
 } from './billing-ui'
-import {
-  executeUsageAdminAction,
-  formatUsageAdminAction,
-} from './usage-ui'
 import {
   executeWorkspaceMemberAdminAction,
   executeWorkspaceSettingsAdminAction,
@@ -16630,7 +16627,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeUsageAdminAction(
+      const result = await callUi('usage-ui', 'executeUsageAdminAction',
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -33511,12 +33508,12 @@ function App() {
 {rolloutControlsEnabled &&
         usageCapabilities?.supportsUsageAdminTools &&
         usageAdminSummary ? (
-          <UsageAdminPanel
+          <UsageAdminLazySection
+            enabled={rolloutControlsEnabled}
             summary={usageAdminSummary}
             billingAction={billingAction}
             usageAdminAction={usageAdminAction}
             billingAdminAction={billingAdminAction}
-            formatAction={formatUsageAdminAction as (action: string) => string}
             onAction={(action) =>
               void handleUsageAdminAction(
                 action as Parameters<typeof handleUsageAdminAction>[0],
