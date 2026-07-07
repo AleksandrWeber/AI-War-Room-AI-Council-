@@ -27387,3 +27387,241 @@ describe('modifiabilityvaultizability rollout integration', () => {
       .expect(403)
   })
 })
+describe('configurabilityvaultizability rollout integration', () => {
+  it('reports configurabilityvaultizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/configurabilityvaultizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsConfigurabilityvaultizabilityRollout: true,
+      supportsConfigurabilityvaultizabilityAdminTools: true,
+      supportsBillingInvoiceConfigurabilityvaultizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/configurabilityvaultizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns configurabilityvaultizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/configurabilityvaultizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        configurabilityvaultizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects configurabilityvaultizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/configurabilityvaultizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('customizabilityvaultizability rollout integration', () => {
+  it('reports customizabilityvaultizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/customizabilityvaultizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsCustomizabilityvaultizabilityRollout: true,
+      supportsCustomizabilityvaultizabilityAdminTools: true,
+      supportsMembershipCustomizabilityvaultizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/customizabilityvaultizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns customizabilityvaultizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/customizabilityvaultizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        customizabilityvaultizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects customizabilityvaultizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/customizabilityvaultizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('operabilityvaultizability rollout integration', () => {
+  it('reports operabilityvaultizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/operabilityvaultizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsOperabilityvaultizabilityRollout: true,
+      supportsOperabilityvaultizabilityAdminTools: true,
+      supportsIdempotencyKeyOperabilityvaultizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/operabilityvaultizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns operabilityvaultizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/operabilityvaultizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        operabilityvaultizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects operabilityvaultizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/operabilityvaultizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('tunabilityvaultizability rollout integration', () => {
+  it('reports tunabilityvaultizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/tunabilityvaultizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsTunabilityvaultizabilityRollout: true,
+      supportsTunabilityvaultizabilityAdminTools: true,
+      supportsShieldScanTunabilityvaultizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/tunabilityvaultizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns tunabilityvaultizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/tunabilityvaultizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        tunabilityvaultizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects tunabilityvaultizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/tunabilityvaultizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})
+
+
+describe('adjustabilityvaultizability rollout integration', () => {
+  it('reports adjustabilityvaultizability capabilities and rollout readiness', async () => {
+    const capabilities = await request(app.getHttpServer())
+      .get('/api/adjustabilityvaultizability/capabilities')
+      .expect(200)
+
+    expect(capabilities.body).toMatchObject({
+      supportsAdjustabilityvaultizabilityRollout: true,
+      supportsAdjustabilityvaultizabilityAdminTools: true,
+      supportsBillingNotificationAdjustabilityvaultizabilitySignals: true,
+    })
+
+    const rollout = await request(app.getHttpServer())
+      .get('/api/adjustabilityvaultizability/readiness')
+      .expect(200)
+
+    expect(rollout.body.status).toBe('ready')
+  })
+
+  it('returns adjustabilityvaultizability admin summary for owners', async () => {
+    const response = await request(app.getHttpServer())
+      .get('/api/adjustabilityvaultizability/workspace/workspace_1/admin')
+      .set(authHeaders)
+      .expect(200)
+
+    expect(response.body).toMatchObject({
+      workspaceId: 'workspace_1',
+      role: 'owner',
+      stats: {
+        totalDomains: 4,
+        coveredDomains: expect.any(Number),
+        adjustabilityvaultizabilityPercent: expect.any(Number),
+      },
+    })
+  })
+
+  it('rejects adjustabilityvaultizability admin tools for members', async () => {
+    await request(app.getHttpServer())
+      .get('/api/adjustabilityvaultizability/workspace/workspace_1/admin')
+      .set({
+        'x-user-id': 'user_member',
+        'x-workspace-id': 'workspace_1',
+      })
+      .expect(403)
+  })
+})

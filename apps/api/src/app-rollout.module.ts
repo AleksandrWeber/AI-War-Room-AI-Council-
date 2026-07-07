@@ -413,6 +413,11 @@ import { AdaptabilityvaultizabilityModule } from './adaptabilityvaultizability/a
 import { FlexibilityvaultizabilityModule } from './flexibilityvaultizability/flexibilityvaultizability.module.js'
 import { ExtensibilityvaultizabilityModule } from './extensibilityvaultizability/extensibilityvaultizability.module.js'
 import { ModifiabilityvaultizabilityModule } from './modifiabilityvaultizability/modifiabilityvaultizability.module.js'
+import { ConfigurabilityvaultizabilityModule } from './configurabilityvaultizability/configurabilityvaultizability.module.js'
+import { CustomizabilityvaultizabilityModule } from './customizabilityvaultizability/customizabilityvaultizability.module.js'
+import { OperabilityvaultizabilityModule } from './operabilityvaultizability/operabilityvaultizability.module.js'
+import { TunabilityvaultizabilityModule } from './tunabilityvaultizability/tunabilityvaultizability.module.js'
+import { AdjustabilityvaultizabilityModule } from './adjustabilityvaultizability/adjustabilityvaultizability.module.js'
 
 @Module({
   imports: [
@@ -830,6 +835,11 @@ import { ModifiabilityvaultizabilityModule } from './modifiabilityvaultizability
     FlexibilityvaultizabilityModule,
     ExtensibilityvaultizabilityModule,
     ModifiabilityvaultizabilityModule,
+    ConfigurabilityvaultizabilityModule,
+    CustomizabilityvaultizabilityModule,
+    OperabilityvaultizabilityModule,
+    TunabilityvaultizabilityModule,
+    AdjustabilityvaultizabilityModule,
   ],
   exports: [
     CustomizabilityModule,
