@@ -373,6 +373,16 @@ import { TracevaultizabilityModule } from './tracevaultizability/tracevaultizabi
 import { EvidencevaultizabilityModule } from './evidencevaultizability/evidencevaultizability.module.js'
 import { AuditvaultizabilityModule } from './auditvaultizability/auditvaultizability.module.js'
 import { CompliancevaultizabilityModule } from './compliancevaultizability/compliancevaultizability.module.js'
+import { ValidityvaultizabilityModule } from './validityvaultizability/validityvaultizability.module.js'
+import { AuthenticityvaultizabilityModule } from './authenticityvaultizability/authenticityvaultizability.module.js'
+import { ProvenancevaultizabilityModule } from './provenancevaultizability/provenancevaultizability.module.js'
+import { VerificationvaultizabilityModule } from './verificationvaultizability/verificationvaultizability.module.js'
+import { AttestationvaultizabilityModule } from './attestationvaultizability/attestationvaultizability.module.js'
+import { AssurancevaultizabilityModule } from './assurancevaultizability/assurancevaultizability.module.js'
+import { AuditabilityvaultizabilityModule } from './auditabilityvaultizability/auditabilityvaultizability.module.js'
+import { InspectabilityvaultizabilityModule } from './inspectabilityvaultizability/inspectabilityvaultizability.module.js'
+import { ReproducibilityvaultizabilityModule } from './reproducibilityvaultizability/reproducibilityvaultizability.module.js'
+import { CredibilityvaultizabilityModule } from './credibilityvaultizability/credibilityvaultizability.module.js'
 
 @Module({
   imports: [
@@ -750,6 +760,16 @@ import { CompliancevaultizabilityModule } from './compliancevaultizability/compl
     EvidencevaultizabilityModule,
     AuditvaultizabilityModule,
     CompliancevaultizabilityModule,
+    ValidityvaultizabilityModule,
+    AuthenticityvaultizabilityModule,
+    ProvenancevaultizabilityModule,
+    VerificationvaultizabilityModule,
+    AttestationvaultizabilityModule,
+    AssurancevaultizabilityModule,
+    AuditabilityvaultizabilityModule,
+    InspectabilityvaultizabilityModule,
+    ReproducibilityvaultizabilityModule,
+    CredibilityvaultizabilityModule,
   ],
   exports: [
     CustomizabilityModule,

@@ -14485,6 +14485,266 @@
   border-color: color-mix(in srgb, #d44 45%, var(--border));
 }
 
+.workspace-validityvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-validityvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-validityvaultizability-card p,
+.workspace-validityvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-validityvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-validityvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-authenticityvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-authenticityvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-authenticityvaultizability-card p,
+.workspace-authenticityvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-authenticityvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-authenticityvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-provenancevaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-provenancevaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-provenancevaultizability-card p,
+.workspace-provenancevaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-provenancevaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-provenancevaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-verificationvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-verificationvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-verificationvaultizability-card p,
+.workspace-verificationvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-verificationvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-verificationvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-attestationvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-attestationvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-attestationvaultizability-card p,
+.workspace-attestationvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-attestationvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-attestationvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-assurancevaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-assurancevaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-assurancevaultizability-card p,
+.workspace-assurancevaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-assurancevaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-assurancevaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-auditabilityvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-auditabilityvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-auditabilityvaultizability-card p,
+.workspace-auditabilityvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-auditabilityvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-auditabilityvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-inspectabilityvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-inspectabilityvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-inspectabilityvaultizability-card p,
+.workspace-inspectabilityvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-inspectabilityvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-inspectabilityvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-reproducibilityvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-reproducibilityvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-reproducibilityvaultizability-card p,
+.workspace-reproducibilityvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-reproducibilityvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-reproducibilityvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
+.workspace-credibilityvaultizability-list {
+  display: grid;
+  gap: 12px;
+}
+
+.workspace-credibilityvaultizability-card {
+  background: rgba(2, 6, 23, 0.45);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 14px;
+}
+
+.workspace-credibilityvaultizability-card p,
+.workspace-credibilityvaultizability-card small {
+  color: var(--muted);
+  margin: 6px 0 0;
+}
+
+.workspace-credibilityvaultizability-card--ready {
+  border-color: color-mix(in srgb, var(--accent) 35%, var(--border));
+}
+
+.workspace-credibilityvaultizability-card--missing {
+  border-color: color-mix(in srgb, #d44 45%, var(--border));
+}
+
 .workspace-settings-form {
   display: grid;
   gap: 0.75rem;

@@ -1074,6 +1074,26 @@ import type {
   AuditvaultizabilityAdminSummaryResponse,
   CompliancevaultizabilityRolloutResponse,
   CompliancevaultizabilityAdminSummaryResponse,
+  ValidityvaultizabilityRolloutResponse,
+  ValidityvaultizabilityAdminSummaryResponse,
+  AuthenticityvaultizabilityRolloutResponse,
+  AuthenticityvaultizabilityAdminSummaryResponse,
+  ProvenancevaultizabilityRolloutResponse,
+  ProvenancevaultizabilityAdminSummaryResponse,
+  VerificationvaultizabilityRolloutResponse,
+  VerificationvaultizabilityAdminSummaryResponse,
+  AttestationvaultizabilityRolloutResponse,
+  AttestationvaultizabilityAdminSummaryResponse,
+  AssurancevaultizabilityRolloutResponse,
+  AssurancevaultizabilityAdminSummaryResponse,
+  AuditabilityvaultizabilityRolloutResponse,
+  AuditabilityvaultizabilityAdminSummaryResponse,
+  InspectabilityvaultizabilityRolloutResponse,
+  InspectabilityvaultizabilityAdminSummaryResponse,
+  ReproducibilityvaultizabilityRolloutResponse,
+  ReproducibilityvaultizabilityAdminSummaryResponse,
+  CredibilityvaultizabilityRolloutResponse,
+  CredibilityvaultizabilityAdminSummaryResponse,
   RunCapabilitiesResponse,
   TemporalRolloutResponse,
   TemporalRuntimeHealthResponse,
@@ -5866,6 +5886,96 @@ import {
   formatCompliancevaultizabilityRolloutStatus,
 } from './compliancevaultizability-ui'
 import {
+  executeValidityvaultizabilityAdminAction,
+  fetchValidityvaultizabilityAdminSummary,
+  fetchValidityvaultizabilityRollout,
+  formatValidityvaultizabilityAdminAction,
+  formatValidityvaultizabilityDomain,
+  formatValidityvaultizabilityRolloutCheckStatus,
+  formatValidityvaultizabilityRolloutStatus,
+} from './validityvaultizability-ui'
+import {
+  executeAuthenticityvaultizabilityAdminAction,
+  fetchAuthenticityvaultizabilityAdminSummary,
+  fetchAuthenticityvaultizabilityRollout,
+  formatAuthenticityvaultizabilityAdminAction,
+  formatAuthenticityvaultizabilityDomain,
+  formatAuthenticityvaultizabilityRolloutCheckStatus,
+  formatAuthenticityvaultizabilityRolloutStatus,
+} from './authenticityvaultizability-ui'
+import {
+  executeProvenancevaultizabilityAdminAction,
+  fetchProvenancevaultizabilityAdminSummary,
+  fetchProvenancevaultizabilityRollout,
+  formatProvenancevaultizabilityAdminAction,
+  formatProvenancevaultizabilityDomain,
+  formatProvenancevaultizabilityRolloutCheckStatus,
+  formatProvenancevaultizabilityRolloutStatus,
+} from './provenancevaultizability-ui'
+import {
+  executeVerificationvaultizabilityAdminAction,
+  fetchVerificationvaultizabilityAdminSummary,
+  fetchVerificationvaultizabilityRollout,
+  formatVerificationvaultizabilityAdminAction,
+  formatVerificationvaultizabilityDomain,
+  formatVerificationvaultizabilityRolloutCheckStatus,
+  formatVerificationvaultizabilityRolloutStatus,
+} from './verificationvaultizability-ui'
+import {
+  executeAttestationvaultizabilityAdminAction,
+  fetchAttestationvaultizabilityAdminSummary,
+  fetchAttestationvaultizabilityRollout,
+  formatAttestationvaultizabilityAdminAction,
+  formatAttestationvaultizabilityDomain,
+  formatAttestationvaultizabilityRolloutCheckStatus,
+  formatAttestationvaultizabilityRolloutStatus,
+} from './attestationvaultizability-ui'
+import {
+  executeAssurancevaultizabilityAdminAction,
+  fetchAssurancevaultizabilityAdminSummary,
+  fetchAssurancevaultizabilityRollout,
+  formatAssurancevaultizabilityAdminAction,
+  formatAssurancevaultizabilityDomain,
+  formatAssurancevaultizabilityRolloutCheckStatus,
+  formatAssurancevaultizabilityRolloutStatus,
+} from './assurancevaultizability-ui'
+import {
+  executeAuditabilityvaultizabilityAdminAction,
+  fetchAuditabilityvaultizabilityAdminSummary,
+  fetchAuditabilityvaultizabilityRollout,
+  formatAuditabilityvaultizabilityAdminAction,
+  formatAuditabilityvaultizabilityDomain,
+  formatAuditabilityvaultizabilityRolloutCheckStatus,
+  formatAuditabilityvaultizabilityRolloutStatus,
+} from './auditabilityvaultizability-ui'
+import {
+  executeInspectabilityvaultizabilityAdminAction,
+  fetchInspectabilityvaultizabilityAdminSummary,
+  fetchInspectabilityvaultizabilityRollout,
+  formatInspectabilityvaultizabilityAdminAction,
+  formatInspectabilityvaultizabilityDomain,
+  formatInspectabilityvaultizabilityRolloutCheckStatus,
+  formatInspectabilityvaultizabilityRolloutStatus,
+} from './inspectabilityvaultizability-ui'
+import {
+  executeReproducibilityvaultizabilityAdminAction,
+  fetchReproducibilityvaultizabilityAdminSummary,
+  fetchReproducibilityvaultizabilityRollout,
+  formatReproducibilityvaultizabilityAdminAction,
+  formatReproducibilityvaultizabilityDomain,
+  formatReproducibilityvaultizabilityRolloutCheckStatus,
+  formatReproducibilityvaultizabilityRolloutStatus,
+} from './reproducibilityvaultizability-ui'
+import {
+  executeCredibilityvaultizabilityAdminAction,
+  fetchCredibilityvaultizabilityAdminSummary,
+  fetchCredibilityvaultizabilityRollout,
+  formatCredibilityvaultizabilityAdminAction,
+  formatCredibilityvaultizabilityDomain,
+  formatCredibilityvaultizabilityRolloutCheckStatus,
+  formatCredibilityvaultizabilityRolloutStatus,
+} from './credibilityvaultizability-ui'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
@@ -7474,6 +7584,26 @@ function App() {
     useState<AuditvaultizabilityRolloutResponse | null>(null)
   const [compliancevaultizabilityRollout, setCompliancevaultizabilityRollout] =
     useState<CompliancevaultizabilityRolloutResponse | null>(null)
+  const [validityvaultizabilityRollout, setValidityvaultizabilityRollout] =
+    useState<ValidityvaultizabilityRolloutResponse | null>(null)
+  const [authenticityvaultizabilityRollout, setAuthenticityvaultizabilityRollout] =
+    useState<AuthenticityvaultizabilityRolloutResponse | null>(null)
+  const [provenancevaultizabilityRollout, setProvenancevaultizabilityRollout] =
+    useState<ProvenancevaultizabilityRolloutResponse | null>(null)
+  const [verificationvaultizabilityRollout, setVerificationvaultizabilityRollout] =
+    useState<VerificationvaultizabilityRolloutResponse | null>(null)
+  const [attestationvaultizabilityRollout, setAttestationvaultizabilityRollout] =
+    useState<AttestationvaultizabilityRolloutResponse | null>(null)
+  const [assurancevaultizabilityRollout, setAssurancevaultizabilityRollout] =
+    useState<AssurancevaultizabilityRolloutResponse | null>(null)
+  const [auditabilityvaultizabilityRollout, setAuditabilityvaultizabilityRollout] =
+    useState<AuditabilityvaultizabilityRolloutResponse | null>(null)
+  const [inspectabilityvaultizabilityRollout, setInspectabilityvaultizabilityRollout] =
+    useState<InspectabilityvaultizabilityRolloutResponse | null>(null)
+  const [reproducibilityvaultizabilityRollout, setReproducibilityvaultizabilityRollout] =
+    useState<ReproducibilityvaultizabilityRolloutResponse | null>(null)
+  const [credibilityvaultizabilityRollout, setCredibilityvaultizabilityRollout] =
+    useState<CredibilityvaultizabilityRolloutResponse | null>(null)
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
@@ -8611,6 +8741,26 @@ function App() {
     useState<AuditvaultizabilityAdminSummaryResponse | null>(null)
   const [compliancevaultizabilityAdminSummary, setCompliancevaultizabilityAdminSummary] =
     useState<CompliancevaultizabilityAdminSummaryResponse | null>(null)
+  const [validityvaultizabilityAdminSummary, setValidityvaultizabilityAdminSummary] =
+    useState<ValidityvaultizabilityAdminSummaryResponse | null>(null)
+  const [authenticityvaultizabilityAdminSummary, setAuthenticityvaultizabilityAdminSummary] =
+    useState<AuthenticityvaultizabilityAdminSummaryResponse | null>(null)
+  const [provenancevaultizabilityAdminSummary, setProvenancevaultizabilityAdminSummary] =
+    useState<ProvenancevaultizabilityAdminSummaryResponse | null>(null)
+  const [verificationvaultizabilityAdminSummary, setVerificationvaultizabilityAdminSummary] =
+    useState<VerificationvaultizabilityAdminSummaryResponse | null>(null)
+  const [attestationvaultizabilityAdminSummary, setAttestationvaultizabilityAdminSummary] =
+    useState<AttestationvaultizabilityAdminSummaryResponse | null>(null)
+  const [assurancevaultizabilityAdminSummary, setAssurancevaultizabilityAdminSummary] =
+    useState<AssurancevaultizabilityAdminSummaryResponse | null>(null)
+  const [auditabilityvaultizabilityAdminSummary, setAuditabilityvaultizabilityAdminSummary] =
+    useState<AuditabilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [inspectabilityvaultizabilityAdminSummary, setInspectabilityvaultizabilityAdminSummary] =
+    useState<InspectabilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [reproducibilityvaultizabilityAdminSummary, setReproducibilityvaultizabilityAdminSummary] =
+    useState<ReproducibilityvaultizabilityAdminSummaryResponse | null>(null)
+  const [credibilityvaultizabilityAdminSummary, setCredibilityvaultizabilityAdminSummary] =
+    useState<CredibilityvaultizabilityAdminSummaryResponse | null>(null)
   const [settingsAdminAction, setSettingsAdminAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -10199,6 +10349,36 @@ function App() {
     'idle' | 'running'
   >('idle')
   const [compliancevaultizabilityAdminAction, setCompliancevaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [validityvaultizabilityAdminAction, setValidityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [authenticityvaultizabilityAdminAction, setAuthenticityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [provenancevaultizabilityAdminAction, setProvenancevaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [verificationvaultizabilityAdminAction, setVerificationvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [attestationvaultizabilityAdminAction, setAttestationvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [assurancevaultizabilityAdminAction, setAssurancevaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [auditabilityvaultizabilityAdminAction, setAuditabilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [inspectabilityvaultizabilityAdminAction, setInspectabilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [reproducibilityvaultizabilityAdminAction, setReproducibilityvaultizabilityAdminAction] = useState<
+    'idle' | 'running'
+  >('idle')
+  const [credibilityvaultizabilityAdminAction, setCredibilityvaultizabilityAdminAction] = useState<
     'idle' | 'running'
   >('idle')
   const [workspaceNameDraft, setWorkspaceNameDraft] = useState('')
@@ -16680,6 +16860,126 @@ function App() {
         }
       })
 
+    fetchValidityvaultizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setValidityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setValidityvaultizabilityRollout(null)
+        }
+      })
+
+    fetchAuthenticityvaultizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAuthenticityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAuthenticityvaultizabilityRollout(null)
+        }
+      })
+
+    fetchProvenancevaultizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setProvenancevaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setProvenancevaultizabilityRollout(null)
+        }
+      })
+
+    fetchVerificationvaultizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setVerificationvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setVerificationvaultizabilityRollout(null)
+        }
+      })
+
+    fetchAttestationvaultizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAttestationvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAttestationvaultizabilityRollout(null)
+        }
+      })
+
+    fetchAssurancevaultizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAssurancevaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAssurancevaultizabilityRollout(null)
+        }
+      })
+
+    fetchAuditabilityvaultizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setAuditabilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAuditabilityvaultizabilityRollout(null)
+        }
+      })
+
+    fetchInspectabilityvaultizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setInspectabilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setInspectabilityvaultizabilityRollout(null)
+        }
+      })
+
+    fetchReproducibilityvaultizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setReproducibilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setReproducibilityvaultizabilityRollout(null)
+        }
+      })
+
+    fetchCredibilityvaultizabilityRollout(apiBaseUrl)
+      .then((rollout) => {
+        if (!controller.signal.aborted) {
+          setCredibilityvaultizabilityRollout(rollout)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setCredibilityvaultizabilityRollout(null)
+        }
+      })
+
     fetchUsageCapabilities(apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
@@ -21076,6 +21376,76 @@ function App() {
         workspaceAuthHeaders,
       )
       setCompliancevaultizabilityAdminSummary(compliancevaultizabilityAdmin)
+
+      const validityvaultizabilityAdmin = await fetchValidityvaultizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setValidityvaultizabilityAdminSummary(validityvaultizabilityAdmin)
+
+      const authenticityvaultizabilityAdmin = await fetchAuthenticityvaultizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuthenticityvaultizabilityAdminSummary(authenticityvaultizabilityAdmin)
+
+      const provenancevaultizabilityAdmin = await fetchProvenancevaultizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setProvenancevaultizabilityAdminSummary(provenancevaultizabilityAdmin)
+
+      const verificationvaultizabilityAdmin = await fetchVerificationvaultizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setVerificationvaultizabilityAdminSummary(verificationvaultizabilityAdmin)
+
+      const attestationvaultizabilityAdmin = await fetchAttestationvaultizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAttestationvaultizabilityAdminSummary(attestationvaultizabilityAdmin)
+
+      const assurancevaultizabilityAdmin = await fetchAssurancevaultizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAssurancevaultizabilityAdminSummary(assurancevaultizabilityAdmin)
+
+      const auditabilityvaultizabilityAdmin = await fetchAuditabilityvaultizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setAuditabilityvaultizabilityAdminSummary(auditabilityvaultizabilityAdmin)
+
+      const inspectabilityvaultizabilityAdmin = await fetchInspectabilityvaultizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setInspectabilityvaultizabilityAdminSummary(inspectabilityvaultizabilityAdmin)
+
+      const reproducibilityvaultizabilityAdmin = await fetchReproducibilityvaultizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setReproducibilityvaultizabilityAdminSummary(reproducibilityvaultizabilityAdmin)
+
+      const credibilityvaultizabilityAdmin = await fetchCredibilityvaultizabilityAdminSummary(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setCredibilityvaultizabilityAdminSummary(credibilityvaultizabilityAdmin)
     } catch (error) {
       setBillingError(
         error instanceof Error
@@ -22308,6 +22678,296 @@ function App() {
       )
     } finally {
       setTransparencyAdminAction('idle')
+    }
+  }
+
+  async function handleCredibilityvaultizabilityAdminAction(
+    action: 'refresh_credibilityvaultizability_summary',
+  ) {
+    setCredibilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeCredibilityvaultizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchCredibilityvaultizabilityRollout(apiBaseUrl)
+      setCredibilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run credibilityvaultizability admin action.',
+      )
+    } finally {
+      setCredibilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleReproducibilityvaultizabilityAdminAction(
+    action: 'refresh_reproducibilityvaultizability_summary',
+  ) {
+    setReproducibilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeReproducibilityvaultizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchReproducibilityvaultizabilityRollout(apiBaseUrl)
+      setReproducibilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run reproducibilityvaultizability admin action.',
+      )
+    } finally {
+      setReproducibilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleInspectabilityvaultizabilityAdminAction(
+    action: 'refresh_inspectabilityvaultizability_summary',
+  ) {
+    setInspectabilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeInspectabilityvaultizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchInspectabilityvaultizabilityRollout(apiBaseUrl)
+      setInspectabilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run inspectabilityvaultizability admin action.',
+      )
+    } finally {
+      setInspectabilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAuditabilityvaultizabilityAdminAction(
+    action: 'refresh_auditabilityvaultizability_summary',
+  ) {
+    setAuditabilityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAuditabilityvaultizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAuditabilityvaultizabilityRollout(apiBaseUrl)
+      setAuditabilityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run auditabilityvaultizability admin action.',
+      )
+    } finally {
+      setAuditabilityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAssurancevaultizabilityAdminAction(
+    action: 'refresh_assurancevaultizability_summary',
+  ) {
+    setAssurancevaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAssurancevaultizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAssurancevaultizabilityRollout(apiBaseUrl)
+      setAssurancevaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run assurancevaultizability admin action.',
+      )
+    } finally {
+      setAssurancevaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAttestationvaultizabilityAdminAction(
+    action: 'refresh_attestationvaultizability_summary',
+  ) {
+    setAttestationvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAttestationvaultizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAttestationvaultizabilityRollout(apiBaseUrl)
+      setAttestationvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run attestationvaultizability admin action.',
+      )
+    } finally {
+      setAttestationvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleVerificationvaultizabilityAdminAction(
+    action: 'refresh_verificationvaultizability_summary',
+  ) {
+    setVerificationvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeVerificationvaultizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchVerificationvaultizabilityRollout(apiBaseUrl)
+      setVerificationvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run verificationvaultizability admin action.',
+      )
+    } finally {
+      setVerificationvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleProvenancevaultizabilityAdminAction(
+    action: 'refresh_provenancevaultizability_summary',
+  ) {
+    setProvenancevaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeProvenancevaultizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchProvenancevaultizabilityRollout(apiBaseUrl)
+      setProvenancevaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run provenancevaultizability admin action.',
+      )
+    } finally {
+      setProvenancevaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleAuthenticityvaultizabilityAdminAction(
+    action: 'refresh_authenticityvaultizability_summary',
+  ) {
+    setAuthenticityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeAuthenticityvaultizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchAuthenticityvaultizabilityRollout(apiBaseUrl)
+      setAuthenticityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run authenticityvaultizability admin action.',
+      )
+    } finally {
+      setAuthenticityvaultizabilityAdminAction('idle')
+    }
+  }
+
+  async function handleValidityvaultizabilityAdminAction(
+    action: 'refresh_validityvaultizability_summary',
+  ) {
+    setValidityvaultizabilityAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await executeValidityvaultizabilityAdminAction(
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        { action },
+      )
+      setBillingMessage(result.message)
+      await handleLoadBillingStatus()
+      const rollout = await fetchValidityvaultizabilityRollout(apiBaseUrl)
+      setValidityvaultizabilityRollout(rollout)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to run validityvaultizability admin action.',
+      )
+    } finally {
+      setValidityvaultizabilityAdminAction('idle')
     }
   }
 
@@ -52565,6 +53225,296 @@ function App() {
               ))}
             </div>
             <small>Checked at {registryvaultizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {attestationvaultizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production attestationvaultizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${attestationvaultizabilityRollout.status}`}
+              >
+                {formatAttestationvaultizabilityRolloutStatus(attestationvaultizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{attestationvaultizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {attestationvaultizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAttestationvaultizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {attestationvaultizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {verificationvaultizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production verificationvaultizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${verificationvaultizabilityRollout.status}`}
+              >
+                {formatVerificationvaultizabilityRolloutStatus(verificationvaultizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{verificationvaultizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {verificationvaultizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatVerificationvaultizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {verificationvaultizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {provenancevaultizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production provenancevaultizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${provenancevaultizabilityRollout.status}`}
+              >
+                {formatProvenancevaultizabilityRolloutStatus(provenancevaultizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{provenancevaultizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {provenancevaultizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatProvenancevaultizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {provenancevaultizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {authenticityvaultizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production authenticityvaultizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${authenticityvaultizabilityRollout.status}`}
+              >
+                {formatAuthenticityvaultizabilityRolloutStatus(authenticityvaultizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{authenticityvaultizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {authenticityvaultizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAuthenticityvaultizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {authenticityvaultizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {validityvaultizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production validityvaultizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${validityvaultizabilityRollout.status}`}
+              >
+                {formatValidityvaultizabilityRolloutStatus(validityvaultizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{validityvaultizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {validityvaultizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatValidityvaultizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {validityvaultizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {credibilityvaultizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production credibilityvaultizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${credibilityvaultizabilityRollout.status}`}
+              >
+                {formatCredibilityvaultizabilityRolloutStatus(credibilityvaultizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{credibilityvaultizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {credibilityvaultizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatCredibilityvaultizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {credibilityvaultizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {reproducibilityvaultizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production reproducibilityvaultizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${reproducibilityvaultizabilityRollout.status}`}
+              >
+                {formatReproducibilityvaultizabilityRolloutStatus(reproducibilityvaultizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{reproducibilityvaultizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {reproducibilityvaultizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatReproducibilityvaultizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {reproducibilityvaultizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {inspectabilityvaultizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production inspectabilityvaultizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${inspectabilityvaultizabilityRollout.status}`}
+              >
+                {formatInspectabilityvaultizabilityRolloutStatus(inspectabilityvaultizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{inspectabilityvaultizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {inspectabilityvaultizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatInspectabilityvaultizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {inspectabilityvaultizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {auditabilityvaultizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production auditabilityvaultizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${auditabilityvaultizabilityRollout.status}`}
+              >
+                {formatAuditabilityvaultizabilityRolloutStatus(auditabilityvaultizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{auditabilityvaultizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {auditabilityvaultizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAuditabilityvaultizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {auditabilityvaultizabilityRollout.checkedAt}</small>
+          </div>
+        ) : null}
+
+        {assurancevaultizabilityRollout ? (
+          <div className="billing-rollout">
+            <div className="billing-rollout__header">
+              <span>Production assurancevaultizability rollout readiness</span>
+              <strong
+                className={`billing-rollout__status billing-rollout__status--${assurancevaultizabilityRollout.status}`}
+              >
+                {formatAssurancevaultizabilityRolloutStatus(assurancevaultizabilityRollout.status)}
+              </strong>
+            </div>
+            <p>{assurancevaultizabilityRollout.guidance}</p>
+            <div className="billing-rollout__checks">
+              {assurancevaultizabilityRollout.checks.map((check) => (
+                <article
+                  className={`billing-rollout-check billing-rollout-check--${check.status}`}
+                  key={check.name}
+                >
+                  <strong>{check.label}</strong>
+                  <span>
+                    {formatAssurancevaultizabilityRolloutCheckStatus(check.status)}
+                  </span>
+                  <p>{check.detail}</p>
+                </article>
+              ))}
+            </div>
+            <small>Checked at {assurancevaultizabilityRollout.checkedAt}</small>
           </div>
         ) : null}
 
@@ -87352,6 +88302,656 @@ function App() {
                 }
               >
                 {formatRegistryvaultizabilityAdminAction('refresh_registryvaultizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {attestationvaultizabilityAdminSummary ? (
+          <div className="billing-admin workspace-attestationvaultizability-admin">
+            <div className="billing-admin__header">
+              <span>Attestationvaultizability admin</span>
+              <strong>{attestationvaultizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{attestationvaultizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification attestationvaultizability</span>
+                <strong>
+                  {attestationvaultizabilityAdminSummary.stats.attestationvaultizabilityPercent}%
+                </strong>
+                <small>
+                  {attestationvaultizabilityAdminSummary.stats.coveredDomains}/
+                  {attestationvaultizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Attestationvaultizability signals</span>
+                <strong>{attestationvaultizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {attestationvaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-attestationvaultizability-list">
+              {attestationvaultizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-attestationvaultizability-card workspace-attestationvaultizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAttestationvaultizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {attestationvaultizabilityAdminSummary.availableActions.includes(
+              'refresh_attestationvaultizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={attestationvaultizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAttestationvaultizabilityAdminAction(
+                    'refresh_attestationvaultizability_summary',
+                  )
+                }
+              >
+                {formatAttestationvaultizabilityAdminAction('refresh_attestationvaultizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {verificationvaultizabilityAdminSummary ? (
+          <div className="billing-admin workspace-verificationvaultizability-admin">
+            <div className="billing-admin__header">
+              <span>Verificationvaultizability admin</span>
+              <strong>{verificationvaultizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{verificationvaultizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan verificationvaultizability</span>
+                <strong>
+                  {verificationvaultizabilityAdminSummary.stats.verificationvaultizabilityPercent}%
+                </strong>
+                <small>
+                  {verificationvaultizabilityAdminSummary.stats.coveredDomains}/
+                  {verificationvaultizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Verificationvaultizability signals</span>
+                <strong>{verificationvaultizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {verificationvaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-verificationvaultizability-list">
+              {verificationvaultizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-verificationvaultizability-card workspace-verificationvaultizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatVerificationvaultizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {verificationvaultizabilityAdminSummary.availableActions.includes(
+              'refresh_verificationvaultizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={verificationvaultizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleVerificationvaultizabilityAdminAction(
+                    'refresh_verificationvaultizability_summary',
+                  )
+                }
+              >
+                {formatVerificationvaultizabilityAdminAction('refresh_verificationvaultizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {provenancevaultizabilityAdminSummary ? (
+          <div className="billing-admin workspace-provenancevaultizability-admin">
+            <div className="billing-admin__header">
+              <span>Provenancevaultizability admin</span>
+              <strong>{provenancevaultizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{provenancevaultizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key provenancevaultizability</span>
+                <strong>
+                  {provenancevaultizabilityAdminSummary.stats.provenancevaultizabilityPercent}%
+                </strong>
+                <small>
+                  {provenancevaultizabilityAdminSummary.stats.coveredDomains}/
+                  {provenancevaultizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Provenancevaultizability signals</span>
+                <strong>{provenancevaultizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {provenancevaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-provenancevaultizability-list">
+              {provenancevaultizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-provenancevaultizability-card workspace-provenancevaultizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatProvenancevaultizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {provenancevaultizabilityAdminSummary.availableActions.includes(
+              'refresh_provenancevaultizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={provenancevaultizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleProvenancevaultizabilityAdminAction(
+                    'refresh_provenancevaultizability_summary',
+                  )
+                }
+              >
+                {formatProvenancevaultizabilityAdminAction('refresh_provenancevaultizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {authenticityvaultizabilityAdminSummary ? (
+          <div className="billing-admin workspace-authenticityvaultizability-admin">
+            <div className="billing-admin__header">
+              <span>Authenticityvaultizability admin</span>
+              <strong>{authenticityvaultizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{authenticityvaultizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership authenticityvaultizability</span>
+                <strong>
+                  {authenticityvaultizabilityAdminSummary.stats.authenticityvaultizabilityPercent}%
+                </strong>
+                <small>
+                  {authenticityvaultizabilityAdminSummary.stats.coveredDomains}/
+                  {authenticityvaultizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Authenticityvaultizability signals</span>
+                <strong>{authenticityvaultizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {authenticityvaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-authenticityvaultizability-list">
+              {authenticityvaultizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-authenticityvaultizability-card workspace-authenticityvaultizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAuthenticityvaultizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {authenticityvaultizabilityAdminSummary.availableActions.includes(
+              'refresh_authenticityvaultizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={authenticityvaultizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAuthenticityvaultizabilityAdminAction(
+                    'refresh_authenticityvaultizability_summary',
+                  )
+                }
+              >
+                {formatAuthenticityvaultizabilityAdminAction('refresh_authenticityvaultizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {validityvaultizabilityAdminSummary ? (
+          <div className="billing-admin workspace-validityvaultizability-admin">
+            <div className="billing-admin__header">
+              <span>Validityvaultizability admin</span>
+              <strong>{validityvaultizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{validityvaultizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice validityvaultizability</span>
+                <strong>
+                  {validityvaultizabilityAdminSummary.stats.validityvaultizabilityPercent}%
+                </strong>
+                <small>
+                  {validityvaultizabilityAdminSummary.stats.coveredDomains}/
+                  {validityvaultizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Validityvaultizability signals</span>
+                <strong>{validityvaultizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {validityvaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-validityvaultizability-list">
+              {validityvaultizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-validityvaultizability-card workspace-validityvaultizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatValidityvaultizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {validityvaultizabilityAdminSummary.availableActions.includes(
+              'refresh_validityvaultizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={validityvaultizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleValidityvaultizabilityAdminAction(
+                    'refresh_validityvaultizability_summary',
+                  )
+                }
+              >
+                {formatValidityvaultizabilityAdminAction('refresh_validityvaultizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {credibilityvaultizabilityAdminSummary ? (
+          <div className="billing-admin workspace-credibilityvaultizability-admin">
+            <div className="billing-admin__header">
+              <span>Credibilityvaultizability admin</span>
+              <strong>{credibilityvaultizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{credibilityvaultizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing notification credibilityvaultizability</span>
+                <strong>
+                  {credibilityvaultizabilityAdminSummary.stats.credibilityvaultizabilityPercent}%
+                </strong>
+                <small>
+                  {credibilityvaultizabilityAdminSummary.stats.coveredDomains}/
+                  {credibilityvaultizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Credibilityvaultizability signals</span>
+                <strong>{credibilityvaultizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {credibilityvaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing notifications, and billing webhook events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-credibilityvaultizability-list">
+              {credibilityvaultizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-credibilityvaultizability-card workspace-credibilityvaultizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatCredibilityvaultizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {credibilityvaultizabilityAdminSummary.availableActions.includes(
+              'refresh_credibilityvaultizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={credibilityvaultizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleCredibilityvaultizabilityAdminAction(
+                    'refresh_credibilityvaultizability_summary',
+                  )
+                }
+              >
+                {formatCredibilityvaultizabilityAdminAction('refresh_credibilityvaultizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {reproducibilityvaultizabilityAdminSummary ? (
+          <div className="billing-admin workspace-reproducibilityvaultizability-admin">
+            <div className="billing-admin__header">
+              <span>Reproducibilityvaultizability admin</span>
+              <strong>{reproducibilityvaultizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{reproducibilityvaultizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Shield scan reproducibilityvaultizability</span>
+                <strong>
+                  {reproducibilityvaultizabilityAdminSummary.stats.reproducibilityvaultizabilityPercent}%
+                </strong>
+                <small>
+                  {reproducibilityvaultizabilityAdminSummary.stats.coveredDomains}/
+                  {reproducibilityvaultizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Reproducibilityvaultizability signals</span>
+                <strong>{reproducibilityvaultizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {reproducibilityvaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, shield scans, and provider credentials'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-reproducibilityvaultizability-list">
+              {reproducibilityvaultizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-reproducibilityvaultizability-card workspace-reproducibilityvaultizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatReproducibilityvaultizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {reproducibilityvaultizabilityAdminSummary.availableActions.includes(
+              'refresh_reproducibilityvaultizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={reproducibilityvaultizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleReproducibilityvaultizabilityAdminAction(
+                    'refresh_reproducibilityvaultizability_summary',
+                  )
+                }
+              >
+                {formatReproducibilityvaultizabilityAdminAction('refresh_reproducibilityvaultizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {inspectabilityvaultizabilityAdminSummary ? (
+          <div className="billing-admin workspace-inspectabilityvaultizability-admin">
+            <div className="billing-admin__header">
+              <span>Inspectabilityvaultizability admin</span>
+              <strong>{inspectabilityvaultizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{inspectabilityvaultizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Idempotency key inspectabilityvaultizability</span>
+                <strong>
+                  {inspectabilityvaultizabilityAdminSummary.stats.inspectabilityvaultizabilityPercent}%
+                </strong>
+                <small>
+                  {inspectabilityvaultizabilityAdminSummary.stats.coveredDomains}/
+                  {inspectabilityvaultizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Inspectabilityvaultizability signals</span>
+                <strong>{inspectabilityvaultizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {inspectabilityvaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, idempotency keys, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-inspectabilityvaultizability-list">
+              {inspectabilityvaultizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-inspectabilityvaultizability-card workspace-inspectabilityvaultizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatInspectabilityvaultizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {inspectabilityvaultizabilityAdminSummary.availableActions.includes(
+              'refresh_inspectabilityvaultizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={inspectabilityvaultizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleInspectabilityvaultizabilityAdminAction(
+                    'refresh_inspectabilityvaultizability_summary',
+                  )
+                }
+              >
+                {formatInspectabilityvaultizabilityAdminAction('refresh_inspectabilityvaultizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {auditabilityvaultizabilityAdminSummary ? (
+          <div className="billing-admin workspace-auditabilityvaultizability-admin">
+            <div className="billing-admin__header">
+              <span>Auditabilityvaultizability admin</span>
+              <strong>{auditabilityvaultizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{auditabilityvaultizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Membership auditabilityvaultizability</span>
+                <strong>
+                  {auditabilityvaultizabilityAdminSummary.stats.auditabilityvaultizabilityPercent}%
+                </strong>
+                <small>
+                  {auditabilityvaultizabilityAdminSummary.stats.coveredDomains}/
+                  {auditabilityvaultizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Auditabilityvaultizability signals</span>
+                <strong>{auditabilityvaultizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {auditabilityvaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, workspace memberships, and usage events'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-auditabilityvaultizability-list">
+              {auditabilityvaultizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-auditabilityvaultizability-card workspace-auditabilityvaultizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAuditabilityvaultizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {auditabilityvaultizabilityAdminSummary.availableActions.includes(
+              'refresh_auditabilityvaultizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={auditabilityvaultizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAuditabilityvaultizabilityAdminAction(
+                    'refresh_auditabilityvaultizability_summary',
+                  )
+                }
+              >
+                {formatAuditabilityvaultizabilityAdminAction('refresh_auditabilityvaultizability_summary')}
+              </button>
+            ) : null}
+          </div>
+        ) : null}
+
+        {assurancevaultizabilityAdminSummary ? (
+          <div className="billing-admin workspace-assurancevaultizability-admin">
+            <div className="billing-admin__header">
+              <span>Assurancevaultizability admin</span>
+              <strong>{assurancevaultizabilityAdminSummary.role}</strong>
+            </div>
+            <p>{assurancevaultizabilityAdminSummary.guidance}</p>
+            <div className="billing-admin__stats">
+              <article className="billing-admin-stat">
+                <span>Billing invoice assurancevaultizability</span>
+                <strong>
+                  {assurancevaultizabilityAdminSummary.stats.assurancevaultizabilityPercent}%
+                </strong>
+                <small>
+                  {assurancevaultizabilityAdminSummary.stats.coveredDomains}/
+                  {assurancevaultizabilityAdminSummary.stats.totalDomains} domains covered
+                </small>
+              </article>
+              <article className="billing-admin-stat">
+                <span>Assurancevaultizability signals</span>
+                <strong>{assurancevaultizabilityAdminSummary.stats.totalRecords}</strong>
+                <small>
+                  {assurancevaultizabilityAdminSummary.stats.postgresConnectivity
+                    ? 'Run outcomes, billing invoices, and billing records'
+                    : 'PostgreSQL unavailable'}
+                </small>
+              </article>
+            </div>
+            <div className="workspace-assurancevaultizability-list">
+              {assurancevaultizabilityAdminSummary.records.map((record) => (
+                <article
+                  className={`workspace-assurancevaultizability-card workspace-assurancevaultizability-card--${record.tableExists ? 'ready' : 'missing'}`}
+                  key={record.domain}
+                >
+                  <div>
+                    <strong>{formatAssurancevaultizabilityDomain(record.domain)}</strong>
+                    <p>{record.tableName}</p>
+                    <small>
+                      {record.tableExists
+                        ? `${record.recordCount} record(s)`
+                        : 'Table missing'}
+                    </small>
+                  </div>
+                </article>
+              ))}
+            </div>
+            {assurancevaultizabilityAdminSummary.availableActions.includes(
+              'refresh_assurancevaultizability_summary',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={assurancevaultizabilityAdminAction !== 'idle'}
+                onClick={() =>
+                  void handleAssurancevaultizabilityAdminAction(
+                    'refresh_assurancevaultizability_summary',
+                  )
+                }
+              >
+                {formatAssurancevaultizabilityAdminAction('refresh_assurancevaultizability_summary')}
               </button>
             ) : null}
           </div>

@@ -1456,7 +1456,19 @@ Current `v5.326` behavior:
 - Workspace owners and admins can inspect workspace compatibilizability metrics from `GET /api/compatibilizability/workspace/:workspaceId/admin`.
 - The web billing panel shows compatibilizability rollout checks and workspace compatibilizability admin tools.
 
-Current `v5.550` behavior:
+Current `v5.560` behavior:
+
+- Production credibilityvaultizability rollout readiness validates credibilityvaultizability coverage and readiness through `GET /api/credibilityvaultizability/readiness`.
+- Workspace owners and admins can inspect workspace credibilityvaultizability metrics from `GET /api/credibilityvaultizability/workspace/:workspaceId/admin`.
+- The web billing panel shows credibilityvaultizability rollout checks and workspace credibilityvaultizability admin tools.
+
+Current `v5.330` behavior:
+
+- Production attestationvaultizability rollout readiness validates attestationvaultizability coverage and readiness through `GET /api/attestationvaultizability/readiness`.
+- Workspace owners and admins can inspect workspace attestationvaultizability metrics from `GET /api/attestationvaultizability/workspace/:workspaceId/admin`.
+- The web billing panel shows attestationvaultizability rollout checks and workspace attestationvaultizability admin tools.
+
+Current `v5.330` behavior:
 
 - Production compliancevaultizability rollout readiness validates compliancevaultizability coverage and readiness through `GET /api/compliancevaultizability/readiness`.
 - Workspace owners and admins can inspect workspace compliancevaultizability metrics from `GET /api/compliancevaultizability/workspace/:workspaceId/admin`.
