@@ -1175,7 +1175,10 @@ import type {
   WorkspaceMemberAdminSummaryResponse,
   WorkspaceSettingsAdminSummaryResponse,
 } from '@ai-war-room/schemas'
-import { filterFindingsByDisplaySensitivity } from '@ai-war-room/schemas'
+import {
+  filterFindingsByDisplaySensitivity,
+  resolvePreferredActiveWorkspaceId,
+} from '@ai-war-room/schemas'
 import {
   formatPaidTier,
   getHighlightedIdea,
@@ -1197,6 +1200,7 @@ import {
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
+  createOrReissueAuthSession,
   loadStoredActiveWorkspaceId,
   loadStoredAuthSession,
   saveStoredActiveWorkspaceId,
@@ -6635,15 +6639,19 @@ function App() {
 
     const controller = new AbortController()
 
+    const bootstrapWorkspaceId = loadStoredActiveWorkspaceId(fallbackWorkspaceId)
+
     fetch(`${apiBaseUrl}/auth/session`, {
       method: 'POST',
       signal: controller.signal,
       headers: {
         'Content-Type': 'application/json',
-        ...buildBootstrapAuthHeaders(authCapabilities),
+        ...buildBootstrapAuthHeaders(authCapabilities, {
+          workspaceId: bootstrapWorkspaceId,
+        }),
       },
       body: JSON.stringify({
-        workspaceId: 'local_workspace',
+        workspaceId: bootstrapWorkspaceId,
       }),
     })
       .then((response) => (response.ok ? response.json() : null))
@@ -6652,6 +6660,10 @@ function App() {
           const nextSession = session as AuthSessionResponse
           saveStoredAuthSession(nextSession)
           setAuthSession(nextSession)
+          if (nextSession.workspaceId !== activeWorkspaceId) {
+            saveStoredActiveWorkspaceId(nextSession.workspaceId)
+            setActiveWorkspaceId(nextSession.workspaceId)
+          }
         }
       })
       .catch(() => {
@@ -6744,27 +6756,71 @@ function App() {
         }
 
         setMyWorkspaces(listed.workspaces)
-        const knownIds = new Set(
-          listed.workspaces.map((workspace) => workspace.workspaceId),
+        const mineWorkspaceIds = listed.workspaces.map(
+          (workspace) => workspace.workspaceId,
         )
-        if (knownIds.size === 0) {
+        if (mineWorkspaceIds.length === 0) {
           return
         }
 
-        if (!knownIds.has(activeWorkspaceId)) {
-          const fallback =
-            listed.workspaces.find(
-              (workspace) => workspace.workspaceId === fallbackWorkspaceId,
-            )?.workspaceId ?? listed.workspaces[0]?.workspaceId
-          if (fallback) {
-            saveStoredActiveWorkspaceId(fallback)
-            setActiveWorkspaceId(fallback)
+        const preferred = resolvePreferredActiveWorkspaceId({
+          mineWorkspaceIds,
+          sessionWorkspaceId: authSession?.workspaceId ?? loadStoredAuthSession()?.workspaceId,
+          storedActiveWorkspaceId: activeWorkspaceId,
+          fallbackWorkspaceId,
+        })
+
+        if (preferred.workspaceId !== activeWorkspaceId) {
+          saveStoredActiveWorkspaceId(preferred.workspaceId)
+          setActiveWorkspaceId(preferred.workspaceId)
+          if (preferred.source === 'fallback') {
             setWorkspaceRecoveryTip(
-              `Stored workspace was unavailable. Switched to ${fallback}.`,
+              `Stored workspace was unavailable. Switched to ${preferred.workspaceId}.`,
             )
+          } else if (preferred.source === 'session') {
+            setWorkspaceRecoveryTip(null)
+          } else {
+            setWorkspaceRecoveryTip(null)
+          }
+
+          if (authCapabilities?.supportsSessionBootstrap) {
+            try {
+              const nextSession = await createOrReissueAuthSession({
+                apiBaseUrl,
+                authCapabilities,
+                workspaceId: preferred.workspaceId,
+                existingSession: authSession ?? loadStoredAuthSession(),
+              })
+              if (!cancelled) {
+                saveStoredAuthSession(nextSession)
+                setAuthSession(nextSession)
+              }
+            } catch {
+              // best-effort session sync during recovery
+            }
           }
         } else {
           setWorkspaceRecoveryTip(null)
+          if (
+            authCapabilities?.supportsSessionBootstrap &&
+            authSession &&
+            authSession.workspaceId !== preferred.workspaceId
+          ) {
+            try {
+              const nextSession = await createOrReissueAuthSession({
+                apiBaseUrl,
+                authCapabilities,
+                workspaceId: preferred.workspaceId,
+                existingSession: authSession,
+              })
+              if (!cancelled) {
+                saveStoredAuthSession(nextSession)
+                setAuthSession(nextSession)
+              }
+            } catch {
+              // best-effort
+            }
+          }
         }
       } catch {
         if (!cancelled) {
@@ -6824,8 +6880,10 @@ function App() {
         const nextQuery = params.toString()
         const nextUrl = `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ''}${window.location.hash}`
         window.history.replaceState({}, '', nextUrl)
-        saveStoredActiveWorkspaceId(accepted.workspaceId)
-        setActiveWorkspaceId(accepted.workspaceId)
+        await applyActiveWorkspace(accepted.workspaceId)
+        if (cancelled) {
+          return
+        }
         setInviteStatusMessage(
           `${accepted.guidance} Joined ${accepted.workspaceId} as ${accepted.role}.`,
         )
@@ -12005,6 +12063,43 @@ function App() {
     )
   }
 
+  async function applyActiveWorkspace(
+    nextWorkspaceId: string,
+    options?: { requireSessionSync?: boolean },
+  ): Promise<{ ok: boolean; session: AuthSessionResponse | null }> {
+    const requireSessionSync =
+      options?.requireSessionSync ??
+      authCapabilities?.provider === 'session'
+    let nextSession = authSession ?? loadStoredAuthSession()
+
+    if (authCapabilities?.supportsSessionBootstrap) {
+      try {
+        nextSession = await createOrReissueAuthSession({
+          apiBaseUrl,
+          authCapabilities,
+          workspaceId: nextWorkspaceId,
+          existingSession: nextSession,
+          userId: nextSession?.userId,
+        })
+        saveStoredAuthSession(nextSession)
+        setAuthSession(nextSession)
+      } catch (error) {
+        if (requireSessionSync) {
+          setBillingError(
+            error instanceof Error
+              ? error.message
+              : 'Failed to sync workspace session.',
+          )
+          return { ok: false, session: nextSession }
+        }
+      }
+    }
+
+    saveStoredActiveWorkspaceId(nextWorkspaceId)
+    setActiveWorkspaceId(nextWorkspaceId)
+    return { ok: true, session: nextSession }
+  }
+
   async function handleCreateWorkspace() {
     const name = newWorkspaceName.trim()
     if (!name) {
@@ -12025,8 +12120,10 @@ function App() {
       )
       setBillingMessage(created.guidance)
       setNewWorkspaceName('')
-      saveStoredActiveWorkspaceId(created.workspace.workspaceId)
-      setActiveWorkspaceId(created.workspace.workspaceId)
+      const synced = await applyActiveWorkspace(created.workspace.workspaceId)
+      if (!synced.ok) {
+        return
+      }
       setLatestInviteUrl(null)
       setInviteUrlsById({})
       setWorkspaceInvites([])
@@ -12034,7 +12131,7 @@ function App() {
         'workspace-ui',
         'listMyWorkspaces',
         apiBaseUrl,
-        buildWorkspaceAuthHeaders(authCapabilities, authSession, {
+        buildWorkspaceAuthHeaders(authCapabilities, synced.session, {
           workspaceId: created.workspace.workspaceId,
         }),
       )
@@ -12080,11 +12177,12 @@ function App() {
           (workspace) => workspace.workspaceId === fallbackWorkspaceId,
         )?.workspaceId ?? listed.workspaces[0]?.workspaceId
       if (fallback) {
-        saveStoredActiveWorkspaceId(fallback)
-        setActiveWorkspaceId(fallback)
-        setWorkspaceRecoveryTip(
-          `Left workspace. Switched to ${fallback}.`,
-        )
+        const synced = await applyActiveWorkspace(fallback)
+        if (synced.ok) {
+          setWorkspaceRecoveryTip(
+            `Left workspace. Switched to ${fallback}.`,
+          )
+        }
       }
     } catch (error) {
       setBillingError(
@@ -12127,11 +12225,12 @@ function App() {
           (workspace) => workspace.workspaceId === fallbackWorkspaceId,
         )?.workspaceId ?? listed.workspaces[0]?.workspaceId
       if (fallback) {
-        saveStoredActiveWorkspaceId(fallback)
-        setActiveWorkspaceId(fallback)
-        setWorkspaceRecoveryTip(
-          `Archived workspace. Switched to ${fallback}.`,
-        )
+        const synced = await applyActiveWorkspace(fallback)
+        if (synced.ok) {
+          setWorkspaceRecoveryTip(
+            `Archived workspace. Switched to ${fallback}.`,
+          )
+        }
       }
     } catch (error) {
       setBillingError(
@@ -29709,12 +29808,16 @@ function App() {
                   value={activeWorkspaceId}
                   onChange={(event) => {
                     const nextWorkspaceId = event.target.value
-                    saveStoredActiveWorkspaceId(nextWorkspaceId)
-                    setActiveWorkspaceId(nextWorkspaceId)
-                    setWorkspaceRecoveryTip(null)
-                    setLatestInviteUrl(null)
-                    setInviteUrlsById({})
-                    setWorkspaceInvites([])
+                    void (async () => {
+                      const synced = await applyActiveWorkspace(nextWorkspaceId)
+                      if (!synced.ok) {
+                        return
+                      }
+                      setWorkspaceRecoveryTip(null)
+                      setLatestInviteUrl(null)
+                      setInviteUrlsById({})
+                      setWorkspaceInvites([])
+                    })()
                   }}
                 >
                   {myWorkspaces.map((workspace) => (

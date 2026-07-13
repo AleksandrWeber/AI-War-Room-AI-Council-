@@ -2,6 +2,7 @@ import type {
   AuthCapabilitiesResponse,
   AuthSessionResponse,
 } from '@ai-war-room/schemas'
+import { authSessionResponseSchema } from '@ai-war-room/schemas'
 
 const sessionStorageKey = 'ai-war-room.auth-session'
 export const activeWorkspaceStorageKey = 'ai-war-room.active-workspace-id'
@@ -65,9 +66,16 @@ export function buildBootstrapAuthHeaders(
     AuthCapabilitiesResponse,
     'provider' | 'requiresBearerToken'
   > | null,
+  options?: {
+    workspaceId?: string
+    userId?: string
+  },
 ) {
   const headers: Record<string, string> = {
-    ...defaultWorkspaceAuthHeaders,
+    'x-user-id':
+      options?.userId ?? defaultWorkspaceAuthHeaders['x-user-id'],
+    'x-workspace-id':
+      options?.workspaceId ?? defaultWorkspaceAuthHeaders['x-workspace-id'],
   }
   const bearerToken = import.meta.env.VITE_AUTH_BEARER_TOKEN
 
@@ -81,6 +89,67 @@ export function buildBootstrapAuthHeaders(
   }
 
   return headers
+}
+
+export async function createOrReissueAuthSession(input: {
+  apiBaseUrl: string
+  authCapabilities?: Pick<
+    AuthCapabilitiesResponse,
+    'provider' | 'requiresBearerToken' | 'supportsSessionBootstrap'
+  > | null
+  workspaceId: string
+  userId?: string
+  existingSession?: Pick<
+    AuthSessionResponse,
+    'token' | 'userId' | 'expiresAt'
+  > | null
+}) {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  }
+
+  if (input.existingSession?.token) {
+    headers.Authorization = `Bearer ${input.existingSession.token}`
+    headers['x-user-id'] = input.existingSession.userId
+    headers['x-workspace-id'] = input.workspaceId
+  } else {
+    Object.assign(
+      headers,
+      buildBootstrapAuthHeaders(input.authCapabilities, {
+        workspaceId: input.workspaceId,
+        userId: input.userId,
+      }),
+    )
+  }
+
+  const response = await fetch(`${input.apiBaseUrl}/auth/session`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({ workspaceId: input.workspaceId }),
+  })
+
+  if (!response.ok) {
+    let detail = `API returned ${response.status}`
+    try {
+      const payload = (await response.json()) as {
+        message?: string | { message?: string }
+      }
+      if (typeof payload.message === 'string' && payload.message.trim()) {
+        detail = payload.message
+      } else if (
+        payload.message &&
+        typeof payload.message === 'object' &&
+        typeof payload.message.message === 'string'
+      ) {
+        detail = payload.message.message
+      }
+    } catch {
+      // keep status fallback
+    }
+    throw new Error(detail)
+  }
+
+  return authSessionResponseSchema.parse(await response.json())
 }
 
 export function buildWorkspaceAuthHeaders(

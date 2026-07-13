@@ -174,6 +174,37 @@ export class AuthService {
     }
   }
 
+  tryVerifySessionBearer(
+    request: AuthenticatedRequest,
+  ): AuthSessionClaims | null {
+    const authorization = this.getSingleHeader(request.headers.authorization)
+
+    if (!authorization?.startsWith('Bearer ')) {
+      return null
+    }
+
+    const token = authorization.slice('Bearer '.length).trim()
+    if (!token) {
+      return null
+    }
+
+    const bootstrapToken = this.configService.get('AUTH_BEARER_TOKEN', {
+      infer: true,
+    })
+    if (bootstrapToken && token === bootstrapToken) {
+      return null
+    }
+
+    try {
+      return verifyAuthSessionToken({
+        token,
+        secret: this.getSessionSecret(),
+      })
+    } catch {
+      return null
+    }
+  }
+
   resolveSessionClaims(request: AuthenticatedRequest): AuthSessionClaims | null {
     return request.sessionClaims ?? null
   }

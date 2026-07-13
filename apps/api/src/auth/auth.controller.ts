@@ -39,9 +39,6 @@ export class AuthController {
     @Req() request: AuthenticatedRequest,
     @Body() body: CreateSessionBody,
   ) {
-    this.authService.assertSessionBootstrapAccess(request)
-
-    const userId = this.getSingleHeader(request.headers['x-user-id'])
     const headerWorkspaceId = this.getSingleHeader(
       request.headers['x-workspace-id'],
     )
@@ -49,6 +46,37 @@ export class AuthController {
       typeof body.workspaceId === 'string' && body.workspaceId.trim().length > 0
         ? body.workspaceId
         : null
+    const existingClaims = this.authService.tryVerifySessionBearer(request)
+
+    if (existingClaims) {
+      const workspaceId = bodyWorkspaceId ?? headerWorkspaceId
+
+      if (!workspaceId) {
+        throw new UnauthorizedException({
+          message: 'Missing workspaceId for session re-issue.',
+        })
+      }
+
+      if (bodyWorkspaceId && headerWorkspaceId && headerWorkspaceId !== bodyWorkspaceId) {
+        throw new ForbiddenException({
+          message: 'Workspace header does not match request workspace.',
+        })
+      }
+
+      await this.workspaceService.requireMembership({
+        userId: existingClaims.userId,
+        workspaceId,
+      })
+
+      return this.authService.createSession({
+        userId: existingClaims.userId,
+        workspaceId,
+      })
+    }
+
+    this.authService.assertSessionBootstrapAccess(request)
+
+    const userId = this.getSingleHeader(request.headers['x-user-id'])
 
     if (!userId || !headerWorkspaceId) {
       throw new UnauthorizedException({

@@ -136,6 +136,37 @@ describe('API skeleton', () => {
     })
   })
 
+  it('re-issues an auth session for a new workspace from an existing session token', async () => {
+    const initial = await request(app!.getHttpServer())
+      .post('/api/auth/session')
+      .set({
+        'x-user-id': 'user_local',
+        'x-workspace-id': 'local_workspace',
+      })
+      .send({
+        workspaceId: 'local_workspace',
+      })
+      .expect(201)
+
+    const reissued = await request(app!.getHttpServer())
+      .post('/api/auth/session')
+      .set({
+        Authorization: `Bearer ${initial.body.token}`,
+        'x-workspace-id': 'secondary_workspace',
+      })
+      .send({
+        workspaceId: 'secondary_workspace',
+      })
+      .expect(201)
+
+    expect(reissued.body).toMatchObject({
+      userId: 'user_local',
+      workspaceId: 'secondary_workspace',
+      token: expect.any(String),
+    })
+    expect(reissued.body.token).not.toBe(initial.body.token)
+  })
+
   it('returns run capabilities from shared schemas', async () => {
     const response = await request(app!.getHttpServer())
       .get('/api/runs/capabilities')

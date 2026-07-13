@@ -136,6 +136,48 @@ test('workspace picker switches active workspace', async ({ page }) => {
   )
 })
 
+test('workspace picker syncs auth session and survives reload', async ({
+  page,
+}) => {
+  await page.goto('/')
+  await expect(page.getByText('API status: online')).toBeVisible({
+    timeout: 60_000,
+  })
+  await expect(page.getByTestId('workspace-picker')).toBeVisible({
+    timeout: 30_000,
+  })
+
+  await page.getByTestId('workspace-picker').selectOption('secondary_workspace')
+  await expect(page.getByTestId('active-workspace-id')).toHaveText(
+    'Active workspace: secondary_workspace',
+  )
+
+  await expect
+    .poll(async () => {
+      return page.evaluate(() => {
+        const raw = localStorage.getItem('ai-war-room.auth-session')
+        if (!raw) {
+          return null
+        }
+        try {
+          return (JSON.parse(raw) as { workspaceId?: string }).workspaceId ?? null
+        } catch {
+          return null
+        }
+      })
+    })
+    .toBe('secondary_workspace')
+
+  await page.reload()
+  await expect(page.getByText('API status: online')).toBeVisible({
+    timeout: 60_000,
+  })
+  await expect(page.getByTestId('active-workspace-id')).toHaveText(
+    'Active workspace: secondary_workspace',
+    { timeout: 30_000 },
+  )
+})
+
 test('stale active workspace recovers on boot', async ({ page }) => {
   await page.addInitScript(() => {
     localStorage.setItem(
