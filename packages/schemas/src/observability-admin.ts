@@ -29,6 +29,32 @@ export type ObservabilityAdminStats = z.infer<
   typeof observabilityAdminStatsSchema
 >
 
+export const observabilityAlertTypeSchema = z.enum([
+  'worker_health',
+  'stream_lag',
+  'provider_failure',
+])
+export type ObservabilityAlertType = z.infer<typeof observabilityAlertTypeSchema>
+
+export const observabilityAlertSeveritySchema = z.enum([
+  'info',
+  'warning',
+  'critical',
+])
+export type ObservabilityAlertSeverity = z.infer<
+  typeof observabilityAlertSeveritySchema
+>
+
+export const observabilityAlertSchema = z.object({
+  alertId: nonEmptyStringSchema,
+  workspaceId: nonEmptyStringSchema,
+  type: observabilityAlertTypeSchema,
+  severity: observabilityAlertSeveritySchema,
+  message: nonEmptyStringSchema,
+  createdAt: utcDateStringSchema,
+})
+export type ObservabilityAlert = z.infer<typeof observabilityAlertSchema>
+
 export const observabilityAdminActionSchema = z.enum([
   'refresh_event_summary',
   'clear_observability_buffer',
@@ -42,6 +68,7 @@ export const observabilityAdminSummaryResponseSchema = z.object({
   role: workspaceRoleSchema,
   events: z.array(observabilityAdminEventSchema),
   stats: observabilityAdminStatsSchema,
+  alerts: z.array(observabilityAlertSchema).default([]),
   availableActions: z.array(observabilityAdminActionSchema),
   guidance: nonEmptyStringSchema,
 })

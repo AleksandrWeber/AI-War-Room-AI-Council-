@@ -1,5 +1,5 @@
 import { ConfigService } from '@nestjs/config'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type { ApiEnv } from '../config/env.js'
 import { ObservabilityAdminService } from './observability-admin.service.js'
 import { ObservabilityService } from './observability.service.js'
@@ -7,11 +7,27 @@ import { ObservabilityService } from './observability.service.js'
 function createObservabilityAdminService(env: Partial<ApiEnv> = {}) {
   const configService = new ConfigService<ApiEnv>({
     NODE_ENV: 'test',
+    TEMPORAL_ENABLED: false,
+    TEMPORAL_ADDRESS: '127.0.0.1:7233',
+    TEMPORAL_NAMESPACE: 'default',
+    TEMPORAL_TASK_QUEUE: 'ai-war-room-runs',
     ...env,
   })
   const observabilityService = new ObservabilityService()
 
-  return new ObservabilityAdminService(configService, observabilityService)
+  return new ObservabilityAdminService(
+    configService,
+    observabilityService,
+    {
+      listWorkspaceBufferedStreams: vi.fn(async () => []),
+    } as never,
+    {
+      getRuntimeHealth: vi.fn(async () => ({
+        status: 'healthy',
+        guidance: 'Temporal runtime is healthy.',
+      })),
+    } as never,
+  )
 }
 
 describe('ObservabilityAdminService', () => {
@@ -34,10 +50,10 @@ describe('ObservabilityAdminService', () => {
     })
   })
 
-  it('returns workspace observability admin summary for owners', () => {
+  it('returns workspace observability admin summary for owners', async () => {
     const service = createObservabilityAdminService()
 
-    expect(
+    await expect(
       service.getWorkspaceObservabilityAdminSummary(
         {
           userId: 'user_test',
@@ -46,20 +62,21 @@ describe('ObservabilityAdminService', () => {
         },
         'workspace_1',
       ),
-    ).toMatchObject({
+    ).resolves.toMatchObject({
       workspaceId: 'workspace_1',
       role: 'owner',
       stats: {
         totalEvents: 0,
       },
+      alerts: [],
       availableActions: ['refresh_event_summary'],
     })
   })
 
-  it('rejects observability admin tools for members', () => {
+  it('rejects observability admin tools for members', async () => {
     const service = createObservabilityAdminService()
 
-    expect(() =>
+    await expect(
       service.getWorkspaceObservabilityAdminSummary(
         {
           userId: 'user_member',
@@ -68,13 +85,11 @@ describe('ObservabilityAdminService', () => {
         },
         'workspace_1',
       ),
-    ).toThrow(
-      expect.objectContaining({
-        response: {
-          message:
-            'Only workspace owners and admins can manage observability tools.',
-        },
-      }),
-    )
+    ).rejects.toMatchObject({
+      response: {
+        message:
+          'Only workspace owners and admins can manage observability tools.',
+      },
+    })
   })
 })

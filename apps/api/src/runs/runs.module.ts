@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common'
+import { Module, forwardRef } from '@nestjs/common'
 import { AgentService } from '../agents/agent.service.js'
 import { ArtifactService } from '../artifacts/artifact.service.js'
 import { AuthModule } from '../auth/auth.module.js'
@@ -34,7 +34,7 @@ import { RunsService } from './runs.service.js'
     WorkspacesModule,
     UsageModule,
     BillingModule,
-    ObservabilityModule,
+    forwardRef(() => ObservabilityModule),
     ResearchModule,
     ShieldModule,
   ],

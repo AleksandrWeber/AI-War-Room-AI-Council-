@@ -10,8 +10,13 @@ import {
   type AuthContext,
 } from '@ai-war-room/schemas'
 import type { ApiEnv } from '../config/env.js'
+import { StreamEventBufferService } from '../persistence/stream-event-buffer.service.js'
+import { isTerminalPipelineStreamEvent } from '../runs/pipeline-stream-event.js'
+import { TemporalHealthService } from '../temporal/temporal-health.service.js'
+import { getTemporalWorkerConfig } from '../temporal/temporal-worker.config.js'
 import {
   buildObservabilityAdminStats,
+  buildObservabilityAlerts,
   getObservabilityAdminGuidance,
   resolveObservabilityAdminActions,
   toObservabilityAdminEvents,
@@ -24,6 +29,8 @@ export class ObservabilityAdminService {
   constructor(
     private readonly configService: ConfigService<ApiEnv, true>,
     private readonly observabilityService: ObservabilityService,
+    private readonly streamEventBufferService: StreamEventBufferService,
+    private readonly temporalHealthService: TemporalHealthService,
   ) {}
 
   getCapabilities() {
@@ -55,7 +62,7 @@ export class ObservabilityAdminService {
     })
   }
 
-  getWorkspaceObservabilityAdminSummary(
+  async getWorkspaceObservabilityAdminSummary(
     authContext: AuthContext,
     workspaceId: string,
   ) {
@@ -67,23 +74,46 @@ export class ObservabilityAdminService {
       })
     }
 
-    const events = toObservabilityAdminEvents(
-      this.observabilityService.getRecentEventsForWorkspace(workspaceId),
-    )
+    const recentEvents =
+      this.observabilityService.getRecentEventsForWorkspace(workspaceId)
+    const events = toObservabilityAdminEvents(recentEvents)
     const stats = buildObservabilityAdminStats(events)
     const availableActions = resolveObservabilityAdminActions({ stats })
+    const temporalConfig = getTemporalWorkerConfig(this.configService)
+    const temporalHealth = temporalConfig.enabled
+      ? await this.temporalHealthService.getRuntimeHealth()
+      : null
+    const streamSummaries =
+      await this.streamEventBufferService.listWorkspaceBufferedStreams(
+        workspaceId,
+      )
+    const alerts = buildObservabilityAlerts({
+      workspaceId,
+      temporalEnabled: temporalConfig.enabled,
+      temporalHealthy: temporalHealth ? temporalHealth.status === 'healthy' : true,
+      temporalGuidance: temporalHealth?.guidance,
+      streamSummaries: streamSummaries.map((summary) => ({
+        runId: summary.runId,
+        lastEventAt: summary.lastEvent?.timestamp,
+        terminal: summary.lastEvent
+          ? isTerminalPipelineStreamEvent(summary.lastEvent)
+          : false,
+      })),
+      recentEvents,
+    })
 
     return observabilityAdminSummaryResponseSchema.parse({
       workspaceId,
       role: authContext.role,
       events,
       stats,
+      alerts,
       availableActions,
-      guidance: getObservabilityAdminGuidance({ stats }),
+      guidance: getObservabilityAdminGuidance({ stats, alerts }),
     })
   }
 
-  executeObservabilityAdminAction(
+  async executeObservabilityAdminAction(
     authContext: AuthContext,
     input: {
       workspaceId: string
@@ -105,7 +135,7 @@ export class ObservabilityAdminService {
 
     switch (payload.action) {
       case 'refresh_event_summary': {
-        const summary = this.getWorkspaceObservabilityAdminSummary(
+        const summary = await this.getWorkspaceObservabilityAdminSummary(
           authContext,
           payload.workspaceId,
         )
@@ -113,13 +143,13 @@ export class ObservabilityAdminService {
         return observabilityAdminActionResponseSchema.parse({
           workspaceId: payload.workspaceId,
           action: payload.action,
-          message: `Refreshed observability summary with ${summary.stats.totalEvents} recent workspace event(s).`,
+          message: `Refreshed observability summary with ${summary.stats.totalEvents} recent workspace event(s) and ${summary.alerts.length} alert(s).`,
           stats: summary.stats,
         })
       }
       case 'clear_observability_buffer': {
         this.observabilityService.clearRecentEvents()
-        const summary = this.getWorkspaceObservabilityAdminSummary(
+        const summary = await this.getWorkspaceObservabilityAdminSummary(
           authContext,
           payload.workspaceId,
         )

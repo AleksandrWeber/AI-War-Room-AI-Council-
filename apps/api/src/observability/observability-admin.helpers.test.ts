@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 import {
+  STREAM_LAG_WARNING_MS,
   buildObservabilityAdminStats,
+  buildObservabilityAlerts,
   getObservabilityAdminGuidance,
   resolveObservabilityAdminActions,
   toObservabilityAdminEvents,
@@ -27,6 +29,51 @@ describe('observability admin helpers', () => {
       pipelinePhaseEvents: 1,
       llmEvents: 1,
     })
+  })
+
+  it('builds worker, stream lag, and provider failure alerts', () => {
+    const nowMs = Date.parse('2026-01-01T00:02:00.000Z')
+
+    expect(
+      buildObservabilityAlerts({
+        workspaceId: 'workspace_1',
+        nowMs,
+        temporalEnabled: true,
+        temporalHealthy: false,
+        temporalGuidance: 'Temporal worker is not polling.',
+        streamSummaries: [
+          {
+            runId: 'run_lagging',
+            lastEventAt: '2026-01-01T00:00:00.000Z',
+            terminal: false,
+          },
+        ],
+        recentEvents: [
+          {
+            eventName: 'llm_provider_failure',
+            level: 'error',
+            timestamp: '2026-01-01T00:01:00.000Z',
+            attributes: {
+              workspaceId: 'workspace_1',
+            },
+          },
+        ],
+      }),
+    ).toEqual([
+      expect.objectContaining({
+        type: 'worker_health',
+        severity: 'critical',
+      }),
+      expect.objectContaining({
+        type: 'stream_lag',
+        severity: 'warning',
+        message: expect.stringContaining(`${STREAM_LAG_WARNING_MS / 1000}s`),
+      }),
+      expect.objectContaining({
+        type: 'provider_failure',
+        severity: 'warning',
+      }),
+    ])
   })
 
   it('offers buffer clear when events exist', () => {

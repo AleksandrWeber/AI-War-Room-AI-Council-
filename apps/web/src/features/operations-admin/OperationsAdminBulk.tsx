@@ -246,12 +246,33 @@ export default function OperationsAdminBulk(props: OperationsAdminBulkProps) {
               detail: <>{props.observabilityAdminSummary.stats.pipelinePhaseEvents} pipeline</>,
             },
             {
+              label: 'Active alerts',
+              value: props.observabilityAdminSummary.alerts?.length ?? 0,
+              detail: <>worker / stream lag / provider</>,
+            },
+            {
               label: 'Errors / warnings',
               value: props.observabilityAdminSummary.stats.errorEvents,
               detail: <>{props.observabilityAdminSummary.stats.warnEvents} warnings</>,
             }
             ]}
           >
+{(props.observabilityAdminSummary.alerts?.length ?? 0) > 0 ? (
+              <div className="workspace-observability-event-list">
+                {props.observabilityAdminSummary.alerts.map((alert) => (
+                  <article
+                    className={`workspace-observability-event-card workspace-observability-event-card--${alert.severity === 'critical' ? 'error' : 'warn'}`}
+                    key={alert.alertId}
+                  >
+                    <div>
+                      <strong>{alert.type}</strong>
+                      <p>{alert.message}</p>
+                      <small>{alert.severity}</small>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            ) : null}
 <div className="workspace-observability-event-list">
               {props.observabilityAdminSummary.events.length ? (
                 props.observabilityAdminSummary.events.map((event) => (
