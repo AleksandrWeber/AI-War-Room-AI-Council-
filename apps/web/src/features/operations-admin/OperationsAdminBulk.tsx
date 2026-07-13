@@ -165,6 +165,35 @@ export default function OperationsAdminBulk(props: OperationsAdminBulkProps) {
                 {formatShieldReviewAdminAction('rerun_review_summary')}
               </button>
             ) : null}
+            {props.shieldFalsePositiveReports ? (
+              <>
+                <p className="clear-copy">
+                  User FP queue: {props.shieldFalsePositiveReports.openCount} open
+                  / {props.shieldFalsePositiveReports.reports.length} total
+                </p>
+                <div className="workspace-shield-review-list">
+                  {props.shieldFalsePositiveReports.reports
+                    .slice(0, 8)
+                    .map((report) => (
+                      <article
+                        className="workspace-shield-review-card"
+                        key={report.reportId}
+                      >
+                        <div>
+                          <strong>
+                            {report.category} · {report.severity}
+                          </strong>
+                          <p>
+                            Run {report.runId} · {report.status} ·{' '}
+                            {report.actorUserId}
+                          </p>
+                          {report.note ? <small>{report.note}</small> : null}
+                        </div>
+                      </article>
+                    ))}
+                </div>
+              </>
+            ) : null}
           </BillingAdminPanel>
         ) : null}
 

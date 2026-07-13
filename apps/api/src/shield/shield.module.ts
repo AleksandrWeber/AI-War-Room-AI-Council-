@@ -7,6 +7,7 @@ import { AdvancedShieldService } from './advanced-shield.service.js'
 import { DeterministicShieldClassifier } from './deterministic-shield.classifier.js'
 import { ShieldAdminService } from './shield-admin.service.js'
 import { ShieldController } from './shield.controller.js'
+import { ShieldFalsePositiveService } from './shield-false-positive.service.js'
 import { ShieldOverrideService } from './shield-override.service.js'
 
 @Module({
@@ -22,7 +23,13 @@ import { ShieldOverrideService } from './shield-override.service.js'
     DeterministicShieldClassifier,
     ShieldAdminService,
     ShieldOverrideService,
+    ShieldFalsePositiveService,
   ],
-  exports: [AdvancedShieldService, ShieldAdminService, ShieldOverrideService],
+  exports: [
+    AdvancedShieldService,
+    ShieldAdminService,
+    ShieldOverrideService,
+    ShieldFalsePositiveService,
+  ],
 })
 export class ShieldModule {}

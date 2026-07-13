@@ -22,6 +22,7 @@ import type {
   ResearchRolloutResponse,
   ShieldRolloutResponse,
   ShieldReviewAdminSummaryResponse,
+  ShieldFalsePositiveReportListResponse,
   ProviderCredentialsRolloutResponse,
   ProviderKeyAdminSummaryResponse,
   ObservabilityRolloutResponse,
@@ -1655,6 +1656,15 @@ function App() {
   const [shieldOverrideError, setShieldOverrideError] = useState<string | null>(
     null,
   )
+  const [falsePositiveNote, setFalsePositiveNote] = useState('')
+  const [falsePositiveState, setFalsePositiveState] = useState<
+    'idle' | 'submitting' | 'error'
+  >('idle')
+  const [falsePositiveError, setFalsePositiveError] = useState<string | null>(
+    null,
+  )
+  const [reportedFalsePositiveFindingIds, setReportedFalsePositiveFindingIds] =
+    useState<string[]>([])
   const [reviewDraft, setReviewDraft] = useState<ReviewDraft | null>(() => {
     const saved = localStorage.getItem(reviewStorageKey)
     if (!saved) {
@@ -2961,6 +2971,8 @@ function App() {
     useState<ModelHealthAdminSummaryResponse | null>(null)
   const [shieldReviewAdminSummary, setShieldReviewAdminSummary] =
     useState<ShieldReviewAdminSummaryResponse | null>(null)
+  const [shieldFalsePositiveReports, setShieldFalsePositiveReports] =
+    useState<ShieldFalsePositiveReportListResponse | null>(null)
   const [providerKeyAdminSummary, setProviderKeyAdminSummary] =
     useState<ProviderKeyAdminSummaryResponse | null>(null)
   const [observabilityAdminSummary, setObservabilityAdminSummary] =
@@ -6779,6 +6791,10 @@ function App() {
       setShieldOverrideReason('')
       setShieldOverrideState('idle')
       setShieldOverrideError(null)
+      setFalsePositiveNote('')
+      setFalsePositiveState('idle')
+      setFalsePositiveError(null)
+      setReportedFalsePositiveFindingIds([])
       setReviewDraft({
         triage: nextDraftRun.triage,
         selectedAgents: nextDraftRun.selectedAgents,
@@ -6899,6 +6915,52 @@ function App() {
         error instanceof Error
           ? error.message
           : 'Failed to record Shield override.',
+      )
+    }
+  }
+
+  async function handleMarkFindingAsFalsePositive() {
+    if (!draftRun || !activeFinding) {
+      return
+    }
+
+    if (activeFinding.severity === 'critical') {
+      setFalsePositiveError(
+        'Critical findings require an owner/admin Shield override, not a false-positive report.',
+      )
+      setFalsePositiveState('error')
+      return
+    }
+
+    setFalsePositiveState('submitting')
+    setFalsePositiveError(null)
+
+    try {
+      await callUi(
+        'shield-ui',
+        'createShieldFalsePositiveReport',
+        apiBaseUrl,
+        draftRun.runId,
+        workspaceAuthHeaders,
+        {
+          findingId: activeFinding.findingId,
+          note: falsePositiveNote.trim() || undefined,
+          shieldScan: draftRun.shieldScan,
+        },
+      )
+      setReportedFalsePositiveFindingIds((current) =>
+        current.includes(activeFinding.findingId)
+          ? current
+          : [...current, activeFinding.findingId],
+      )
+      setFalsePositiveNote('')
+      setFalsePositiveState('idle')
+    } catch (error) {
+      setFalsePositiveState('error')
+      setFalsePositiveError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to report Shield false positive.',
       )
     }
   }
@@ -7321,6 +7383,15 @@ function App() {
         workspaceAuthHeaders,
       )
       setShieldReviewAdminSummary(shieldReviewAdmin)
+
+      const falsePositiveQueue = await callUi(
+        'shield-ui',
+        'fetchShieldFalsePositiveReports',
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setShieldFalsePositiveReports(falsePositiveQueue)
 
       const providerKeyAdmin = await callUi('provider-credentials-ui', 'fetchProviderKeyAdminSummary', 
         apiBaseUrl,
@@ -30025,6 +30096,7 @@ function App() {
             runHistoryAdminSummary,
             shieldReviewAdminAction,
             shieldReviewAdminSummary,
+            shieldFalsePositiveReports,
             streamRecoveryAdminAction,
             streamRecoveryAdminSummary,
           }}
@@ -31904,6 +31976,46 @@ function App() {
                       <small>
                         Recommended action: {activeFinding.recommendedAction}
                       </small>
+                      {activeFinding.severity === 'critical' ? (
+                        <p className="runtime-note">
+                          Critical findings stay on the override path and cannot
+                          be marked as false positives.
+                        </p>
+                      ) : reportedFalsePositiveFindingIds.includes(
+                          activeFinding.findingId,
+                        ) ? (
+                        <p className="clear-copy">
+                          False positive reported for this finding. It does not
+                          change scan status or unlock critical runs.
+                        </p>
+                      ) : (
+                        <div className="finding-detail">
+                          <label>
+                            Optional note
+                            <textarea
+                              rows={2}
+                              value={falsePositiveNote}
+                              onChange={(event) =>
+                                setFalsePositiveNote(event.target.value)
+                              }
+                              placeholder="Why this finding looks like a false positive."
+                            />
+                          </label>
+                          <button
+                            className="secondary-button"
+                            type="button"
+                            disabled={falsePositiveState === 'submitting'}
+                            onClick={handleMarkFindingAsFalsePositive}
+                          >
+                            {falsePositiveState === 'submitting'
+                              ? 'Reporting...'
+                              : 'Mark as false positive'}
+                          </button>
+                          {falsePositiveError ? (
+                            <p className="form-error">{falsePositiveError}</p>
+                          ) : null}
+                        </div>
+                      )}
                     </div>
                   ) : null}
                 </>

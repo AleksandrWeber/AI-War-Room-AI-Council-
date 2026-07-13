@@ -112,6 +112,63 @@ export async function createShieldOverride(
   return response.json()
 }
 
+export async function createShieldFalsePositiveReport(
+  apiBaseUrl: string,
+  runId: string,
+  headers: Record<string, string>,
+  input: {
+    findingId: string
+    note?: string
+    shieldScan: unknown
+  },
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/shield/runs/${encodeURIComponent(runId)}/false-positive-reports`,
+    {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(input),
+    },
+  )
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null)
+    throw new Error(
+      typeof body?.message === 'string'
+        ? body.message
+        : `API returned ${response.status}`,
+    )
+  }
+
+  return response.json()
+}
+
+export async function fetchShieldFalsePositiveReports(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/shield/workspace/${encodeURIComponent(workspaceId)}/false-positive-reports`,
+    {
+      headers,
+    },
+  )
+
+  if (response.status === 403) {
+    return null
+  }
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return response.json()
+}
+
 export function formatShieldRolloutStatus(status: 'ready' | 'not_ready') {
   switch (status) {
     case 'ready':

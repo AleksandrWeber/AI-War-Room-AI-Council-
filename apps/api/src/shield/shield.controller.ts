@@ -14,6 +14,7 @@ import {
   WorkspaceAccessGuard,
 } from '../auth/workspace-access.guard.js'
 import { ShieldAdminService } from './shield-admin.service.js'
+import { ShieldFalsePositiveService } from './shield-false-positive.service.js'
 import { ShieldOverrideService } from './shield-override.service.js'
 
 type ShieldReviewAdminBody = {
@@ -26,6 +27,7 @@ export class ShieldController {
   constructor(
     private readonly shieldAdminService: ShieldAdminService,
     private readonly shieldOverrideService: ShieldOverrideService,
+    private readonly shieldFalsePositiveService: ShieldFalsePositiveService,
   ) {}
 
   @Get('capabilities')
@@ -96,6 +98,34 @@ export class ShieldController {
       authContext: request.authContext!,
       body,
     })
+  }
+
+  @Post('runs/:runId/false-positive-reports')
+  @UseGuards(WorkspaceAccessGuard)
+  createShieldFalsePositiveReport(
+    @Param('runId') runId: string,
+    @Req() request: AuthenticatedRequest,
+    @Body() body: unknown,
+  ) {
+    return this.shieldFalsePositiveService.createReport({
+      runId,
+      authContext: request.authContext!,
+      body,
+    })
+  }
+
+  @Get('workspace/:workspaceId/false-positive-reports')
+  @UseGuards(WorkspaceAccessGuard)
+  listShieldFalsePositiveReports(
+    @Param('workspaceId') workspaceId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    this.assertWorkspaceParam(request, workspaceId)
+
+    return this.shieldFalsePositiveService.listWorkspaceReports(
+      request.authContext!,
+      workspaceId,
+    )
   }
 
   private assertWorkspaceParam(
