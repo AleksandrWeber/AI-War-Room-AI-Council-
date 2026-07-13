@@ -22,6 +22,7 @@ export type IdempotencyAdminStats = z.infer<typeof idempotencyAdminStatsSchema>
 export const idempotencyAdminActionSchema = z.enum([
   'refresh_idempotency_summary',
   'clear_workspace_idempotency_reservations',
+  'purge_expired_idempotency_keys',
 ])
 export type IdempotencyAdminAction = z.infer<typeof idempotencyAdminActionSchema>
 

@@ -22,6 +22,7 @@ export interface RunRepository {
   saveMockPipelineResult(result: MockPipelineResult): Promise<void>
   listArtifacts(workspaceId: string): Promise<ArtifactHistoryItem[]>
   listIdempotencyRecords(workspaceId: string): Promise<IdempotencyRecord[]>
+  purgeExpiredIdempotencyKeys(workspaceId: string): Promise<number>
   findArtifactById(
     workspaceId: string,
     artifactId: string,

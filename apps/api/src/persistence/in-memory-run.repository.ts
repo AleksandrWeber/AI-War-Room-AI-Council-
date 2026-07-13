@@ -11,26 +11,32 @@ import type {
 
 export class InMemoryRunRepository implements RunRepository {
   private readonly draftsByIdempotencyKey = new Map<string, DraftRun>()
+  private readonly idempotencyExpiresAtByKey = new Map<string, string>()
   private readonly pipelineResultsByRunId = new Map<string, MockPipelineResult>()
 
   async findDraftRunByIdempotencyKey(
     workspaceId: string,
     idempotencyKey: string,
   ): Promise<DraftRun | null> {
-    return (
-      this.draftsByIdempotencyKey.get(
-        this.createIdempotencyKey(workspaceId, idempotencyKey),
-      ) ?? null
-    )
+    const key = this.createIdempotencyKey(workspaceId, idempotencyKey)
+    const expiresAt = this.idempotencyExpiresAtByKey.get(key)
+
+    if (expiresAt && Date.parse(expiresAt) <= Date.now()) {
+      return null
+    }
+
+    return this.draftsByIdempotencyKey.get(key) ?? null
   }
 
   async saveDraftRun(input: SaveDraftRunInput): Promise<void> {
-    this.draftsByIdempotencyKey.set(
-      this.createIdempotencyKey(
-        input.draftRun.workspaceId,
-        input.idempotencyKey,
-      ),
-      input.draftRun,
+    const key = this.createIdempotencyKey(
+      input.draftRun.workspaceId,
+      input.idempotencyKey,
+    )
+    this.draftsByIdempotencyKey.set(key, input.draftRun)
+    this.idempotencyExpiresAtByKey.set(
+      key,
+      new Date(Date.now() + input.idempotencyTtlSeconds * 1000).toISOString(),
     )
   }
 
@@ -57,16 +63,44 @@ export class InMemoryRunRepository implements RunRepository {
   }
 
   async listIdempotencyRecords(workspaceId: string): Promise<IdempotencyRecord[]> {
+    const now = Date.now()
+
     return [...this.draftsByIdempotencyKey.entries()]
       .filter(([key]) => key.startsWith(`${workspaceId}:`))
-      .map(([key, draft]) => ({
-        idempotencyKey: key.slice(workspaceId.length + 1),
-        runId: draft.runId,
-        expiresAt: draft.updatedAt,
-        expired: false,
-      }))
+      .map(([key, draft]) => {
+        const expiresAt =
+          this.idempotencyExpiresAtByKey.get(key) ?? draft.updatedAt
+
+        return {
+          idempotencyKey: key.slice(workspaceId.length + 1),
+          runId: draft.runId,
+          expiresAt,
+          expired: Date.parse(expiresAt) <= now,
+        }
+      })
       .sort((left, right) => right.expiresAt.localeCompare(left.expiresAt))
       .slice(0, 20)
+  }
+
+  async purgeExpiredIdempotencyKeys(workspaceId: string): Promise<number> {
+    const now = Date.now()
+    let purgedCount = 0
+
+    for (const [key, expiresAt] of this.idempotencyExpiresAtByKey.entries()) {
+      if (!key.startsWith(`${workspaceId}:`)) {
+        continue
+      }
+
+      if (Date.parse(expiresAt) > now) {
+        continue
+      }
+
+      this.idempotencyExpiresAtByKey.delete(key)
+      this.draftsByIdempotencyKey.delete(key)
+      purgedCount += 1
+    }
+
+    return purgedCount
   }
 
   async findArtifactById(

@@ -66,6 +66,10 @@ export function getIdempotencyAdminGuidance(input: {
     return 'Workspace owners and admins can inspect idempotency metrics once draft runs reserve keys.'
   }
 
+  if (input.stats.expiredKeys > 0) {
+    return 'Workspace owners and admins can purge expired idempotency keys that are no longer eligible for draft replay.'
+  }
+
   if (input.stats.activeReservations > 0) {
     return 'Workspace owners and admins can inspect active idempotency reservations and refresh the summary.'
   }
@@ -80,6 +84,10 @@ export function resolveIdempotencyAdminActions(input: {
 
   if (input.stats.activeReservations > 0) {
     actions.push('clear_workspace_idempotency_reservations')
+  }
+
+  if (input.stats.expiredKeys > 0) {
+    actions.push('purge_expired_idempotency_keys')
   }
 
   return actions

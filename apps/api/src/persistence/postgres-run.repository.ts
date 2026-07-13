@@ -318,6 +318,19 @@ export class PostgresRunRepository implements RunRepository {
     }))
   }
 
+  async purgeExpiredIdempotencyKeys(workspaceId: string): Promise<number> {
+    const result = await this.postgresService.query(
+      `
+        DELETE FROM idempotency_keys
+        WHERE workspace_id = $1
+          AND expires_at < NOW()
+      `,
+      [workspaceId],
+    )
+
+    return result.rowCount ?? 0
+  }
+
   async findArtifactById(
     workspaceId: string,
     artifactId: string,

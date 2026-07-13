@@ -63,7 +63,8 @@ export class IdempotencyController {
 
     if (
       action !== 'refresh_idempotency_summary' &&
-      action !== 'clear_workspace_idempotency_reservations'
+      action !== 'clear_workspace_idempotency_reservations' &&
+      action !== 'purge_expired_idempotency_keys'
     ) {
       throw new BadRequestException({
         message: 'Unsupported idempotency admin action.',

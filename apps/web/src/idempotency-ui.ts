@@ -93,13 +93,16 @@ export function formatIdempotencyRolloutCheckStatus(
 export function formatIdempotencyAdminAction(
   action:
     | 'refresh_idempotency_summary'
-    | 'clear_workspace_idempotency_reservations',
+    | 'clear_workspace_idempotency_reservations'
+    | 'purge_expired_idempotency_keys',
 ) {
   switch (action) {
     case 'refresh_idempotency_summary':
       return 'Refresh idempotency summary'
     case 'clear_workspace_idempotency_reservations':
       return 'Clear idempotency reservations'
+    case 'purge_expired_idempotency_keys':
+      return 'Purge expired idempotency keys'
   }
 }
 

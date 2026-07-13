@@ -613,6 +613,22 @@ export default function OperationsAdminBulk(props: OperationsAdminBulkProps) {
                 )}
               </button>
             ) : null}
+            {props.idempotencyAdminSummary.availableActions.includes(
+              'purge_expired_idempotency_keys',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={props.idempotencyAdminAction !== 'idle'}
+                onClick={() =>
+                  void props.handleIdempotencyAdminAction(
+                    'purge_expired_idempotency_keys',
+                  )
+                }
+              >
+                {formatIdempotencyAdminAction('purge_expired_idempotency_keys')}
+              </button>
+            ) : null}
           </BillingAdminPanel>
         ) : null}
 

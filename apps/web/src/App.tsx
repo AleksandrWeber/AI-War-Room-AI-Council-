@@ -11718,7 +11718,8 @@ function App() {
   async function handleIdempotencyAdminAction(
     action:
       | 'refresh_idempotency_summary'
-      | 'clear_workspace_idempotency_reservations',
+      | 'clear_workspace_idempotency_reservations'
+      | 'purge_expired_idempotency_keys',
   ) {
     setIdempotencyAdminAction('running')
     setBillingError(null)

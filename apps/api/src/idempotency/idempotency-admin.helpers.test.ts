@@ -31,18 +31,35 @@ describe('idempotency admin helpers', () => {
     ])
   })
 
-  it('offers clear action when active reservations exist', () => {
-    const stats = buildIdempotencyAdminStats([
-      {
-        idempotencyKey: 'idem_1',
-        reservationActive: true,
-        expired: false,
-      },
-    ])
-
-    expect(resolveIdempotencyAdminActions({ stats })).toEqual([
+  it('offers clear and purge actions when reservations or expired keys exist', () => {
+    expect(
+      resolveIdempotencyAdminActions({
+        stats: buildIdempotencyAdminStats([
+          {
+            idempotencyKey: 'idem_1',
+            reservationActive: true,
+            expired: false,
+          },
+        ]),
+      }),
+    ).toEqual([
       'refresh_idempotency_summary',
       'clear_workspace_idempotency_reservations',
+    ])
+
+    expect(
+      resolveIdempotencyAdminActions({
+        stats: buildIdempotencyAdminStats([
+          {
+            idempotencyKey: 'idem_expired',
+            reservationActive: false,
+            expired: true,
+          },
+        ]),
+      }),
+    ).toEqual([
+      'refresh_idempotency_summary',
+      'purge_expired_idempotency_keys',
     ])
   })
 })

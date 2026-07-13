@@ -105,6 +105,7 @@ export class IdempotencyAdminService {
       action:
         | 'refresh_idempotency_summary'
         | 'clear_workspace_idempotency_reservations'
+        | 'purge_expired_idempotency_keys'
     },
   ) {
     this.assertCanManageIdempotency(authContext)
@@ -148,6 +149,22 @@ export class IdempotencyAdminService {
           workspaceId: payload.workspaceId,
           action: payload.action,
           message: `Cleared ${clearedCount} active idempotency reservation(s) for this workspace.`,
+          stats: summary.stats,
+        })
+      }
+      case 'purge_expired_idempotency_keys': {
+        const purgedCount = await this.runRepository.purgeExpiredIdempotencyKeys(
+          payload.workspaceId,
+        )
+        const summary = await this.getWorkspaceIdempotencyAdminSummary(
+          authContext,
+          payload.workspaceId,
+        )
+
+        return idempotencyAdminActionResponseSchema.parse({
+          workspaceId: payload.workspaceId,
+          action: payload.action,
+          message: `Purged ${purgedCount} expired idempotency key(s) for this workspace.`,
           stats: summary.stats,
         })
       }
