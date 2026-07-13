@@ -16305,11 +16305,13 @@
   padding: 20px;
 }
 
-.review-card > span {
+.review-card > span,
+.review-card-title {
   color: var(--muted);
   font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.08em;
+  margin: 0;
   text-transform: uppercase;
 }
 
@@ -16321,11 +16323,22 @@
   white-space: pre-wrap;
 }
 
-.review-idea mark {
+.review-idea mark,
+.finding-mark {
   background: rgba(251, 191, 36, 0.28);
+  border: 0;
   border-radius: 8px;
   color: #fef3c7;
+  cursor: pointer;
+  display: inline;
+  font: inherit;
   padding: 2px 4px;
+  text-align: inherit;
+  white-space: pre-wrap;
+}
+
+.finding-mark:hover {
+  background: rgba(251, 191, 36, 0.42);
 }
 
 .finding-detail {
@@ -16639,11 +16652,13 @@
 }
 
 .artifact-card-header > span,
+.artifact-card-header > h3,
 .artifact-card > span {
   color: var(--accent);
   font-size: 13px;
   font-weight: 800;
   letter-spacing: 0.08em;
+  margin: 0;
   text-transform: uppercase;
 }
 
@@ -16658,8 +16673,12 @@
   gap: 8px;
 }
 
-.artifact-section strong {
+.artifact-section strong,
+.artifact-section h4 {
   color: var(--text);
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0;
 }
 
 .artifact-section p,

@@ -1494,11 +1494,17 @@ function getSeverityLabel(severity: string) {
   return severity === 'none' ? 'No risk' : severity
 }
 
-function getHighlightedIdea(rawIdea: string, findings: ShieldFinding[]) {
+function getHighlightedIdea(
+  rawIdea: string,
+  findings: ShieldFinding[],
+  onSelectFinding?: (findingId: string) => void,
+) {
   const spans = findings
     .filter((finding) => finding.span)
     .map((finding) => ({
       findingId: finding.findingId,
+      category: finding.category,
+      severity: finding.severity,
       start: finding.span!.start,
       end: finding.span!.end,
     }))
@@ -1520,7 +1526,14 @@ function getHighlightedIdea(rawIdea: string, findings: ShieldFinding[]) {
         return (
           <Fragment key={span.findingId}>
             {before}
-            <mark>{highlighted}</mark>
+            <button
+              type="button"
+              className="finding-mark"
+              aria-label={`Shield ${span.severity} finding: ${span.category}. Activate to review.`}
+              onClick={() => onSelectFinding?.(span.findingId)}
+            >
+              {highlighted}
+            </button>
           </Fragment>
         )
       })}
@@ -6749,6 +6762,12 @@ function App() {
       setStreamedArtifacts([])
       setPipelineState('idle')
       setSubmitState('success')
+      queueMicrotask(() => {
+        document.getElementById('human-review')?.scrollIntoView({
+          behavior: 'smooth',
+          block: 'start',
+        })
+      })
     } catch (error) {
       setSubmitState('error')
       setSubmitError(
@@ -31658,10 +31677,14 @@ function App() {
       </section>
 
       {draftRun && reviewDraft ? (
-        <section className="panel review-panel">
+        <section
+          className="panel review-panel"
+          id="human-review"
+          aria-labelledby="human-review-heading"
+        >
           <div className="section-heading">
             <p className="eyebrow">Human Review</p>
-            <h2>Approve the plan before execution.</h2>
+            <h2 id="human-review-heading">Approve the plan before execution.</h2>
             <p>
               Draft state is autosaved locally. Review Shield context, triage,
               selected agents, and estimated run cost before execution.
@@ -31670,9 +31693,12 @@ function App() {
 
           <div className="review-grid">
             <div className="review-card">
-              <span>Input with Shield context</span>
+              <h3 className="review-card-title">Input with Shield context</h3>
               <div
                 className={`shield-warning-card shield-warning-card--${draftRun.shieldScan.status}`}
+                role={
+                  draftRun.shieldScan.status === 'blocked' ? 'alert' : 'status'
+                }
               >
                 <strong>
                   Shield {draftRun.shieldScan.status}:{' '}
@@ -31685,33 +31711,92 @@ function App() {
                 </p>
               </div>
               <p className="review-idea">
-                {getHighlightedIdea(draftRun.idea.rawIdea, draftRun.shieldScan.findings)}
+                {getHighlightedIdea(
+                  draftRun.idea.rawIdea,
+                  draftRun.shieldScan.findings,
+                  setActiveFindingId,
+                )}
               </p>
               {draftRun.shieldScan.findings.length > 0 ? (
                 <>
-                  <div className="finding-tabs" aria-label="Shield findings">
-                    {draftRun.shieldScan.findings.map((finding) => (
-                      <button
-                        className={
-                          finding.findingId === activeFinding?.findingId
-                            ? 'finding-tab finding-tab--active'
-                            : 'finding-tab'
-                        }
-                        key={finding.findingId}
-                        type="button"
-                        onClick={() => setActiveFindingId(finding.findingId)}
-                      >
-                        {finding.category}
-                      </button>
-                    ))}
+                  <div
+                    className="finding-tabs"
+                    role="tablist"
+                    aria-label="Shield findings"
+                  >
+                    {draftRun.shieldScan.findings.map((finding) => {
+                      const selected =
+                        finding.findingId === activeFinding?.findingId
+                      return (
+                        <button
+                          className={
+                            selected
+                              ? 'finding-tab finding-tab--active'
+                              : 'finding-tab'
+                          }
+                          key={finding.findingId}
+                          type="button"
+                          role="tab"
+                          id={`finding-tab-${finding.findingId}`}
+                          aria-selected={selected}
+                          aria-controls={`finding-panel-${finding.findingId}`}
+                          tabIndex={selected ? 0 : -1}
+                          onClick={() => setActiveFindingId(finding.findingId)}
+                          onKeyDown={(event) => {
+                            const findings = draftRun.shieldScan.findings
+                            const index = findings.findIndex(
+                              (item) => item.findingId === finding.findingId,
+                            )
+                            if (event.key === 'ArrowRight') {
+                              event.preventDefault()
+                              const next =
+                                findings[(index + 1) % findings.length]
+                              setActiveFindingId(next.findingId)
+                              queueMicrotask(() =>
+                                document
+                                  .getElementById(
+                                    `finding-tab-${next.findingId}`,
+                                  )
+                                  ?.focus(),
+                              )
+                            }
+                            if (event.key === 'ArrowLeft') {
+                              event.preventDefault()
+                              const prev =
+                                findings[
+                                  (index - 1 + findings.length) % findings.length
+                                ]
+                              setActiveFindingId(prev.findingId)
+                              queueMicrotask(() =>
+                                document
+                                  .getElementById(
+                                    `finding-tab-${prev.findingId}`,
+                                  )
+                                  ?.focus(),
+                              )
+                            }
+                          }}
+                        >
+                          {finding.category}
+                        </button>
+                      )
+                    })}
                   </div>
                   {activeFinding ? (
-                    <div className="finding-detail">
+                    <div
+                      className="finding-detail"
+                      role="tabpanel"
+                      id={`finding-panel-${activeFinding.findingId}`}
+                      aria-labelledby={`finding-tab-${activeFinding.findingId}`}
+                      tabIndex={0}
+                    >
                       <strong>
                         {activeFinding.category} · {activeFinding.severity}
                       </strong>
                       <p>{activeFinding.explanation}</p>
-                      <small>Recommended action: {activeFinding.recommendedAction}</small>
+                      <small>
+                        Recommended action: {activeFinding.recommendedAction}
+                      </small>
                     </div>
                   ) : null}
                 </>
@@ -31766,7 +31851,7 @@ function App() {
             </div>
 
             <div className="review-card">
-              <span>Editable triage metadata</span>
+              <h3 className="review-card-title">Editable triage metadata</h3>
               <div className="field-grid">
                 <label>
                   Domain
@@ -31842,8 +31927,8 @@ function App() {
           </div>
 
           <div className="review-card">
-            <span>Selected agents</span>
-            <div className="agent-selection-summary">
+            <h3 className="review-card-title">Selected agents</h3>
+            <div className="agent-selection-summary" aria-live="polite">
               <strong>{selectedAgentCount} selected</strong>
               <span>{selectedSpecialistCount} specialists + Moderator</span>
               <span>{reviewDraft.triage.recommendedRunMode} run mode</span>
@@ -31886,9 +31971,26 @@ function App() {
               <span>{reviewDraft.triage.complexity} complexity</span>
               <span>{reviewDraft.triage.securitySensitivity} security</span>
             </div>
+            {reviewDraft.selectedAgents.length < 3 ? (
+              <p id="execute-gate-hint" className="form-error" role="status">
+                Select at least three agents (including Moderator) before
+                execution.
+              </p>
+            ) : requiresCriticalShieldOverride && !shieldOverride ? (
+              <p id="execute-gate-hint" className="form-error" role="status">
+                Record a Shield override with a reason before this critical run
+                can execute.
+              </p>
+            ) : null}
             <button
               className="execute-button"
               type="button"
+              aria-describedby={
+                reviewDraft.selectedAgents.length < 3 ||
+                (Boolean(requiresCriticalShieldOverride) && !shieldOverride)
+                  ? 'execute-gate-hint'
+                  : undefined
+              }
               disabled={
                 pipelineState === 'running' ||
                 reviewDraft.selectedAgents.length < 3 ||
@@ -31937,10 +32039,15 @@ function App() {
       ) : null}
 
       {pipelineResult || streamEvents.length > 0 ? (
-        <section className="panel results-panel">
+        <section
+          className="panel results-panel"
+          id="pipeline-result"
+          aria-labelledby="pipeline-result-heading"
+          aria-busy={pipelineState === 'running'}
+        >
           <div className="section-heading">
             <p className="eyebrow">Pipeline Result</p>
-            <h2>
+            <h2 id="pipeline-result-heading">
               {pipelineState === 'running'
                 ? useTemporalWorkflowRuntime
                   ? 'Observing Temporal workflow...'
@@ -31955,9 +32062,18 @@ function App() {
             ) : null}
           </div>
 
-          <div className="step-list">
+          <div
+            className="step-list"
+            role="list"
+            aria-label="Pipeline step status"
+            aria-live="polite"
+          >
             {displayedSteps.map((step) => (
-              <div className="step-item" key={`${step.stepId}-${step.status}`}>
+              <div
+                className="step-item"
+                role="listitem"
+                key={`${step.stepId}-${step.status}`}
+              >
                 <span>{step.label}</span>
                 <strong>{step.status}</strong>
               </div>
@@ -31982,27 +32098,82 @@ function App() {
 
           {visibleArtifacts.length > 0 ? (
             <div className="artifact-viewer">
-              <div className="artifact-tabs" aria-label="Generated artifacts">
-                {visibleArtifacts.map((artifact) => (
-                  <button
-                    className={
-                      artifact.metadata.artifactType === activeArtifactType
-                        ? 'artifact-tab artifact-tab--active'
-                        : 'artifact-tab'
-                    }
-                    key={artifact.metadata.artifactType}
-                    type="button"
-                    onClick={() => setActiveArtifactType(artifact.metadata.artifactType)}
-                  >
-                    {formatArtifactTitle(artifact.metadata.artifactType)}
-                  </button>
-                ))}
+              <div
+                className="artifact-tabs"
+                role="tablist"
+                aria-label="Generated artifacts"
+              >
+                {visibleArtifacts.map((artifact) => {
+                  const selected =
+                    artifact.metadata.artifactType === activeArtifactType
+                  const tabId = `artifact-tab-${artifact.metadata.artifactType}`
+                  return (
+                    <button
+                      className={
+                        selected
+                          ? 'artifact-tab artifact-tab--active'
+                          : 'artifact-tab'
+                      }
+                      key={artifact.metadata.artifactType}
+                      type="button"
+                      role="tab"
+                      id={tabId}
+                      aria-selected={selected}
+                      aria-controls="artifact-panel"
+                      tabIndex={selected ? 0 : -1}
+                      onClick={() =>
+                        setActiveArtifactType(artifact.metadata.artifactType)
+                      }
+                      onKeyDown={(event) => {
+                        const types = visibleArtifacts.map(
+                          (item) => item.metadata.artifactType,
+                        )
+                        const index = types.indexOf(
+                          artifact.metadata.artifactType,
+                        )
+                        if (event.key === 'ArrowRight') {
+                          event.preventDefault()
+                          const next = types[(index + 1) % types.length]
+                          setActiveArtifactType(next)
+                          queueMicrotask(() =>
+                            document
+                              .getElementById(`artifact-tab-${next}`)
+                              ?.focus(),
+                          )
+                        }
+                        if (event.key === 'ArrowLeft') {
+                          event.preventDefault()
+                          const prev =
+                            types[(index - 1 + types.length) % types.length]
+                          setActiveArtifactType(prev)
+                          queueMicrotask(() =>
+                            document
+                              .getElementById(`artifact-tab-${prev}`)
+                              ?.focus(),
+                          )
+                        }
+                      }}
+                    >
+                      {formatArtifactTitle(artifact.metadata.artifactType)}
+                    </button>
+                  )
+                })}
               </div>
 
               {selectedArtifact ? (
-                <article className="artifact-card">
+                <article
+                  className="artifact-card"
+                  role="tabpanel"
+                  id="artifact-panel"
+                  aria-labelledby={`artifact-tab-${selectedArtifact.metadata.artifactType}`}
+                  tabIndex={0}
+                >
                   <div className="artifact-card-header">
-                    <span>{formatArtifactTitle(selectedArtifact.metadata.artifactType)}</span>
+                    <h3>
+                      {formatArtifactTitle(
+                        selectedArtifact.metadata.artifactType,
+                      )}
+                    </h3>
                     <div className="metadata-row">
                       <span>{selectedArtifact.metadata.validationStatus}</span>
                       <span>{selectedArtifact.metadata.modelProvider}</span>
@@ -32017,12 +32188,14 @@ function App() {
                   <p className="prompt-version">
                     Prompt version: {selectedArtifact.metadata.promptVersion}
                   </p>
-                  {Object.entries(selectedArtifact.artifact.content).map(([key, value]) => (
-                    <div className="artifact-section" key={key}>
-                      <strong>{formatAgent(key)}</strong>
-                      {renderArtifactValue(value)}
-                    </div>
-                  ))}
+                  {Object.entries(selectedArtifact.artifact.content).map(
+                    ([key, value]) => (
+                      <div className="artifact-section" key={key}>
+                        <h4>{formatAgent(key)}</h4>
+                        {renderArtifactValue(value)}
+                      </div>
+                    ),
+                  )}
                 </article>
               ) : null}
             </div>
