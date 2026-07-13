@@ -84,6 +84,33 @@ describe('WorkspaceAdminService', () => {
     expect(removeResult.message).toContain('Removed user_new_member')
   })
 
+  it('promotes a member to owner so the original owner is no longer sole', async () => {
+    const service = createWorkspaceAdminService()
+    const authContext = {
+      userId: 'user_test',
+      workspaceId: 'workspace_1',
+      role: 'owner' as const,
+    }
+
+    const promoted = await service.executeWorkspaceMemberAdminAction(
+      authContext,
+      {
+        workspaceId: 'workspace_1',
+        action: 'update_member_role',
+        userId: 'user_member',
+        role: 'owner',
+      },
+    )
+
+    expect(promoted.member?.role).toBe('owner')
+
+    const summary = await service.getWorkspaceMemberAdminSummary(
+      authContext,
+      'workspace_1',
+    )
+    expect(summary.stats.ownerCount).toBeGreaterThan(1)
+  })
+
   it('returns workspace settings admin summary for owners', async () => {
     const service = createWorkspaceAdminService()
 

@@ -95,13 +95,17 @@ export function WorkspaceMemberAdminPanel({
           <button
             type="button"
             className="danger-button"
-            data-testid="leave-workspace"
+            data-testid="leave-workspace-admin"
             disabled={memberAdminAction !== 'idle'}
             onClick={onLeaveWorkspace}
           >
             Leave workspace
           </button>
         </div>
+      ) : summary.role === 'owner' && summary.stats.ownerCount <= 1 ? (
+        <p className="runtime-note" data-testid="sole-owner-leave-hint">
+          Promote another member to owner before you can leave this workspace.
+        </p>
       ) : null}
       <div className="workspace-member-list">
         {summary.members.map((member) => (
@@ -114,20 +118,36 @@ export function WorkspaceMemberAdminPanel({
             <div className="workspace-member-card__actions">
               {summary.availableActions.includes('update_member_role') &&
               member.role !== 'owner' ? (
-                <button
-                  className="secondary-button"
-                  type="button"
-                  disabled={memberAdminAction !== 'idle'}
-                  onClick={() =>
-                    onMemberAdminAction({
-                      action: 'update_member_role',
-                      userId: member.userId,
-                      role: 'admin',
-                    })
-                  }
-                >
-                  Make admin
-                </button>
+                <>
+                  <button
+                    className="secondary-button"
+                    type="button"
+                    disabled={memberAdminAction !== 'idle'}
+                    onClick={() =>
+                      onMemberAdminAction({
+                        action: 'update_member_role',
+                        userId: member.userId,
+                        role: 'admin',
+                      })
+                    }
+                  >
+                    Make admin
+                  </button>
+                  <button
+                    className="secondary-button"
+                    type="button"
+                    disabled={memberAdminAction !== 'idle'}
+                    onClick={() =>
+                      onMemberAdminAction({
+                        action: 'update_member_role',
+                        userId: member.userId,
+                        role: 'owner',
+                      })
+                    }
+                  >
+                    Make owner
+                  </button>
+                </>
               ) : null}
               {summary.availableActions.includes('remove_member') ? (
                 <button

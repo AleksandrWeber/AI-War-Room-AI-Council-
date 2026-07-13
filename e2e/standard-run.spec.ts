@@ -174,6 +174,22 @@ test('create workspace switches picker to the new workspace', async ({ page }) =
   await expect(page.getByTestId('workspace-picker')).toContainText(name)
 })
 
+test('member leave control is visible on secondary workspace', async ({
+  page,
+}) => {
+  await page.goto('/')
+  await expect(page.getByText('API status: online')).toBeVisible({
+    timeout: 60_000,
+  })
+  await page.getByTestId('workspace-picker').selectOption('secondary_workspace')
+  await expect(page.getByTestId('active-workspace-id')).toHaveText(
+    'Active workspace: secondary_workspace',
+  )
+  await expect(page.getByTestId('leave-workspace')).toBeVisible({
+    timeout: 30_000,
+  })
+})
+
 test('sole owner cannot leave their only-owned workspace', async ({ page }) => {
   await page.goto('/')
   await expect(page.getByText('API status: online')).toBeVisible({

@@ -29655,31 +29655,60 @@ function App() {
             Active workspace: {activeWorkspaceId}
           </div>
           {myWorkspaces.length > 0 ? (
-            <label className="workspace-picker">
-              Switch workspace
-              <select
-                data-testid="workspace-picker"
-                value={activeWorkspaceId}
-                onChange={(event) => {
-                  const nextWorkspaceId = event.target.value
-                  saveStoredActiveWorkspaceId(nextWorkspaceId)
-                  setActiveWorkspaceId(nextWorkspaceId)
-                  setWorkspaceRecoveryTip(null)
-                  setLatestInviteUrl(null)
-                  setInviteUrlsById({})
-                  setWorkspaceInvites([])
-                }}
-              >
-                {myWorkspaces.map((workspace) => (
-                  <option
-                    key={workspace.workspaceId}
-                    value={workspace.workspaceId}
-                  >
-                    {workspace.name} ({workspace.role})
-                  </option>
-                ))}
-              </select>
-            </label>
+            <div className="workspace-picker-row">
+              <label className="workspace-picker">
+                Switch workspace
+                <select
+                  data-testid="workspace-picker"
+                  value={activeWorkspaceId}
+                  onChange={(event) => {
+                    const nextWorkspaceId = event.target.value
+                    saveStoredActiveWorkspaceId(nextWorkspaceId)
+                    setActiveWorkspaceId(nextWorkspaceId)
+                    setWorkspaceRecoveryTip(null)
+                    setLatestInviteUrl(null)
+                    setInviteUrlsById({})
+                    setWorkspaceInvites([])
+                  }}
+                >
+                  {myWorkspaces.map((workspace) => (
+                    <option
+                      key={workspace.workspaceId}
+                      value={workspace.workspaceId}
+                    >
+                      {workspace.name} ({workspace.role})
+                    </option>
+                  ))}
+                </select>
+              </label>
+              {Boolean(
+                (() => {
+                  const active = myWorkspaces.find(
+                    (workspace) => workspace.workspaceId === activeWorkspaceId,
+                  )
+                  if (!active) {
+                    return false
+                  }
+                  if (active.role !== 'owner') {
+                    return true
+                  }
+                  return (memberAdminSummary?.stats.ownerCount ?? 0) > 1
+                })(),
+              ) ? (
+                <button
+                  type="button"
+                  className="danger-button"
+                  data-testid="leave-workspace"
+                  disabled={
+                    memberAdminAction !== 'idle' ||
+                    workspaceMutationAction !== 'idle'
+                  }
+                  onClick={() => void handleLeaveWorkspace()}
+                >
+                  Leave workspace
+                </button>
+              ) : null}
+            </div>
           ) : null}
           <form
             className="workspace-create-form"
