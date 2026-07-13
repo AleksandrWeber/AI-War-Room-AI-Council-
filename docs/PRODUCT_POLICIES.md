@@ -26,7 +26,7 @@ Operational product decisions that shape Shield, storage, and research. Implemen
 
 - **Local default:** `RESEARCH_PROVIDER=mock`.
 - **Production live adapter:** **Tavily only** in MVP (`RESEARCH_PROVIDER=tavily` + `TAVILY_API_KEY`). Production rejects `mock`.
-- **Availability:** research remains available without waiting for paid tiers; usage metered to the workspace; platform system key for MVP.
+- **Availability:** research remains available without waiting for paid tiers (including free workspaces); usage metered to the workspace; platform system key for MVP.
 - **Failure mode:** **fail-soft** — if live research throws / is unavailable, Market Research Agent continues with a degraded note; the pipeline is not blocked.
 - **Trust:** retrieved content is Shield-scanned before agent consumption (existing path).
 - **Post-MVP:** BYOK research keys; second-provider failover behind the same adapter interface.

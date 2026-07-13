@@ -681,7 +681,7 @@ describe('API skeleton', () => {
     expect(replayedEvents.some((event) => event.event === 'completed')).toBe(true)
   })
 
-  it('blocks Market Research Agent for free workspaces', async () => {
+  it('allows Market Research Agent for free workspaces', async () => {
     const draftResponse = await request(app!.getHttpServer())
       .post('/api/runs/draft')
       .set(authHeaders)
@@ -703,10 +703,16 @@ describe('API skeleton', () => {
         approvedTriage: draftResponse.body.triage,
         selectedAgents: ['market_researcher', 'critic', 'moderator'],
       })
-      .expect(403)
+      .expect(201)
 
-    expect(response.body.message).toBe(
-      'Market Research Agent requires a paid or verified workspace tier.',
+    const marketOutput = response.body.agentOutputs.find(
+      (agentOutput: { agentRole: string }) =>
+        agentOutput.agentRole === 'market_researcher',
+    )
+
+    expect(marketOutput).toBeTruthy()
+    expect(marketOutput.output.roleSpecificInsights.researchCitations.length).toBeGreaterThan(
+      0,
     )
   })
 

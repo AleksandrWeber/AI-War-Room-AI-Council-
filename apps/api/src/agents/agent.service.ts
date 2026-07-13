@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { HttpException, Injectable } from '@nestjs/common'
 import { randomUUID } from 'node:crypto'
 import {
   type AgentExecutionResult,
@@ -42,6 +42,10 @@ export class AgentService {
           draftRun: input.draftRun,
         })
       } catch (error) {
+        if (error instanceof HttpException) {
+          throw error
+        }
+
         researchDegradedMessage =
           error instanceof Error
             ? `Live research unavailable (${error.message}). Continuing without external research.`

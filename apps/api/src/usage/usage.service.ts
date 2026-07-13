@@ -193,13 +193,9 @@ export class UsageService {
   }
 
   async assertWorkspaceCanUseResearch(workspaceId: string): Promise<void> {
-    const limit = await this.usageRepository.getWorkspaceLimit(workspaceId)
-
-    if (!limit || limit.paidTier === 'free') {
-      throw new ForbiddenException({
-        message: 'Market Research Agent requires a paid or verified workspace tier.',
-      })
-    }
+    // Product policy (2026-07-13): Market Research is available on all tiers,
+    // including free. Live provider failures remain fail-soft at the agent layer.
+    await this.usageRepository.getWorkspaceLimit(workspaceId)
   }
 
   async recordPipelineUsage(input: {
