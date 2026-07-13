@@ -49,6 +49,12 @@ export interface WorkspaceRepository {
     userId: string,
   ): Promise<WorkspaceMembershipRecord[]>
 
+  createWorkspace(input: {
+    workspaceId: string
+    name: string
+    ownerUserId: string
+  }): Promise<WorkspaceRecord>
+
   provisionExternalMember(
     input: ProvisionExternalMemberInput,
   ): Promise<ProvisionExternalMemberResult>

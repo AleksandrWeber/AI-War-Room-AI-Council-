@@ -30,12 +30,15 @@ export type WorkspaceMemberAdminPanelProps = {
   inviteAction: 'idle' | 'running'
   invites: WorkspaceInviteRecord[]
   latestInviteUrl: string | null
+  inviteUrlsById: Record<string, string>
+  canLeaveWorkspace: boolean
   onNewMemberFormChange: (value: WorkspaceMemberFormState) => void
   onInviteFormChange: (value: WorkspaceInviteFormState) => void
   onCreateInvite: () => void
   onRevokeInvite: (inviteId: string) => void
   onResendInvite: (inviteId: string) => void
-  onCopyInviteLink: () => void
+  onCopyInviteLink: (inviteUrl?: string) => void
+  onLeaveWorkspace: () => void
   onMemberAdminAction: (input: {
     action: 'update_member_role' | 'remove_member' | 'add_member'
     userId: string
@@ -54,12 +57,15 @@ export function WorkspaceMemberAdminPanel({
   inviteAction,
   invites,
   latestInviteUrl,
+  inviteUrlsById,
+  canLeaveWorkspace,
   onNewMemberFormChange,
   onInviteFormChange,
   onCreateInvite,
   onRevokeInvite,
   onResendInvite,
   onCopyInviteLink,
+  onLeaveWorkspace,
   onMemberAdminAction,
   onExportAudit,
 }: WorkspaceMemberAdminPanelProps) {
@@ -84,6 +90,19 @@ export function WorkspaceMemberAdminPanel({
         },
       ]}
     >
+      {canLeaveWorkspace ? (
+        <div className="workspace-member-card__actions">
+          <button
+            type="button"
+            className="danger-button"
+            data-testid="leave-workspace"
+            disabled={memberAdminAction !== 'idle'}
+            onClick={onLeaveWorkspace}
+          >
+            Leave workspace
+          </button>
+        </div>
+      ) : null}
       <div className="workspace-member-list">
         {summary.members.map((member) => (
           <article className="workspace-member-card" key={member.userId}>
@@ -202,7 +221,7 @@ export function WorkspaceMemberAdminPanel({
               <button
                 type="button"
                 className="secondary-button"
-                onClick={onCopyInviteLink}
+                onClick={() => onCopyInviteLink(latestInviteUrl)}
               >
                 Copy invite link
               </button>
@@ -210,7 +229,9 @@ export function WorkspaceMemberAdminPanel({
           ) : null}
           {invites.length > 0 ? (
             <div className="workspace-member-list">
-              {invites.map((invite) => (
+              {invites.map((invite) => {
+                const inviteUrl = inviteUrlsById[invite.inviteId]
+                return (
                 <article className="workspace-member-card" key={invite.inviteId}>
                   <div>
                     <strong>{invite.email}</strong>
@@ -223,6 +244,15 @@ export function WorkspaceMemberAdminPanel({
                   </div>
                   {invite.status === 'pending' || invite.status === 'expired' ? (
                     <div className="workspace-member-card__actions">
+                      {inviteUrl ? (
+                        <button
+                          type="button"
+                          className="secondary-button"
+                          onClick={() => onCopyInviteLink(inviteUrl)}
+                        >
+                          Copy link
+                        </button>
+                      ) : null}
                       <button
                         type="button"
                         className="secondary-button"
@@ -244,7 +274,8 @@ export function WorkspaceMemberAdminPanel({
                     </div>
                   ) : null}
                 </article>
-              ))}
+                )
+              })}
             </div>
           ) : null}
         </form>

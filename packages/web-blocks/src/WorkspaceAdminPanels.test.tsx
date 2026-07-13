@@ -30,6 +30,8 @@ describe('WorkspaceAdminPanels', () => {
         inviteAction="idle"
         invites={[]}
         latestInviteUrl={null}
+        inviteUrlsById={{}}
+        canLeaveWorkspace={false}
         onWorkspaceNameDraftChange={() => undefined}
         onUpdateWorkspaceName={() => undefined}
         onResetWorkspaceName={() => undefined}
@@ -40,6 +42,7 @@ describe('WorkspaceAdminPanels', () => {
         onRevokeInvite={() => undefined}
         onResendInvite={() => undefined}
         onCopyInviteLink={() => undefined}
+        onLeaveWorkspace={() => undefined}
         onMemberAdminAction={() => undefined}
         onExportAudit={() => undefined}
       />,

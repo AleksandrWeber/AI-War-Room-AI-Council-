@@ -1,6 +1,8 @@
 import {
   acceptWorkspaceInviteResponseSchema,
   createWorkspaceInviteResponseSchema,
+  createWorkspaceResponseSchema,
+  leaveWorkspaceResponseSchema,
   listMyWorkspacesResponseSchema,
   listWorkspaceInvitesResponseSchema,
   resendWorkspaceInviteResponseSchema,
@@ -214,6 +216,64 @@ export async function listMyWorkspaces(
   }
 
   return listMyWorkspacesResponseSchema.parse(await response.json())
+}
+
+export async function createWorkspace(
+  apiBaseUrl: string,
+  headers: Record<string, string>,
+  input: { name: string },
+) {
+  const response = await fetch(`${apiBaseUrl}/workspaces`, {
+    method: 'POST',
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(input),
+  })
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return createWorkspaceResponseSchema.parse(await response.json())
+}
+
+export async function leaveWorkspace(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/workspaces/${encodeURIComponent(workspaceId)}/leave`,
+    {
+      method: 'POST',
+      headers,
+    },
+  )
+
+  if (!response.ok) {
+    let detail = `API returned ${response.status}`
+    try {
+      const payload = (await response.json()) as {
+        message?: string | { message?: string }
+      }
+      if (typeof payload.message === 'string' && payload.message.trim()) {
+        detail = payload.message
+      } else if (
+        payload.message &&
+        typeof payload.message === 'object' &&
+        typeof payload.message.message === 'string'
+      ) {
+        detail = payload.message.message
+      }
+    } catch {
+      // keep status fallback
+    }
+    throw new Error(detail)
+  }
+
+  return leaveWorkspaceResponseSchema.parse(await response.json())
 }
 
 export async function listWorkspaceInvites(

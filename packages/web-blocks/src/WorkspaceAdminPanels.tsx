@@ -20,6 +20,8 @@ export type WorkspaceAdminPanelsProps = {
   inviteAction: 'idle' | 'running'
   invites: WorkspaceInviteRecord[]
   latestInviteUrl: string | null
+  inviteUrlsById: Record<string, string>
+  canLeaveWorkspace: boolean
   onWorkspaceNameDraftChange: (value: string) => void
   onUpdateWorkspaceName: (name: string) => void
   onResetWorkspaceName: () => void
@@ -31,7 +33,8 @@ export type WorkspaceAdminPanelsProps = {
   onCreateInvite: () => void
   onRevokeInvite: (inviteId: string) => void
   onResendInvite: (inviteId: string) => void
-  onCopyInviteLink: () => void
+  onCopyInviteLink: (inviteUrl?: string) => void
+  onLeaveWorkspace: () => void
   onMemberAdminAction: (input: {
     action: 'update_member_role' | 'remove_member' | 'add_member'
     userId: string
@@ -53,6 +56,8 @@ export function WorkspaceAdminPanels({
   inviteAction,
   invites,
   latestInviteUrl,
+  inviteUrlsById,
+  canLeaveWorkspace,
   onWorkspaceNameDraftChange,
   onUpdateWorkspaceName,
   onResetWorkspaceName,
@@ -63,6 +68,7 @@ export function WorkspaceAdminPanels({
   onRevokeInvite,
   onResendInvite,
   onCopyInviteLink,
+  onLeaveWorkspace,
   onMemberAdminAction,
   onExportAudit,
   mode = 'all',
@@ -92,12 +98,15 @@ export function WorkspaceAdminPanels({
           inviteAction={inviteAction}
           invites={invites}
           latestInviteUrl={latestInviteUrl}
+          inviteUrlsById={inviteUrlsById}
+          canLeaveWorkspace={canLeaveWorkspace}
           onNewMemberFormChange={onNewMemberFormChange}
           onInviteFormChange={onInviteFormChange}
           onCreateInvite={onCreateInvite}
           onRevokeInvite={onRevokeInvite}
           onResendInvite={onResendInvite}
           onCopyInviteLink={onCopyInviteLink}
+          onLeaveWorkspace={onLeaveWorkspace}
           onMemberAdminAction={onMemberAdminAction}
           onExportAudit={onExportAudit}
         />

@@ -156,3 +156,32 @@ test('stale active workspace recovers on boot', async ({ page }) => {
     'Active workspace: missing_workspace_from_storage',
   )
 })
+
+test('create workspace switches picker to the new workspace', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByText('API status: online')).toBeVisible({
+    timeout: 60_000,
+  })
+
+  const name = `Lab ${Date.now()}`
+  await page.getByTestId('create-workspace-name').fill(name)
+  await page.getByTestId('create-workspace').click()
+
+  await expect(page.getByTestId('active-workspace-id')).not.toHaveText(
+    'Active workspace: local_workspace',
+    { timeout: 30_000 },
+  )
+  await expect(page.getByTestId('workspace-picker')).toContainText(name)
+})
+
+test('sole owner cannot leave their only-owned workspace', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByText('API status: online')).toBeVisible({
+    timeout: 60_000,
+  })
+  await page.getByTestId('workspace-picker').selectOption('local_workspace')
+  await expect(page.getByTestId('active-workspace-id')).toHaveText(
+    'Active workspace: local_workspace',
+  )
+  await expect(page.getByTestId('leave-workspace')).toHaveCount(0)
+})

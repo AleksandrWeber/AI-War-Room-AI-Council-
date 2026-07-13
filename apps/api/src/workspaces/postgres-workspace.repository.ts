@@ -102,6 +102,81 @@ export class PostgresWorkspaceRepository implements WorkspaceRepository {
     }))
   }
 
+  async createWorkspace(input: {
+    workspaceId: string
+    name: string
+    ownerUserId: string
+  }): Promise<WorkspaceRecord> {
+    return this.postgresService.transaction(async (client) => {
+      await client.query(
+        `
+          INSERT INTO app_users (user_id, email, display_name)
+          VALUES ($1, NULL, $1)
+          ON CONFLICT (user_id) DO NOTHING
+        `,
+        [input.ownerUserId],
+      )
+
+      const inserted = await client.query<WorkspaceRow>(
+        `
+          INSERT INTO workspaces (workspace_id, name)
+          VALUES ($1, $2)
+          RETURNING workspace_id, name, shield_display_sensitivity, created_at
+        `,
+        [input.workspaceId, input.name],
+      )
+      const workspace = inserted.rows[0]
+
+      if (!workspace) {
+        throw new Error(`Failed to create workspace ${input.workspaceId}.`)
+      }
+
+      await client.query(
+        `
+          INSERT INTO workspace_usage_limits (
+            workspace_id,
+            paid_tier,
+            daily_token_limit,
+            daily_cost_limit_usd
+          )
+          VALUES ($1, 'free', 250000, 25.0000)
+          ON CONFLICT (workspace_id) DO NOTHING
+        `,
+        [input.workspaceId],
+      )
+
+      await client.query(
+        `
+          INSERT INTO billing_records (
+            billing_record_id,
+            workspace_id,
+            provider,
+            paid_tier,
+            status
+          )
+          VALUES ($1, $2, 'stripe', 'free', 'draft')
+          ON CONFLICT (billing_record_id) DO NOTHING
+        `,
+        [`billing_${input.workspaceId}`, input.workspaceId],
+      )
+
+      await client.query(
+        `
+          INSERT INTO workspace_memberships (workspace_id, user_id, role)
+          VALUES ($1, $2, 'owner')
+        `,
+        [input.workspaceId, input.ownerUserId],
+      )
+
+      return {
+        workspaceId: workspace.workspace_id,
+        name: workspace.name,
+        shieldDisplaySensitivity: workspace.shield_display_sensitivity,
+        createdAt: workspace.created_at.toISOString(),
+      }
+    })
+  }
+
   async provisionExternalMember(
     input: ProvisionExternalMemberInput,
   ): Promise<ProvisionExternalMemberResult> {

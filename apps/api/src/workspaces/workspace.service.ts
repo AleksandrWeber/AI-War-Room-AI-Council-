@@ -1,5 +1,15 @@
-import { ForbiddenException, Inject, Injectable } from '@nestjs/common'
 import {
+  BadRequestException,
+  ForbiddenException,
+  Inject,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common'
+import { randomUUID } from 'node:crypto'
+import {
+  createWorkspaceRequestSchema,
+  createWorkspaceResponseSchema,
+  leaveWorkspaceResponseSchema,
   listMyWorkspacesResponseSchema,
   type AuthContext,
   type ExternalAuthIdentity,
@@ -10,6 +20,7 @@ import {
   type WorkspaceRepository,
 } from './workspace.repository.js'
 import { UserProvisioningService } from './user-provisioning.service.js'
+import { assertOwnerCountSafe } from './workspace-member-admin.helpers.js'
 
 @Injectable()
 export class WorkspaceService {
@@ -76,6 +87,86 @@ export class WorkspaceService {
     return listMyWorkspacesResponseSchema.parse({
       userId,
       workspaces,
+    })
+  }
+
+  async createWorkspace(input: { userId: string; body: unknown }) {
+    const parsed = createWorkspaceRequestSchema.safeParse(input.body)
+    if (!parsed.success) {
+      throw new BadRequestException({
+        message: 'Invalid create workspace request.',
+        issues: parsed.error.issues,
+      })
+    }
+
+    const workspaceId = `workspace_${randomUUID()}`
+    const created = await this.workspaceRepository.createWorkspace({
+      workspaceId,
+      name: parsed.data.name.trim(),
+      ownerUserId: input.userId,
+    })
+
+    return createWorkspaceResponseSchema.parse({
+      workspace: {
+        workspaceId: created.workspaceId,
+        name: created.name,
+        role: 'owner',
+      },
+      guidance: 'Workspace created. You are the owner.',
+    })
+  }
+
+  async leaveWorkspace(input: {
+    authContext: AuthContext
+    workspaceId: string
+  }) {
+    if (input.authContext.workspaceId !== input.workspaceId) {
+      throw new ForbiddenException({
+        message: 'Workspace header does not match request workspace.',
+      })
+    }
+
+    const members = await this.workspaceRepository.listWorkspaceMembers(
+      input.workspaceId,
+    )
+    const membership = members.find(
+      (member) => member.userId === input.authContext.userId,
+    )
+
+    if (!membership) {
+      throw new NotFoundException({
+        message: 'You are not a member of this workspace.',
+      })
+    }
+
+    try {
+      assertOwnerCountSafe({
+        members,
+        targetUserId: input.authContext.userId,
+      })
+    } catch (error) {
+      throw new BadRequestException({
+        message:
+          error instanceof Error
+            ? error.message
+            : 'Workspace must keep at least one owner.',
+      })
+    }
+
+    const removed = await this.workspaceRepository.removeMember({
+      workspaceId: input.workspaceId,
+      userId: input.authContext.userId,
+    })
+
+    if (!removed) {
+      throw new NotFoundException({
+        message: 'You are not a member of this workspace.',
+      })
+    }
+
+    return leaveWorkspaceResponseSchema.parse({
+      workspaceId: input.workspaceId,
+      guidance: 'You left the workspace. Membership has been removed.',
     })
   }
 }

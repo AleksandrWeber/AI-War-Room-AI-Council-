@@ -5908,12 +5908,19 @@ function App() {
     import('@ai-war-room/schemas').WorkspaceInviteRecord[]
   >([])
   const [latestInviteUrl, setLatestInviteUrl] = useState<string | null>(null)
+  const [inviteUrlsById, setInviteUrlsById] = useState<Record<string, string>>(
+    {},
+  )
   const [myWorkspaces, setMyWorkspaces] = useState<
     import('@ai-war-room/schemas').MyWorkspaceMembership[]
   >([])
   const [workspaceRecoveryTip, setWorkspaceRecoveryTip] = useState<string | null>(
     null,
   )
+  const [newWorkspaceName, setNewWorkspaceName] = useState('')
+  const [workspaceMutationAction, setWorkspaceMutationAction] = useState<
+    'idle' | 'running'
+  >('idle')
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
     useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
@@ -11887,6 +11894,10 @@ function App() {
         },
       )
       setLatestInviteUrl(created.inviteUrl)
+      setInviteUrlsById((current) => ({
+        ...current,
+        [created.invite.inviteId]: created.inviteUrl,
+      }))
       setBillingMessage(created.guidance)
       setInviteForm({ email: '', role: 'member', expiresInHours: 168 })
       const listed = await callUi(
@@ -11958,6 +11969,10 @@ function App() {
         { expiresInHours: inviteForm.expiresInHours },
       )
       setLatestInviteUrl(resent.inviteUrl)
+      setInviteUrlsById((current) => ({
+        ...current,
+        [resent.invite.inviteId]: resent.inviteUrl,
+      }))
       setBillingMessage(resent.guidance)
       const listed = await callUi(
         'workspace-ui',
@@ -11978,15 +11993,109 @@ function App() {
     }
   }
 
-  function handleCopyInviteLink() {
-    if (!latestInviteUrl) {
+  function handleCopyInviteLink(inviteUrl?: string) {
+    const url = inviteUrl ?? latestInviteUrl
+    if (!url) {
       return
     }
 
-    void navigator.clipboard.writeText(latestInviteUrl).then(
+    void navigator.clipboard.writeText(url).then(
       () => setBillingMessage('Invite link copied to clipboard.'),
       () => setBillingError('Could not copy invite link.'),
     )
+  }
+
+  async function handleCreateWorkspace() {
+    const name = newWorkspaceName.trim()
+    if (!name) {
+      return
+    }
+
+    setWorkspaceMutationAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const created = await callUi(
+        'workspace-ui',
+        'createWorkspace',
+        apiBaseUrl,
+        workspaceAuthHeaders,
+        { name },
+      )
+      setBillingMessage(created.guidance)
+      setNewWorkspaceName('')
+      saveStoredActiveWorkspaceId(created.workspace.workspaceId)
+      setActiveWorkspaceId(created.workspace.workspaceId)
+      setLatestInviteUrl(null)
+      setInviteUrlsById({})
+      setWorkspaceInvites([])
+      const listed = await callUi(
+        'workspace-ui',
+        'listMyWorkspaces',
+        apiBaseUrl,
+        buildWorkspaceAuthHeaders(authCapabilities, authSession, {
+          workspaceId: created.workspace.workspaceId,
+        }),
+      )
+      setMyWorkspaces(listed.workspaces)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to create workspace.',
+      )
+    } finally {
+      setWorkspaceMutationAction('idle')
+    }
+  }
+
+  async function handleLeaveWorkspace() {
+    setWorkspaceMutationAction('running')
+    setMemberAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const left = await callUi(
+        'workspace-ui',
+        'leaveWorkspace',
+        apiBaseUrl,
+        activeWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBillingMessage(left.guidance)
+      setLatestInviteUrl(null)
+      setInviteUrlsById({})
+      setWorkspaceInvites([])
+      const listed = await callUi(
+        'workspace-ui',
+        'listMyWorkspaces',
+        apiBaseUrl,
+        workspaceAuthHeaders,
+      )
+      setMyWorkspaces(listed.workspaces)
+      const fallback =
+        listed.workspaces.find(
+          (workspace) => workspace.workspaceId === fallbackWorkspaceId,
+        )?.workspaceId ?? listed.workspaces[0]?.workspaceId
+      if (fallback) {
+        saveStoredActiveWorkspaceId(fallback)
+        setActiveWorkspaceId(fallback)
+        setWorkspaceRecoveryTip(
+          `Left workspace. Switched to ${fallback}.`,
+        )
+      }
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to leave workspace.',
+      )
+    } finally {
+      setWorkspaceMutationAction('idle')
+      setMemberAdminAction('idle')
+    }
   }
 
   async function handleSettingsAdminAction(input: {
@@ -29556,6 +29665,9 @@ function App() {
                   saveStoredActiveWorkspaceId(nextWorkspaceId)
                   setActiveWorkspaceId(nextWorkspaceId)
                   setWorkspaceRecoveryTip(null)
+                  setLatestInviteUrl(null)
+                  setInviteUrlsById({})
+                  setWorkspaceInvites([])
                 }}
               >
                 {myWorkspaces.map((workspace) => (
@@ -29569,6 +29681,33 @@ function App() {
               </select>
             </label>
           ) : null}
+          <form
+            className="workspace-create-form"
+            onSubmit={(event) => {
+              event.preventDefault()
+              void handleCreateWorkspace()
+            }}
+          >
+            <label>
+              New workspace name
+              <input
+                data-testid="create-workspace-name"
+                value={newWorkspaceName}
+                onChange={(event) => setNewWorkspaceName(event.target.value)}
+              />
+            </label>
+            <button
+              type="submit"
+              data-testid="create-workspace"
+              disabled={
+                workspaceMutationAction !== 'idle' || !newWorkspaceName.trim()
+              }
+            >
+              {workspaceMutationAction === 'running'
+                ? 'Creating…'
+                : 'Create workspace'}
+            </button>
+          </form>
           {workspaceRecoveryTip ? (
             <p className="invite-status invite-status--ok" data-testid="workspace-recovery-tip">
               {workspaceRecoveryTip}
@@ -30444,6 +30583,21 @@ function App() {
           inviteAction={inviteAction}
           invites={workspaceInvites}
           latestInviteUrl={latestInviteUrl}
+          inviteUrlsById={inviteUrlsById}
+          canLeaveWorkspace={Boolean(
+            (() => {
+              const active = myWorkspaces.find(
+                (workspace) => workspace.workspaceId === activeWorkspaceId,
+              )
+              if (!active) {
+                return false
+              }
+              if (active.role !== 'owner') {
+                return true
+              }
+              return (memberAdminSummary?.stats.ownerCount ?? 0) > 1
+            })(),
+          )}
           onWorkspaceNameDraftChange={setWorkspaceNameDraft}
           onUpdateWorkspaceName={(name) =>
             void handleSettingsAdminAction({
@@ -30468,6 +30622,7 @@ function App() {
           onRevokeInvite={(inviteId) => void handleRevokeWorkspaceInvite(inviteId)}
           onResendInvite={(inviteId) => void handleResendWorkspaceInvite(inviteId)}
           onCopyInviteLink={handleCopyInviteLink}
+          onLeaveWorkspace={() => void handleLeaveWorkspace()}
           onMemberAdminAction={(input) => void handleMemberAdminAction(input)}
           onExportAudit={(format) => void handleExportWorkspaceAudit(format)}
         />
@@ -32237,6 +32392,21 @@ function App() {
           inviteAction={inviteAction}
           invites={workspaceInvites}
           latestInviteUrl={latestInviteUrl}
+          inviteUrlsById={inviteUrlsById}
+          canLeaveWorkspace={Boolean(
+            (() => {
+              const active = myWorkspaces.find(
+                (workspace) => workspace.workspaceId === activeWorkspaceId,
+              )
+              if (!active) {
+                return false
+              }
+              if (active.role !== 'owner') {
+                return true
+              }
+              return (memberAdminSummary?.stats.ownerCount ?? 0) > 1
+            })(),
+          )}
           onWorkspaceNameDraftChange={setWorkspaceNameDraft}
           onUpdateWorkspaceName={(name) =>
             void handleSettingsAdminAction({
@@ -32261,6 +32431,7 @@ function App() {
           onRevokeInvite={(inviteId) => void handleRevokeWorkspaceInvite(inviteId)}
           onResendInvite={(inviteId) => void handleResendWorkspaceInvite(inviteId)}
           onCopyInviteLink={handleCopyInviteLink}
+          onLeaveWorkspace={() => void handleLeaveWorkspace()}
           onMemberAdminAction={(input) => void handleMemberAdminAction(input)}
           onExportAudit={(format) => void handleExportWorkspaceAudit(format)}
         />

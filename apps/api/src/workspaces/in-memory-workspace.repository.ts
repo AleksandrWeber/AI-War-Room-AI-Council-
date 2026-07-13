@@ -155,6 +155,36 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
     )
   }
 
+  async createWorkspace(input: {
+    workspaceId: string
+    name: string
+    ownerUserId: string
+  }): Promise<WorkspaceRecord> {
+    if (this.workspaces.has(input.workspaceId)) {
+      throw new Error(`Workspace ${input.workspaceId} already exists.`)
+    }
+
+    const createdAt = new Date().toISOString()
+    this.workspaces.set(input.workspaceId, {
+      name: input.name,
+      shieldDisplaySensitivity: 'medium_and_up',
+      createdAt,
+    })
+    this.users.add(input.ownerUserId)
+    this.memberships.set(`${input.ownerUserId}:${input.workspaceId}`, {
+      userId: input.ownerUserId,
+      workspaceId: input.workspaceId,
+      role: 'owner',
+    })
+
+    return {
+      workspaceId: input.workspaceId,
+      name: input.name,
+      shieldDisplaySensitivity: 'medium_and_up',
+      createdAt,
+    }
+  }
+
   async provisionExternalMember(
     input: ProvisionExternalMemberInput,
   ): Promise<ProvisionExternalMemberResult> {

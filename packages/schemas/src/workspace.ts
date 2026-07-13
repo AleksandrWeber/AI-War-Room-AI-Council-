@@ -42,6 +42,25 @@ export type ListMyWorkspacesResponse = z.infer<
   typeof listMyWorkspacesResponseSchema
 >
 
+export const createWorkspaceRequestSchema = z.object({
+  name: nonEmptyStringSchema.max(120),
+})
+export type CreateWorkspaceRequest = z.infer<typeof createWorkspaceRequestSchema>
+
+export const createWorkspaceResponseSchema = z.object({
+  workspace: myWorkspaceMembershipSchema,
+  guidance: nonEmptyStringSchema,
+})
+export type CreateWorkspaceResponse = z.infer<
+  typeof createWorkspaceResponseSchema
+>
+
+export const leaveWorkspaceResponseSchema = z.object({
+  workspaceId: nonEmptyStringSchema,
+  guidance: nonEmptyStringSchema,
+})
+export type LeaveWorkspaceResponse = z.infer<typeof leaveWorkspaceResponseSchema>
+
 export const authContextSchema = z.object({
   userId: nonEmptyStringSchema,
   workspaceId: nonEmptyStringSchema,

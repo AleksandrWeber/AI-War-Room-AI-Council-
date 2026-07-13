@@ -57,20 +57,32 @@ export class WorkspacesController {
   @Get('mine')
   async listMyWorkspaces(@Req() request: AuthenticatedRequest) {
     await this.authService.assertApiAccess(request)
-    const authIdentity = this.authService.resolveAuthIdentity(request)
-    const userId =
-      authIdentity?.userId ??
-      (Array.isArray(request.headers['x-user-id'])
-        ? request.headers['x-user-id'][0]
-        : request.headers['x-user-id'])
+    const userId = this.resolveRequestUserId(request)
 
-    if (!userId || typeof userId !== 'string' || userId.trim().length === 0) {
+    if (!userId) {
       throw new UnauthorizedException({
         message: 'Missing authenticated user for workspace listing.',
       })
     }
 
     return this.workspaceService.listMyWorkspaces(userId)
+  }
+
+  @Post()
+  async createWorkspace(
+    @Body() body: unknown,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    await this.authService.assertApiAccess(request)
+    const userId = this.resolveRequestUserId(request)
+
+    if (!userId) {
+      throw new UnauthorizedException({
+        message: 'Missing authenticated user for workspace creation.',
+      })
+    }
+
+    return this.workspaceService.createWorkspace({ userId, body })
   }
 
   @Post('invites/accept')
@@ -82,6 +94,20 @@ export class WorkspacesController {
     return this.workspaceInviteService.acceptInvite({
       authContext: request.authContext!,
       body,
+    })
+  }
+
+  @Post(':workspaceId/leave')
+  @UseGuards(WorkspaceAccessGuard)
+  leaveWorkspace(
+    @Param('workspaceId') workspaceId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    this.assertWorkspaceParam(request, workspaceId)
+
+    return this.workspaceService.leaveWorkspace({
+      authContext: request.authContext!,
+      workspaceId,
     })
   }
 
@@ -299,5 +325,17 @@ export class WorkspacesController {
         message: 'Workspace parameter does not match authenticated workspace.',
       })
     }
+  }
+
+  private resolveRequestUserId(request: AuthenticatedRequest) {
+    const authIdentity = this.authService.resolveAuthIdentity(request)
+    const headerUserId = Array.isArray(request.headers['x-user-id'])
+      ? request.headers['x-user-id'][0]
+      : request.headers['x-user-id']
+    const userId = authIdentity?.userId ?? headerUserId
+
+    return typeof userId === 'string' && userId.trim().length > 0
+      ? userId.trim()
+      : null
   }
 }
