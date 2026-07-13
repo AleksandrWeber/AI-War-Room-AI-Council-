@@ -18,6 +18,21 @@ describe('Shield adversarial evaluation', () => {
         (result) => result.caseId === 'secret-exfiltration-request',
       )?.actualStatus,
     ).toBe('blocked')
+    expect(
+      report.results.find(
+        (result) => result.caseId === 'user-input-print-system-prompt',
+      )?.actualCategories,
+    ).toContain('prompt_injection')
+    expect(
+      report.results.find(
+        (result) => result.caseId === 'retrieved-page-secret-leakage',
+      )?.actualCategories,
+    ).toContain('secrets')
+    expect(
+      report.results.find(
+        (result) => result.caseId === 'retrieved-page-exfiltration-instructions',
+      )?.actualStatus,
+    ).toBe('blocked')
   })
 
   it('flags shield expectation drift as a regression', async () => {
