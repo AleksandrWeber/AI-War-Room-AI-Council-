@@ -58,7 +58,31 @@ export class RunsController {
     })
 
     reply.header('Content-Type', 'text/markdown; charset=utf-8')
+    reply.header(
+      'Content-Disposition',
+      `attachment; filename="${artifactId}.md"`,
+    )
     reply.send(markdown)
+  }
+
+  @Get('artifacts/:artifactId/export/pdf')
+  @UseGuards(WorkspaceAccessGuard)
+  async exportArtifactPdf(
+    @Param('artifactId') artifactId: string,
+    @Req() request: AuthenticatedRequest,
+    @Res() reply: FastifyReply,
+  ) {
+    const pdf = await this.runsService.exportArtifactPdf({
+      workspaceId: request.authContext!.workspaceId,
+      artifactId,
+    })
+
+    reply.header('Content-Type', 'application/pdf')
+    reply.header(
+      'Content-Disposition',
+      `attachment; filename="${artifactId}.pdf"`,
+    )
+    reply.send(pdf)
   }
 
   @Post('feedback')

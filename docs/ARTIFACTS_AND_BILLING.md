@@ -40,13 +40,14 @@ Implemented today (API):
 
 | Export | Endpoint / surface |
 | --- | --- |
+| Artifact PDF (primary) | `GET /api/runs/artifacts/:artifactId/export/pdf` |
 | Artifact Markdown | `GET /api/runs/artifacts/:artifactId/export/markdown` |
-| Artifact History UI | Markdown export controls on the history panel |
+| Artifact viewer + history UI | Export PDF and Export Markdown controls |
 | Billing invoices | `GET /api/billing/workspace/:workspaceId/invoices/export?format=csv\|json` |
 | Run history (admin) | `GET /api/runs/history/workspace/:workspaceId/admin/export?format=csv\|json` |
 | Workspace audit (admin) | `GET /api/workspaces/:workspaceId/admin/audit/export?format=csv\|json` |
 
-Markdown export must reflect the **immutable persisted** artifact content, not a live LLM rewrite. PDF generation should consume the same validated content when wired for a surface.
+PDF and Markdown exports both reflect the **immutable persisted** artifact content (same section rendering), not a live LLM rewrite.
 
 ## Usage metering
 

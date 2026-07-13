@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { randomUUID } from 'node:crypto'
+import PDFDocument from 'pdfkit'
 import {
   type AgentRole,
   type ArtifactHistoryResponse,
@@ -103,6 +104,22 @@ export class RunsService {
     workspaceId: string
     artifactId: string
   }): Promise<string> {
+    const artifact = await this.requireArtifact(input)
+    return this.renderArtifactMarkdown(artifact)
+  }
+
+  async exportArtifactPdf(input: {
+    workspaceId: string
+    artifactId: string
+  }): Promise<Buffer> {
+    const artifact = await this.requireArtifact(input)
+    return this.renderArtifactPdf(artifact)
+  }
+
+  private async requireArtifact(input: {
+    workspaceId: string
+    artifactId: string
+  }): Promise<ArtifactHistoryItem> {
     const artifact = await this.runRepository.findArtifactById(
       input.workspaceId,
       input.artifactId,
@@ -114,7 +131,7 @@ export class RunsService {
       })
     }
 
-    return this.renderArtifactMarkdown(artifact)
+    return artifact
   }
 
   async createDraftRun(input: unknown): Promise<DraftRun> {
@@ -500,6 +517,64 @@ export class RunsService {
     }
 
     return lines.join('\n').trimEnd()
+  }
+
+  private renderArtifactPdf(artifact: ArtifactHistoryItem): Promise<Buffer> {
+    return new Promise((resolve, reject) => {
+      const doc = new PDFDocument({
+        margin: 54,
+        info: {
+          Title: this.formatTitle(artifact.artifactType),
+          Author: 'AI War Room',
+          Subject: `Run ${artifact.runId}`,
+        },
+      })
+      const chunks: Buffer[] = []
+
+      doc.on('data', (chunk: Buffer) => {
+        chunks.push(chunk)
+      })
+      doc.on('end', () => {
+        resolve(Buffer.concat(chunks))
+      })
+      doc.on('error', reject)
+
+      doc.fontSize(18).text(this.formatTitle(artifact.artifactType), {
+        underline: true,
+      })
+      doc.moveDown(0.5)
+      doc.fontSize(10).fillColor('#444444')
+      doc.text(`Artifact ID: ${artifact.artifactId}`)
+      doc.text(`Run ID: ${artifact.runId}`)
+      doc.text(`Version: ${artifact.artifactVersion}`)
+      doc.text(`Created: ${artifact.createdAt}`)
+      doc.text(`Prompt: ${artifact.metadata.promptVersion}`)
+      doc.moveDown()
+      doc.fillColor('#000000')
+
+      for (const [key, value] of Object.entries(artifact.artifact.content)) {
+        doc.fontSize(13).text(this.formatTitle(key), { underline: true })
+        doc.moveDown(0.35)
+        doc.fontSize(11)
+
+        if (Array.isArray(value)) {
+          for (const item of value) {
+            doc.text(`• ${String(item)}`, {
+              indent: 12,
+              paragraphGap: 4,
+            })
+          }
+        } else {
+          doc.text(String(value), {
+            paragraphGap: 6,
+          })
+        }
+
+        doc.moveDown(0.75)
+      }
+
+      doc.end()
+    })
   }
 
   private formatTitle(value: string) {

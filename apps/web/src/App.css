@@ -16573,6 +16573,13 @@
   margin: 6px 0;
 }
 
+.history-export-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
 .secondary-button {
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid var(--border);

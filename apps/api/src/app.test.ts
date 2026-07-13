@@ -547,6 +547,21 @@ describe('API skeleton', () => {
 
     expect(exportResponse.headers['content-type']).toContain('text/markdown')
     expect(exportResponse.text).toContain(`# ${expectedTitle}`)
+
+    const pdfResponse = await request(app!.getHttpServer())
+      .get(`/api/runs/artifacts/${exportedArtifact.artifactId}/export/pdf`)
+      .buffer()
+      .parse((res, callback) => {
+        const data: Buffer[] = []
+        res.on('data', (chunk) => data.push(Buffer.from(chunk)))
+        res.on('end', () => callback(null, Buffer.concat(data)))
+      })
+      .set(authHeaders)
+      .expect(200)
+
+    expect(pdfResponse.headers['content-type']).toContain('application/pdf')
+    expect(Buffer.isBuffer(pdfResponse.body)).toBe(true)
+    expect(pdfResponse.body.subarray(0, 4).toString()).toBe('%PDF')
     expect(exportResponse.text).toContain(`Artifact ID: ${exportedArtifact.artifactId}`)
 
     const observabilityEvents = observabilityService.getRecentEvents()

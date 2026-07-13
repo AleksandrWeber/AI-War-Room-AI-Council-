@@ -7200,6 +7200,35 @@ function App() {
     }
   }
 
+  async function handleExportPdf(artifactId: string) {
+    setHistoryError(null)
+
+    try {
+      const response = await fetch(
+        `${apiBaseUrl}/runs/artifacts/${artifactId}/export/pdf`,
+        {
+          headers: workspaceAuthHeaders,
+        },
+      )
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`)
+      }
+
+      const pdf = await response.blob()
+      const url = URL.createObjectURL(pdf)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = `${artifactId}.pdf`
+      link.click()
+      URL.revokeObjectURL(url)
+    } catch (error) {
+      setHistoryError(
+        error instanceof Error ? error.message : 'Failed to export PDF.',
+      )
+    }
+  }
+
   async function handleSubmitRunFeedback(input: {
     targetType: 'run' | 'artifact'
     runId: string
@@ -32244,6 +32273,28 @@ function App() {
                   <p className="prompt-version">
                     Prompt version: {selectedArtifact.metadata.promptVersion}
                   </p>
+                  <div className="history-export-actions">
+                    <button
+                      className="execute-button"
+                      type="button"
+                      onClick={() =>
+                        handleExportPdf(selectedArtifact.metadata.artifactId)
+                      }
+                    >
+                      Export PDF
+                    </button>
+                    <button
+                      className="secondary-button"
+                      type="button"
+                      onClick={() =>
+                        handleExportMarkdown(
+                          selectedArtifact.metadata.artifactId,
+                        )
+                      }
+                    >
+                      Export Markdown
+                    </button>
+                  </div>
                   {Object.entries(selectedArtifact.artifact.content).map(
                     ([key, value]) => (
                       <div className="artifact-section" key={key}>
@@ -32376,8 +32427,9 @@ function App() {
           <p className="eyebrow">Artifact History</p>
           <h2>Durable artifacts from previous runs.</h2>
           <p>
-            History is workspace-scoped. Each artifact is immutable and can be
-            exported as Markdown from its persisted content.
+            History is workspace-scoped. Each artifact is immutable. PDF is the
+            primary export; Markdown remains available as a lightweight secondary
+            format.
           </p>
         </div>
         <button
@@ -32399,13 +32451,22 @@ function App() {
                   </p>
                   <small>{new Date(artifact.createdAt).toLocaleString()}</small>
                 </div>
-                <button
-                  className="secondary-button"
-                  type="button"
-                  onClick={() => handleExportMarkdown(artifact.artifactId)}
-                >
-                  Export Markdown
-                </button>
+                <div className="history-export-actions">
+                  <button
+                    className="execute-button"
+                    type="button"
+                    onClick={() => handleExportPdf(artifact.artifactId)}
+                  >
+                    Export PDF
+                  </button>
+                  <button
+                    className="secondary-button"
+                    type="button"
+                    onClick={() => handleExportMarkdown(artifact.artifactId)}
+                  >
+                    Export Markdown
+                  </button>
+                </div>
               </article>
             ))}
           </div>
