@@ -1,10 +1,18 @@
 import { Suspense, lazy } from 'react'
-import type { WorkspaceAdminPanelsProps } from '@ai-war-room/web-blocks'
+import type {
+  BillingWorkspacePanelProps,
+  WorkspaceAdminPanelsProps,
+} from '@ai-war-room/web-blocks'
 import type { RolloutAdminBulkProps } from './rollout-admin/RolloutAdminBulk'
 
 const LazyWorkspaceAdminPanels = lazy(async () => {
   const module = await import('@ai-war-room/web-blocks')
   return { default: module.WorkspaceAdminPanels }
+})
+
+const LazyBillingWorkspacePanel = lazy(async () => {
+  const module = await import('@ai-war-room/web-blocks')
+  return { default: module.BillingWorkspacePanel }
 })
 
 const LazyRolloutAdminBulk = lazy(async () => {
@@ -20,6 +28,14 @@ export function WorkspaceAdminLazySection(
   return (
     <Suspense fallback={<p className="clear-copy">Loading workspace admin...</p>}>
       <LazyWorkspaceAdminPanels {...props} />
+    </Suspense>
+  )
+}
+
+export function BillingWorkspaceLazySection(props: BillingWorkspacePanelProps) {
+  return (
+    <Suspense fallback={<p className="clear-copy">Loading billing...</p>}>
+      <LazyBillingWorkspacePanel {...props} />
     </Suspense>
   )
 }

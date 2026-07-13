@@ -1173,10 +1173,14 @@ import type {
   WorkspaceMemberAdminSummaryResponse,
   WorkspaceSettingsAdminSummaryResponse,
 } from '@ai-war-room/schemas'
-import { BillingWorkspacePanel, formatPaidTier } from '@ai-war-room/web-blocks'
+import { formatPaidTier } from '@ai-war-room/web-blocks'
 import { CoreOperationsAdminLazyGate, DomainAdminLazyGate } from './features/AdminLazySection'
 import { UsageAdminLazySection } from './features/UsageAdminLazySection'
-import { RolloutAdminLazyGate, WorkspaceAdminLazySection } from './features/RolloutAdminLazySection'
+import {
+  BillingWorkspaceLazySection,
+  RolloutAdminLazyGate,
+  WorkspaceAdminLazySection,
+} from './features/RolloutAdminLazySection'
 import './App.css'
 import { callUi } from './lazy-ui'
 import {
@@ -36385,7 +36389,7 @@ function App() {
           }}
         />
 
-        <BillingWorkspacePanel
+        <BillingWorkspaceLazySection
           mode="overview"
           workspaceId={defaultWorkspaceId}
           capabilities={billingCapabilities}
@@ -38223,7 +38227,7 @@ function App() {
           onExportAudit={(format) => void handleExportWorkspaceAudit(format)}
         />
 
-        <BillingWorkspacePanel
+        <BillingWorkspaceLazySection
           mode="details"
           workspaceId={defaultWorkspaceId}
           capabilities={billingCapabilities}
