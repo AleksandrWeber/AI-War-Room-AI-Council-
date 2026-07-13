@@ -40,6 +40,20 @@ Apply database migrations:
 npm run db:migrate
 ```
 
+Preview applied vs pending migrations without writing:
+
+```bash
+npm run db:migrate -- --status
+```
+
+Migration safety and rollback:
+
+- Each migration file runs in its own transaction (`BEGIN` / `COMMIT`, with `ROLLBACK` on failure).
+- Migrations are forward-only. There are no automatic down migrations.
+- Before production apply, run `npm run db:migrate -- --status` (or `--dry-run`) and confirm the pending set.
+- To roll back a bad production change: restore PostgreSQL from a known-good backup taken before the migration, redeploy the previous app revision, and do **not** manually delete rows from `schema_migrations` unless you are restoring that backup consistently.
+- Prefer additive migrations (`CREATE INDEX IF NOT EXISTS`, new nullable columns, new tables). Avoid destructive `DROP`/`TRUNCATE` in the same release as the app code that still depends on the old shape.
+
 Start the API:
 
 ```bash
@@ -550,6 +564,8 @@ Database migration rollout readiness:
 
 - `GET /api/migrations/readiness` returns operator-facing production database migration checklist results (`ready` or `not_ready`).
 - Checks cover PostgreSQL connectivity, schema_migrations table, migration file inventory, and pending migration coverage.
+- CLI: `npm run db:migrate -- --status` lists applied vs pending migrations without applying.
+- Migrations are forward-only and transactional per file; production rollback is restore-from-backup plus app redeploy (see README migration safety section).
 - The web billing panel shows migration rollout status and per-check guidance.
 
 Workspace migration admin tools:
