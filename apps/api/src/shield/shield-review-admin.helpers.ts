@@ -32,8 +32,13 @@ export function buildShieldReviewAdminStats(
 
 export function resolveShieldReviewAdminActions(input: {
   stats: ShieldReviewAdminStats
+  fullScanRetainEnabled?: boolean
 }) {
   const actions: ShieldReviewAdminAction[] = ['rerun_review_summary']
+
+  if (input.fullScanRetainEnabled) {
+    actions.push('purge_expired_full_scans')
+  }
 
   if (input.stats.falsePositiveCount > 0) {
     return actions
@@ -44,12 +49,19 @@ export function resolveShieldReviewAdminActions(input: {
 
 export function getShieldReviewAdminGuidance(input: {
   stats: ShieldReviewAdminStats
+  fullScanRetainEnabled?: boolean
+  retainHours?: number
 }) {
+  const retainNote =
+    input.fullScanRetainEnabled && input.retainHours
+      ? ` Business-tier full-scan retain keeps unredacted secrets/PII quotes for ${input.retainHours}h for dispute/debug; purge expired retains from admin actions.`
+      : ''
+
   if (input.stats.falsePositiveCount > 0) {
-    return 'Workspace owners and admins can inspect Shield review regressions and rerun the false-positive review set.'
+    return `Workspace owners and admins can inspect Shield review regressions and rerun the false-positive review set.${retainNote}`
   }
 
-  return 'Workspace owners and admins can inspect Shield review metrics and rerun the false-positive review set locally.'
+  return `Workspace owners and admins can inspect Shield review metrics and rerun the false-positive review set locally.${retainNote}`
 }
 
 export function toShieldReviewAdminCases(

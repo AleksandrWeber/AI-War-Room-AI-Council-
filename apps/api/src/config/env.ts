@@ -28,6 +28,9 @@ export const envSchema = z.object({
     .min(16)
     .default('local-development-encryption-key-change-me'),
   IDEMPOTENCY_TTL_SECONDS: z.coerce.number().int().positive().default(86_400),
+  /** Enterprise (business tier) optional unredacted Shield secrets/PII retain window. */
+  SHIELD_FULL_SCAN_RETAIN_ENABLED: booleanEnvSchema.default(false),
+  SHIELD_FULL_SCAN_RETAIN_HOURS: z.coerce.number().int().positive().max(168).default(72),
   LLM_PRIMARY_PROVIDER: z.enum(['mock', 'anthropic', 'openai']).default('mock'),
   LLM_FALLBACK_PROVIDER: z.enum(['mock', 'anthropic', 'openai']).default('mock'),
   LLM_PRIMARY_MODEL: z.string().trim().min(1).default('mock-json-v1'),

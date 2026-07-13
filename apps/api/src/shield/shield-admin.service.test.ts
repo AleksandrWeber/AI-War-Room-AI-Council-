@@ -20,7 +20,19 @@ function createShieldAdminService(env: Partial<ApiEnv> = {}) {
     new TestObservabilityService() as never,
   )
 
-  return new ShieldAdminService(configService, advancedShieldService)
+  return new ShieldAdminService(
+    configService,
+    advancedShieldService,
+    {
+      isFeatureEnabled: () => false,
+      retainHours: () => 72,
+      purgeExpired: async (workspaceId: string) => ({
+        workspaceId,
+        purgedCount: 0,
+        message: 'No expired full-scan retain records to redact.',
+      }),
+    } as never,
+  )
 }
 
 describe('ShieldAdminService', () => {

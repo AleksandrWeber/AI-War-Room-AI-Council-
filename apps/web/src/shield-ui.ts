@@ -53,7 +53,7 @@ export async function executeShieldReviewAdminAction(
   workspaceId: string,
   headers: Record<string, string>,
   input: {
-    action: 'rerun_review_summary'
+    action: 'rerun_review_summary' | 'purge_expired_full_scans'
   },
 ) {
   const response = await fetch(
@@ -195,10 +195,14 @@ export function formatShieldReviewStatus(status: string) {
   return status.charAt(0).toUpperCase() + status.slice(1)
 }
 
-export function formatShieldReviewAdminAction(action: 'rerun_review_summary') {
+export function formatShieldReviewAdminAction(
+  action: 'rerun_review_summary' | 'purge_expired_full_scans',
+) {
   switch (action) {
     case 'rerun_review_summary':
       return 'Rerun review summary'
+    case 'purge_expired_full_scans':
+      return 'Purge expired full-scan retains'
   }
 }
 

@@ -19,7 +19,10 @@ export const shieldReviewAdminStatsSchema = z.object({
 })
 export type ShieldReviewAdminStats = z.infer<typeof shieldReviewAdminStatsSchema>
 
-export const shieldReviewAdminActionSchema = z.enum(['rerun_review_summary'])
+export const shieldReviewAdminActionSchema = z.enum([
+  'rerun_review_summary',
+  'purge_expired_full_scans',
+])
 export type ShieldReviewAdminAction = z.infer<
   typeof shieldReviewAdminActionSchema
 >
@@ -50,6 +53,7 @@ export const shieldReviewAdminActionResponseSchema = z.object({
   action: shieldReviewAdminActionSchema,
   message: nonEmptyStringSchema,
   stats: shieldReviewAdminStatsSchema.optional(),
+  purgedCount: z.number().int().nonnegative().optional(),
 })
 export type ShieldReviewAdminActionResponse = z.infer<
   typeof shieldReviewAdminActionResponseSchema

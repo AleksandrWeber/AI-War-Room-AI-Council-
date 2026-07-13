@@ -11744,7 +11744,7 @@ function App() {
   }
 
   async function handleShieldReviewAdminAction(
-    action: 'rerun_review_summary',
+    action: 'rerun_review_summary' | 'purge_expired_full_scans',
   ) {
     setShieldReviewAdminAction('running')
     setBillingError(null)

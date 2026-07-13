@@ -36,6 +36,7 @@ import {
   type RunRepository,
 } from '../persistence/run.repository.js'
 import { ShieldOverrideService } from '../shield/shield-override.service.js'
+import { ShieldFullScanRetainService } from '../shield/shield-full-scan-retain.service.js'
 import { TriageService } from '../triage/triage.service.js'
 import { UsageService } from '../usage/usage.service.js'
 import { BillingMeterUsageService } from '../billing/billing-meter-usage.service.js'
@@ -64,6 +65,7 @@ export class RunsService {
     private readonly billingNotificationService: BillingNotificationService,
     private readonly observabilityService: ObservabilityService,
     private readonly shieldOverrideService: ShieldOverrideService,
+    private readonly shieldFullScanRetainService: ShieldFullScanRetainService,
   ) {}
 
   getCapabilities() {
@@ -214,6 +216,7 @@ export class RunsService {
       idempotencyKey: request.idempotencyKey,
       idempotencyTtlSeconds,
     })
+    await this.shieldFullScanRetainService.maybeRetainFullScan(draftRun)
 
     return draftRun
   }

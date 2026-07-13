@@ -8,6 +8,7 @@ import {
   shieldReviewAdminSummaryResponseSchema,
   shieldRolloutResponseSchema,
   type AuthContext,
+  type ShieldReviewAdminAction,
 } from '@ai-war-room/schemas'
 import type { ApiEnv } from '../config/env.js'
 import { AdvancedShieldService } from './advanced-shield.service.js'
@@ -20,12 +21,14 @@ import {
   toShieldReviewAdminCases,
 } from './shield-review-admin.helpers.js'
 import { evaluateShieldRollout } from './shield-rollout.helpers.js'
+import { ShieldFullScanRetainService } from './shield-full-scan-retain.service.js'
 
 @Injectable()
 export class ShieldAdminService {
   constructor(
     private readonly configService: ConfigService<ApiEnv, true>,
     private readonly advancedShieldService: AdvancedShieldService,
+    private readonly shieldFullScanRetainService: ShieldFullScanRetainService,
   ) {}
 
   getCapabilities() {
@@ -72,7 +75,10 @@ export class ShieldAdminService {
 
     const reviewSummary = await this.advancedShieldService.getReviewSummary()
     const stats = buildShieldReviewAdminStats(reviewSummary)
-    const availableActions = resolveShieldReviewAdminActions({ stats })
+    const availableActions = resolveShieldReviewAdminActions({
+      stats,
+      fullScanRetainEnabled: this.shieldFullScanRetainService.isFeatureEnabled(),
+    })
 
     return shieldReviewAdminSummaryResponseSchema.parse({
       workspaceId,
@@ -81,7 +87,11 @@ export class ShieldAdminService {
       cases: toShieldReviewAdminCases(reviewSummary),
       stats,
       availableActions,
-      guidance: getShieldReviewAdminGuidance({ stats }),
+      guidance: getShieldReviewAdminGuidance({
+        stats,
+        fullScanRetainEnabled: this.shieldFullScanRetainService.isFeatureEnabled(),
+        retainHours: this.shieldFullScanRetainService.retainHours(),
+      }),
     })
   }
 
@@ -89,7 +99,7 @@ export class ShieldAdminService {
     authContext: AuthContext,
     input: {
       workspaceId: string
-      action: 'rerun_review_summary'
+      action: ShieldReviewAdminAction
     },
   ) {
     this.assertCanManageShieldReview(authContext)
@@ -118,6 +128,18 @@ export class ShieldAdminService {
               ? `Reran Shield review summary for ${stats.totalCases} cases with no false positives.`
               : `Reran Shield review summary and found ${stats.falsePositiveCount} false positive(s).`,
           stats,
+        })
+      }
+      case 'purge_expired_full_scans': {
+        const purge = await this.shieldFullScanRetainService.purgeExpired(
+          payload.workspaceId,
+        )
+
+        return shieldReviewAdminActionResponseSchema.parse({
+          workspaceId: payload.workspaceId,
+          action: payload.action,
+          message: purge.message,
+          purgedCount: purge.purgedCount,
         })
       }
     }

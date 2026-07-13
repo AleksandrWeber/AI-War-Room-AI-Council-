@@ -165,6 +165,22 @@ export default function OperationsAdminBulk(props: OperationsAdminBulkProps) {
                 {formatShieldReviewAdminAction('rerun_review_summary')}
               </button>
             ) : null}
+            {props.shieldReviewAdminSummary.availableActions.includes(
+              'purge_expired_full_scans',
+            ) ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={props.shieldReviewAdminAction !== 'idle'}
+                onClick={() =>
+                  void props.handleShieldReviewAdminAction(
+                    'purge_expired_full_scans',
+                  )
+                }
+              >
+                {formatShieldReviewAdminAction('purge_expired_full_scans')}
+              </button>
+            ) : null}
             {props.shieldFalsePositiveReports ? (
               <>
                 <p className="clear-copy">

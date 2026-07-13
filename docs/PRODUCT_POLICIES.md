@@ -21,7 +21,7 @@ Operational product decisions that shape Shield, storage, and research. Implemen
 - **At rest (PostgreSQL findings JSON):** for `secrets` and `pii`, redact `span.quote` to `[REDACTED]` and neutralize explanations that would restate the secret. Offsets may remain so Human Review can highlight against stored `idea.rawIdea` during the run lifetime.
 - **Ephemeral:** unredacted highlights live in the API response / client session for review; purged with run retention (30d draft / 180d completed + 30d grace).
 - **Exports:** audit exports must not include raw secret quotes.
-- **Post-MVP:** optional short full-scan retain window for enterprise disputes.
+- **Enterprise full-scan retain (business tier):** when `SHIELD_FULL_SCAN_RETAIN_ENABLED=true`, unredacted secrets/PII findings are also stored in `shield_scan_full_findings` for `SHIELD_FULL_SCAN_RETAIN_HOURS` (default **72h**). Owner/admin dispute read: `GET /api/shield/workspace/:id/scans/:scanId/full`. Expired retains are redacted via admin action `purge_expired_full_scans`. Durable `shield_scans.findings` stay redacted.
 
 ## External research provider strategy
 

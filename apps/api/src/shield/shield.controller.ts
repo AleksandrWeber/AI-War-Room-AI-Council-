@@ -15,6 +15,7 @@ import {
 } from '../auth/workspace-access.guard.js'
 import { ShieldAdminService } from './shield-admin.service.js'
 import { ShieldFalsePositiveService } from './shield-false-positive.service.js'
+import { ShieldFullScanRetainService } from './shield-full-scan-retain.service.js'
 import { ShieldOverrideService } from './shield-override.service.js'
 
 type ShieldReviewAdminBody = {
@@ -28,6 +29,7 @@ export class ShieldController {
     private readonly shieldAdminService: ShieldAdminService,
     private readonly shieldOverrideService: ShieldOverrideService,
     private readonly shieldFalsePositiveService: ShieldFalsePositiveService,
+    private readonly shieldFullScanRetainService: ShieldFullScanRetainService,
   ) {}
 
   @Get('capabilities')
@@ -71,7 +73,10 @@ export class ShieldController {
 
     const action = body.action
 
-    if (action !== 'rerun_review_summary') {
+    if (
+      action !== 'rerun_review_summary' &&
+      action !== 'purge_expired_full_scans'
+    ) {
       throw new BadRequestException({
         message: 'Unsupported Shield review admin action.',
       })
@@ -84,6 +89,22 @@ export class ShieldController {
         action,
       },
     )
+  }
+
+  @Get('workspace/:workspaceId/scans/:scanId/full')
+  @UseGuards(WorkspaceAccessGuard)
+  getFullShieldScanForDispute(
+    @Param('workspaceId') workspaceId: string,
+    @Param('scanId') scanId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    this.assertWorkspaceParam(request, workspaceId)
+
+    return this.shieldFullScanRetainService.getFullScanForDispute({
+      authContext: request.authContext!,
+      workspaceId,
+      scanId,
+    })
   }
 
   @Post('runs/:runId/override')
