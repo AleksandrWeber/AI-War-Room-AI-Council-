@@ -216,6 +216,30 @@ test('create workspace switches picker to the new workspace', async ({ page }) =
   await expect(page.getByTestId('workspace-picker')).toContainText(name)
 })
 
+test('rename workspace updates the picker label', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByText('API status: online')).toBeVisible({
+    timeout: 60_000,
+  })
+
+  const created = `Rename ${Date.now()}`
+  await page.getByTestId('create-workspace-name').fill(created)
+  await page.getByTestId('create-workspace').click()
+  await expect(page.getByTestId('workspace-picker')).toContainText(created, {
+    timeout: 30_000,
+  })
+
+  const renamed = `${created} Renamed`
+  await page.getByTestId('rename-workspace-name').fill(renamed)
+  await page.getByTestId('rename-workspace').click()
+  await expect(page.getByTestId('workspace-picker')).toContainText(renamed, {
+    timeout: 30_000,
+  })
+  await expect(page.getByTestId('workspace-picker')).not.toContainText(
+    `${created} (`,
+  )
+})
+
 test('member leave control is visible on secondary workspace', async ({
   page,
 }) => {

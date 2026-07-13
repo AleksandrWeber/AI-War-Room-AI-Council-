@@ -5922,6 +5922,7 @@ function App() {
     null,
   )
   const [newWorkspaceName, setNewWorkspaceName] = useState('')
+  const [renameWorkspaceName, setRenameWorkspaceName] = useState('')
   const [workspaceMutationAction, setWorkspaceMutationAction] = useState<
     'idle' | 'running'
   >('idle')
@@ -6727,6 +6728,15 @@ function App() {
   useEffect(() => {
     setActiveFindingId(draftRun?.shieldScan.findings[0]?.findingId ?? null)
   }, [draftRun])
+
+  useEffect(() => {
+    const active = myWorkspaces.find(
+      (workspace) => workspace.workspaceId === activeWorkspaceId,
+    )
+    if (active) {
+      setRenameWorkspaceName(active.name)
+    }
+  }, [activeWorkspaceId, myWorkspaces])
 
   useEffect(() => {
     void handleLoadProviderCredentials()
@@ -12243,6 +12253,60 @@ function App() {
     }
   }
 
+  async function handleRenameWorkspace() {
+    const name = renameWorkspaceName.trim()
+    if (!name) {
+      return
+    }
+
+    setWorkspaceMutationAction('running')
+    setSettingsAdminAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const result = await callUi(
+        'workspace-ui',
+        'executeWorkspaceSettingsAdminAction',
+        apiBaseUrl,
+        activeWorkspaceId,
+        workspaceAuthHeaders,
+        {
+          action: 'update_workspace_name',
+          name,
+        },
+      )
+      setBillingMessage(result.message)
+      setWorkspaceNameDraft(name)
+      const listed = await callUi(
+        'workspace-ui',
+        'listMyWorkspaces',
+        apiBaseUrl,
+        workspaceAuthHeaders,
+      )
+      setMyWorkspaces(listed.workspaces)
+      setRenameWorkspaceName(name)
+      if (settingsAdminSummary) {
+        setSettingsAdminSummary({
+          ...settingsAdminSummary,
+          settings: {
+            ...settingsAdminSummary.settings,
+            name,
+          },
+        })
+      }
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to rename workspace.',
+      )
+    } finally {
+      setWorkspaceMutationAction('idle')
+      setSettingsAdminAction('idle')
+    }
+  }
+
   async function handleSettingsAdminAction(input: {
     action:
       | 'update_workspace_name'
@@ -12263,6 +12327,17 @@ function App() {
         input,
       )
       setBillingMessage(result.message)
+      if (input.action === 'update_workspace_name' && input.name?.trim()) {
+        const nextName = input.name.trim()
+        setRenameWorkspaceName(nextName)
+        const listed = await callUi(
+          'workspace-ui',
+          'listMyWorkspaces',
+          apiBaseUrl,
+          workspaceAuthHeaders,
+        )
+        setMyWorkspaces(listed.workspaces)
+      }
       await handleLoadBillingStatus()
     } catch (error) {
       setBillingError(
@@ -29907,6 +29982,54 @@ function App() {
                 : 'Create workspace'}
             </button>
           </form>
+          {Boolean(
+            (() => {
+              const active = myWorkspaces.find(
+                (workspace) => workspace.workspaceId === activeWorkspaceId,
+              )
+              return (
+                active?.role === 'owner' || active?.role === 'admin'
+              )
+            })(),
+          ) ? (
+            <form
+              className="workspace-create-form"
+              onSubmit={(event) => {
+                event.preventDefault()
+                void handleRenameWorkspace()
+              }}
+            >
+              <label>
+                Rename current workspace
+                <input
+                  data-testid="rename-workspace-name"
+                  value={renameWorkspaceName}
+                  onChange={(event) =>
+                    setRenameWorkspaceName(event.target.value)
+                  }
+                />
+              </label>
+              <button
+                type="submit"
+                data-testid="rename-workspace"
+                disabled={
+                  workspaceMutationAction !== 'idle' ||
+                  settingsAdminAction !== 'idle' ||
+                  !renameWorkspaceName.trim() ||
+                  renameWorkspaceName.trim() ===
+                    myWorkspaces.find(
+                      (workspace) =>
+                        workspace.workspaceId === activeWorkspaceId,
+                    )?.name
+                }
+              >
+                {workspaceMutationAction === 'running' ||
+                settingsAdminAction === 'running'
+                  ? 'Renaming…'
+                  : 'Rename workspace'}
+              </button>
+            </form>
+          ) : null}
           {workspaceRecoveryTip ? (
             <p className="invite-status invite-status--ok" data-testid="workspace-recovery-tip">
               {workspaceRecoveryTip}
