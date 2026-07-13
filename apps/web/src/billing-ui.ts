@@ -39,49 +39,11 @@ import {
 
 export const defaultWorkspaceId = 'local_workspace'
 
-export type BillingReturnHint = 'success' | 'cancel' | 'portal'
-
-export function readBillingReturnHint(): BillingReturnHint | null {
-  const url = new URL(window.location.href)
-
-  if (
-    url.searchParams.get('billing') === 'success' ||
-    url.pathname.endsWith('/billing/success')
-  ) {
-    return 'success'
-  }
-
-  if (
-    url.searchParams.get('billing') === 'cancel' ||
-    url.pathname.endsWith('/billing/cancel')
-  ) {
-    return 'cancel'
-  }
-
-  if (
-    url.searchParams.get('billing') === 'portal' ||
-    url.pathname.endsWith('/billing/portal')
-  ) {
-    return 'portal'
-  }
-
-  return null
-}
-
-export function clearBillingReturnHint() {
-  const url = new URL(window.location.href)
-  url.searchParams.delete('billing')
-
-  if (
-    url.pathname.endsWith('/billing/success') ||
-    url.pathname.endsWith('/billing/cancel') ||
-    url.pathname.endsWith('/billing/portal')
-  ) {
-    url.pathname = '/'
-  }
-
-  window.history.replaceState({}, '', url)
-}
+export type { BillingReturnHint } from './billing-return.js'
+export {
+  clearBillingReturnHint,
+  readBillingReturnHint,
+} from './billing-return.js'
 
 export async function fetchBillingCapabilities(apiBaseUrl: string) {
   const response = await fetch(`${apiBaseUrl}/billing/capabilities`)

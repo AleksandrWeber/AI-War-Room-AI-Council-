@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url'
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
 const appPath = join(root, 'src/App.tsx')
 
-const KEEP_STATIC_MODULES = new Set(['billing-ui', 'workspace-ui'])
+const KEEP_STATIC_MODULES = new Set([])
 
 let source = readFileSync(appPath, 'utf8')
 

@@ -5,6 +5,7 @@ import type {
   AuthRolloutResponse,
   AuthSessionResponse,
   BillingAdminSummaryResponse,
+  MockCustomerPortalResponse,
   BillingCapabilitiesResponse,
   BillingInvoiceRecord,
   BillingMeterUsageReport,
@@ -1172,49 +1173,22 @@ import type {
   WorkspaceMemberAdminSummaryResponse,
   WorkspaceSettingsAdminSummaryResponse,
 } from '@ai-war-room/schemas'
-import { BillingWorkspacePanel } from '@ai-war-room/web-blocks'
+import { BillingWorkspacePanel, formatPaidTier } from '@ai-war-room/web-blocks'
 import { CoreOperationsAdminLazyGate, DomainAdminLazyGate } from './features/AdminLazySection'
 import { UsageAdminLazySection } from './features/UsageAdminLazySection'
 import { RolloutAdminLazyGate, WorkspaceAdminLazySection } from './features/RolloutAdminLazySection'
 import './App.css'
 import { callUi } from './lazy-ui'
 import {
+  clearBillingReturnHint,
+  readBillingReturnHint,
+} from './billing-return'
+import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
   loadStoredAuthSession,
   saveStoredAuthSession,
 } from './auth-headers'
-import {
-  clearBillingReturnHint,
-  completeMockBillingCheckout,
-  createBillingCheckoutSession,
-  createCustomerPortalSession,
-  cancelMockCustomerPortalSubscription,
-  defaultWorkspaceId,
-  executeBillingAdminAction,
-  fetchBillingAdminSummary,
-  fetchBillingCapabilities,
-  fetchBillingRollout,
-  fetchBillingAlerts,
-  fetchBillingInvoices,
-  fetchBillingMeterUsageReports,
-  fetchBillingNotifications,
-  fetchBillingUsageSummary,
-  fetchBillingWebhookEvents,
-  fetchBillingWorkspaceStatus,
-  downloadBillingInvoiceExport,
-  fetchMockCustomerPortal,
-  formatPaidTier,
-  readBillingReturnHint,
-  type MockCustomerPortalResponse,
-} from './billing-ui'
-import {
-  executeWorkspaceMemberAdminAction,
-  executeWorkspaceSettingsAdminAction,
-  downloadWorkspaceAuditExport,
-  fetchWorkspaceMemberAdminSummary,
-  fetchWorkspaceSettingsAdminSummary,
-} from './workspace-ui'
 import {
   type TemporalRunStartResponse,
   type TemporalWorkflowRecoveryResponse,
@@ -1446,6 +1420,7 @@ type TemporalRunStatusResponse = {
 }
 
 const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:3000/api'
+const defaultWorkspaceId = 'local_workspace'
 const reviewStorageKey = 'ai-war-room.review-draft'
 const ideaStorageKey = 'ai-war-room.idea-draft'
 const pipelineResultStorageKey = 'ai-war-room.pipeline-result'
@@ -13157,7 +13132,7 @@ function App() {
         }
       })
 
-    fetchBillingCapabilities(apiBaseUrl)
+    callUi('billing-ui', 'fetchBillingCapabilities', apiBaseUrl)
       .then((capabilities) => {
         if (!controller.signal.aborted) {
           setBillingCapabilities(capabilities)
@@ -13169,7 +13144,7 @@ function App() {
         }
       })
 
-    fetchBillingRollout(apiBaseUrl)
+    callUi('billing-ui', 'fetchBillingRollout', apiBaseUrl)
       .then((rollout) => {
         if (!controller.signal.aborted) {
           setBillingRollout(rollout)
@@ -17886,70 +17861,70 @@ function App() {
     setBillingError(null)
 
     try {
-      const status = await fetchBillingWorkspaceStatus(
+      const status = await callUi('billing-ui', 'fetchBillingWorkspaceStatus', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
       )
       setBillingStatus(status)
 
-      const events = await fetchBillingWebhookEvents(
+      const events = await callUi('billing-ui', 'fetchBillingWebhookEvents', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
       )
       setBillingWebhookEvents(events.events)
 
-      const invoices = await fetchBillingInvoices(
+      const invoices = await callUi('billing-ui', 'fetchBillingInvoices', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
       )
       setBillingInvoices(invoices.invoices)
 
-      const usage = await fetchBillingUsageSummary(
+      const usage = await callUi('billing-ui', 'fetchBillingUsageSummary', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
       )
       setBillingUsageSummary(usage)
 
-      const alerts = await fetchBillingAlerts(
+      const alerts = await callUi('billing-ui', 'fetchBillingAlerts', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
       )
       setBillingAlerts(alerts.alerts)
 
-      const meterUsage = await fetchBillingMeterUsageReports(
+      const meterUsage = await callUi('billing-ui', 'fetchBillingMeterUsageReports', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
       )
       setBillingMeterUsageReports(meterUsage.reports)
 
-      const notifications = await fetchBillingNotifications(
+      const notifications = await callUi('billing-ui', 'fetchBillingNotifications', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
       )
       setBillingNotifications(notifications.notifications)
 
-      const adminSummary = await fetchBillingAdminSummary(
+      const adminSummary = await callUi('billing-ui', 'fetchBillingAdminSummary', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
       )
       setBillingAdminSummary(adminSummary)
 
-      const membersAdmin = await fetchWorkspaceMemberAdminSummary(
+      const membersAdmin = await callUi('workspace-ui', 'fetchWorkspaceMemberAdminSummary', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
       )
       setMemberAdminSummary(membersAdmin)
 
-      const settingsAdmin = await fetchWorkspaceSettingsAdminSummary(
+      const settingsAdmin = await callUi('workspace-ui', 'fetchWorkspaceSettingsAdminSummary', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -17977,7 +17952,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeBillingAdminAction(
+      const result = await callUi('billing-ui', 'executeBillingAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -18032,7 +18007,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeWorkspaceMemberAdminAction(
+      const result = await callUi('workspace-ui', 'executeWorkspaceMemberAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -18067,7 +18042,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const result = await executeWorkspaceSettingsAdminAction(
+      const result = await callUi('workspace-ui', 'executeWorkspaceSettingsAdminAction', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -35166,7 +35141,7 @@ function App() {
     setBillingError(null)
 
     try {
-      await downloadBillingInvoiceExport(
+      await callUi('billing-ui', 'downloadBillingInvoiceExport', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -35185,7 +35160,7 @@ function App() {
     setBillingError(null)
 
     try {
-      await downloadWorkspaceAuditExport(
+      await callUi('workspace-ui', 'downloadWorkspaceAuditExport', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
@@ -35207,7 +35182,7 @@ function App() {
     setMockCustomerPortal(null)
 
     try {
-      const session = await createBillingCheckoutSession(
+      const session = await callUi('billing-ui', 'createBillingCheckoutSession', 
         apiBaseUrl,
         defaultWorkspaceId,
         paidTier,
@@ -35215,7 +35190,7 @@ function App() {
       )
 
       if (billingCapabilities?.adapter === 'mock') {
-        const completed = await completeMockBillingCheckout(session.checkoutUrl)
+        const completed = await callUi('billing-ui', 'completeMockBillingCheckout', session.checkoutUrl)
         setBillingStatus(completed)
         setBillingMessage(
           `Mock checkout completed. Workspace upgraded to ${formatPaidTier(paidTier)}.`,
@@ -35241,14 +35216,14 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const session = await createCustomerPortalSession(
+      const session = await callUi('billing-ui', 'createCustomerPortalSession', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
       )
 
       if (billingCapabilities?.adapter === 'mock') {
-        const portal = await fetchMockCustomerPortal(session.portalUrl)
+        const portal = await callUi('billing-ui', 'fetchMockCustomerPortal', session.portalUrl)
         setMockCustomerPortal(portal)
         return
       }
@@ -35271,7 +35246,7 @@ function App() {
     setBillingMessage(null)
 
     try {
-      const status = await cancelMockCustomerPortalSubscription(
+      const status = await callUi('billing-ui', 'cancelMockCustomerPortalSubscription', 
         apiBaseUrl,
         defaultWorkspaceId,
         workspaceAuthHeaders,
