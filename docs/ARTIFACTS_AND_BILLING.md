@@ -23,7 +23,7 @@ Types (`artifactType`): `executive_summary` | `prd` | `development_prompt`.
 | PRD | `prdSchema` | goals, MVP scope, functional/non-functional requirements |
 | Development Prompt | `developmentPromptSchema` | `targetTool`, stack, modules, implementation order, `toolSpecificGuidance`, outOfScope |
 
-**Target tool (product decision 2026-07-13):** MVP is **Cursor-first** — one Cursor-optimized Development Prompt derived from the PRD. Human Review sends `developmentPromptTargetTool` (default `cursor`). Non-Cursor values currently attach scaffolding guidance only; full Claude Code / Bolt / Lovable adapters remain TODO §10. Do not fork the PRD per tool.
+**Target tool (product decision 2026-07-13):** MVP is **Cursor-first** — one Cursor-optimized Development Prompt derived from the PRD. Human Review sends `developmentPromptTargetTool` (default `cursor`). Claude Code / Bolt / Lovable use shared-PRD tool guidance profiles in `development-prompt-targets.ts`. Do not fork the PRD per tool.
 
 Persisted envelope:
 

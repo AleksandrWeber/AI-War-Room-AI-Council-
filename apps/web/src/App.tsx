@@ -1275,9 +1275,9 @@ type ReviewDraft = {
 
 const developmentPromptTargetToolOptions = [
   { value: 'cursor', label: 'Cursor (MVP default)' },
-  { value: 'claude_code', label: 'Claude Code (scaffolding)' },
-  { value: 'bolt', label: 'Bolt (scaffolding)' },
-  { value: 'lovable', label: 'Lovable (scaffolding)' },
+  { value: 'claude_code', label: 'Claude Code' },
+  { value: 'bolt', label: 'Bolt' },
+  { value: 'lovable', label: 'Lovable' },
 ] as const
 
 type PipelineStep = {
@@ -32102,8 +32102,8 @@ function App() {
               </select>
             </label>
             <p className="runtime-note">
-              Cursor is the MVP default. Other tools keep the shared PRD and add
-              scaffolding guidance until full adapters ship.
+              Cursor is the MVP default. Other tools keep the shared PRD and apply
+              tool-specific implementation guidance.
             </p>
             {reviewDraft.selectedAgents.length < 3 ? (
               <p id="execute-gate-hint" className="form-error" role="status">

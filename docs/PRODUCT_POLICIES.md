@@ -4,9 +4,9 @@ Operational product decisions that shape Shield, storage, and research. Implemen
 
 ## Development Prompt target
 
-- **MVP:** Cursor-first — one Cursor-optimized Development Prompt from the PRD. Human Review can select `targetTool` (`cursor` default; `claude_code` / `bolt` / `lovable` use scaffolding guidance).
+- **MVP:** Cursor-first — one Cursor-optimized Development Prompt from the PRD. Human Review can select `targetTool` (`cursor` default; `claude_code` / `bolt` / `lovable` use tool-specific guidance profiles).
 - **Schema:** `developmentPromptSchema.targetTool` + `toolSpecificGuidance`; pipeline request field `developmentPromptTargetTool`.
-- **Post-MVP:** deepen Claude Code / Bolt / Lovable adapters (full prompt templates/renderers). See TODO §10.
+- **Adapters:** Cursor / Claude Code / Bolt / Lovable guidance lives in `development-prompt-targets.ts` (shared PRD; no per-tool PRD fork).
 
 ## Shield false-positive policy
 

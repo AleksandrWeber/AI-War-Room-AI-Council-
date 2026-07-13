@@ -10,13 +10,21 @@ describe('development prompt target tools', () => {
     expect(getDevelopmentPromptSystemAddon('cursor')).toMatch(/Cursor/)
   })
 
-  it('returns scaffolding guidance for future adapters', () => {
-    expect(getDevelopmentPromptToolGuidance('claude_code').join(' ')).toMatch(
-      /scaffolding/i,
-    )
-    expect(getDevelopmentPromptToolGuidance('bolt').join(' ')).toMatch(/Bolt/)
-    expect(getDevelopmentPromptToolGuidance('lovable').join(' ')).toMatch(
-      /Lovable/,
-    )
+  it('returns concrete adapter guidance for Claude Code, Bolt, and Lovable', () => {
+    const claude = getDevelopmentPromptToolGuidance('claude_code').join(' ')
+    const bolt = getDevelopmentPromptToolGuidance('bolt').join(' ')
+    const lovable = getDevelopmentPromptToolGuidance('lovable').join(' ')
+
+    expect(claude).toMatch(/Claude Code CLI/)
+    expect(claude).not.toMatch(/scaffolding/i)
+    expect(getDevelopmentPromptSystemAddon('claude_code')).toMatch(/CLI session/)
+
+    expect(bolt).toMatch(/preview/i)
+    expect(bolt).not.toMatch(/scaffolding/i)
+    expect(getDevelopmentPromptSystemAddon('bolt')).toMatch(/previewable/)
+
+    expect(lovable).toMatch(/visual/i)
+    expect(lovable).not.toMatch(/scaffolding/i)
+    expect(getDevelopmentPromptSystemAddon('lovable')).toMatch(/polished/)
   })
 })
