@@ -111,6 +111,20 @@ export class WorkspacesController {
     })
   }
 
+  @Post(':workspaceId/archive')
+  @UseGuards(WorkspaceAccessGuard)
+  archiveWorkspace(
+    @Param('workspaceId') workspaceId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    this.assertWorkspaceParam(request, workspaceId)
+
+    return this.workspaceService.archiveWorkspace({
+      authContext: request.authContext!,
+      workspaceId,
+    })
+  }
+
   @Get(':workspaceId/invites')
   @UseGuards(WorkspaceAccessGuard)
   listWorkspaceInvites(

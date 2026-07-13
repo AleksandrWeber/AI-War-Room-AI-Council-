@@ -12098,6 +12098,52 @@ function App() {
     }
   }
 
+  async function handleArchiveWorkspace() {
+    setWorkspaceMutationAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const archived = await callUi(
+        'workspace-ui',
+        'archiveWorkspace',
+        apiBaseUrl,
+        activeWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setBillingMessage(archived.guidance)
+      setLatestInviteUrl(null)
+      setInviteUrlsById({})
+      setWorkspaceInvites([])
+      const listed = await callUi(
+        'workspace-ui',
+        'listMyWorkspaces',
+        apiBaseUrl,
+        workspaceAuthHeaders,
+      )
+      setMyWorkspaces(listed.workspaces)
+      const fallback =
+        listed.workspaces.find(
+          (workspace) => workspace.workspaceId === fallbackWorkspaceId,
+        )?.workspaceId ?? listed.workspaces[0]?.workspaceId
+      if (fallback) {
+        saveStoredActiveWorkspaceId(fallback)
+        setActiveWorkspaceId(fallback)
+        setWorkspaceRecoveryTip(
+          `Archived workspace. Switched to ${fallback}.`,
+        )
+      }
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to archive workspace.',
+      )
+    } finally {
+      setWorkspaceMutationAction('idle')
+    }
+  }
+
   async function handleSettingsAdminAction(input: {
     action:
       | 'update_workspace_name'
@@ -29706,6 +29752,27 @@ function App() {
                   onClick={() => void handleLeaveWorkspace()}
                 >
                   Leave workspace
+                </button>
+              ) : null}
+              {Boolean(
+                (() => {
+                  const active = myWorkspaces.find(
+                    (workspace) => workspace.workspaceId === activeWorkspaceId,
+                  )
+                  if (!active || active.role !== 'owner') {
+                    return false
+                  }
+                  return (memberAdminSummary?.stats.ownerCount ?? 1) === 1
+                })(),
+              ) ? (
+                <button
+                  type="button"
+                  className="danger-button"
+                  data-testid="archive-workspace"
+                  disabled={workspaceMutationAction !== 'idle'}
+                  onClick={() => void handleArchiveWorkspace()}
+                >
+                  Archive workspace
                 </button>
               ) : null}
             </div>

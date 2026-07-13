@@ -201,3 +201,35 @@ test('sole owner cannot leave their only-owned workspace', async ({ page }) => {
   )
   await expect(page.getByTestId('leave-workspace')).toHaveCount(0)
 })
+
+test('archive workspace removes it from picker and recovers active', async ({
+  page,
+}) => {
+  await page.goto('/')
+  await expect(page.getByText('API status: online')).toBeVisible({
+    timeout: 60_000,
+  })
+
+  const name = `Archive ${Date.now()}`
+  await page.getByTestId('create-workspace-name').fill(name)
+  await page.getByTestId('create-workspace').click()
+
+  await expect(page.getByTestId('workspace-picker')).toContainText(name, {
+    timeout: 30_000,
+  })
+  await expect(page.getByTestId('archive-workspace')).toBeVisible({
+    timeout: 30_000,
+  })
+
+  const activeBefore = await page.getByTestId('active-workspace-id').innerText()
+  await page.getByTestId('archive-workspace').click()
+
+  await expect(page.getByTestId('workspace-recovery-tip')).toContainText(
+    /Archived workspace/i,
+    { timeout: 30_000 },
+  )
+  await expect(page.getByTestId('workspace-picker')).not.toContainText(name)
+  await expect(page.getByTestId('active-workspace-id')).not.toHaveText(
+    activeBefore,
+  )
+})

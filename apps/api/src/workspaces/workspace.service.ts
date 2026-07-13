@@ -7,6 +7,7 @@ import {
 } from '@nestjs/common'
 import { randomUUID } from 'node:crypto'
 import {
+  archiveWorkspaceResponseSchema,
   createWorkspaceRequestSchema,
   createWorkspaceResponseSchema,
   leaveWorkspaceResponseSchema,
@@ -167,6 +168,68 @@ export class WorkspaceService {
     return leaveWorkspaceResponseSchema.parse({
       workspaceId: input.workspaceId,
       guidance: 'You left the workspace. Membership has been removed.',
+    })
+  }
+
+  async archiveWorkspace(input: {
+    authContext: AuthContext
+    workspaceId: string
+  }) {
+    if (input.authContext.workspaceId !== input.workspaceId) {
+      throw new ForbiddenException({
+        message: 'Workspace header does not match request workspace.',
+      })
+    }
+
+    if (input.authContext.role !== 'owner') {
+      throw new ForbiddenException({
+        message: 'Only workspace owners can archive this workspace.',
+      })
+    }
+
+    const workspace = await this.workspaceRepository.getWorkspace(
+      input.workspaceId,
+    )
+    if (!workspace) {
+      throw new NotFoundException({
+        message: 'Workspace was not found.',
+      })
+    }
+
+    const members = await this.workspaceRepository.listWorkspaceMembers(
+      input.workspaceId,
+    )
+    const ownerCount = members.filter((member) => member.role === 'owner').length
+    if (ownerCount !== 1) {
+      throw new BadRequestException({
+        message:
+          'Only the sole owner can archive this workspace. Promote or demote owners first, or leave instead.',
+      })
+    }
+
+    const activeRuns = await this.workspaceRepository.countActiveRuns(
+      input.workspaceId,
+    )
+    if (activeRuns > 0) {
+      throw new BadRequestException({
+        message:
+          'Cannot archive a workspace while draft, pending, or running runs exist.',
+      })
+    }
+
+    const archived = await this.workspaceRepository.softDeleteWorkspace(
+      input.workspaceId,
+    )
+    if (!archived) {
+      throw new NotFoundException({
+        message: 'Workspace was not found.',
+      })
+    }
+
+    return archiveWorkspaceResponseSchema.parse({
+      workspaceId: input.workspaceId,
+      guidance:
+        'Workspace archived. It is hidden from your workspace picker.',
     })
   }
 }

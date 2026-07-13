@@ -19,6 +19,7 @@ export type WorkspaceRecord = {
   name: string
   shieldDisplaySensitivity: 'high_only' | 'medium_and_up' | 'all'
   createdAt: string
+  deletedAt: string | null
 }
 
 export type ProvisionExternalMemberInput = {
@@ -81,6 +82,10 @@ export interface WorkspaceRepository {
   }): Promise<WorkspaceMemberRecord>
 
   getWorkspace(workspaceId: string): Promise<WorkspaceRecord | null>
+
+  softDeleteWorkspace(workspaceId: string): Promise<WorkspaceRecord | null>
+
+  countActiveRuns(workspaceId: string): Promise<number>
 
   updateWorkspaceName(input: {
     workspaceId: string

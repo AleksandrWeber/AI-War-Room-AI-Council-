@@ -1,5 +1,6 @@
 import {
   acceptWorkspaceInviteResponseSchema,
+  archiveWorkspaceResponseSchema,
   createWorkspaceInviteResponseSchema,
   createWorkspaceResponseSchema,
   leaveWorkspaceResponseSchema,
@@ -274,6 +275,43 @@ export async function leaveWorkspace(
   }
 
   return leaveWorkspaceResponseSchema.parse(await response.json())
+}
+
+export async function archiveWorkspace(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/workspaces/${encodeURIComponent(workspaceId)}/archive`,
+    {
+      method: 'POST',
+      headers,
+    },
+  )
+
+  if (!response.ok) {
+    let detail = `API returned ${response.status}`
+    try {
+      const payload = (await response.json()) as {
+        message?: string | { message?: string }
+      }
+      if (typeof payload.message === 'string' && payload.message.trim()) {
+        detail = payload.message
+      } else if (
+        payload.message &&
+        typeof payload.message === 'object' &&
+        typeof payload.message.message === 'string'
+      ) {
+        detail = payload.message.message
+      }
+    } catch {
+      // keep status fallback
+    }
+    throw new Error(detail)
+  }
+
+  return archiveWorkspaceResponseSchema.parse(await response.json())
 }
 
 export async function listWorkspaceInvites(

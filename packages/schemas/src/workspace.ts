@@ -61,6 +61,14 @@ export const leaveWorkspaceResponseSchema = z.object({
 })
 export type LeaveWorkspaceResponse = z.infer<typeof leaveWorkspaceResponseSchema>
 
+export const archiveWorkspaceResponseSchema = z.object({
+  workspaceId: nonEmptyStringSchema,
+  guidance: nonEmptyStringSchema,
+})
+export type ArchiveWorkspaceResponse = z.infer<
+  typeof archiveWorkspaceResponseSchema
+>
+
 export const authContextSchema = z.object({
   userId: nonEmptyStringSchema,
   workspaceId: nonEmptyStringSchema,

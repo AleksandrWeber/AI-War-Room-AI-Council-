@@ -84,6 +84,7 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
       name: string
       shieldDisplaySensitivity: WorkspaceRecord['shieldDisplaySensitivity']
       createdAt: string
+      deletedAt: string | null
     }
   >([
     [
@@ -92,6 +93,7 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
         name: 'Local Workspace',
         shieldDisplaySensitivity: 'medium_and_up',
         createdAt: '2026-07-04T12:00:00.000Z',
+        deletedAt: null,
       },
     ],
     [
@@ -100,6 +102,7 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
         name: 'Secondary Workspace',
         shieldDisplaySensitivity: 'medium_and_up',
         createdAt: '2026-07-04T12:00:00.000Z',
+        deletedAt: null,
       },
     ],
     [
@@ -108,6 +111,7 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
         name: 'Workspace One',
         shieldDisplaySensitivity: 'medium_and_up',
         createdAt: '2026-07-04T12:00:00.000Z',
+        deletedAt: null,
       },
     ],
     [
@@ -116,6 +120,7 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
         name: 'Tiny Quota Workspace',
         shieldDisplaySensitivity: 'medium_and_up',
         createdAt: '2026-07-04T12:00:00.000Z',
+        deletedAt: null,
       },
     ],
     [
@@ -124,14 +129,21 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
         name: 'Pro Workspace',
         shieldDisplaySensitivity: 'medium_and_up',
         createdAt: '2026-07-04T12:00:00.000Z',
+        deletedAt: null,
       },
     ],
   ])
+  private readonly activeRunCounts = new Map<string, number>()
 
   async findMembership(
     userId: string,
     workspaceId: string,
   ): Promise<WorkspaceMembershipRecord | null> {
+    const workspace = this.workspaces.get(workspaceId)
+    if (!workspace || workspace.deletedAt) {
+      return null
+    }
+
     return this.memberships.get(`${userId}:${workspaceId}`) ?? null
   }
 
@@ -150,9 +162,13 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
   async listMembershipsForUser(
     userId: string,
   ): Promise<WorkspaceMembershipRecord[]> {
-    return [...this.memberships.values()].filter(
-      (membership) => membership.userId === userId,
-    )
+    return [...this.memberships.values()].filter((membership) => {
+      if (membership.userId !== userId) {
+        return false
+      }
+      const workspace = this.workspaces.get(membership.workspaceId)
+      return Boolean(workspace && !workspace.deletedAt)
+    })
   }
 
   async createWorkspace(input: {
@@ -169,6 +185,7 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
       name: input.name,
       shieldDisplaySensitivity: 'medium_and_up',
       createdAt,
+      deletedAt: null,
     })
     this.users.add(input.ownerUserId)
     this.memberships.set(`${input.ownerUserId}:${input.workspaceId}`, {
@@ -182,6 +199,7 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
       name: input.name,
       shieldDisplaySensitivity: 'medium_and_up',
       createdAt,
+      deletedAt: null,
     }
   }
 
@@ -205,6 +223,7 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
         name: `Workspace ${input.workspaceId}`,
         shieldDisplaySensitivity: 'medium_and_up',
         createdAt: new Date().toISOString(),
+        deletedAt: null,
       })
       actions.push('created_workspace')
     }
@@ -282,6 +301,7 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
         name: `Workspace ${input.workspaceId}`,
         shieldDisplaySensitivity: 'medium_and_up',
         createdAt: new Date().toISOString(),
+        deletedAt: null,
       })
     }
     const existingProfile = this.userProfiles.get(input.userId)
@@ -304,7 +324,7 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
   async getWorkspace(workspaceId: string): Promise<WorkspaceRecord | null> {
     const workspace = this.workspaces.get(workspaceId)
 
-    if (!workspace) {
+    if (!workspace || workspace.deletedAt) {
       return null
     }
 
@@ -313,7 +333,41 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
       name: workspace.name,
       shieldDisplaySensitivity: workspace.shieldDisplaySensitivity,
       createdAt: workspace.createdAt,
+      deletedAt: null,
     }
+  }
+
+  async softDeleteWorkspace(
+    workspaceId: string,
+  ): Promise<WorkspaceRecord | null> {
+    const workspace = this.workspaces.get(workspaceId)
+
+    if (!workspace || workspace.deletedAt) {
+      return null
+    }
+
+    const deletedAt = new Date().toISOString()
+    const updated = {
+      ...workspace,
+      deletedAt,
+    }
+    this.workspaces.set(workspaceId, updated)
+
+    return {
+      workspaceId,
+      name: updated.name,
+      shieldDisplaySensitivity: updated.shieldDisplaySensitivity,
+      createdAt: updated.createdAt,
+      deletedAt,
+    }
+  }
+
+  async countActiveRuns(workspaceId: string): Promise<number> {
+    return this.activeRunCounts.get(workspaceId) ?? 0
+  }
+
+  setActiveRunCount(workspaceId: string, count: number) {
+    this.activeRunCounts.set(workspaceId, count)
   }
 
   async updateWorkspaceName(input: {
@@ -322,7 +376,7 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
   }): Promise<WorkspaceRecord | null> {
     const workspace = this.workspaces.get(input.workspaceId)
 
-    if (!workspace) {
+    if (!workspace || workspace.deletedAt) {
       return null
     }
 
@@ -337,6 +391,7 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
       name: updated.name,
       shieldDisplaySensitivity: updated.shieldDisplaySensitivity,
       createdAt: updated.createdAt,
+      deletedAt: null,
     }
   }
 
@@ -346,7 +401,7 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
   }): Promise<WorkspaceRecord | null> {
     const workspace = this.workspaces.get(input.workspaceId)
 
-    if (!workspace) {
+    if (!workspace || workspace.deletedAt) {
       return null
     }
 
@@ -361,6 +416,7 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
       name: updated.name,
       shieldDisplaySensitivity: updated.shieldDisplaySensitivity,
       createdAt: updated.createdAt,
+      deletedAt: null,
     }
   }
 

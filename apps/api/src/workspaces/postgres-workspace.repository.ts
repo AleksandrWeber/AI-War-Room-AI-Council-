@@ -22,6 +22,7 @@ type WorkspaceRow = {
   name: string
   shield_display_sensitivity: WorkspaceRecord['shieldDisplaySensitivity']
   created_at: Date
+  deleted_at: Date | null
 }
 
 @Injectable()
@@ -34,10 +35,12 @@ export class PostgresWorkspaceRepository implements WorkspaceRepository {
   ): Promise<WorkspaceMembershipRecord | null> {
     const result = await this.postgresService.query<WorkspaceMembershipRow>(
       `
-        SELECT workspace_id, user_id, role
-        FROM workspace_memberships
-        WHERE user_id = $1
-          AND workspace_id = $2
+        SELECT m.workspace_id, m.user_id, m.role
+        FROM workspace_memberships m
+        INNER JOIN workspaces w ON w.workspace_id = m.workspace_id
+        WHERE m.user_id = $1
+          AND m.workspace_id = $2
+          AND w.deleted_at IS NULL
         LIMIT 1
       `,
       [userId, workspaceId],
@@ -87,10 +90,12 @@ export class PostgresWorkspaceRepository implements WorkspaceRepository {
       role: WorkspaceMembershipRecord['role']
     }>(
       `
-        SELECT workspace_id, user_id, role
-        FROM workspace_memberships
-        WHERE user_id = $1
-        ORDER BY workspace_id ASC
+        SELECT m.workspace_id, m.user_id, m.role
+        FROM workspace_memberships m
+        INNER JOIN workspaces w ON w.workspace_id = m.workspace_id
+        WHERE m.user_id = $1
+          AND w.deleted_at IS NULL
+        ORDER BY m.workspace_id ASC
       `,
       [userId],
     )
@@ -121,7 +126,7 @@ export class PostgresWorkspaceRepository implements WorkspaceRepository {
         `
           INSERT INTO workspaces (workspace_id, name)
           VALUES ($1, $2)
-          RETURNING workspace_id, name, shield_display_sensitivity, created_at
+          RETURNING workspace_id, name, shield_display_sensitivity, created_at, deleted_at
         `,
         [input.workspaceId, input.name],
       )
@@ -173,6 +178,9 @@ export class PostgresWorkspaceRepository implements WorkspaceRepository {
         name: workspace.name,
         shieldDisplaySensitivity: workspace.shield_display_sensitivity,
         createdAt: workspace.created_at.toISOString(),
+        deletedAt: workspace.deleted_at
+          ? workspace.deleted_at.toISOString()
+          : null,
       }
     })
   }
@@ -424,9 +432,10 @@ export class PostgresWorkspaceRepository implements WorkspaceRepository {
   async getWorkspace(workspaceId: string): Promise<WorkspaceRecord | null> {
     const result = await this.postgresService.query<WorkspaceRow>(
       `
-        SELECT workspace_id, name, shield_display_sensitivity, created_at
+        SELECT workspace_id, name, shield_display_sensitivity, created_at, deleted_at
         FROM workspaces
         WHERE workspace_id = $1
+          AND deleted_at IS NULL
         LIMIT 1
       `,
       [workspaceId],
@@ -440,6 +449,42 @@ export class PostgresWorkspaceRepository implements WorkspaceRepository {
     return this.mapWorkspace(row)
   }
 
+  async softDeleteWorkspace(
+    workspaceId: string,
+  ): Promise<WorkspaceRecord | null> {
+    const result = await this.postgresService.query<WorkspaceRow>(
+      `
+        UPDATE workspaces
+        SET deleted_at = NOW()
+        WHERE workspace_id = $1
+          AND deleted_at IS NULL
+        RETURNING workspace_id, name, shield_display_sensitivity, created_at, deleted_at
+      `,
+      [workspaceId],
+    )
+    const row = result.rows[0]
+
+    if (!row) {
+      return null
+    }
+
+    return this.mapWorkspace(row)
+  }
+
+  async countActiveRuns(workspaceId: string): Promise<number> {
+    const result = await this.postgresService.query<{ count: string }>(
+      `
+        SELECT COUNT(*)::text AS count
+        FROM runs
+        WHERE workspace_id = $1
+          AND status IN ('draft', 'pending', 'running')
+      `,
+      [workspaceId],
+    )
+
+    return Number(result.rows[0]?.count ?? '0')
+  }
+
   async updateWorkspaceName(input: {
     workspaceId: string
     name: string
@@ -449,7 +494,8 @@ export class PostgresWorkspaceRepository implements WorkspaceRepository {
         UPDATE workspaces
         SET name = $2
         WHERE workspace_id = $1
-        RETURNING workspace_id, name, shield_display_sensitivity, created_at
+          AND deleted_at IS NULL
+        RETURNING workspace_id, name, shield_display_sensitivity, created_at, deleted_at
       `,
       [input.workspaceId, input.name],
     )
@@ -471,7 +517,8 @@ export class PostgresWorkspaceRepository implements WorkspaceRepository {
         UPDATE workspaces
         SET shield_display_sensitivity = $2
         WHERE workspace_id = $1
-        RETURNING workspace_id, name, shield_display_sensitivity, created_at
+          AND deleted_at IS NULL
+        RETURNING workspace_id, name, shield_display_sensitivity, created_at, deleted_at
       `,
       [input.workspaceId, input.shieldDisplaySensitivity],
     )
@@ -490,6 +537,7 @@ export class PostgresWorkspaceRepository implements WorkspaceRepository {
       name: row.name,
       shieldDisplaySensitivity: row.shield_display_sensitivity,
       createdAt: row.created_at.toISOString(),
+      deletedAt: row.deleted_at ? row.deleted_at.toISOString() : null,
     }
   }
 }
