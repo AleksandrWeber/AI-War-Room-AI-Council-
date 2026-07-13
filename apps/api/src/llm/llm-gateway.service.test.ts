@@ -258,6 +258,32 @@ describe('LlmGatewayService', () => {
     ])
   })
 
+  it('accepts oversized strings by truncating them to schema limits', async () => {
+    const boundedSchema = z.object({
+      summary: z.string().max(20),
+      risks: z.array(z.string()),
+    })
+    const { gateway } = createGateway([
+      new ScriptedProvider('mock', [
+        JSON.stringify({
+          summary: 'This summary is intentionally longer than twenty characters.',
+          risks: [],
+        }),
+      ]),
+    ])
+
+    const result = await gateway.generateStructuredJson({
+      taskName: 'test',
+      schema: boundedSchema,
+      messages: [{ role: 'user', content: 'Return JSON.' }],
+      fallback: { summary: 'fallback', risks: [] },
+    })
+
+    expect(result.validationStatus).toBe('valid')
+    expect(result.value.summary.length).toBe(20)
+    expect(result.value.summary.endsWith('…')).toBe(true)
+  })
+
   it('routes from champion to deputy after a provider failure', async () => {
     const { gateway, observability, modelRouter } = createGateway([
       new ScriptedProvider('mock', [

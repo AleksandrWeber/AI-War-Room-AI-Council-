@@ -14,6 +14,7 @@ import {
   prdSchema,
 } from '@ai-war-room/schemas'
 import { LlmGatewayService } from '../llm/llm-gateway.service.js'
+import { truncateText } from '../llm/llm.utils.js'
 import { artifactPrompts } from '../prompts/artifact.prompts.js'
 import {
   getDevelopmentPromptSystemAddon,
@@ -237,7 +238,7 @@ export class ArtifactService {
     moderatorSynthesis: ModeratorSynthesis
   }): ExecutiveSummary {
     return {
-      productIdea: input.draftRun.idea.rawIdea,
+      productIdea: truncateText(input.draftRun.idea.rawIdea, 2_000),
       targetUsers: input.moderatorSynthesis.targetUsers,
       coreValueProposition: input.moderatorSynthesis.proposedSolution,
       mainDifferentiator:
@@ -295,6 +296,22 @@ export class ArtifactService {
         'User approval rate after Human Review.',
       ],
       openQuestions: input.moderatorSynthesis.openQuestions,
+      screensOrViews: [
+        'Idea submission screen',
+        'Human review screen',
+        'Pipeline progress view',
+        'Artifact viewer with Development Prompt copy action',
+      ],
+      userStories: [
+        'As a founder, I want to submit a product idea so that I can get a structured plan.',
+        'As a builder, I want a detailed development prompt so that I can implement a web app in Cursor.',
+        'As a reviewer, I want agent gaps and additions so that I know what to improve in the idea.',
+      ],
+      acceptanceCriteria: [
+        'PRD includes screens, user stories, and acceptance criteria.',
+        'Development Prompt includes buildTodos and a copyPasteBrief.',
+        'Pipeline validates all artifacts against shared schemas.',
+      ],
     }
   }
 
@@ -304,6 +321,44 @@ export class ArtifactService {
     targetTool: DevelopmentPromptTargetTool
     toolSpecificGuidance: string[]
   }): DevelopmentPrompt {
+    const buildTodos = [
+      {
+        title: 'Scaffold the web app shell',
+        details:
+          'Create the Vite + React + TypeScript app shell with routing and a primary layout for the product idea screens.',
+        acceptanceCheck: 'App boots locally and shows an empty home route.',
+        suggestedFiles: ['apps/web/src/App.tsx', 'apps/web/src/main.tsx'],
+      },
+      {
+        title: 'Model core entities',
+        details:
+          'Define TypeScript types/Zod schemas for the main entities described in the PRD data model.',
+        acceptanceCheck: 'Schemas parse fixture objects for the primary entities.',
+        suggestedFiles: ['packages/schemas/src'],
+      },
+      {
+        title: 'Implement primary screens',
+        details:
+          'Build the screens listed in screenMap with the functional requirements from the PRD.',
+        acceptanceCheck: 'Each screenOrViews item is reachable in the UI.',
+        suggestedFiles: ['apps/web/src'],
+      },
+      {
+        title: 'Wire API endpoints',
+        details:
+          'Implement the API requirements needed for the MVP journeys and validate responses with shared schemas.',
+        acceptanceCheck: 'Core endpoints return schema-valid JSON in local smoke checks.',
+        suggestedFiles: ['apps/api/src'],
+      },
+      {
+        title: 'Add acceptance tests',
+        details:
+          'Cover the happy-path user journey and schema validation gates listed in testingRequirements.',
+        acceptanceCheck: 'Targeted tests pass locally.',
+        suggestedFiles: ['apps/api/src', 'apps/web/src'],
+      },
+    ]
+
     return {
       targetTool: input.targetTool,
       productSummary: input.completedPrd.overview,
@@ -332,6 +387,7 @@ export class ArtifactService {
         'Show agent step statuses.',
         'Render generated artifacts after execution.',
         'Keep Shield warnings compact and contextual.',
+        'Expose copy action for Development Prompt copyPasteBrief.',
       ],
       securityConstraints: input.completedPrd.securityConsiderations,
       testingRequirements: [
@@ -345,6 +401,25 @@ export class ArtifactService {
       ],
       outOfScope: input.completedPrd.nonGoals,
       toolSpecificGuidance: input.toolSpecificGuidance,
+      buildTodos,
+      screenMap:
+        input.completedPrd.screensOrViews.length > 0
+          ? input.completedPrd.screensOrViews
+          : [
+              'Idea submission',
+              'Human review',
+              'Pipeline progress',
+              'Artifact viewer',
+            ],
+      copyPasteBrief: [
+        `Build the product described in this PRD overview: ${input.completedPrd.overview}`,
+        `Target users: ${input.completedPrd.userPersonas.join(', ')}`,
+        `MVP scope: ${input.completedPrd.mvpScope.join('; ')}`,
+        `Screens: ${input.completedPrd.screensOrViews.join('; ') || 'Define from MVP scope'}`,
+        'Implement using Vite, React, TypeScript, NestJS, Fastify, and Zod.',
+        'Work through buildTodos one by one with acceptance checks after each todo.',
+        `Additions from moderator: ${(input.moderatorSynthesis.additionsToIdea ?? []).join('; ')}`,
+      ].join('\n\n'),
     }
   }
 }

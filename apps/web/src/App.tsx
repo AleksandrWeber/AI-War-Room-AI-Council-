@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent, type ReactNode } from 'react'
 import type {
   AuthCapabilitiesResponse,
   AuthRolloutResponse,
@@ -1312,6 +1312,10 @@ type AgentExecution = {
     weaknesses: string[]
     risks: string[]
     recommendations: string[]
+    ideaGaps?: string[]
+    additions?: string[]
+    mustHaveFeatures?: string[]
+    buildNotes?: string[]
   }
 }
 
@@ -1520,16 +1524,140 @@ function getSeverityLabel(severity: string) {
 
 function renderArtifactValue(value: unknown) {
   if (Array.isArray(value)) {
+    if (
+      value.length > 0 &&
+      value.every(
+        (item) =>
+          item !== null &&
+          typeof item === 'object' &&
+          !Array.isArray(item) &&
+          'title' in item,
+      )
+    ) {
+      return (
+        <ol className="build-todo-list">
+          {value.map((item, index) => {
+            const todo = item as {
+              title: string
+              details?: string
+              acceptanceCheck?: string
+              suggestedFiles?: string[]
+            }
+            return (
+              <li key={`${todo.title}-${index}`} className="build-todo-item">
+                <strong>{todo.title}</strong>
+                {todo.details ? <p>{todo.details}</p> : null}
+                {todo.acceptanceCheck ? (
+                  <p>
+                    <em>Acceptance:</em> {todo.acceptanceCheck}
+                  </p>
+                ) : null}
+                {todo.suggestedFiles && todo.suggestedFiles.length > 0 ? (
+                  <p>
+                    <em>Files:</em> {todo.suggestedFiles.join(', ')}
+                  </p>
+                ) : null}
+              </li>
+            )
+          })}
+        </ol>
+      )
+    }
+
     return (
       <ul>
         {value.map((item, index) => (
-          <li key={`${String(item)}-${index}`}>{String(item)}</li>
+          <li key={`${String(item)}-${index}`}>
+            {typeof item === 'object' && item !== null
+              ? JSON.stringify(item)
+              : String(item)}
+          </li>
         ))}
       </ul>
     )
   }
 
+  if (typeof value === 'string' && value.length > 400) {
+    return <pre className="artifact-long-text">{value}</pre>
+  }
+
   return <p>{String(value)}</p>
+}
+
+function renderAgentListSection(title: string, items: string[] | undefined) {
+  if (!items || items.length === 0) {
+    return null
+  }
+
+  return (
+    <div className="agent-section">
+      <h4>{title}</h4>
+      <ul>
+        {items.map((item, index) => (
+          <li key={`${title}-${index}`}>{item}</li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function CollapsiblePanel({
+  eyebrow,
+  title,
+  description,
+  className,
+  id,
+  headingId,
+  defaultOpen = false,
+  open,
+  onOpenChange,
+  children,
+  'aria-busy': ariaBusy,
+}: {
+  eyebrow: string
+  title: string
+  description?: string
+  className?: string
+  id?: string
+  headingId?: string
+  defaultOpen?: boolean
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
+  children: ReactNode
+  'aria-busy'?: boolean
+}) {
+  const controlled = open !== undefined
+
+  return (
+    <section
+      className={['panel', 'collapsible-panel', className].filter(Boolean).join(' ')}
+      id={id}
+      aria-labelledby={headingId}
+      aria-busy={ariaBusy}
+    >
+      <details
+        className="collapsible-panel-details"
+        {...(controlled
+          ? {
+              open,
+              onToggle: (event: React.SyntheticEvent<HTMLDetailsElement>) => {
+                onOpenChange?.(event.currentTarget.open)
+              },
+            }
+          : { defaultOpen })}
+      >
+        <summary className="collapsible-panel-summary">
+          <div className="section-heading">
+            <p className="eyebrow">{eyebrow}</p>
+            <h2 id={headingId}>{title}</h2>
+            {description ? <p>{description}</p> : null}
+          </div>
+          <span className="collapsible-panel-chevron" aria-hidden="true" />
+        </summary>
+        <div className="collapsible-panel-body">{children}</div>
+      </details>
+    </section>
+  )
 }
 
 function parseSseEvents(chunk: string): PipelineStreamEvent[] {
@@ -2874,6 +3002,7 @@ function App() {
     null,
   )
   const [artifactHistory, setArtifactHistory] = useState<ArtifactHistoryItem[]>([])
+  const [artifactHistoryOpen, setArtifactHistoryOpen] = useState(false)
   const [historyError, setHistoryError] = useState<string | null>(null)
   const [feedbackComment, setFeedbackComment] = useState('')
   const [feedbackState, setFeedbackState] = useState<
@@ -7512,6 +7641,7 @@ function App() {
 
       const history = (await response.json()) as ArtifactHistoryResponse
       setArtifactHistory(history.artifacts)
+      setArtifactHistoryOpen(true)
 
       return history.artifacts
     } catch (error) {
@@ -29760,6 +29890,13 @@ function App() {
   }
 
   function handlePipelineStreamEvent(event: PipelineStreamEvent) {
+    // Keepalive pings must not accumulate in React state (long runs).
+    if (event.type === 'status' && event.stepId === 'heartbeat') {
+      lastStreamEventIdRef.current = event.eventId
+      setLastStreamEventId(event.eventId)
+      return
+    }
+
     setStreamEvents((current) => [...current, event])
     lastStreamEventIdRef.current = event.eventId
     setLastStreamEventId(event.eventId)
@@ -29838,8 +29975,13 @@ function App() {
   const liveStepLabel =
     [...statusEvents]
       .reverse()
-      .find((event) => event.status === 'running')?.label ??
-    statusEvents.at(-1)?.label ??
+      .find(
+        (event) =>
+          event.status === 'running' && event.stepId !== 'heartbeat',
+      )?.label ??
+    statusEvents
+      .filter((event) => event.stepId !== 'heartbeat')
+      .at(-1)?.label ??
     (pipelineState === 'running' ? 'Waiting for the first agent step…' : null)
   const pipelineElapsedLabel = `${Math.floor(pipelineElapsedSec / 60)}:${String(
     pipelineElapsedSec % 60,
@@ -30123,17 +30265,13 @@ function App() {
         </div>
       </section>
 
-      <section className="panel provider-panel">
-        <div className="section-heading">
-          <p className="eyebrow">Provider Keys</p>
-          <h2>Connect workspace AI providers.</h2>
-          <p>
-            Add Anthropic or OpenAI keys from the client UI. Keys are sent
-            directly to the backend, encrypted before PostgreSQL storage, and
-            never returned to the browser.
-          </p>
-        </div>
-
+      <CollapsiblePanel
+        className="provider-panel"
+        eyebrow="Provider Keys"
+        title="Connect workspace AI providers."
+        description="Add Anthropic or OpenAI keys from the client UI. Keys are sent directly to the backend, encrypted before PostgreSQL storage, and never returned to the browser."
+        defaultOpen={false}
+      >
         {providerCredentials?.needsProviderKey ? (
           <div className="provider-alert">
             <strong>No backend provider keys found.</strong>
@@ -30314,19 +30452,16 @@ function App() {
             )}
           </div>
         ) : null}
-      </section>
+      </CollapsiblePanel>
 
-      <section className="panel billing-panel" id="billing">
-        <div className="section-heading">
-          <p className="eyebrow">Workspace Billing</p>
-          <h2>Upgrade tiers and unlock paid features.</h2>
-          <p>
-            Market Research and higher daily usage limits require a paid
-            workspace tier. Checkout uses mock billing locally or Stripe in
-            production.
-          </p>
-        </div>
-
+      <CollapsiblePanel
+        className="billing-panel"
+        id="billing"
+        eyebrow="Workspace Billing"
+        title="Upgrade tiers and unlock paid features."
+        description="Market Research and higher daily usage limits require a paid workspace tier. Checkout uses mock billing locally or Stripe in production."
+        defaultOpen={false}
+      >
                 <RolloutAdminLazyGate
           enabled={rolloutControlsEnabled}
           rolloutProps={{
@@ -32834,23 +32969,18 @@ function App() {
           onExportInvoices={(format) => handleExportBillingInvoices(format)}
         />
 
-      </section>
+      </CollapsiblePanel>
 
       {draftRun && reviewDraft ? (
-        <section
-          className="panel review-panel"
+        <CollapsiblePanel
+          className="review-panel"
           id="human-review"
-          aria-labelledby="human-review-heading"
+          headingId="human-review-heading"
+          eyebrow="Human Review"
+          title="Approve the plan before execution."
+          description="Draft state is autosaved locally. Review Shield context, triage, selected agents, and estimated run cost before execution."
+          defaultOpen
         >
-          <div className="section-heading">
-            <p className="eyebrow">Human Review</p>
-            <h2 id="human-review-heading">Approve the plan before execution.</h2>
-            <p>
-              Draft state is autosaved locally. Review Shield context, triage,
-              selected agents, and estimated run cost before execution.
-            </p>
-          </div>
-
           <div className="review-grid">
             <div className="review-card">
               <h3 className="review-card-title">Input with Shield context</h3>
@@ -33276,33 +33406,30 @@ function App() {
               </div>
             ) : null}
           </div>
-        </section>
+        </CollapsiblePanel>
       ) : null}
 
       {pipelineResult || streamEvents.length > 0 || pipelineState === 'running' ? (
-        <section
-          className="panel results-panel"
+        <CollapsiblePanel
+          className="results-panel"
           id="pipeline-result"
-          aria-labelledby="pipeline-result-heading"
+          headingId="pipeline-result-heading"
+          eyebrow="Pipeline Result"
+          title={
+            pipelineState === 'running'
+              ? useTemporalWorkflowRuntime
+                ? 'Observing Temporal workflow...'
+                : 'Streaming run status...'
+              : 'Artifacts generated from isolated prompt-driven agents.'
+          }
+          description={
+            activeTemporalWorkflow
+              ? `Workflow ${activeTemporalWorkflow.workflowId} is ${activeTemporalWorkflow.status}.`
+              : undefined
+          }
+          defaultOpen
           aria-busy={pipelineState === 'running'}
         >
-          <div className="section-heading">
-            <p className="eyebrow">Pipeline Result</p>
-            <h2 id="pipeline-result-heading">
-              {pipelineState === 'running'
-                ? useTemporalWorkflowRuntime
-                  ? 'Observing Temporal workflow...'
-                  : 'Streaming run status...'
-                : 'Artifacts generated from isolated prompt-driven agents.'}
-            </h2>
-            {activeTemporalWorkflow ? (
-              <p>
-                Workflow {activeTemporalWorkflow.workflowId} is{' '}
-                {activeTemporalWorkflow.status}.
-              </p>
-            ) : null}
-          </div>
-
           <div
             className="step-list"
             role="list"
@@ -33351,6 +33478,30 @@ function App() {
                   <article className="agent-card" key={agentOutput.agentRole}>
                     <h3>{formatAgent(agentOutput.agentRole)}</h3>
                     <p>{agentOutput.output.summary}</p>
+                    {renderAgentListSection(
+                      'Idea gaps',
+                      agentOutput.output.ideaGaps,
+                    )}
+                    {renderAgentListSection(
+                      'What to add',
+                      agentOutput.output.additions,
+                    )}
+                    {renderAgentListSection(
+                      'Must-have features',
+                      agentOutput.output.mustHaveFeatures,
+                    )}
+                    {renderAgentListSection(
+                      'Build notes',
+                      agentOutput.output.buildNotes,
+                    )}
+                    {renderAgentListSection(
+                      'Recommendations',
+                      agentOutput.output.recommendations,
+                    )}
+                    {renderAgentListSection(
+                      'Risks',
+                      agentOutput.output.risks,
+                    )}
                     <div className="metadata-row">
                       <span>{agentOutput.validationStatus}</span>
                       <span>{agentOutput.modelProvider}</span>
@@ -33504,6 +33655,25 @@ function App() {
                     >
                       Export Markdown
                     </button>
+                    {selectedArtifact.metadata.artifactType ===
+                      'development_prompt' &&
+                    typeof selectedArtifact.artifact.content.copyPasteBrief ===
+                      'string' ? (
+                      <button
+                        className="secondary-button"
+                        type="button"
+                        data-testid="copy-development-prompt-brief"
+                        onClick={() => {
+                          void navigator.clipboard.writeText(
+                            String(
+                              selectedArtifact.artifact.content.copyPasteBrief,
+                            ),
+                          )
+                        }}
+                      >
+                        Copy Cursor brief
+                      </button>
+                    ) : null}
                   </div>
                   {Object.entries(selectedArtifact.artifact.content).map(
                     ([key, value]) => (
@@ -33629,26 +33799,41 @@ function App() {
               </div>
             </div>
           ) : null}
-        </section>
+        </CollapsiblePanel>
       ) : null}
 
-      <section className="panel history-panel">
-        <div className="section-heading">
-          <p className="eyebrow">Artifact History</p>
-          <h2>Durable artifacts from previous runs.</h2>
-          <p>
-            History is workspace-scoped. Each artifact is immutable. PDF is the
-            primary export; Markdown remains available as a lightweight secondary
-            format.
-          </p>
+      <CollapsiblePanel
+        className="history-panel"
+        eyebrow="Artifact History"
+        title="Durable artifacts from previous runs."
+        description="History is workspace-scoped. Each artifact is immutable. PDF is the primary export; Markdown remains available as a lightweight secondary format."
+        open={artifactHistoryOpen}
+        onOpenChange={setArtifactHistoryOpen}
+      >
+        <div className="collapsible-panel-actions">
+          <button
+            className="execute-button"
+            type="button"
+            onClick={() => {
+              void handleLoadArtifactHistory()
+            }}
+          >
+            Load artifact history
+          </button>
+          {artifactHistory.length > 0 ? (
+            <button
+              className="secondary-button"
+              type="button"
+              onClick={() => {
+                setArtifactHistory([])
+                setHistoryError(null)
+                setArtifactHistoryOpen(false)
+              }}
+            >
+              Hide history
+            </button>
+          ) : null}
         </div>
-        <button
-          className="execute-button"
-          type="button"
-          onClick={handleLoadArtifactHistory}
-        >
-          Load artifact history
-        </button>
         {historyError ? <p className="form-error">{historyError}</p> : null}
         {artifactHistory.length > 0 ? (
           <div className="history-list">
@@ -33681,49 +33866,58 @@ function App() {
             ))}
           </div>
         ) : null}
-      </section>
+      </CollapsiblePanel>
 
-      <section className="panel" id="pipeline">
-        <div className="section-heading">
-          <p className="eyebrow">Pipeline</p>
-          <h2>Structured, resumable, and guarded.</h2>
-        </div>
+      <CollapsiblePanel
+        id="pipeline"
+        eyebrow="Pipeline"
+        title="Structured, resumable, and guarded."
+        defaultOpen={false}
+      >
         <ol className="pipeline-list">
           {pipelineSteps.map((step) => (
             <li key={step}>{step}</li>
           ))}
         </ol>
-      </section>
+      </CollapsiblePanel>
 
-      <section className="grid-section">
-        <div className="panel">
-          <p className="eyebrow">Agent model</p>
-          <h2>Parallel experts, no endless debate.</h2>
-          <div className="agent-list">
-            {agentCards.map((agent) => (
-              <article className="agent-card" key={agent.title}>
-                <h3>{agent.title}</h3>
-                <p>{agent.text}</p>
-              </article>
-            ))}
+      <CollapsiblePanel
+        className="grid-section-panel"
+        eyebrow="Council model"
+        title="Parallel experts, no endless debate."
+        description="Specialists run in isolation. Shield stays quiet until it matters."
+        defaultOpen={false}
+      >
+        <div className="grid-section collapsible-grid">
+          <div className="panel nested-panel">
+            <p className="eyebrow">Agent model</p>
+            <h2>Parallel experts, no endless debate.</h2>
+            <div className="agent-list">
+              {agentCards.map((agent) => (
+                <article className="agent-card" key={agent.title}>
+                  <h3>{agent.title}</h3>
+                  <p>{agent.text}</p>
+                </article>
+              ))}
+            </div>
+          </div>
+
+          <div className="panel shield-panel nested-panel">
+            <p className="eyebrow">Shield layer</p>
+            <h2>Security stays quiet until it matters.</h2>
+            <p>
+              Shield scans user input, agent output, moderator synthesis, and
+              final artifacts. Findings are shown as compact warnings with exact
+              text highlights, while low-risk checks stay in the background.
+            </p>
+            <div className="finding-preview">
+              <span>Example finding</span>
+              <mark>ignore previous instructions</mark>
+              <p>Prompt injection pattern detected. Require confirmation.</p>
+            </div>
           </div>
         </div>
-
-        <div className="panel shield-panel">
-          <p className="eyebrow">Shield layer</p>
-          <h2>Security stays quiet until it matters.</h2>
-          <p>
-            Shield scans user input, agent output, moderator synthesis, and
-            final artifacts. Findings are shown as compact warnings with exact
-            text highlights, while low-risk checks stay in the background.
-          </p>
-          <div className="finding-preview">
-            <span>Example finding</span>
-            <mark>ignore previous instructions</mark>
-            <p>Prompt injection pattern detected. Require confirmation.</p>
-          </div>
-        </div>
-      </section>
+      </CollapsiblePanel>
     </main>
   )
 }

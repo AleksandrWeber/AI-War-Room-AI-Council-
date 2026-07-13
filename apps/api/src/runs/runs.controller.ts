@@ -10,6 +10,7 @@ import {
 } from '@nestjs/common'
 import type { FastifyReply } from 'fastify'
 import { randomUUID } from 'node:crypto'
+import { ZodError } from 'zod'
 import {
   WorkspaceAccessGuard,
   type AuthenticatedRequest,
@@ -262,6 +263,10 @@ export class RunsController {
     reply.raw.writeHead(200, this.buildSseHeaders(request))
 
     const send = async (event: PipelineStreamEvent) => {
+      if (reply.raw.destroyed) {
+        return
+      }
+
       const bufferedEvent = runId
         ? await this.streamEventBufferService.append({
             workspaceId,
@@ -272,6 +277,21 @@ export class RunsController {
 
       this.writeStreamEvent(reply, bufferedEvent)
     }
+
+    const heartbeat = setInterval(() => {
+      if (reply.raw.destroyed) {
+        return
+      }
+
+      this.writeStreamEvent(reply, {
+        eventId: `event_${randomUUID()}`,
+        type: 'status',
+        stepId: 'heartbeat',
+        label: 'Still working…',
+        status: 'running',
+        timestamp: new Date().toISOString(),
+      })
+    }, 10_000)
 
     try {
       if (runId && lastEventId) {
@@ -299,13 +319,27 @@ export class RunsController {
       send({
         eventId: `event_${randomUUID()}`,
         type: 'error',
-        message:
-          error instanceof Error ? error.message : 'Failed to execute pipeline.',
+        message: this.formatPipelineError(error),
         timestamp: new Date().toISOString(),
       })
     } finally {
+      clearInterval(heartbeat)
       reply.raw.end()
     }
+  }
+
+  private formatPipelineError(error: unknown) {
+    if (error instanceof ZodError) {
+      return error.issues
+        .map((issue) => `${issue.path.join('.') || 'root'}: ${issue.message}`)
+        .join('; ')
+    }
+
+    if (error instanceof Error) {
+      return error.message
+    }
+
+    return 'Failed to execute pipeline.'
   }
 
   private writeStreamEvent(reply: FastifyReply, event: PipelineStreamEvent) {

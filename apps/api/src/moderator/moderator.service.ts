@@ -98,6 +98,16 @@ export class ModeratorService {
         'Which artifact format should users export first?',
         'What quality signal proves that a generated development prompt is build-ready?',
       ],
+      additionsToIdea: [
+        ...input.agentOutputs.flatMap((agent) => agent.output.additions).slice(0, 8),
+        'Add an explicit MVP checklist and non-goals section to the idea brief.',
+      ].slice(0, 12),
+      mvpBuildSequence: [
+        'Define screens, entities, and acceptance criteria from the idea.',
+        'Generate PRD with user stories and functional requirements.',
+        'Produce a Cursor-ready Development Prompt with buildTodos.',
+        'Implement web app modules in todo order with verification gates.',
+      ],
       artifactGenerationBrief: {
         promptVersion: moderatorPromptV1.version,
         validationStatus: 'fallback',

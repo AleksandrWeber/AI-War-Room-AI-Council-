@@ -10,6 +10,7 @@ import { LlmProviderRegistry } from './llm-provider.registry.js'
 import type { LlmMessage, StructuredJsonRequest, StructuredJsonResult } from './llm.types.js'
 import {
   addUsage,
+  applyZodTooBigTruncation,
   emptyUsage,
   parseJsonObject,
 } from './llm.utils.js'
@@ -180,8 +181,14 @@ export class LlmGatewayService {
       'error',
     )
 
+    const fallbackValue = this.ensureSchemaValue(
+      request.schema,
+      request.fallback,
+      'LLM fallback value failed schema validation.',
+    )
+
     return {
-      value: request.fallback,
+      value: fallbackValue,
       rawText: lastRawText,
       validationStatus: 'fallback',
       providerId,
@@ -200,26 +207,89 @@ export class LlmGatewayService {
     | { success: false; error: string } {
     try {
       const json = parseJsonObject(rawText)
-      const result = schema.safeParse(json)
+      const result = this.safeParseWithTruncation(schema, json)
 
       if (!result.success) {
         return {
           success: false,
-          error: result.error.issues
-            .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
-            .join('; '),
+          error: result.error,
         }
       }
 
       return {
         success: true,
-        value: result.data,
+        value: result.value,
       }
     } catch (error) {
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Unknown parse error.',
       }
+    }
+  }
+
+  private ensureSchemaValue<TSchema extends z.ZodType>(
+    schema: TSchema,
+    value: unknown,
+    failureMessage: string,
+  ): z.infer<TSchema> {
+    const parsed = this.safeParseWithTruncation(schema, value)
+
+    if (!parsed.success) {
+      throw new Error(`${failureMessage} ${parsed.error}`)
+    }
+
+    return parsed.value
+  }
+
+  private safeParseWithTruncation<TSchema extends z.ZodType>(
+    schema: TSchema,
+    value: unknown,
+  ):
+    | { success: true; value: z.infer<TSchema> }
+    | { success: false; error: string } {
+    const first = schema.safeParse(value)
+
+    if (first.success) {
+      return {
+        success: true,
+        value: first.data,
+      }
+    }
+
+    const truncated = applyZodTooBigTruncation(
+      value,
+      first.error.issues as Array<{
+        code: string
+        origin?: string
+        maximum?: number
+        path: PropertyKey[]
+      }>,
+    )
+
+    if (truncated !== null) {
+      const second = schema.safeParse(truncated)
+
+      if (second.success) {
+        return {
+          success: true,
+          value: second.data,
+        }
+      }
+
+      return {
+        success: false,
+        error: second.error.issues
+          .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
+          .join('; '),
+      }
+    }
+
+    return {
+      success: false,
+      error: first.error.issues
+        .map((issue) => `${issue.path.join('.')}: ${issue.message}`)
+        .join('; '),
     }
   }
 
@@ -246,7 +316,7 @@ export class LlmGatewayService {
       return 'triage'
     }
 
-    if (taskName === 'moderator/v1') {
+    if (taskName.startsWith('moderator/')) {
       return 'moderator'
     }
 

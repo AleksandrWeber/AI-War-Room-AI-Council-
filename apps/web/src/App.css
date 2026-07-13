@@ -16595,6 +16595,69 @@
   margin-bottom: 24px;
 }
 
+.collapsible-panel {
+  margin-bottom: 24px;
+}
+
+.collapsible-panel-details {
+  display: grid;
+  gap: 0;
+}
+
+.collapsible-panel-summary {
+  align-items: flex-start;
+  cursor: pointer;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+  list-style: none;
+}
+
+.collapsible-panel-summary::-webkit-details-marker {
+  display: none;
+}
+
+.collapsible-panel-summary .section-heading {
+  flex: 1;
+  margin: 0;
+}
+
+.collapsible-panel-chevron {
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  flex: 0 0 auto;
+  height: 10px;
+  margin-top: 10px;
+  transform: rotate(45deg);
+  transition: transform 160ms ease;
+  width: 10px;
+}
+
+.collapsible-panel-details[open] > .collapsible-panel-summary .collapsible-panel-chevron {
+  margin-top: 14px;
+  transform: rotate(225deg);
+}
+
+.collapsible-panel-body {
+  display: grid;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.collapsible-panel-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.collapsible-grid {
+  margin: 0;
+}
+
+.nested-panel {
+  margin: 0;
+}
+
 .history-list {
   display: grid;
   gap: 12px;
@@ -16865,6 +16928,56 @@
 .agent-card p,
 .shield-panel p {
   color: var(--muted);
+}
+
+.agent-card .agent-section {
+  margin-top: 14px;
+}
+
+.agent-card .agent-section h4 {
+  color: var(--text);
+  font-size: 13px;
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.agent-card .agent-section ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.agent-card .agent-section li {
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.build-todo-list {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.build-todo-item {
+  margin-bottom: 12px;
+}
+
+.build-todo-item p {
+  margin: 4px 0 0;
+}
+
+.artifact-long-text {
+  white-space: pre-wrap;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--muted);
+  margin: 0;
+  max-height: 320px;
+  overflow: auto;
+  padding: 12px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.02);
 }
 
 .finding-preview {

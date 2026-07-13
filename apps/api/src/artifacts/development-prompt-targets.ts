@@ -16,11 +16,12 @@ export function getDevelopmentPromptToolGuidance(
   switch (targetTool) {
     case 'cursor':
       return [
-        'Optimize steps for Cursor Agent / Composer with small file-scoped edits.',
-        'Prefer explicit file paths, acceptance checks, and iterative verification loops.',
+        'Optimize buildTodos and implementationOrder for Cursor Agent / Composer with small file-scoped edits.',
+        'Prefer explicit file paths in suggestedFiles, acceptance checks, and iterative verification loops.',
         'Call out when the implementer should open related files as context before editing.',
-        'Keep each implementationOrder item small enough for one Composer turn when possible.',
+        'Keep each buildTodos item small enough for one Composer turn when possible.',
         'After risky edits, require a local build/typecheck/test gate before the next step.',
+        'Make copyPasteBrief paste-ready as the first message in a new Cursor Agent chat.',
       ]
     case 'claude_code':
       return [
@@ -57,7 +58,8 @@ export function getDevelopmentPromptSystemAddon(
       return [
         'Target tool: Cursor (Agent / Composer).',
         'Keep the completed PRD as the single source of truth.',
-        'Write implementationOrder and toolSpecificGuidance for file-scoped Cursor edits with explicit paths and verification gates.',
+        'Write buildTodos, implementationOrder, and toolSpecificGuidance for file-scoped Cursor edits with explicit paths and verification gates.',
+        'copyPasteBrief must be a complete first-message brief for Cursor Agent.',
       ].join(' ')
     case 'claude_code':
       return [

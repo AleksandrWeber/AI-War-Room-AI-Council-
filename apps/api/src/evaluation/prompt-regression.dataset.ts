@@ -65,15 +65,35 @@ const agentOutput = {
   runId: 'run_eval',
   agentRole: 'product_manager',
   output: {
-    summary: 'Product Manager reviewed the idea for technical founders.',
+    summary:
+      'Product Manager produced a full breakdown for technical founders covering positioning, MVP scope, idea gaps, additions, must-have features, and build notes so the idea can become an implementation-ready web app brief.',
     strengths: ['Structured review path'],
     weaknesses: ['Needs validation data'],
     risks: ['Generated artifacts may overstate confidence'],
-    recommendations: ['Keep human review before artifact generation'],
+    recommendations: [
+      'Keep human review before artifact generation',
+      'Expand the idea with screens and acceptance criteria',
+    ],
+    ideaGaps: [
+      'Primary journeys are incomplete',
+      'MVP prioritization needs more detail',
+    ],
+    additions: [
+      'Add an MVP feature checklist',
+      'Add screen inventory and non-goals',
+    ],
+    mustHaveFeatures: [
+      'Idea submission flow',
+      'Artifact viewer with copyable Development Prompt',
+    ],
+    buildNotes: [
+      'Start with schemas and primary screens',
+      'Break work into Cursor-sized todos with acceptance checks',
+    ],
     roleSpecificInsights: {},
   },
   validationStatus: 'valid',
-  promptVersion: 'agents/product_manager/v1',
+  promptVersion: 'agents/product_manager/v2',
   modelProvider: 'mock',
   modelName: 'mock-json-v1',
   inputTokens: 10,
@@ -94,8 +114,18 @@ const moderatorSynthesis = {
   keyDecisions: ['Keep agents isolated'],
   risks: ['Artifact confidence can exceed evidence'],
   openQuestions: ['Which export format ships first?'],
+  additionsToIdea: [
+    'Add MVP checklist and non-goals',
+    'Add screen inventory and acceptance criteria',
+  ],
+  mvpBuildSequence: [
+    'Clarify gaps and additions',
+    'Lock PRD screens and stories',
+    'Generate Development Prompt buildTodos',
+    'Implement web app in todo order',
+  ],
   artifactGenerationBrief: {
-    promptVersion: 'moderator/v1',
+    promptVersion: 'moderator/v2',
   },
 }
 
@@ -112,6 +142,14 @@ const completedPrd = {
   securityConsiderations: ['Treat input as untrusted'],
   successMetrics: ['Artifact completion rate'],
   openQuestions: ['Which provider ships first?'],
+  screensOrViews: ['Idea submission', 'Human review', 'Artifact viewer'],
+  userStories: [
+    'As a founder, I want to submit an idea so that I get a structured plan.',
+  ],
+  acceptanceCriteria: [
+    'PRD includes screens and user stories',
+    'Development Prompt includes buildTodos',
+  ],
 }
 
 function createMessages(system: string, userTemplate: string, payload: unknown) {
@@ -145,7 +183,7 @@ export const promptRegressionDataset: PromptRegressionCase[] = [
   {
     caseId: 'agent-product-manager',
     taskName: agentPrompts.product_manager.version,
-    expectedPromptVersion: 'agents/product_manager/v1',
+    expectedPromptVersion: 'agents/product_manager/v2',
     schema: agentOutputSchema,
     messages: createMessages(
       agentPrompts.product_manager.system,
@@ -161,7 +199,7 @@ export const promptRegressionDataset: PromptRegressionCase[] = [
   {
     caseId: 'moderator-synthesis',
     taskName: moderatorPromptV1.version,
-    expectedPromptVersion: 'moderator/v1',
+    expectedPromptVersion: 'moderator/v2',
     schema: moderatorSynthesisSchema,
     messages: createMessages(
       moderatorPromptV1.system,
@@ -178,7 +216,7 @@ export const promptRegressionDataset: PromptRegressionCase[] = [
   {
     caseId: 'artifact-executive-summary',
     taskName: artifactPrompts.executive_summary.version,
-    expectedPromptVersion: 'artifacts/executive_summary/v1',
+    expectedPromptVersion: 'artifacts/executive_summary/v2',
     schema: executiveSummarySchema,
     messages: createMessages(
       artifactPrompts.executive_summary.system,
@@ -194,7 +232,7 @@ export const promptRegressionDataset: PromptRegressionCase[] = [
   {
     caseId: 'artifact-prd',
     taskName: artifactPrompts.prd.version,
-    expectedPromptVersion: 'artifacts/prd/v1',
+    expectedPromptVersion: 'artifacts/prd/v2',
     schema: prdSchema,
     messages: createMessages(artifactPrompts.prd.system, artifactPrompts.prd.userTemplate, {
       draftRun,
@@ -206,7 +244,7 @@ export const promptRegressionDataset: PromptRegressionCase[] = [
   {
     caseId: 'artifact-development-prompt',
     taskName: artifactPrompts.development_prompt.version,
-    expectedPromptVersion: 'artifacts/development_prompt/v1',
+    expectedPromptVersion: 'artifacts/development_prompt/v2',
     schema: developmentPromptSchema,
     messages: createMessages(
       artifactPrompts.development_prompt.system,

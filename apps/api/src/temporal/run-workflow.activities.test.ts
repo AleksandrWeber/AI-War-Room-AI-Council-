@@ -78,9 +78,13 @@ function createResult(): MockPipelineResult {
           weaknesses: ['Needs orchestration later'],
           risks: ['Worker availability'],
           recommendations: ['Add Temporal integration behind a boundary'],
+          ideaGaps: ['Durable recovery path is underspecified'],
+          additions: ['Add worker health and replay notes to the idea'],
+          mustHaveFeatures: ['Durable run execution boundary'],
+          buildNotes: ['Keep REST/SSE unchanged while adding Temporal activities'],
           roleSpecificInsights: {},
         },
-        promptVersion: 'agent.product_manager.v1',
+        promptVersion: 'agents/product_manager/v2',
         modelProvider: 'mock',
         modelName: 'mock-json-v1',
         validationStatus: 'valid',
@@ -100,6 +104,12 @@ function createResult(): MockPipelineResult {
       keyDecisions: ['Keep REST/SSE flow unchanged in v4.0'],
       risks: ['Temporal server dependency in later milestones'],
       openQuestions: [],
+      additionsToIdea: ['Add durable execution notes and recovery expectations'],
+      mvpBuildSequence: [
+        'Validate durable input',
+        'Run agent pool activity',
+        'Persist completed artifacts',
+      ],
       artifactGenerationBrief: {},
     },
     artifacts: [
@@ -125,6 +135,13 @@ function createResult(): MockPipelineResult {
         securityConsiderations: ['Preserve Shield checks'],
         successMetrics: ['Runs survive worker restart'],
         openQuestions: [],
+        screensOrViews: ['Workflow status view'],
+        userStories: [
+          'As an operator, I want durable runs so that restarts do not lose progress.',
+        ],
+        acceptanceCriteria: [
+          'Approved runs can be recovered after worker restart',
+        ],
       }),
       createArtifact('development_prompt', {
         targetTool: 'cursor',
@@ -142,6 +159,17 @@ function createResult(): MockPipelineResult {
         toolSpecificGuidance: [
           'Optimize steps for Cursor Agent / Composer with small file-scoped edits.',
         ],
+        buildTodos: [
+          {
+            title: 'Add Temporal activity wrapper',
+            details: 'Wrap the existing pipeline execution behind a Temporal activity.',
+            acceptanceCheck: 'Unit tests cover validate and execute contracts.',
+            suggestedFiles: ['apps/api/src/temporal'],
+          },
+        ],
+        screenMap: ['No UI change for skeleton'],
+        copyPasteBrief:
+          'Add a Temporal worker skeleton that executes the existing mock pipeline as an activity without changing REST/SSE.',
       }),
     ],
     completedAt: now,

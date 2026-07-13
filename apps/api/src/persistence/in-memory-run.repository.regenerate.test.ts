@@ -2,6 +2,13 @@ import { describe, expect, it } from 'vitest'
 import { InMemoryRunRepository } from './in-memory-run.repository.js'
 import type { MockPipelineResult } from '@ai-war-room/schemas'
 
+const agentExtras = {
+  ideaGaps: ['Missing journey detail'],
+  additions: ['Add MVP checklist'],
+  mustHaveFeatures: ['Primary create/read flow'],
+  buildNotes: ['Start with schemas and screens'],
+} as const
+
 function sampleResult(
   overrides: Partial<MockPipelineResult> = {},
 ): MockPipelineResult {
@@ -24,15 +31,16 @@ function sampleResult(
         runId: 'run_1',
         agentRole: 'product_manager',
         output: {
-          summary: 'Original PM summary',
+          summary: 'Original PM summary with enough depth for a product breakdown.',
           strengths: ['Clear scope'],
           weaknesses: ['Needs validation'],
           risks: ['Scope creep'],
           recommendations: ['Keep schemas strict'],
+          ...agentExtras,
           roleSpecificInsights: {},
         },
         validationStatus: 'valid',
-        promptVersion: 'agents/product_manager/v1',
+        promptVersion: 'agents/product_manager/v2',
         modelProvider: 'mock',
         modelName: 'mock-json-v1',
         inputTokens: 10,
@@ -44,15 +52,16 @@ function sampleResult(
         runId: 'run_1',
         agentRole: 'critic',
         output: {
-          summary: 'Original critic summary',
+          summary: 'Original critic summary with gap analysis and additions.',
           strengths: ['Honest critique'],
           weaknesses: ['Mock depth'],
           risks: ['Overconfidence'],
           recommendations: ['Add evals'],
+          ...agentExtras,
           roleSpecificInsights: {},
         },
         validationStatus: 'valid',
-        promptVersion: 'agents/critic/v1',
+        promptVersion: 'agents/critic/v2',
         modelProvider: 'mock',
         modelName: 'mock-json-v1',
         inputTokens: 11,
@@ -71,8 +80,10 @@ function sampleResult(
       keyDecisions: ['Decision'],
       risks: ['Risk'],
       openQuestions: ['Question'],
+      additionsToIdea: ['Add screens and acceptance criteria'],
+      mvpBuildSequence: ['Clarify gaps', 'PRD', 'Development Prompt', 'Build'],
       artifactGenerationBrief: {
-        promptVersion: 'moderator/v1',
+        promptVersion: 'moderator/v2',
         validationStatus: 'valid',
         source: 'test',
       },
@@ -85,12 +96,13 @@ function sampleResult(
           workspaceId: 'workspace_1',
           artifactType: 'executive_summary',
           artifactVersion: 'v1',
-          promptVersion: 'artifacts/executive_summary/v1',
+          promptVersion: 'artifacts/executive_summary/v2',
           modelProvider: 'mock',
           modelName: 'mock-json-v1',
           validationStatus: 'valid',
           shieldStatus: 'clear',
           tokenUsage: { inputTokens: 1, outputTokens: 1 },
+          estimatedCostUsd: 0,
           createdAt: completedAt,
         },
         artifact: {
@@ -113,12 +125,13 @@ function sampleResult(
           workspaceId: 'workspace_1',
           artifactType: 'prd',
           artifactVersion: 'v1',
-          promptVersion: 'artifacts/prd/v1',
+          promptVersion: 'artifacts/prd/v2',
           modelProvider: 'mock',
           modelName: 'mock-json-v1',
           validationStatus: 'valid',
           shieldStatus: 'clear',
           tokenUsage: { inputTokens: 1, outputTokens: 1 },
+          estimatedCostUsd: 0,
           createdAt: completedAt,
         },
         artifact: {
@@ -128,12 +141,17 @@ function sampleResult(
             goals: ['Goal'],
             nonGoals: ['Non-goal'],
             userPersonas: ['Founder'],
+            userJourneys: ['Journey'],
             functionalRequirements: ['Req'],
             nonFunctionalRequirements: ['NFR'],
             successMetrics: ['Metric'],
-            risks: ['Risk'],
             mvpScope: ['Scope'],
+            futureScope: ['Later'],
+            securityConsiderations: ['Secure'],
             openQuestions: ['Q'],
+            screensOrViews: ['Home'],
+            userStories: ['As a founder, I want a plan.'],
+            acceptanceCriteria: ['PRD validates'],
           },
         },
       },
@@ -144,22 +162,22 @@ function sampleResult(
           workspaceId: 'workspace_1',
           artifactType: 'development_prompt',
           artifactVersion: 'v1',
-          promptVersion: 'artifacts/development_prompt/v1',
+          promptVersion: 'artifacts/development_prompt/v2',
           modelProvider: 'mock',
           modelName: 'mock-json-v1',
           validationStatus: 'valid',
           shieldStatus: 'clear',
           tokenUsage: { inputTokens: 1, outputTokens: 1 },
+          estimatedCostUsd: 0,
           createdAt: completedAt,
         },
         artifact: {
           artifactType: 'development_prompt',
           content: {
             targetTool: 'cursor',
-            implementationContext: 'Context',
-            recommendedStack: ['TS'],
-            architecturePlan: 'Plan',
-            fileByFileGuidance: ['File'],
+            productSummary: 'Build the approved product.',
+            technicalStack: ['TypeScript'],
+            architectureOverview: 'Monorepo web + api.',
             requiredModules: ['Module'],
             dataModel: ['Model'],
             apiRequirements: ['API'],
@@ -169,6 +187,16 @@ function sampleResult(
             implementationOrder: ['First'],
             outOfScope: ['Chat'],
             toolSpecificGuidance: ['Use Cursor'],
+            buildTodos: [
+              {
+                title: 'Scaffold app',
+                details: 'Create the web shell.',
+                acceptanceCheck: 'App boots',
+                suggestedFiles: ['apps/web/src/App.tsx'],
+              },
+            ],
+            screenMap: ['Home'],
+            copyPasteBrief: 'Build the approved MVP web app using the PRD.',
           },
         },
       },
@@ -189,7 +217,9 @@ describe('InMemoryRunRepository regenerate persistence', () => {
       'workspace_1',
       'run_1',
     )
-    expect(found?.agentOutputs[0]?.output.summary).toBe('Original PM summary')
+    expect(found?.agentOutputs[0]?.output.summary).toBe(
+      'Original PM summary with enough depth for a product breakdown.',
+    )
 
     const replaced = sampleResult({
       completedAt: '2026-07-13T13:00:00.000Z',
@@ -213,7 +243,9 @@ describe('InMemoryRunRepository regenerate persistence', () => {
       'run_1',
     )
     expect(after?.agentOutputs[0]?.output.summary).toBe('Regenerated PM summary')
-    expect(after?.agentOutputs[1]?.output.summary).toBe('Original critic summary')
+    expect(after?.agentOutputs[1]?.output.summary).toBe(
+      'Original critic summary with gap analysis and additions.',
+    )
     expect(
       await repository.findCompletedPipelineResult('workspace_other', 'run_1'),
     ).toBeNull()

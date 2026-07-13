@@ -9,8 +9,12 @@ import {
   agentOutputSchema,
 } from '@ai-war-room/schemas'
 import { LlmGatewayService } from '../llm/llm-gateway.service.js'
+import { truncateText } from '../llm/llm.utils.js'
 import { agentPrompts } from '../prompts/agent.prompts.js'
 import { ResearchService } from '../research/research.service.js'
+
+const AGENT_PROMPT_IDEA_MAX_CHARS = 40_000
+const AGENT_FALLBACK_IDEA_MAX_CHARS = 240
 
 function createId(prefix: string) {
   return `${prefix}_${randomUUID()}`
@@ -54,6 +58,16 @@ export class AgentService {
     }
 
     const fallback = this.createFallbackAgentOutput(input.agentRole, input.draftRun)
+    const promptDraftRun = {
+      ...input.draftRun,
+      idea: {
+        ...input.draftRun.idea,
+        rawIdea: truncateText(
+          input.draftRun.idea.rawIdea,
+          AGENT_PROMPT_IDEA_MAX_CHARS,
+        ),
+      },
+    }
     const result = await this.llmGatewayService.generateStructuredJson({
       taskName: prompt.version,
       schema: agentOutputSchema,
@@ -66,7 +80,7 @@ export class AgentService {
         {
           role: 'user',
           content: `${prompt.userTemplate}${JSON.stringify({
-            draftRun: input.draftRun,
+            draftRun: promptDraftRun,
             role: input.agentRole,
             researchContext,
             researchDegradedMessage,
@@ -133,21 +147,44 @@ export class AgentService {
     agentRole: Exclude<AgentRole, 'moderator'>,
     draftRun: DraftRun,
   ): AgentOutput {
-    const idea = draftRun.idea.rawIdea
+    const idea = truncateText(
+      draftRun.idea.rawIdea,
+      AGENT_FALLBACK_IDEA_MAX_CHARS,
+    )
     const targetAudience = draftRun.idea.targetAudience ?? 'early adopters'
 
     return {
-      summary: `${this.formatRole(agentRole)} fallback review for "${idea}" targeting ${targetAudience}.`,
+      summary: `${this.formatRole(agentRole)} produced a fallback breakdown for "${idea}" targeting ${targetAudience}. The live model response failed schema validation, so this output lists gaps, additions, MVP must-haves, and build notes that should still be reviewed before implementation.`,
       strengths: [
         'The workflow is structured and schema-first.',
         'Human review protects the expensive execution path.',
       ],
       weaknesses: [
         'This fallback output was generated after gateway validation failure.',
+        'Depth and product-specific recommendations may be incomplete.',
       ],
       risks: ['The model response did not satisfy the expected schema.'],
       recommendations: [
         'Review prompt version and validation error logs before using this output.',
+        'Re-run the agent after fixing provider or schema issues for a full breakdown.',
+      ],
+      ideaGaps: [
+        'Live model gap analysis is unavailable in this fallback.',
+        'Product-specific missing sections were not regenerated from the raw idea.',
+      ],
+      additions: [
+        'Add an explicit MVP feature list to the idea brief.',
+        'Add primary user journeys and success metrics before build.',
+        'Add non-goals and constraints so implementers do not invent scope.',
+      ],
+      mustHaveFeatures: [
+        'Core user-facing web screens for the primary journey.',
+        'Persisted data model for the main entities in the idea.',
+        'Basic auth or workspace isolation if multi-user access is required.',
+      ],
+      buildNotes: [
+        'Treat this fallback as a planning scaffold, not a final implementation brief.',
+        'Prefer regenerating agent output before trusting Development Prompt details.',
       ],
       roleSpecificInsights: {
         role: agentRole,

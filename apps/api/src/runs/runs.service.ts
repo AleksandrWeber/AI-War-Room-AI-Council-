@@ -457,14 +457,27 @@ export class RunsService {
       'agent_pool',
       () =>
         Promise.all(
-          executableAgents.map((agentRole) =>
-            this.agentService.executeAgent({
+          executableAgents.map(async (agentRole) => {
+            await this.emitStatus(
+              emit,
+              `agent:${agentRole}`,
+              `Agent · ${agentRole}`,
+              'running',
+            )
+            const output = await this.agentService.executeAgent({
               runId: request.draftRun.runId,
               agentRole,
               draftRun: request.draftRun,
               completedAt: now,
-            }),
-          ),
+            })
+            await this.emitStatus(
+              emit,
+              `agent:${agentRole}`,
+              `Agent · ${agentRole}`,
+              'completed',
+            )
+            return output
+          }),
         ),
       {
         agentCount: executableAgents.length,
@@ -698,7 +711,29 @@ export class RunsService {
 
       if (Array.isArray(value)) {
         for (const item of value) {
-          lines.push(`- ${String(item)}`)
+          if (item !== null && typeof item === 'object' && !Array.isArray(item)) {
+            const record = item as Record<string, unknown>
+            const title = typeof record.title === 'string' ? record.title : null
+            if (title) {
+              lines.push(`### ${title}`)
+              if (typeof record.details === 'string') {
+                lines.push(record.details)
+              }
+              if (typeof record.acceptanceCheck === 'string') {
+                lines.push(`- Acceptance: ${record.acceptanceCheck}`)
+              }
+              if (Array.isArray(record.suggestedFiles)) {
+                lines.push(
+                  `- Files: ${record.suggestedFiles.map(String).join(', ')}`,
+                )
+              }
+              lines.push('')
+            } else {
+              lines.push(`- ${JSON.stringify(item)}`)
+            }
+          } else {
+            lines.push(`- ${String(item)}`)
+          }
         }
       } else {
         lines.push(String(value))
@@ -750,10 +785,32 @@ export class RunsService {
 
         if (Array.isArray(value)) {
           for (const item of value) {
-            doc.text(`• ${String(item)}`, {
-              indent: 12,
-              paragraphGap: 4,
-            })
+            if (item !== null && typeof item === 'object' && !Array.isArray(item)) {
+              const record = item as Record<string, unknown>
+              const title =
+                typeof record.title === 'string' ? record.title : JSON.stringify(item)
+              doc.text(`• ${title}`, {
+                indent: 12,
+                paragraphGap: 2,
+              })
+              if (typeof record.details === 'string') {
+                doc.text(record.details, {
+                  indent: 24,
+                  paragraphGap: 2,
+                })
+              }
+              if (typeof record.acceptanceCheck === 'string') {
+                doc.text(`Acceptance: ${record.acceptanceCheck}`, {
+                  indent: 24,
+                  paragraphGap: 4,
+                })
+              }
+            } else {
+              doc.text(`• ${String(item)}`, {
+                indent: 12,
+                paragraphGap: 4,
+              })
+            }
           }
         } else {
           doc.text(String(value), {

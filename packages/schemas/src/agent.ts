@@ -7,11 +7,15 @@ import {
 import { shieldScanResultSchema } from './shield.js'
 
 export const agentOutputSchema = z.object({
-  summary: nonEmptyStringSchema.max(4_000),
-  strengths: z.array(nonEmptyStringSchema.max(1_000)).max(20),
-  weaknesses: z.array(nonEmptyStringSchema.max(1_000)).max(20),
-  risks: z.array(nonEmptyStringSchema.max(1_000)).max(20),
-  recommendations: z.array(nonEmptyStringSchema.max(1_000)).max(20),
+  summary: nonEmptyStringSchema.max(8_000),
+  strengths: z.array(nonEmptyStringSchema.max(2_000)).max(40),
+  weaknesses: z.array(nonEmptyStringSchema.max(2_000)).max(40),
+  risks: z.array(nonEmptyStringSchema.max(2_000)).max(40),
+  recommendations: z.array(nonEmptyStringSchema.max(2_000)).min(1).max(40),
+  ideaGaps: z.array(nonEmptyStringSchema.max(2_000)).min(1).max(40),
+  additions: z.array(nonEmptyStringSchema.max(2_000)).min(1).max(40),
+  mustHaveFeatures: z.array(nonEmptyStringSchema.max(2_000)).min(1).max(40),
+  buildNotes: z.array(nonEmptyStringSchema.max(2_000)).min(1).max(40),
   roleSpecificInsights: z.record(z.string(), z.unknown()).default({}),
 })
 

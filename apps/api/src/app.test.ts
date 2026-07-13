@@ -523,9 +523,21 @@ describe('API skeleton', () => {
     expect(pipelineResponse.body.agentOutputs[0].modelProvider).toBe('mock')
     expect(pipelineResponse.body.agentOutputs[0].inputTokens).toBeGreaterThan(0)
     expect(
+      pipelineResponse.body.agentOutputs[0].output.additions.length,
+    ).toBeGreaterThan(0)
+    expect(
+      pipelineResponse.body.agentOutputs[0].output.mustHaveFeatures.length,
+    ).toBeGreaterThan(0)
+    expect(
       pipelineResponse.body.moderatorSynthesis.artifactGenerationBrief
         .promptVersion,
-    ).toBe('moderator/v1')
+    ).toBe('moderator/v2')
+    expect(
+      pipelineResponse.body.moderatorSynthesis.additionsToIdea.length,
+    ).toBeGreaterThan(0)
+    expect(
+      pipelineResponse.body.moderatorSynthesis.mvpBuildSequence.length,
+    ).toBeGreaterThan(0)
     expect(pipelineResponse.body.moderatorSynthesis.mvpScope).toContain(
       'Prompt-driven isolated agent analysis',
     )
@@ -534,8 +546,24 @@ describe('API skeleton', () => {
       'executive_summary',
     )
     expect(pipelineResponse.body.artifacts[0].metadata.promptVersion).toBe(
-      'artifacts/executive_summary/v1',
+      'artifacts/executive_summary/v2',
     )
+    const developmentPromptArtifact = pipelineResponse.body.artifacts.find(
+      (artifact: { artifact: { artifactType: string } }) =>
+        artifact.artifact.artifactType === 'development_prompt',
+    )
+    expect(developmentPromptArtifact?.metadata.promptVersion).toBe(
+      'artifacts/development_prompt/v2',
+    )
+    expect(
+      developmentPromptArtifact?.artifact.content.buildTodos.length,
+    ).toBeGreaterThan(0)
+    expect(
+      developmentPromptArtifact?.artifact.content.copyPasteBrief.length,
+    ).toBeGreaterThan(0)
+    expect(
+      developmentPromptArtifact?.artifact.content.screenMap.length,
+    ).toBeGreaterThan(0)
     expect(
       pipelineResponse.body.artifacts[2].metadata.tokenUsage.inputTokens,
     ).toBeGreaterThan(0)
@@ -726,7 +754,7 @@ describe('API skeleton', () => {
     expect(streamResponse.text).toContain('event: status')
     expect(streamResponse.text).toContain('event: artifact')
     expect(streamResponse.text).toContain('event: completed')
-    expect(streamResponse.text).toContain('artifacts/development_prompt/v1')
+    expect(streamResponse.text).toContain('artifacts/development_prompt/v2')
 
     const streamedEvents = parseSseBlocks(streamResponse.text)
     const firstEventId = streamedEvents[0].id
