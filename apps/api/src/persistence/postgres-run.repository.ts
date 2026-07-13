@@ -10,6 +10,7 @@ import type {
   SaveDraftRunInput,
 } from './run.repository.js'
 import { PostgresService } from './postgres.service.js'
+import { redactShieldFindingsForPersistence } from '../shield/shield-persistence-redaction.js'
 
 type DraftRunRow = {
   run_id: string
@@ -152,7 +153,11 @@ export class PostgresRunRepository implements RunRepository {
           'user_input',
           input.draftRun.shieldScan.status,
           input.draftRun.shieldScan.maxSeverity,
-          JSON.stringify(input.draftRun.shieldScan.findings),
+          JSON.stringify(
+            redactShieldFindingsForPersistence(
+              input.draftRun.shieldScan.findings,
+            ),
+          ),
           input.draftRun.createdAt,
         ],
       )

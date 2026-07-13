@@ -94,8 +94,8 @@ If workflows stick in `running` with empty stream replay, check worker health fi
 2. **Auth failures after deploy** — confirm `AUTH_PROVIDER` and secrets; session mode depends on `APP_ENCRYPTION_KEY` (key rotation invalidates sessions).
 3. **Provider / BYOK errors** — `GET /api/provider-credentials/readiness`; system env keys are required for platform readiness (BYOK is not a substitute). Changing `APP_ENCRYPTION_KEY` without re-encrypt orphans stored keys.
 4. **Billing webhook duplicates / missed upgrades** — inspect workspace webhook-events admin; events are idempotent by external id.
-5. **Shield blocks / override disputes** — use Shield override with reason (audit trail); review workspace Shield admin false-positive summary.
-6. **Pipeline hang** — Temporal readiness + worker; otherwise direct run path and SSE stream readiness; check observability admin for stream lag / provider failure alerts.
+5. **Shield blocks / override disputes** — use Shield override with reason (audit trail); review workspace Shield admin false-positive summary. Production FP budget is **≤ 5%** on the review set (`docs/PRODUCT_POLICIES.md`). Secrets/PII finding quotes are redacted in PostgreSQL.
+6. **Pipeline hang** — Temporal readiness + worker; otherwise direct run path and SSE stream readiness; check observability admin for stream lag / provider failure alerts. Market research failures are fail-soft (pipeline continues without live research).
 7. **Bad migration in prod** — stop rolling forward; restore backup + previous revision; re-plan an additive fix migration.
 
 Workspace owner/admin tools for many of these domains live under the web billing/admin panels (`/api/.../workspace/:workspaceId/admin`).

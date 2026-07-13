@@ -1,5 +1,8 @@
 import type { ApiEnv } from '../config/env.js'
 
+/** Production false-positive rate ceiling on the Shield review set (locked product policy). */
+export const SHIELD_PRODUCTION_FALSE_POSITIVE_BUDGET = 0.05
+
 export type ShieldRolloutCheck = {
   name: string
   label: string
@@ -31,6 +34,18 @@ export function evaluateShieldRollout(
 ): ShieldRolloutEvaluation {
   const isProduction = input.nodeEnv === 'production'
   const { reviewSummary } = input
+  const failuresAreOnlyFalsePositivesWithinBudget =
+    reviewSummary.totalCases > 0 &&
+    reviewSummary.passedCases + reviewSummary.falsePositiveCount ===
+      reviewSummary.totalCases &&
+    reviewSummary.falsePositiveRate <= SHIELD_PRODUCTION_FALSE_POSITIVE_BUDGET
+  const reviewRegressionPassing =
+    reviewSummary.totalCases > 0 &&
+    (reviewSummary.passedCases === reviewSummary.totalCases ||
+      (isProduction && failuresAreOnlyFalsePositivesWithinBudget))
+  const productionFpBudgetPassing =
+    !isProduction ||
+    reviewSummary.falsePositiveRate <= SHIELD_PRODUCTION_FALSE_POSITIVE_BUDGET
 
   const checks: ShieldRolloutCheck[] = [
     {
@@ -54,29 +69,26 @@ export function evaluateShieldRollout(
     {
       name: 'review_regression_passing',
       label: 'Review regression passing',
-      status:
-        reviewSummary.totalCases > 0 &&
-        reviewSummary.passedCases === reviewSummary.totalCases
-          ? 'pass'
-          : 'fail',
+      status: reviewRegressionPassing ? 'pass' : 'fail',
       detail:
         reviewSummary.totalCases === 0
           ? 'No review cases were evaluated.'
           : reviewSummary.passedCases === reviewSummary.totalCases
             ? `All ${reviewSummary.totalCases} review cases passed.`
-            : `${reviewSummary.totalCases - reviewSummary.passedCases} review case(s) failed.`,
+            : failuresAreOnlyFalsePositivesWithinBudget
+              ? `${reviewSummary.falsePositiveCount} false positive(s) within the ${(SHIELD_PRODUCTION_FALSE_POSITIVE_BUDGET * 100).toFixed(0)}% production budget.`
+              : `${reviewSummary.totalCases - reviewSummary.passedCases} review case(s) failed outside the false-positive budget.`,
     },
     {
       name: 'production_false_positive_budget',
       label: 'Production false-positive budget',
-      status:
-        !isProduction || reviewSummary.falsePositiveCount === 0 ? 'pass' : 'fail',
+      status: productionFpBudgetPassing ? 'pass' : 'fail',
       detail:
         !isProduction
           ? 'False-positive budget is only enforced in production.'
-          : reviewSummary.falsePositiveCount === 0
-            ? 'No false positives detected in the review set.'
-            : `${reviewSummary.falsePositiveCount} false positive(s) detected in production review.`,
+          : productionFpBudgetPassing
+            ? `False-positive rate ${(reviewSummary.falsePositiveRate * 100).toFixed(1)}% is within the ${(SHIELD_PRODUCTION_FALSE_POSITIVE_BUDGET * 100).toFixed(0)}% budget.`
+            : `False-positive rate ${(reviewSummary.falsePositiveRate * 100).toFixed(1)}% exceeds the ${(SHIELD_PRODUCTION_FALSE_POSITIVE_BUDGET * 100).toFixed(0)}% production budget.`,
     },
     {
       name: 'adversarial_dataset_coverage',

@@ -103,5 +103,6 @@ Custom ports must keep CORS aligned (`WEB_ORIGIN` ↔ `VITE_API_URL`). See READM
 ## Where to dig deeper
 
 - Auth, billing, Temporal, Shield, and readiness endpoints — root README sections.
+- Locked product policies — [PRODUCT_POLICIES.md](./PRODUCT_POLICIES.md).
 - Operator deploy / incident checklist — [OPERATOR.md](./OPERATOR.md).
 - Artifact / billing developer contracts — [ARTIFACTS_AND_BILLING.md](./ARTIFACTS_AND_BILLING.md).

@@ -30,13 +30,25 @@ export class AgentService {
     completedAt: string
   }): Promise<AgentExecutionResult> {
     const prompt = agentPrompts[input.agentRole]
-    const researchContext =
-      input.agentRole === 'market_researcher'
-        ? await this.researchService.createResearchContext({
-            workspaceId: input.draftRun.workspaceId,
-            draftRun: input.draftRun,
-          })
-        : null
+    let researchContext: Awaited<
+      ReturnType<ResearchService['createResearchContext']>
+    > | null = null
+    let researchDegradedMessage: string | null = null
+
+    if (input.agentRole === 'market_researcher') {
+      try {
+        researchContext = await this.researchService.createResearchContext({
+          workspaceId: input.draftRun.workspaceId,
+          draftRun: input.draftRun,
+        })
+      } catch (error) {
+        researchDegradedMessage =
+          error instanceof Error
+            ? `Live research unavailable (${error.message}). Continuing without external research.`
+            : 'Live research unavailable. Continuing without external research.'
+      }
+    }
+
     const fallback = this.createFallbackAgentOutput(input.agentRole, input.draftRun)
     const result = await this.llmGatewayService.generateStructuredJson({
       taskName: prompt.version,
@@ -53,15 +65,27 @@ export class AgentService {
             draftRun: input.draftRun,
             role: input.agentRole,
             researchContext,
+            researchDegradedMessage,
           })}`,
         },
       ],
       fallback,
     })
-    const output =
+    let output =
       researchContext && input.agentRole === 'market_researcher'
         ? this.attachResearchCitations(result.value, researchContext)
         : result.value
+
+    if (researchDegradedMessage && input.agentRole === 'market_researcher') {
+      output = {
+        ...output,
+        roleSpecificInsights: {
+          ...output.roleSpecificInsights,
+          researchDegraded: true,
+          researchDegradedMessage,
+        },
+      }
+    }
 
     return agentExecutionResultSchema.parse({
       runId: input.runId,

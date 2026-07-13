@@ -44,7 +44,7 @@ describe('evaluateShieldRollout', () => {
     ).toBe('fail')
   })
 
-  it('fails in production when false positives are present', () => {
+  it('fails in production when false-positive rate exceeds the 5% budget', () => {
     const rollout = evaluateShieldRollout(
       createInput({
         nodeEnv: 'production',
@@ -62,5 +62,30 @@ describe('evaluateShieldRollout', () => {
         (check) => check.name === 'production_false_positive_budget',
       )?.status,
     ).toBe('fail')
+  })
+
+  it('passes production false-positive budget at or under 5%', () => {
+    const rollout = evaluateShieldRollout(
+      createInput({
+        nodeEnv: 'production',
+        reviewSummary: {
+          totalCases: 20,
+          passedCases: 19,
+          falsePositiveCount: 1,
+          falsePositiveRate: 0.05,
+        },
+      }),
+    )
+
+    expect(
+      rollout.checks.find(
+        (check) => check.name === 'production_false_positive_budget',
+      )?.status,
+    ).toBe('pass')
+    expect(
+      rollout.checks.find((check) => check.name === 'review_regression_passing')
+        ?.status,
+    ).toBe('pass')
+    expect(rollout.status).toBe('ready')
   })
 })
