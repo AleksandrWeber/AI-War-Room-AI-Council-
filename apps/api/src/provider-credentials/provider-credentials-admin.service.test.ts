@@ -41,7 +41,13 @@ describe('ProviderCredentialsAdminService', () => {
     expect(service.getCapabilities()).toMatchObject({
       supportsProviderCredentialsRollout: true,
       supportsProviderKeyAdminTools: true,
-      managedProviders: ['anthropic', 'openai', 'gemini'],
+      managedProviders: [
+        'anthropic',
+        'openai',
+        'gemini',
+        'cursor',
+        'openrouter',
+      ],
     })
   })
 

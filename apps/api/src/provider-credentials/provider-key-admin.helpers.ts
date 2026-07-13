@@ -27,6 +27,12 @@ export function buildProviderKeyAdminStats(
     geminiCredentials: credentials.filter(
       (credential) => credential.providerId === 'gemini',
     ).length,
+    cursorCredentials: credentials.filter(
+      (credential) => credential.providerId === 'cursor',
+    ).length,
+    openrouterCredentials: credentials.filter(
+      (credential) => credential.providerId === 'openrouter',
+    ).length,
   }
 }
 

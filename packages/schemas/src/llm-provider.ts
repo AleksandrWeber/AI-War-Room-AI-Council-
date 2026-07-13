@@ -6,6 +6,8 @@ export const llmGatewayProviderIdSchema = z.enum([
   'anthropic',
   'openai',
   'gemini',
+  'cursor',
+  'openrouter',
 ])
 export type LlmGatewayProviderId = z.infer<typeof llmGatewayProviderIdSchema>
 

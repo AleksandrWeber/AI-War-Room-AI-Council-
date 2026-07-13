@@ -25,6 +25,8 @@ export type LlmRolloutInput = {
   anthropicApiKey?: string
   openaiApiKey?: string
   geminiApiKey?: string
+  cursorApiKey?: string
+  openrouterApiKey?: string
 }
 
 function hasProviderCredential(
@@ -41,6 +43,14 @@ function hasProviderCredential(
 
   if (provider === 'gemini') {
     return Boolean(input.geminiApiKey)
+  }
+
+  if (provider === 'cursor') {
+    return Boolean(input.cursorApiKey)
+  }
+
+  if (provider === 'openrouter') {
+    return Boolean(input.openrouterApiKey)
   }
 
   return true
@@ -125,6 +135,33 @@ export function evaluateLlmRollout(input: LlmRolloutInput): LlmRolloutEvaluation
         : input.geminiApiKey
           ? 'Gemini API key is configured.'
           : 'GEMINI_API_KEY is required for platform readiness when Gemini is an active provider. Workspace BYOK overrides are separate and are not checked here.',
+    },
+    {
+      name: 'cursor_api_key',
+      label: 'Cursor API key',
+      status:
+        !activeProviders.has('cursor') || hasProviderCredential('cursor', input)
+          ? 'pass'
+          : 'fail',
+      detail: !activeProviders.has('cursor')
+        ? 'Cursor is not configured as a primary or fallback provider.'
+        : input.cursorApiKey
+          ? 'Cursor API key is configured.'
+          : 'CURSOR_API_KEY is required for platform readiness when Cursor is an active provider. Workspace BYOK overrides are separate and are not checked here.',
+    },
+    {
+      name: 'openrouter_api_key',
+      label: 'OpenRouter API key',
+      status:
+        !activeProviders.has('openrouter') ||
+        hasProviderCredential('openrouter', input)
+          ? 'pass'
+          : 'fail',
+      detail: !activeProviders.has('openrouter')
+        ? 'OpenRouter is not configured as a primary or fallback provider.'
+        : input.openrouterApiKey
+          ? 'OpenRouter API key is configured.'
+          : 'OPENROUTER_API_KEY is required for platform readiness when OpenRouter is an active provider. Workspace BYOK overrides are separate and are not checked here.',
     },
   ]
 

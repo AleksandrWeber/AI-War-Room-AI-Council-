@@ -21,6 +21,12 @@ export class ProviderCredentialTesterService {
       case 'gemini':
         await this.testGemini(input.apiKey)
         return
+      case 'cursor':
+        await this.testCursor(input.apiKey)
+        return
+      case 'openrouter':
+        await this.testOpenRouter(input.apiKey)
+        return
       case 'tavily':
         await this.testTavily(input.apiKey)
         return
@@ -115,6 +121,51 @@ export class ProviderCredentialTesterService {
 
     if (!response.ok) {
       throw new Error(`Gemini test failed with ${response.status}.`)
+    }
+  }
+
+  private async testCursor(apiKey: string) {
+    const response = await fetch(
+      this.configService.get('CURSOR_API_ME_URL', { infer: true }),
+      {
+        method: 'GET',
+        headers: {
+          authorization: `Bearer ${apiKey}`,
+        },
+        signal: AbortSignal.timeout(
+          this.configService.get('LLM_REQUEST_TIMEOUT_MS', { infer: true }),
+        ),
+      },
+    )
+
+    if (!response.ok) {
+      throw new Error(`Cursor test failed with ${response.status}.`)
+    }
+  }
+
+  private async testOpenRouter(apiKey: string) {
+    const response = await fetch(
+      this.configService.get('OPENROUTER_API_URL', { infer: true }),
+      {
+        method: 'POST',
+        headers: {
+          authorization: `Bearer ${apiKey}`,
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          model: 'openai/gpt-4o-mini',
+          temperature: 0,
+          response_format: { type: 'json_object' },
+          messages: [{ role: 'user', content: 'Return {"ok":true} as JSON.' }],
+        }),
+        signal: AbortSignal.timeout(
+          this.configService.get('LLM_REQUEST_TIMEOUT_MS', { infer: true }),
+        ),
+      },
+    )
+
+    if (!response.ok) {
+      throw new Error(`OpenRouter test failed with ${response.status}.`)
     }
   }
 

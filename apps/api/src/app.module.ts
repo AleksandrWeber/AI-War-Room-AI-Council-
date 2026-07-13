@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
+import { resolve } from 'node:path'
 import { validateEnv } from './config/env.js'
 import { AuthModule } from './auth/auth.module.js'
 import { BillingModule } from './billing/billing.module.js'
@@ -166,6 +167,12 @@ import { AppRolloutModule } from './app-rollout.module.js'
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      // Workspace `npm run dev:api` uses cwd apps/api; local secrets live in repo-root .env.
+      envFilePath: [
+        resolve(process.cwd(), '.env'),
+        resolve(process.cwd(), '..', '.env'),
+        resolve(process.cwd(), '..', '..', '.env'),
+      ],
       validate: validateEnv,
     }),
     HealthModule,

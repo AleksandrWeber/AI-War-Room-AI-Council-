@@ -2,9 +2,20 @@ import { ConfigService } from '@nestjs/config'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { ApiEnv } from '../config/env.js'
 import { AnthropicLlmProvider } from './anthropic-llm.provider.js'
+import { CursorLlmProvider } from './cursor-llm.provider.js'
 import { GeminiLlmProvider } from './gemini-llm.provider.js'
 import type { LlmProviderRequest } from './llm.types.js'
 import { OpenAiLlmProvider } from './openai-llm.provider.js'
+import { OpenRouterLlmProvider } from './openrouter-llm.provider.js'
+
+const agentPromptMock = vi.hoisted(() => vi.fn())
+
+vi.mock('@cursor/sdk', () => ({
+  Agent: {
+    prompt: agentPromptMock,
+  },
+  CursorAgentError: class CursorAgentError extends Error {},
+}))
 
 const request: LlmProviderRequest = {
   taskName: 'test',
@@ -22,6 +33,9 @@ function createConfig(overrides: Partial<ApiEnv>) {
     ANTHROPIC_API_URL: 'https://anthropic.test/v1/messages',
     OPENAI_API_URL: 'https://openai.test/v1/chat/completions',
     GEMINI_API_URL: 'https://gemini.test/v1beta',
+    CURSOR_RUNTIME: 'local',
+    CURSOR_REQUEST_TIMEOUT_MS: 30_000,
+    CURSOR_API_ME_URL: 'https://api.cursor.com/v1/me',
     ...overrides,
   })
 }
@@ -29,6 +43,7 @@ function createConfig(overrides: Partial<ApiEnv>) {
 describe('LLM provider adapters', () => {
   afterEach(() => {
     vi.unstubAllGlobals()
+    agentPromptMock.mockReset()
   })
 
   it('sends Anthropic messages and extracts JSON text with usage', async () => {
@@ -139,5 +154,73 @@ describe('LLM provider adapters', () => {
       'ANTHROPIC_API_KEY is required',
     )
     expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('calls Cursor Agent.prompt and extracts JSON from the result', async () => {
+    agentPromptMock.mockResolvedValue({
+      status: 'finished',
+      result: '```json\n{"ok":true}\n```',
+      usage: { inputTokens: 20, outputTokens: 4 },
+    })
+
+    const provider = new CursorLlmProvider(
+      createConfig({ CURSOR_API_KEY: 'crsr_test' }) as never,
+    )
+    const result = await provider.completeJson({
+      ...request,
+      model: 'composer-2.5',
+    })
+
+    expect(agentPromptMock).toHaveBeenCalledOnce()
+    expect(agentPromptMock.mock.calls[0]?.[1]).toMatchObject({
+      apiKey: 'crsr_test',
+      model: { id: 'composer-2.5' },
+      mode: 'plan',
+    })
+    expect(result.rawText).toBe('{"ok":true}')
+    expect(result.providerId).toBe('cursor')
+    expect(result.usage.inputTokens).toBe(20)
+  })
+
+  it('fails fast when Cursor is missing its API key', async () => {
+    const provider = new CursorLlmProvider(createConfig({}) as never)
+
+    await expect(provider.completeJson(request)).rejects.toThrow(
+      'CURSOR_API_KEY is required',
+    )
+    expect(agentPromptMock).not.toHaveBeenCalled()
+  })
+
+  it('sends OpenRouter chat completions and extracts JSON text', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        choices: [{ message: { content: '{"ok":true}' } }],
+        usage: { prompt_tokens: 11, completion_tokens: 3 },
+      }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const provider = new OpenRouterLlmProvider(
+      createConfig({
+        OPENROUTER_API_KEY: 'sk-or-test',
+        OPENROUTER_API_URL: 'https://openrouter.test/api/v1/chat/completions',
+        OPENROUTER_HTTP_REFERER: 'http://127.0.0.1:5173',
+        OPENROUTER_APP_TITLE: 'AI War Room',
+      }) as never,
+    )
+    const result = await provider.completeJson({
+      ...request,
+      model: 'openai/gpt-4o-mini',
+    })
+    const [, init] = fetchMock.mock.calls[0]
+    const body = JSON.parse(String(init.body)) as { model: string }
+
+    expect(init.headers.authorization).toBe('Bearer sk-or-test')
+    expect(init.headers['HTTP-Referer']).toBe('http://127.0.0.1:5173')
+    expect(init.headers['X-Title']).toBe('AI War Room')
+    expect(body.model).toBe('openai/gpt-4o-mini')
+    expect(result.providerId).toBe('openrouter')
+    expect(result.rawText).toBe('{"ok":true}')
   })
 })

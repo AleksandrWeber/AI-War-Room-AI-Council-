@@ -37,10 +37,10 @@ export const envSchema = z.object({
   CHUNK_SUMMARY_LLM_ENABLED: booleanEnvSchema.default(false),
   CHUNK_SUMMARY_LLM_MIN_CHARS: z.coerce.number().int().positive().default(4_000),
   LLM_PRIMARY_PROVIDER: z
-    .enum(['mock', 'anthropic', 'openai', 'gemini'])
+    .enum(['mock', 'anthropic', 'openai', 'gemini', 'cursor', 'openrouter'])
     .default('mock'),
   LLM_FALLBACK_PROVIDER: z
-    .enum(['mock', 'anthropic', 'openai', 'gemini'])
+    .enum(['mock', 'anthropic', 'openai', 'gemini', 'cursor', 'openrouter'])
     .default('mock'),
   LLM_PRIMARY_MODEL: z.string().trim().min(1).default('mock-json-v1'),
   LLM_FALLBACK_MODEL: z.string().trim().min(1).default('mock-json-v1'),
@@ -58,6 +58,22 @@ export const envSchema = z.object({
   GEMINI_API_URL: z
     .url()
     .default('https://generativelanguage.googleapis.com/v1beta'),
+  CURSOR_API_KEY: optionalEnvStringSchema,
+  /** local = agent loop in-process; cloud = Cursor-hosted no-repo agent. */
+  CURSOR_RUNTIME: z.enum(['local', 'cloud']).default('local'),
+  CURSOR_LOCAL_CWD: optionalEnvStringSchema,
+  CURSOR_REQUEST_TIMEOUT_MS: z.coerce
+    .number()
+    .int()
+    .positive()
+    .default(180_000),
+  CURSOR_API_ME_URL: z.url().default('https://api.cursor.com/v1/me'),
+  OPENROUTER_API_KEY: optionalEnvStringSchema,
+  OPENROUTER_API_URL: z
+    .url()
+    .default('https://openrouter.ai/api/v1/chat/completions'),
+  OPENROUTER_HTTP_REFERER: optionalEnvStringSchema,
+  OPENROUTER_APP_TITLE: optionalEnvStringSchema,
   RESEARCH_PROVIDER: z.enum(['mock', 'tavily']).default('mock'),
   RESEARCH_SECONDARY_PROVIDER: z.enum(['none', 'serper']).default('none'),
   TAVILY_API_KEY: optionalEnvStringSchema,
@@ -261,6 +277,30 @@ export function validateEnv(config: Record<string, unknown>): ApiEnv {
   if (env.LLM_FALLBACK_PROVIDER === 'gemini' && !env.GEMINI_API_KEY) {
     throw new Error(
       'GEMINI_API_KEY is required when LLM_FALLBACK_PROVIDER=gemini.',
+    )
+  }
+
+  if (env.LLM_PRIMARY_PROVIDER === 'cursor' && !env.CURSOR_API_KEY) {
+    throw new Error(
+      'CURSOR_API_KEY is required when LLM_PRIMARY_PROVIDER=cursor.',
+    )
+  }
+
+  if (env.LLM_FALLBACK_PROVIDER === 'cursor' && !env.CURSOR_API_KEY) {
+    throw new Error(
+      'CURSOR_API_KEY is required when LLM_FALLBACK_PROVIDER=cursor.',
+    )
+  }
+
+  if (env.LLM_PRIMARY_PROVIDER === 'openrouter' && !env.OPENROUTER_API_KEY) {
+    throw new Error(
+      'OPENROUTER_API_KEY is required when LLM_PRIMARY_PROVIDER=openrouter.',
+    )
+  }
+
+  if (env.LLM_FALLBACK_PROVIDER === 'openrouter' && !env.OPENROUTER_API_KEY) {
+    throw new Error(
+      'OPENROUTER_API_KEY is required when LLM_FALLBACK_PROVIDER=openrouter.',
     )
   }
 

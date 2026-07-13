@@ -27,12 +27,16 @@ export type ProviderCredentialsRolloutInput = {
   anthropicApiKey?: string
   openaiApiKey?: string
   geminiApiKey?: string
+  cursorApiKey?: string
+  openrouterApiKey?: string
 }
 
 const managedProviders: ManagedLlmProviderId[] = [
   'anthropic',
   'openai',
   'gemini',
+  'cursor',
+  'openrouter',
 ]
 
 function activeRealProviders(input: ProviderCredentialsRolloutInput) {
@@ -41,7 +45,9 @@ function activeRealProviders(input: ProviderCredentialsRolloutInput) {
       (provider): provider is ManagedLlmProviderId =>
         provider === 'anthropic' ||
         provider === 'openai' ||
-        provider === 'gemini',
+        provider === 'gemini' ||
+        provider === 'cursor' ||
+        provider === 'openrouter',
     ),
   )
 }
@@ -135,6 +141,32 @@ export function evaluateProviderCredentialsRollout(
         : input.geminiApiKey
           ? 'Gemini system API key is configured for fallback routing.'
           : 'GEMINI_API_KEY is required for platform readiness when Gemini is an active provider. Workspace BYOK overrides are separate and are not checked here.',
+    },
+    {
+      name: 'cursor_system_key',
+      label: 'Cursor system key',
+      status:
+        !activeProviders.has('cursor') || Boolean(input.cursorApiKey)
+          ? 'pass'
+          : 'fail',
+      detail: !activeProviders.has('cursor')
+        ? 'Cursor is not configured as an active LLM provider.'
+        : input.cursorApiKey
+          ? 'Cursor system API key is configured for fallback routing.'
+          : 'CURSOR_API_KEY is required for platform readiness when Cursor is an active provider. Workspace BYOK overrides are separate and are not checked here.',
+    },
+    {
+      name: 'openrouter_system_key',
+      label: 'OpenRouter system key',
+      status:
+        !activeProviders.has('openrouter') || Boolean(input.openrouterApiKey)
+          ? 'pass'
+          : 'fail',
+      detail: !activeProviders.has('openrouter')
+        ? 'OpenRouter is not configured as an active LLM provider.'
+        : input.openrouterApiKey
+          ? 'OpenRouter system API key is configured for fallback routing.'
+          : 'OPENROUTER_API_KEY is required for platform readiness when OpenRouter is an active provider. Workspace BYOK overrides are separate and are not checked here.',
     },
   ]
 

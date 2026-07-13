@@ -2,7 +2,13 @@ import { z } from 'zod'
 import { nonEmptyStringSchema, utcDateStringSchema } from './common.js'
 
 /** LLM-only providers used by the model gateway. */
-export const llmProviderIdSchema = z.enum(['anthropic', 'openai', 'gemini'])
+export const llmProviderIdSchema = z.enum([
+  'anthropic',
+  'openai',
+  'gemini',
+  'cursor',
+  'openrouter',
+])
 export type ManagedLlmProviderId = z.infer<typeof llmProviderIdSchema>
 
 /** Research providers that can use workspace BYOK credentials. */
@@ -16,6 +22,8 @@ export const managedProviderIdSchema = z.enum([
   'anthropic',
   'openai',
   'gemini',
+  'cursor',
+  'openrouter',
   'tavily',
   'serper',
 ])

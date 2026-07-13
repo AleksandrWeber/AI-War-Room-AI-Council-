@@ -1,4 +1,4 @@
-import { Inject, Injectable, Optional } from '@nestjs/common'
+import { Inject, Injectable, OnModuleInit, Optional } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { randomUUID } from 'node:crypto'
 import {
@@ -29,7 +29,7 @@ function createId(prefix: string) {
 }
 
 @Injectable()
-export class ModelRouterService {
+export class ModelRouterService implements OnModuleInit {
   private initialized: Promise<void> | null = null
 
   constructor(
@@ -39,6 +39,10 @@ export class ModelRouterService {
     @Optional()
     private readonly configService?: ConfigService<ApiEnv, true>,
   ) {}
+
+  async onModuleInit() {
+    await this.ensureInitialized()
+  }
 
   async selectModel(input: {
     taskName: string
@@ -51,7 +55,9 @@ export class ModelRouterService {
     const selected = input.forceDeputy && deputy ? deputy : champion
 
     if (!champion || !selected) {
-      throw new Error(`No active model is available for role "${input.role}".`)
+      throw new Error(
+        `No active model is available for role "${input.role}". Recover degraded providers or set LLM_PRIMARY_PROVIDER to an active model.`,
+      )
     }
 
     const decision = modelSelectionDecisionSchema.parse({
@@ -167,13 +173,26 @@ export class ModelRouterService {
     const costEfficiency = 1 / (1 + model.inputCostPerMillionTokensUsd)
     const latencyScore = 1 / (1 + model.latencyP95Ms / 10_000)
     const weights = this.getWeights(role)
+    const primaryProvider = this.configService?.get('LLM_PRIMARY_PROVIDER', {
+      infer: true,
+    })
+    const fallbackProvider = this.configService?.get('LLM_FALLBACK_PROVIDER', {
+      infer: true,
+    })
+    const providerPreference =
+      model.providerId === primaryProvider
+        ? 1
+        : model.providerId === fallbackProvider
+          ? 0.35
+          : 0
 
     return (
       model.evaluationScore * weights.evaluation +
       model.safetyScore * weights.safety +
       model.reliabilityScore * weights.reliability +
       costEfficiency * weights.cost +
-      latencyScore * weights.latency
+      latencyScore * weights.latency +
+      providerPreference
     )
   }
 

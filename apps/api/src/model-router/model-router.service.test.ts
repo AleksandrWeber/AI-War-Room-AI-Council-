@@ -91,6 +91,8 @@ describe('ModelRouterService', () => {
   it('uses deputy when champion is degraded', async () => {
     const { router } = createRouter()
     await router.markModelDegraded('mock-json-v1-primary')
+    await router.markModelDegraded('mock-json-v1-primary')
+    await router.markModelDegraded('mock-json-v1-primary')
 
     const decision = await router.selectModel({
       taskName: 'artifacts/prd/v1',
@@ -133,6 +135,8 @@ describe('ModelRouterService', () => {
 
   it('persists degradation and recovery health events', async () => {
     const { router } = createRouter()
+    await router.markModelDegraded('mock-json-v1-primary', 'timeout')
+    await router.markModelDegraded('mock-json-v1-primary', 'timeout')
     await router.markModelDegraded('mock-json-v1-primary', 'timeout')
     let events = await router.getHealthEvents('mock-json-v1-primary')
     let models = await router.getRegistrySnapshot()

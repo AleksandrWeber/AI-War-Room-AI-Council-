@@ -1357,7 +1357,7 @@ type ArtifactHistoryResponse = {
 type ProviderCredential = {
   credentialId: string
   workspaceId: string
-  providerId: 'anthropic' | 'openai' | 'gemini' | 'tavily' | 'serper'
+  providerId: 'anthropic' | 'openai' | 'gemini' | 'cursor' | 'openrouter' | 'tavily' | 'serper'
   label: string
   maskedKey: string
   createdByUserId: string
@@ -1369,7 +1369,7 @@ type ProviderCredential = {
 }
 
 type ProviderCredentialInstructions = Record<
-  'anthropic' | 'openai' | 'gemini' | 'tavily' | 'serper',
+  'anthropic' | 'openai' | 'gemini' | 'cursor' | 'openrouter' | 'tavily' | 'serper',
   {
     label: string
     url: string
@@ -1386,7 +1386,7 @@ type ProviderCredentialListResponse = {
 
 type ProviderCredentialForm = {
   credentialId?: string
-  providerId: 'anthropic' | 'openai' | 'gemini' | 'tavily' | 'serper'
+  providerId: 'anthropic' | 'openai' | 'gemini' | 'cursor' | 'openrouter' | 'tavily' | 'serper'
   label: string
   apiKey: string
 }
@@ -1642,6 +1642,7 @@ function App() {
   })
   const [pipelineState, setPipelineState] = useState<PipelineState>('idle')
   const [pipelineError, setPipelineError] = useState<string | null>(null)
+  const [pipelineElapsedSec, setPipelineElapsedSec] = useState(0)
   const [regeneratingAgentRole, setRegeneratingAgentRole] = useState<string | null>(
     null,
   )
@@ -6730,6 +6731,20 @@ function App() {
   }, [draftRun])
 
   useEffect(() => {
+    if (pipelineState !== 'running') {
+      return
+    }
+
+    const startedAt = Date.now()
+    setPipelineElapsedSec(0)
+    const timerId = window.setInterval(() => {
+      setPipelineElapsedSec(Math.floor((Date.now() - startedAt) / 1000))
+    }, 1000)
+
+    return () => window.clearInterval(timerId)
+  }, [pipelineState])
+
+  useEffect(() => {
     const active = myWorkspaces.find(
       (workspace) => workspace.workspaceId === activeWorkspaceId,
     )
@@ -6956,7 +6971,7 @@ function App() {
           ...workspaceAuthHeaders,
         },
         body: JSON.stringify({
-          workspaceId: 'local_workspace',
+          workspaceId: activeWorkspaceId,
           idempotencyKey: globalThis.crypto.randomUUID(),
           idea: {
             rawIdea,
@@ -6970,7 +6985,24 @@ function App() {
       })
 
       if (!response.ok) {
-        throw new Error(`API returned ${response.status}`)
+        let detail = `API returned ${response.status}`
+        try {
+          const payload = (await response.json()) as {
+            message?: string | { message?: string }
+          }
+          if (typeof payload.message === 'string' && payload.message.trim()) {
+            detail = payload.message
+          } else if (
+            payload.message &&
+            typeof payload.message === 'object' &&
+            typeof payload.message.message === 'string'
+          ) {
+            detail = payload.message.message
+          }
+        } catch {
+          // keep status fallback
+        }
+        throw new Error(detail)
       }
 
       const nextDraftRun = (await response.json()) as DraftRun
@@ -29803,6 +29835,15 @@ function App() {
           status: mapTemporalStatusToStepStatus(event.status),
         }))
       : statusEvents)
+  const liveStepLabel =
+    [...statusEvents]
+      .reverse()
+      .find((event) => event.status === 'running')?.label ??
+    statusEvents.at(-1)?.label ??
+    (pipelineState === 'running' ? 'Waiting for the first agent step…' : null)
+  const pipelineElapsedLabel = `${Math.floor(pipelineElapsedSec / 60)}:${String(
+    pipelineElapsedSec % 60,
+  ).padStart(2, '0')}`
   const selectedAgentCount = reviewDraft?.selectedAgents.length ?? 0
   const selectedSpecialistCount =
     reviewDraft?.selectedAgents.filter((agent) => agent !== 'moderator').length ?? 0
@@ -29837,7 +29878,11 @@ function App() {
         <div className="war-room-card" aria-label="Run preview">
           <div className="card-header">
             <span>Standard run</span>
-            <strong>Under 5 min</strong>
+            <strong>
+              {pipelineState === 'running'
+                ? `Running ${pipelineElapsedLabel}`
+                : 'Live models · often 5–15 min'}
+            </strong>
           </div>
           <form className="idea-form" id="idea" onSubmit={handleCreateDraftRun}>
             <label htmlFor="rawIdea">Raw idea</label>
@@ -29872,7 +29917,10 @@ function App() {
             className="active-workspace-status"
             data-testid="active-workspace-id"
           >
-            Active workspace: {activeWorkspaceId}
+            Active workspace:{' '}
+            {myWorkspaces.find(
+              (workspace) => workspace.workspaceId === activeWorkspaceId,
+            )?.name ?? activeWorkspaceId}
           </div>
           {myWorkspaces.length > 0 ? (
             <div className="workspace-picker-row">
@@ -30117,6 +30165,8 @@ function App() {
                       anthropic: 'Anthropic workspace key',
                       openai: 'OpenAI workspace key',
                       gemini: 'Gemini workspace key',
+                      cursor: 'Cursor workspace key',
+                      openrouter: 'OpenRouter workspace key',
                       tavily: 'Tavily research key',
                       serper: 'Serper research key',
                     }
@@ -30132,6 +30182,8 @@ function App() {
                 <option value="anthropic">Anthropic</option>
                 <option value="openai">OpenAI</option>
                 <option value="gemini">Google Gemini</option>
+                <option value="cursor">Cursor</option>
+                <option value="openrouter">OpenRouter</option>
                 <option value="tavily">Tavily (research)</option>
                 <option value="serper">Serper (research failover)</option>
               </select>
@@ -33211,11 +33263,23 @@ function App() {
               <p className="runtime-note">{temporalRecoveryHint}</p>
             ) : null}
             {pipelineError ? <p className="form-error">{pipelineError}</p> : null}
+            {pipelineState === 'running' ? (
+              <div
+                className="run-live"
+                role="status"
+                aria-live="polite"
+                aria-label="Pipeline is running"
+              >
+                <span className="run-live__spinner" aria-hidden="true" />
+                <span className="run-live__timer">{pipelineElapsedLabel}</span>
+                <span className="run-live__label">{liveStepLabel}</span>
+              </div>
+            ) : null}
           </div>
         </section>
       ) : null}
 
-      {pipelineResult || streamEvents.length > 0 ? (
+      {pipelineResult || streamEvents.length > 0 || pipelineState === 'running' ? (
         <section
           className="panel results-panel"
           id="pipeline-result"
@@ -33245,9 +33309,19 @@ function App() {
             aria-label="Pipeline step status"
             aria-live="polite"
           >
+            {displayedSteps.length === 0 && pipelineState === 'running' ? (
+              <div className="step-item step-item--pending" role="listitem">
+                <span>Agents will appear here as each step finishes.</span>
+                <strong>waiting</strong>
+              </div>
+            ) : null}
             {displayedSteps.map((step) => (
               <div
-                className="step-item"
+                className={
+                  step.status === 'running'
+                    ? 'step-item step-item--running'
+                    : 'step-item'
+                }
                 role="listitem"
                 key={`${step.stepId}-${step.status}`}
               >

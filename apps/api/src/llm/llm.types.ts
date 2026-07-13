@@ -1,6 +1,12 @@
 import type { z } from 'zod'
 
-export type LlmProviderId = 'mock' | 'anthropic' | 'openai' | 'gemini'
+export type LlmProviderId =
+  | 'mock'
+  | 'anthropic'
+  | 'openai'
+  | 'gemini'
+  | 'cursor'
+  | 'openrouter'
 
 export type LlmMessage = {
   role: 'system' | 'user' | 'assistant'

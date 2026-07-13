@@ -64,7 +64,10 @@ export class PostgresModelRegistryRepository
             updated_at
           )
           VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
-          ON CONFLICT (model_id) DO NOTHING
+          ON CONFLICT (model_id) DO UPDATE SET
+            model_name = EXCLUDED.model_name,
+            lifecycle_status = EXCLUDED.lifecycle_status,
+            updated_at = EXCLUDED.updated_at
         `,
         [
           model.modelId,
@@ -177,14 +180,26 @@ export class PostgresModelRegistryRepository
     resetFailures: boolean
   }) {
     return this.postgresService.transaction(async (client) => {
+      // Keep the model selectable on the first transient failure; only remove it
+      // from the active pool after repeated failures so a flaky network blip
+      // cannot leave the workspace with zero runnable models.
+      const degradeAfterFailures = 3
       const result = await client.query<ModelRegistryRow>(
         `
           UPDATE model_registry_entries
-          SET lifecycle_status = $2,
-              health_status = $3,
-              consecutive_failures = CASE
+          SET consecutive_failures = CASE
                 WHEN $4::BOOLEAN THEN 0
                 ELSE consecutive_failures + 1
+              END,
+              health_status = CASE
+                WHEN $4::BOOLEAN THEN $3
+                WHEN consecutive_failures + 1 >= $6 THEN $3
+                ELSE health_status
+              END,
+              lifecycle_status = CASE
+                WHEN $4::BOOLEAN THEN $2
+                WHEN consecutive_failures + 1 >= $6 THEN $2
+                ELSE lifecycle_status
               END,
               updated_at = $5
           WHERE model_id = $1
@@ -196,6 +211,7 @@ export class PostgresModelRegistryRepository
           input.healthStatus,
           input.resetFailures,
           input.now,
+          degradeAfterFailures,
         ],
       )
       const row = result.rows[0]

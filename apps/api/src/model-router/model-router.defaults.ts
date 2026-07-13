@@ -21,12 +21,18 @@ export function createDefaultModelRegistry(
   configService?: ConfigService<ApiEnv, true>,
 ): ModelRegistryEntry[] {
   const now = new Date().toISOString()
+  const mockStatus = resolveConfiguredProviderStatus('mock', configService)
   const anthropicStatus = resolveConfiguredProviderStatus(
     'anthropic',
     configService,
   )
   const openAiStatus = resolveConfiguredProviderStatus('openai', configService)
   const geminiStatus = resolveConfiguredProviderStatus('gemini', configService)
+  const cursorStatus = resolveConfiguredProviderStatus('cursor', configService)
+  const openRouterStatus = resolveConfiguredProviderStatus(
+    'openrouter',
+    configService,
+  )
 
   return [
     {
@@ -42,7 +48,7 @@ export function createDefaultModelRegistry(
       evaluationScore: 0.88,
       safetyScore: 0.85,
       reliabilityScore: 0.98,
-      lifecycleStatus: 'active',
+      lifecycleStatus: mockStatus,
       healthStatus: 'healthy',
       consecutiveFailures: 0,
       updatedAt: now,
@@ -60,7 +66,7 @@ export function createDefaultModelRegistry(
       evaluationScore: 0.82,
       safetyScore: 0.82,
       reliabilityScore: 0.96,
-      lifecycleStatus: 'active',
+      lifecycleStatus: mockStatus,
       healthStatus: 'healthy',
       consecutiveFailures: 0,
       updatedAt: now,
@@ -145,17 +151,65 @@ export function createDefaultModelRegistry(
       consecutiveFailures: 0,
       updatedAt: now,
     },
+    {
+      modelId: 'cursor-composer-candidate',
+      providerId: 'cursor',
+      modelName: resolveConfiguredModel(
+        'cursor',
+        'composer-2.5',
+        configService,
+      ),
+      supportedRoles: allModelRouterRoles,
+      contextWindowTokens: 200_000,
+      maxOutputTokens: 8_192,
+      inputCostPerMillionTokensUsd: 3,
+      outputCostPerMillionTokensUsd: 15,
+      latencyP95Ms: 8_000,
+      evaluationScore: 0.9,
+      safetyScore: 0.88,
+      reliabilityScore: 0.9,
+      lifecycleStatus: cursorStatus,
+      healthStatus: 'healthy',
+      consecutiveFailures: 0,
+      updatedAt: now,
+    },
+    {
+      modelId: 'openrouter-fast-candidate',
+      providerId: 'openrouter',
+      modelName: resolveConfiguredModel(
+        'openrouter',
+        'openai/gpt-4o-mini',
+        configService,
+      ),
+      supportedRoles: allModelRouterRoles,
+      contextWindowTokens: 128_000,
+      maxOutputTokens: 16_384,
+      inputCostPerMillionTokensUsd: 0.15,
+      outputCostPerMillionTokensUsd: 0.6,
+      latencyP95Ms: 1_500,
+      evaluationScore: 0.88,
+      safetyScore: 0.86,
+      reliabilityScore: 0.9,
+      lifecycleStatus: openRouterStatus,
+      healthStatus: 'healthy',
+      consecutiveFailures: 0,
+      updatedAt: now,
+    },
   ]
 }
 
 function resolveConfiguredProviderStatus(
-  providerId: 'anthropic' | 'openai' | 'gemini',
+  providerId: 'mock' | 'anthropic' | 'openai' | 'gemini' | 'cursor' | 'openrouter',
   configService?: ConfigService<ApiEnv, true>,
 ): ModelRegistryEntry['lifecycleStatus'] {
-  const primaryProvider = configService?.get('LLM_PRIMARY_PROVIDER', {
+  if (!configService) {
+    return providerId === 'mock' ? 'active' : 'candidate'
+  }
+
+  const primaryProvider = configService.get('LLM_PRIMARY_PROVIDER', {
     infer: true,
   })
-  const fallbackProvider = configService?.get('LLM_FALLBACK_PROVIDER', {
+  const fallbackProvider = configService.get('LLM_FALLBACK_PROVIDER', {
     infer: true,
   })
 
@@ -165,7 +219,7 @@ function resolveConfiguredProviderStatus(
 }
 
 function resolveConfiguredModel(
-  providerId: 'anthropic' | 'openai' | 'gemini',
+  providerId: 'anthropic' | 'openai' | 'gemini' | 'cursor' | 'openrouter',
   defaultModel: string,
   configService?: ConfigService<ApiEnv, true>,
 ) {

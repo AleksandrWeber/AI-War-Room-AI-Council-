@@ -155,7 +155,13 @@ describe('provider credentials rollout integration', () => {
     expect(capabilities.body).toMatchObject({
       supportsProviderCredentialsRollout: true,
       supportsProviderKeyAdminTools: true,
-      managedProviders: ['anthropic', 'openai', 'gemini'],
+      managedProviders: [
+        'anthropic',
+        'openai',
+        'gemini',
+        'cursor',
+        'openrouter',
+      ],
     })
 
     const rollout = await request(app.getHttpServer())

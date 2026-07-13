@@ -222,6 +222,26 @@ export class ProviderCredentialsService {
           'Platform GEMINI_API_KEY remains the fallback when no workspace key is set.',
         ],
       },
+      cursor: {
+        label: 'Cursor',
+        url: 'https://cursor.com/dashboard?tab=integrations',
+        steps: [
+          'Open Cursor Dashboard -> API Keys.',
+          'Create a user or service account API key (crsr_...).',
+          'Paste it here for workspace Cursor BYOK.',
+          'Platform CURSOR_API_KEY remains the fallback when no workspace key is set.',
+        ],
+      },
+      openrouter: {
+        label: 'OpenRouter',
+        url: 'https://openrouter.ai/keys',
+        steps: [
+          'Open OpenRouter Keys.',
+          'Create or copy an API key (sk-or-...).',
+          'Paste it here for workspace OpenRouter BYOK.',
+          'Platform OPENROUTER_API_KEY remains the fallback when no workspace key is set.',
+        ],
+      },
       tavily: {
         label: 'Tavily (research)',
         url: 'https://app.tavily.com/home',
@@ -259,7 +279,9 @@ export class ProviderCredentialsService {
     const hasSystemCredential = Boolean(
       this.configService.get('ANTHROPIC_API_KEY', { infer: true }) ||
         this.configService.get('OPENAI_API_KEY', { infer: true }) ||
-        this.configService.get('GEMINI_API_KEY', { infer: true }),
+        this.configService.get('GEMINI_API_KEY', { infer: true }) ||
+        this.configService.get('CURSOR_API_KEY', { infer: true }) ||
+        this.configService.get('OPENROUTER_API_KEY', { infer: true }),
     )
 
     return !hasWorkspaceCredential && !hasSystemCredential

@@ -9,9 +9,18 @@ export class InMemoryModelRegistryRepository
 
   async ensureDefaultModels(models: ModelRegistryEntry[]): Promise<void> {
     for (const model of models) {
-      if (!this.models.has(model.modelId)) {
+      const existing = this.models.get(model.modelId)
+      if (!existing) {
         this.models.set(model.modelId, model)
+        continue
       }
+
+      this.models.set(model.modelId, {
+        ...existing,
+        modelName: model.modelName,
+        lifecycleStatus: model.lifecycleStatus,
+        updatedAt: model.updatedAt,
+      })
     }
   }
 
@@ -35,11 +44,13 @@ export class InMemoryModelRegistryRepository
       return null
     }
 
+    const consecutiveFailures = model.consecutiveFailures + 1
+    const shouldRemoveFromPool = consecutiveFailures >= 3
     const degraded: ModelRegistryEntry = {
       ...model,
-      lifecycleStatus: 'degraded',
-      healthStatus: 'degraded',
-      consecutiveFailures: model.consecutiveFailures + 1,
+      consecutiveFailures,
+      lifecycleStatus: shouldRemoveFromPool ? 'degraded' : model.lifecycleStatus,
+      healthStatus: shouldRemoveFromPool ? 'degraded' : model.healthStatus,
       updatedAt: input.now,
     }
     this.models.set(input.modelId, degraded)

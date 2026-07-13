@@ -31,7 +31,14 @@ export type ModelHealthStatus = z.infer<typeof modelHealthStatusSchema>
 
 export const modelRegistryEntrySchema = z.object({
   modelId: nonEmptyStringSchema,
-  providerId: z.enum(['mock', 'anthropic', 'openai', 'gemini']),
+  providerId: z.enum([
+    'mock',
+    'anthropic',
+    'openai',
+    'gemini',
+    'cursor',
+    'openrouter',
+  ]),
   modelName: nonEmptyStringSchema,
   supportedRoles: z.array(modelRouterRoleSchema).min(1),
   contextWindowTokens: z.number().int().positive(),

@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import type { LlmProvider, LlmProviderId } from './llm.types.js'
 import { AnthropicLlmProvider } from './anthropic-llm.provider.js'
+import { CursorLlmProvider } from './cursor-llm.provider.js'
 import { GeminiLlmProvider } from './gemini-llm.provider.js'
 import { MockLlmProvider } from './mock-llm.provider.js'
 import { OpenAiLlmProvider } from './openai-llm.provider.js'
+import { OpenRouterLlmProvider } from './openrouter-llm.provider.js'
 
 @Injectable()
 export class LlmProviderRegistry {
@@ -14,6 +16,8 @@ export class LlmProviderRegistry {
     anthropicLlmProvider: AnthropicLlmProvider,
     openAiLlmProvider: OpenAiLlmProvider,
     geminiLlmProvider: GeminiLlmProvider,
+    cursorLlmProvider: CursorLlmProvider,
+    openRouterLlmProvider: OpenRouterLlmProvider,
   ) {
     this.providers = new Map(
       [
@@ -21,6 +25,8 @@ export class LlmProviderRegistry {
         anthropicLlmProvider,
         openAiLlmProvider,
         geminiLlmProvider,
+        cursorLlmProvider,
+        openRouterLlmProvider,
       ].map((provider) => [provider.providerId, provider]),
     )
   }
