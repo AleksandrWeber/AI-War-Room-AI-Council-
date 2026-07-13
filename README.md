@@ -441,6 +441,9 @@ Provider credentials rollout readiness:
 
 - `GET /api/provider-credentials/readiness` returns operator-facing production provider credential checklist results (`ready` or `not_ready`).
 - Checks cover encryption key configuration, encryption roundtrip, PostgreSQL persistence, and active LLM provider system keys.
+- Platform readiness requires env system keys (`ANTHROPIC_API_KEY` / `OPENAI_API_KEY`) when those providers are active. Workspace BYOK is a per-workspace override and is not a substitute for those checks.
+- Rotate a workspace provider key by re-saving it through the provider-credentials API (`PUT`); plaintext is never returned after save.
+- Changing `APP_ENCRYPTION_KEY` without a re-encrypt migration orphans existing BYOK ciphertext and also invalidates signed auth sessions. There is no dual-key rotation path yet.
 - Production startup rejects the default `APP_ENCRYPTION_KEY`.
 - The web billing panel shows provider credentials rollout status and per-check guidance.
 

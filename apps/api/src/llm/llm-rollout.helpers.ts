@@ -93,7 +93,7 @@ export function evaluateLlmRollout(input: LlmRolloutInput): LlmRolloutEvaluation
         ? 'Anthropic is not configured as a primary or fallback provider.'
         : input.anthropicApiKey
           ? 'Anthropic API key is configured.'
-          : 'ANTHROPIC_API_KEY is required when Anthropic is active, unless workspace BYOK credentials are provisioned separately.',
+          : 'ANTHROPIC_API_KEY is required for platform readiness when Anthropic is an active provider. Workspace BYOK overrides are separate and are not checked here.',
     },
     {
       name: 'openai_api_key',
@@ -106,7 +106,7 @@ export function evaluateLlmRollout(input: LlmRolloutInput): LlmRolloutEvaluation
         ? 'OpenAI is not configured as a primary or fallback provider.'
         : input.openaiApiKey
           ? 'OpenAI API key is configured.'
-          : 'OPENAI_API_KEY is required when OpenAI is active, unless workspace BYOK credentials are provisioned separately.',
+          : 'OPENAI_API_KEY is required for platform readiness when OpenAI is an active provider. Workspace BYOK overrides are separate and are not checked here.',
     },
   ]
 

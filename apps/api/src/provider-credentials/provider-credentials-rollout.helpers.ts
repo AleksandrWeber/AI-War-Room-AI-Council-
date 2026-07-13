@@ -103,7 +103,7 @@ export function evaluateProviderCredentialsRollout(
         ? 'Anthropic is not configured as an active LLM provider.'
         : input.anthropicApiKey
           ? 'Anthropic system API key is configured for fallback routing.'
-          : 'ANTHROPIC_API_KEY is required when Anthropic is active unless every workspace uses BYOK keys.',
+          : 'ANTHROPIC_API_KEY is required for platform readiness when Anthropic is an active provider. Workspace BYOK overrides are separate and are not checked here.',
     },
     {
       name: 'openai_system_key',
@@ -114,7 +114,7 @@ export function evaluateProviderCredentialsRollout(
         ? 'OpenAI is not configured as an active LLM provider.'
         : input.openaiApiKey
           ? 'OpenAI system API key is configured for fallback routing.'
-          : 'OPENAI_API_KEY is required when OpenAI is active unless every workspace uses BYOK keys.',
+          : 'OPENAI_API_KEY is required for platform readiness when OpenAI is an active provider. Workspace BYOK overrides are separate and are not checked here.',
     },
   ]
 
