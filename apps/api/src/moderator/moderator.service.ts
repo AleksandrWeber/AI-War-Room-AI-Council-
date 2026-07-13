@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import {
+  type AgentChunkSummary,
   type AgentExecutionResult,
   type DraftRun,
   type ModeratorSynthesis,
@@ -16,8 +17,15 @@ export class ModeratorService {
     draftRun: DraftRun
     approvedTriage: DraftRun['triage']
     agentOutputs: AgentExecutionResult[]
+    chunkSummaries: AgentChunkSummary[]
   }): Promise<ModeratorSynthesis> {
     const fallback = this.createFallbackSynthesis(input)
+    const llmInput = {
+      draftRun: input.draftRun,
+      approvedTriage: input.approvedTriage,
+      chunkSummaries: input.chunkSummaries,
+      agentCount: input.agentOutputs.length,
+    }
     const result = await this.llmGatewayService.generateStructuredJson({
       taskName: moderatorPromptV1.version,
       schema: moderatorSynthesisSchema,
@@ -29,7 +37,7 @@ export class ModeratorService {
         },
         {
           role: 'user',
-          content: `${moderatorPromptV1.userTemplate}${JSON.stringify(input)}`,
+          content: `${moderatorPromptV1.userTemplate}${JSON.stringify(llmInput)}`,
         },
       ],
       fallback,
@@ -52,6 +60,7 @@ export class ModeratorService {
     draftRun: DraftRun
     approvedTriage: DraftRun['triage']
     agentOutputs: AgentExecutionResult[]
+    chunkSummaries: AgentChunkSummary[]
   }): ModeratorSynthesis {
     return {
       executivePositioning:
@@ -82,8 +91,8 @@ export class ModeratorService {
         `Execute ${input.agentOutputs.length} non-moderator agents in isolation.`,
         'Keep Shield as a background security layer.',
       ],
-      risks: input.agentOutputs
-        .flatMap((agentOutput) => agentOutput.output.risks)
+      risks: input.chunkSummaries
+        .flatMap((summary) => summary.topRisks)
         .slice(0, 10),
       openQuestions: [
         'Which artifact format should users export first?',
@@ -93,6 +102,7 @@ export class ModeratorService {
         promptVersion: moderatorPromptV1.version,
         validationStatus: 'fallback',
         source: 'moderator_fallback',
+        chunkSummaryCount: input.chunkSummaries.length,
       },
     }
   }

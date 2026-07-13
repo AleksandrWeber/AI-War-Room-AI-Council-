@@ -27,6 +27,7 @@ import {
 } from '@ai-war-room/schemas'
 import { AgentService } from '../agents/agent.service.js'
 import { ArtifactService } from '../artifacts/artifact.service.js'
+import { ChunkSummaryService } from '../chunk-summary/chunk-summary.service.js'
 import type { ApiEnv } from '../config/env.js'
 import { ModeratorService } from '../moderator/moderator.service.js'
 import { ObservabilityService } from '../observability/observability.service.js'
@@ -58,6 +59,7 @@ export class RunsService {
     private readonly configService: ConfigService<ApiEnv, true>,
     private readonly triageService: TriageService,
     private readonly agentService: AgentService,
+    private readonly chunkSummaryService: ChunkSummaryService,
     private readonly moderatorService: ModeratorService,
     private readonly artifactService: ArtifactService,
     private readonly usageService: UsageService,
@@ -318,6 +320,9 @@ export class RunsService {
       'Prompt-driven Moderator synthesis',
       'running',
     )
+    const chunkSummaries = this.chunkSummaryService.summarizeAgentOutputs(
+      agentOutputs,
+    )
     const moderatorSynthesis = await this.measurePipelinePhase(
       request,
       'moderator',
@@ -326,6 +331,7 @@ export class RunsService {
           draftRun: request.draftRun,
           approvedTriage: request.approvedTriage,
           agentOutputs,
+          chunkSummaries,
         }),
     )
     await this.emitStatus(

@@ -250,6 +250,10 @@ export class LlmGatewayService {
       return 'moderator'
     }
 
+    if (taskName === 'shield/llm_classifier/v1') {
+      return 'shield_classifier'
+    }
+
     if (taskName.startsWith('agents/')) {
       return (taskName.split('/')[1] as ModelRouterRole | undefined) ?? 'critic'
     }

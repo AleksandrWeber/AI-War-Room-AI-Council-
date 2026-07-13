@@ -68,6 +68,10 @@ export class MockLlmProvider implements LlmProvider {
       return JSON.stringify(this.createDevelopmentPromptResponse(request))
     }
 
+    if (request.taskName === 'shield/llm_classifier/v1') {
+      return JSON.stringify(this.createShieldClassifierResponse(request))
+    }
+
     return JSON.stringify({
       summary: `Mock response for ${request.taskName}`,
     })
@@ -159,9 +163,13 @@ export class MockLlmProvider implements LlmProvider {
     const payload = this.extractPayload(request)
     const draftRun = payload.draftRun ?? {}
     const approvedTriage = payload.approvedTriage ?? {}
-    const agentOutputs = Array.isArray(payload.agentOutputs)
-      ? payload.agentOutputs
+    const chunkSummaries = Array.isArray(payload.chunkSummaries)
+      ? payload.chunkSummaries
       : []
+    const agentCount =
+      typeof payload.agentCount === 'number'
+        ? payload.agentCount
+        : chunkSummaries.length
 
     return {
       executivePositioning:
@@ -189,11 +197,13 @@ export class MockLlmProvider implements LlmProvider {
       ],
       keyDecisions: [
         `Use ${approvedTriage.recommendedRunMode ?? 'standard'} run mode for this draft.`,
-        `Execute ${agentOutputs.length} non-moderator agents in isolation.`,
+        `Execute ${agentCount} non-moderator agents in isolation.`,
         'Keep Shield as a background security layer.',
       ],
-      risks: agentOutputs
-        .flatMap((agentOutput) => agentOutput.output?.risks ?? [])
+      risks: chunkSummaries
+        .flatMap(
+          (summary: { topRisks?: string[] }) => summary.topRisks ?? [],
+        )
         .slice(0, 10),
       openQuestions: [
         'Which artifact format should users export first?',
@@ -201,7 +211,8 @@ export class MockLlmProvider implements LlmProvider {
       ],
       artifactGenerationBrief: {
         source: 'mock_prompt_driven_moderator',
-        agentCount: agentOutputs.length,
+        agentCount,
+        chunkSummaryCount: chunkSummaries.length,
         shieldStatus: draftRun.shieldScan?.status ?? 'clear',
       },
     }
@@ -331,6 +342,58 @@ export class MockLlmProvider implements LlmProvider {
       ],
       outOfScope: completedPrd.nonGoals ?? [],
       toolSpecificGuidance,
+    }
+  }
+
+  private createShieldClassifierResponse(request: LlmProviderRequest) {
+    const payload = this.extractPayload(request)
+    const deterministicFindings = Array.isArray(payload.deterministicFindings)
+      ? payload.deterministicFindings
+      : []
+    const text = typeof payload.text === 'string' ? payload.text : ''
+
+    if (deterministicFindings.length === 0 && !/exfiltrate|weapon|ransomware/i.test(text)) {
+      return {
+        findings: [],
+        rationale: 'Mock Layer 2: no residual risk beyond deterministic clear.',
+      }
+    }
+
+    const primary = deterministicFindings[0] as
+      | {
+          severity?: string
+          category?: string
+          recommendedAction?: string
+          explanation?: string
+          span?: { start?: number; end?: number; quote?: string }
+        }
+      | undefined
+
+    return {
+      findings: primary
+        ? [
+            {
+              severity: primary.severity ?? 'medium',
+              category: primary.category ?? 'other',
+              spanStart: primary.span?.start,
+              spanEnd: primary.span?.end,
+              quote: primary.span?.quote,
+              explanation:
+                primary.explanation ??
+                'Mock Layer 2 confirmed the deterministic finding.',
+              recommendedAction: primary.recommendedAction ?? 'warn',
+            },
+          ]
+        : [
+            {
+              severity: 'high',
+              category: 'malicious_intent',
+              explanation:
+                'Mock Layer 2 flagged high-risk domain language for human review.',
+              recommendedAction: 'require_confirmation',
+            },
+          ],
+      rationale: 'Mock Layer 2 escalation response.',
     }
   }
 

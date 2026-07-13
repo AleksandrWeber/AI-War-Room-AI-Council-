@@ -2,6 +2,7 @@ import { Module, forwardRef } from '@nestjs/common'
 import { AgentService } from '../agents/agent.service.js'
 import { ArtifactService } from '../artifacts/artifact.service.js'
 import { AuthModule } from '../auth/auth.module.js'
+import { ChunkSummaryService } from '../chunk-summary/chunk-summary.service.js'
 import { LlmModule } from '../llm/llm.module.js'
 import { ModeratorService } from '../moderator/moderator.service.js'
 import { ObservabilityModule } from '../observability/observability.module.js'
@@ -54,6 +55,7 @@ import {
     StreamRecoveryAdminService,
     TriageService,
     AgentService,
+    ChunkSummaryService,
     ModeratorService,
     ArtifactService,
     TemporalRunService,

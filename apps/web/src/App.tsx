@@ -1,5 +1,5 @@
 // @ts-nocheck
-import { Fragment, useEffect, useRef, useState, type FormEvent } from 'react'
+import { useEffect, useRef, useState, type FormEvent } from 'react'
 import type {
   AuthCapabilitiesResponse,
   AuthRolloutResponse,
@@ -1176,7 +1176,11 @@ import type {
   WorkspaceSettingsAdminSummaryResponse,
 } from '@ai-war-room/schemas'
 import { filterFindingsByDisplaySensitivity } from '@ai-war-room/schemas'
-import { formatPaidTier, settleAbortable } from '@ai-war-room/web-blocks'
+import {
+  formatPaidTier,
+  getHighlightedIdea,
+  settleAbortable,
+} from '@ai-war-room/web-blocks'
 import { CoreOperationsAdminLazyGate, DomainAdminLazyGate } from './features/AdminLazySection'
 import { UsageAdminLazySection } from './features/UsageAdminLazySection'
 import {
@@ -1506,54 +1510,6 @@ function formatArtifactTitle(artifactType: ArtifactResult['metadata']['artifactT
 
 function getSeverityLabel(severity: string) {
   return severity === 'none' ? 'No risk' : severity
-}
-
-function getHighlightedIdea(
-  rawIdea: string,
-  findings: ShieldFinding[],
-  onSelectFinding?: (findingId: string) => void,
-) {
-  const spans = findings
-    .filter((finding) => finding.span)
-    .map((finding) => ({
-      findingId: finding.findingId,
-      category: finding.category,
-      severity: finding.severity,
-      start: finding.span!.start,
-      end: finding.span!.end,
-    }))
-    .sort((left, right) => left.start - right.start)
-
-  if (spans.length === 0) {
-    return rawIdea
-  }
-
-  let cursor = 0
-
-  return (
-    <>
-      {spans.map((span) => {
-        const before = rawIdea.slice(cursor, span.start)
-        const highlighted = rawIdea.slice(span.start, span.end)
-        cursor = span.end
-
-        return (
-          <Fragment key={span.findingId}>
-            {before}
-            <button
-              type="button"
-              className="finding-mark"
-              aria-label={`Shield ${span.severity} finding: ${span.category}. Activate to review.`}
-              onClick={() => onSelectFinding?.(span.findingId)}
-            >
-              {highlighted}
-            </button>
-          </Fragment>
-        )
-      })}
-      {rawIdea.slice(cursor)}
-    </>
-  )
 }
 
 function renderArtifactValue(value: unknown) {

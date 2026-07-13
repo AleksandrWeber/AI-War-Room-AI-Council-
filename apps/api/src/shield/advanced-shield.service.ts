@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common'
 import type { ShieldFindingSource } from '@ai-war-room/schemas'
 import { ObservabilityService } from '../observability/observability.service.js'
 import { DeterministicShieldClassifier } from './deterministic-shield.classifier.js'
+import { LlmShieldClassifierService } from './llm-shield-classifier.service.js'
 import { shieldFalsePositiveReviewSet } from './shield-review-set.js'
 
 @Injectable()
 export class AdvancedShieldService {
   constructor(
     private readonly classifier: DeterministicShieldClassifier,
+    private readonly llmShieldClassifierService: LlmShieldClassifierService,
     private readonly observabilityService: ObservabilityService,
   ) {}
 
@@ -17,10 +19,24 @@ export class AdvancedShieldService {
     text: string
     source: ShieldFindingSource
   }) {
-    const scan = await this.classifier.classify({
+    const deterministicScan = await this.classifier.classify({
       text: input.text,
       source: input.source,
     })
+    const scan = await this.llmShieldClassifierService.escalateIfNeeded({
+      text: input.text,
+      source: input.source,
+      workspaceId: input.workspaceId,
+      runId: input.runId,
+      baseScan: deterministicScan,
+    })
+
+    const classifierId = this.llmShieldClassifierService.shouldEscalate({
+      text: input.text,
+      baseScan: deterministicScan,
+    })
+      ? 'layered-shield-llm/v1'
+      : this.classifier.classifierId
 
     this.observabilityService.record(
       'shield_scan_classified',
@@ -28,7 +44,7 @@ export class AdvancedShieldService {
         workspaceId: input.workspaceId ?? null,
         runId: input.runId ?? null,
         source: input.source,
-        classifierId: this.classifier.classifierId,
+        classifierId,
         status: scan.status,
         maxSeverity: scan.maxSeverity,
         findingCount: scan.findings.length,

@@ -15,8 +15,17 @@ function createShieldAdminService(env: Partial<ApiEnv> = {}) {
     ...env,
   })
   const classifier = new DeterministicShieldClassifier()
+  const llmShieldClassifierService = {
+    shouldEscalate: () => false,
+    escalateIfNeeded: async ({
+      baseScan,
+    }: {
+      baseScan: Awaited<ReturnType<DeterministicShieldClassifier['classify']>>
+    }) => baseScan,
+  }
   const advancedShieldService = new AdvancedShieldService(
     classifier,
+    llmShieldClassifierService as never,
     new TestObservabilityService() as never,
   )
 
