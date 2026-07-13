@@ -6,7 +6,7 @@ import {
   utcDateStringSchema,
 } from './common.js'
 import { agentExecutionResultSchema } from './agent.js'
-import { artifactSchema } from './artifact.js'
+import { artifactSchema, developmentPromptTargetToolSchema } from './artifact.js'
 import { ideaSubmissionSchema } from './idea.js'
 import { moderatorSynthesisSchema } from './moderator.js'
 import { shieldScanResultSchema } from './shield.js'
@@ -52,6 +52,7 @@ export const mockPipelineRequestSchema = z.object({
   draftRun: draftRunSchema,
   approvedTriage: triageResultSchema,
   selectedAgents: z.array(agentRoleSchema).min(3).max(7),
+  developmentPromptTargetTool: developmentPromptTargetToolSchema.default('cursor'),
 })
 
 export const mockPipelineResultSchema = z.object({

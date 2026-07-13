@@ -281,8 +281,13 @@ export class MockLlmProvider implements LlmProvider {
   private createDevelopmentPromptResponse(request: LlmProviderRequest) {
     const payload = this.extractPayload(request)
     const completedPrd = payload.completedPrd ?? {}
+    const targetTool = payload.targetTool ?? 'cursor'
+    const toolSpecificGuidance = Array.isArray(payload.toolSpecificGuidance)
+      ? payload.toolSpecificGuidance
+      : []
 
     return {
+      targetTool,
       productSummary:
         completedPrd.overview ??
         'Build the approved AI War Room product described by the PRD.',
@@ -325,6 +330,7 @@ export class MockLlmProvider implements LlmProvider {
         'Verify generated artifacts with schema tests and runtime checks.',
       ],
       outOfScope: completedPrd.nonGoals ?? [],
+      toolSpecificGuidance,
     }
   }
 

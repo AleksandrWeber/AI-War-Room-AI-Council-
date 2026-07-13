@@ -1266,7 +1266,19 @@ type DraftRun = {
 type ReviewDraft = {
   triage: DraftRun['triage']
   selectedAgents: string[]
+  developmentPromptTargetTool:
+    | 'cursor'
+    | 'claude_code'
+    | 'bolt'
+    | 'lovable'
 }
+
+const developmentPromptTargetToolOptions = [
+  { value: 'cursor', label: 'Cursor (MVP default)' },
+  { value: 'claude_code', label: 'Claude Code (scaffolding)' },
+  { value: 'bolt', label: 'Bolt (scaffolding)' },
+  { value: 'lovable', label: 'Lovable (scaffolding)' },
+] as const
 
 type PipelineStep = {
   stepId: string
@@ -1645,8 +1657,15 @@ function App() {
   )
   const [reviewDraft, setReviewDraft] = useState<ReviewDraft | null>(() => {
     const saved = localStorage.getItem(reviewStorageKey)
+    if (!saved) {
+      return null
+    }
 
-    return saved ? (JSON.parse(saved) as ReviewDraft) : null
+    const parsed = JSON.parse(saved) as ReviewDraft
+    return {
+      ...parsed,
+      developmentPromptTargetTool: parsed.developmentPromptTargetTool ?? 'cursor',
+    }
   })
   const [pipelineState, setPipelineState] = useState<PipelineState>('idle')
   const [pipelineError, setPipelineError] = useState<string | null>(null)
@@ -6763,6 +6782,7 @@ function App() {
       setReviewDraft({
         triage: nextDraftRun.triage,
         selectedAgents: nextDraftRun.selectedAgents,
+        developmentPromptTargetTool: 'cursor',
       })
       setPipelineResult(null)
       localStorage.removeItem(pipelineResultStorageKey)
@@ -6829,6 +6849,8 @@ function App() {
       draftRun,
       approvedTriage: reviewDraft.triage,
       selectedAgents: reviewDraft.selectedAgents,
+      developmentPromptTargetTool:
+        reviewDraft.developmentPromptTargetTool ?? 'cursor',
     }
   }
 
@@ -32056,6 +32078,33 @@ function App() {
               <span>{reviewDraft.triage.complexity} complexity</span>
               <span>{reviewDraft.triage.securitySensitivity} security</span>
             </div>
+            <label>
+              Development Prompt target
+              <select
+                value={reviewDraft.developmentPromptTargetTool ?? 'cursor'}
+                onChange={(event) =>
+                  setReviewDraft((current) =>
+                    current
+                      ? {
+                          ...current,
+                          developmentPromptTargetTool: event.target
+                            .value as ReviewDraft['developmentPromptTargetTool'],
+                        }
+                      : current,
+                  )
+                }
+              >
+                {developmentPromptTargetToolOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <p className="runtime-note">
+              Cursor is the MVP default. Other tools keep the shared PRD and add
+              scaffolding guidance until full adapters ship.
+            </p>
             {reviewDraft.selectedAgents.length < 3 ? (
               <p id="execute-gate-hint" className="form-error" role="status">
                 Select at least three agents (including Moderator) before

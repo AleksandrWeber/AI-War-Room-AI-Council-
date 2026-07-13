@@ -38,7 +38,18 @@ export const prdSchema = z.object({
   openQuestions: z.array(nonEmptyStringSchema.max(1_000)).max(30),
 })
 
+export const developmentPromptTargetToolSchema = z.enum([
+  'cursor',
+  'claude_code',
+  'bolt',
+  'lovable',
+])
+export type DevelopmentPromptTargetTool = z.infer<
+  typeof developmentPromptTargetToolSchema
+>
+
 export const developmentPromptSchema = z.object({
+  targetTool: developmentPromptTargetToolSchema.default('cursor'),
   productSummary: nonEmptyStringSchema.max(4_000),
   technicalStack: z.array(nonEmptyStringSchema.max(500)).min(1).max(30),
   architectureOverview: nonEmptyStringSchema.max(4_000),
@@ -53,6 +64,10 @@ export const developmentPromptSchema = z.object({
     .min(1)
     .max(60),
   outOfScope: z.array(nonEmptyStringSchema.max(1_000)).max(40),
+  toolSpecificGuidance: z
+    .array(nonEmptyStringSchema.max(1_000))
+    .max(20)
+    .default([]),
 })
 
 export const artifactMetadataSchema = z.object({

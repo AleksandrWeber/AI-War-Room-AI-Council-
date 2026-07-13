@@ -343,6 +343,7 @@ export class RunsService {
         draftRun: request.draftRun,
         moderatorSynthesis,
         completedAt: now,
+        developmentPromptTargetTool: request.developmentPromptTargetTool,
       }),
     )
     for (const artifact of artifacts) {

@@ -50,6 +50,7 @@ function createRequest(): MockPipelineRequest {
     },
     approvedTriage: triage,
     selectedAgents: [...triage.recommendedAgents],
+    developmentPromptTargetTool: 'cursor',
   }
 }
 
@@ -126,6 +127,7 @@ function createResult(): MockPipelineResult {
         openQuestions: [],
       }),
       createArtifact('development_prompt', {
+        targetTool: 'cursor',
         productSummary: 'Add Temporal orchestration.',
         technicalStack: ['NestJS', 'Temporal'],
         architectureOverview: 'Worker executes existing pipeline as activity.',
@@ -137,6 +139,9 @@ function createResult(): MockPipelineResult {
         testingRequirements: ['Unit-test contracts'],
         implementationOrder: ['Add skeleton first'],
         outOfScope: ['Production deployment'],
+        toolSpecificGuidance: [
+          'Optimize steps for Cursor Agent / Composer with small file-scoped edits.',
+        ],
       }),
     ],
     completedAt: now,

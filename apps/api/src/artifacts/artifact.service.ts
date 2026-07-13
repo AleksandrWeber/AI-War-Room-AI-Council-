@@ -3,6 +3,7 @@ import { randomUUID } from 'node:crypto'
 import {
   type Artifact,
   type DevelopmentPrompt,
+  type DevelopmentPromptTargetTool,
   type DraftRun,
   type ExecutiveSummary,
   type ModeratorSynthesis,
@@ -14,6 +15,10 @@ import {
 } from '@ai-war-room/schemas'
 import { LlmGatewayService } from '../llm/llm-gateway.service.js'
 import { artifactPrompts } from '../prompts/artifact.prompts.js'
+import {
+  getDevelopmentPromptSystemAddon,
+  getDevelopmentPromptToolGuidance,
+} from './development-prompt-targets.js'
 
 function createId(prefix: string) {
   return `${prefix}_${randomUUID()}`
@@ -27,12 +32,14 @@ export class ArtifactService {
     draftRun: DraftRun
     moderatorSynthesis: ModeratorSynthesis
     completedAt: string
+    developmentPromptTargetTool?: DevelopmentPromptTargetTool
   }): Promise<Artifact[]> {
     const executiveSummary = await this.generateExecutiveSummary(input)
     const prd = await this.generatePrd(input)
     const developmentPrompt = await this.generateDevelopmentPrompt({
       ...input,
       completedPrd: prd.artifact.content,
+      targetTool: input.developmentPromptTargetTool ?? 'cursor',
     })
 
     return [executiveSummary, prd, developmentPrompt]
@@ -113,15 +120,38 @@ export class ArtifactService {
     moderatorSynthesis: ModeratorSynthesis
     completedAt: string
     completedPrd: Prd
+    targetTool: DevelopmentPromptTargetTool
   }): Promise<Artifact & { artifact: { artifactType: 'development_prompt' } }> {
     const prompt = artifactPrompts.development_prompt
-    const fallback = this.createFallbackDevelopmentPrompt(input)
+    const toolSpecificGuidance = getDevelopmentPromptToolGuidance(input.targetTool)
+    const fallback = this.createFallbackDevelopmentPrompt({
+      ...input,
+      toolSpecificGuidance,
+    })
     const result = await this.llmGatewayService.generateStructuredJson({
       taskName: prompt.version,
       schema: developmentPromptSchema,
       workspaceId: input.draftRun.workspaceId,
-      messages: this.createMessages(prompt.system, prompt.userTemplate, input),
+      messages: this.createMessages(
+        `${prompt.system}\n${getDevelopmentPromptSystemAddon(input.targetTool)}`,
+        prompt.userTemplate,
+        {
+          draftRun: input.draftRun,
+          moderatorSynthesis: input.moderatorSynthesis,
+          completedPrd: input.completedPrd,
+          targetTool: input.targetTool,
+          toolSpecificGuidance,
+        },
+      ),
       fallback,
+    })
+    const content = developmentPromptSchema.parse({
+      ...result.value,
+      targetTool: input.targetTool,
+      toolSpecificGuidance:
+        result.value.toolSpecificGuidance.length > 0
+          ? result.value.toolSpecificGuidance
+          : toolSpecificGuidance,
     })
 
     return artifactSchema.parse({
@@ -135,11 +165,11 @@ export class ArtifactService {
         inputTokens: result.usage.inputTokens,
         outputTokens: result.usage.outputTokens,
         estimatedCostUsd: result.usage.estimatedCostUsd,
-        content: result.value,
+        content,
       }),
       artifact: {
         artifactType: 'development_prompt',
-        content: result.value,
+        content,
       },
     }) as Artifact & { artifact: { artifactType: 'development_prompt' } }
   }
@@ -271,8 +301,11 @@ export class ArtifactService {
   private createFallbackDevelopmentPrompt(input: {
     completedPrd: Prd
     moderatorSynthesis: ModeratorSynthesis
+    targetTool: DevelopmentPromptTargetTool
+    toolSpecificGuidance: string[]
   }): DevelopmentPrompt {
     return {
+      targetTool: input.targetTool,
       productSummary: input.completedPrd.overview,
       technicalStack: ['Vite', 'React', 'TypeScript', 'NestJS', 'Fastify', 'Zod'],
       architectureOverview:
@@ -311,6 +344,7 @@ export class ArtifactService {
         'Verify generated artifacts with schema tests and runtime checks.',
       ],
       outOfScope: input.completedPrd.nonGoals,
+      toolSpecificGuidance: input.toolSpecificGuidance,
     }
   }
 }
