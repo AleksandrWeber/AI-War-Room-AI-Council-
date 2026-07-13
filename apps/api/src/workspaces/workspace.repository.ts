@@ -45,6 +45,10 @@ export interface WorkspaceRepository {
 
   findUserProfile(userId: string): Promise<WorkspaceUserProfile | null>
 
+  listMembershipsForUser(
+    userId: string,
+  ): Promise<WorkspaceMembershipRecord[]>
+
   provisionExternalMember(
     input: ProvisionExternalMemberInput,
   ): Promise<ProvisionExternalMemberResult>

@@ -14,6 +14,7 @@ import {
   createWorkspaceInviteRequestSchema,
   createWorkspaceInviteResponseSchema,
   listWorkspaceInvitesResponseSchema,
+  resendWorkspaceInviteResponseSchema,
   revokeWorkspaceInviteResponseSchema,
   type AuthContext,
   type WorkspaceInviteRecord,
@@ -136,6 +137,67 @@ export class WorkspaceInviteService {
     return revokeWorkspaceInviteResponseSchema.parse({
       invite: this.toPublicRecord({ ...invite, revokedAt }),
       guidance: 'Invite revoked. The join link can no longer be accepted.',
+    })
+  }
+
+  async resendInvite(input: {
+    authContext: AuthContext
+    workspaceId: string
+    inviteId: string
+    body: unknown
+  }) {
+    this.assertCanManageInvites(input.authContext, input.workspaceId)
+    const invite = await this.findById(input.inviteId)
+
+    if (!invite || invite.workspaceId !== input.workspaceId) {
+      throw new NotFoundException({ message: 'Invite was not found.' })
+    }
+
+    const status = this.resolveStatus(invite)
+    if (status !== 'pending' && status !== 'expired') {
+      throw new BadRequestException({
+        message: `Invite is ${status} and cannot be resent.`,
+      })
+    }
+
+    const parsedBody = createWorkspaceInviteRequestSchema
+      .pick({ expiresInHours: true })
+      .safeParse(input.body ?? {})
+    if (!parsedBody.success) {
+      throw new BadRequestException({
+        message: 'Invalid resend workspace invite request.',
+        issues: parsedBody.error.issues,
+      })
+    }
+
+    const token = randomBytes(24).toString('base64url')
+    const now = new Date()
+    const expiresAt = new Date(
+      now.getTime() + parsedBody.data.expiresInHours * 60 * 60 * 1000,
+    ).toISOString()
+    const rotated: InviteRow = {
+      ...invite,
+      tokenHash: this.hashToken(token),
+      expiresAt,
+      acceptedAt: undefined,
+      acceptedByUserId: undefined,
+      revokedAt: undefined,
+    }
+
+    await this.persistInviteRotation(rotated)
+
+    const inviteUrl = `${this.configService.get('WEB_ORIGIN', { infer: true })}/?inviteToken=${encodeURIComponent(token)}`
+    this.logger.log(
+      `Workspace invite resent for ${rotated.email} in ${rotated.workspaceId} (link_only delivery).`,
+    )
+
+    return resendWorkspaceInviteResponseSchema.parse({
+      invite: this.toPublicRecord(rotated),
+      token,
+      inviteUrl,
+      delivery: 'link_only',
+      guidance:
+        'Invite link rotated. Share the new URL; the previous token no longer works.',
     })
   }
 
@@ -465,6 +527,31 @@ export class WorkspaceInviteService {
         WHERE invite_id = $1
       `,
       [input.inviteId, input.revokedAt],
+    )
+  }
+
+  private async persistInviteRotation(invite: InviteRow) {
+    if (this.usesMemoryStore()) {
+      this.memoryInvites.set(invite.inviteId, {
+        ...invite,
+        acceptedAt: undefined,
+        acceptedByUserId: undefined,
+        revokedAt: undefined,
+      })
+      return
+    }
+
+    await this.postgresService.query(
+      `
+        UPDATE workspace_invites
+        SET token_hash = $2,
+            expires_at = $3,
+            accepted_at = NULL,
+            accepted_by_user_id = NULL,
+            revoked_at = NULL
+        WHERE invite_id = $1
+      `,
+      [invite.inviteId, invite.tokenHash, invite.expiresAt],
     )
   }
 

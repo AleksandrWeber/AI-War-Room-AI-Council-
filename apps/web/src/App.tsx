@@ -5901,12 +5901,19 @@ function App() {
   const [inviteForm, setInviteForm] = useState({
     email: '',
     role: 'member' as 'admin' | 'member' | 'viewer',
+    expiresInHours: 168,
   })
   const [inviteAction, setInviteAction] = useState<'idle' | 'running'>('idle')
   const [workspaceInvites, setWorkspaceInvites] = useState<
     import('@ai-war-room/schemas').WorkspaceInviteRecord[]
   >([])
   const [latestInviteUrl, setLatestInviteUrl] = useState<string | null>(null)
+  const [myWorkspaces, setMyWorkspaces] = useState<
+    import('@ai-war-room/schemas').MyWorkspaceMembership[]
+  >([])
+  const [workspaceRecoveryTip, setWorkspaceRecoveryTip] = useState<string | null>(
+    null,
+  )
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
     useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
@@ -6709,6 +6716,65 @@ function App() {
   useEffect(() => {
     void handleLoadBillingStatus()
   }, [authCapabilities, authSession, activeWorkspaceId])
+
+  useEffect(() => {
+    if (!workspaceAuthHeaders['x-user-id'] && !workspaceAuthHeaders.Authorization) {
+      return
+    }
+
+    let cancelled = false
+
+    void (async () => {
+      try {
+        const listed = await callUi(
+          'workspace-ui',
+          'listMyWorkspaces',
+          apiBaseUrl,
+          workspaceAuthHeaders,
+        )
+        if (cancelled) {
+          return
+        }
+
+        setMyWorkspaces(listed.workspaces)
+        const knownIds = new Set(
+          listed.workspaces.map((workspace) => workspace.workspaceId),
+        )
+        if (knownIds.size === 0) {
+          return
+        }
+
+        if (!knownIds.has(activeWorkspaceId)) {
+          const fallback =
+            listed.workspaces.find(
+              (workspace) => workspace.workspaceId === fallbackWorkspaceId,
+            )?.workspaceId ?? listed.workspaces[0]?.workspaceId
+          if (fallback) {
+            saveStoredActiveWorkspaceId(fallback)
+            setActiveWorkspaceId(fallback)
+            setWorkspaceRecoveryTip(
+              `Stored workspace was unavailable. Switched to ${fallback}.`,
+            )
+          }
+        } else {
+          setWorkspaceRecoveryTip(null)
+        }
+      } catch {
+        if (!cancelled) {
+          setMyWorkspaces([])
+        }
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [
+    authCapabilities,
+    authSession,
+    workspaceAuthHeaders['x-user-id'],
+    workspaceAuthHeaders.Authorization,
+  ])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -11817,11 +11883,12 @@ function App() {
         {
           email: inviteForm.email.trim(),
           role: inviteForm.role,
+          expiresInHours: inviteForm.expiresInHours,
         },
       )
       setLatestInviteUrl(created.inviteUrl)
       setBillingMessage(created.guidance)
-      setInviteForm({ email: '', role: 'member' })
+      setInviteForm({ email: '', role: 'member', expiresInHours: 168 })
       const listed = await callUi(
         'workspace-ui',
         'listWorkspaceInvites',
@@ -11869,6 +11936,42 @@ function App() {
         error instanceof Error
           ? error.message
           : 'Failed to revoke workspace invite.',
+      )
+    } finally {
+      setInviteAction('idle')
+    }
+  }
+
+  async function handleResendWorkspaceInvite(inviteId: string) {
+    setInviteAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const resent = await callUi(
+        'workspace-ui',
+        'resendWorkspaceInvite',
+        apiBaseUrl,
+        activeWorkspaceId,
+        workspaceAuthHeaders,
+        inviteId,
+        { expiresInHours: inviteForm.expiresInHours },
+      )
+      setLatestInviteUrl(resent.inviteUrl)
+      setBillingMessage(resent.guidance)
+      const listed = await callUi(
+        'workspace-ui',
+        'listWorkspaceInvites',
+        apiBaseUrl,
+        activeWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setWorkspaceInvites(listed.invites)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to resend workspace invite.',
       )
     } finally {
       setInviteAction('idle')
@@ -29442,6 +29545,35 @@ function App() {
           >
             Active workspace: {activeWorkspaceId}
           </div>
+          {myWorkspaces.length > 0 ? (
+            <label className="workspace-picker">
+              Switch workspace
+              <select
+                data-testid="workspace-picker"
+                value={activeWorkspaceId}
+                onChange={(event) => {
+                  const nextWorkspaceId = event.target.value
+                  saveStoredActiveWorkspaceId(nextWorkspaceId)
+                  setActiveWorkspaceId(nextWorkspaceId)
+                  setWorkspaceRecoveryTip(null)
+                }}
+              >
+                {myWorkspaces.map((workspace) => (
+                  <option
+                    key={workspace.workspaceId}
+                    value={workspace.workspaceId}
+                  >
+                    {workspace.name} ({workspace.role})
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : null}
+          {workspaceRecoveryTip ? (
+            <p className="invite-status invite-status--ok" data-testid="workspace-recovery-tip">
+              {workspaceRecoveryTip}
+            </p>
+          ) : null}
           {inviteStatusMessage ? (
             <p className="invite-status invite-status--ok" data-testid="invite-status">
               {inviteStatusMessage}
@@ -30334,6 +30466,7 @@ function App() {
           onInviteFormChange={setInviteForm}
           onCreateInvite={() => void handleCreateWorkspaceInvite()}
           onRevokeInvite={(inviteId) => void handleRevokeWorkspaceInvite(inviteId)}
+          onResendInvite={(inviteId) => void handleResendWorkspaceInvite(inviteId)}
           onCopyInviteLink={handleCopyInviteLink}
           onMemberAdminAction={(input) => void handleMemberAdminAction(input)}
           onExportAudit={(format) => void handleExportWorkspaceAudit(format)}
@@ -32126,6 +32259,7 @@ function App() {
           onInviteFormChange={setInviteForm}
           onCreateInvite={() => void handleCreateWorkspaceInvite()}
           onRevokeInvite={(inviteId) => void handleRevokeWorkspaceInvite(inviteId)}
+          onResendInvite={(inviteId) => void handleResendWorkspaceInvite(inviteId)}
           onCopyInviteLink={handleCopyInviteLink}
           onMemberAdminAction={(input) => void handleMemberAdminAction(input)}
           onExportAudit={(format) => void handleExportWorkspaceAudit(format)}

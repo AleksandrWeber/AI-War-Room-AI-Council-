@@ -26,7 +26,7 @@ describe('WorkspaceAdminPanels', () => {
         newMemberForm={{ userId: '', role: 'member', email: '' }}
         memberAdminAction="idle"
         billingAction="idle"
-        inviteForm={{ email: '', role: 'member' }}
+        inviteForm={{ email: '', role: 'member', expiresInHours: 168 }}
         inviteAction="idle"
         invites={[]}
         latestInviteUrl={null}
@@ -38,6 +38,7 @@ describe('WorkspaceAdminPanels', () => {
         onInviteFormChange={() => undefined}
         onCreateInvite={() => undefined}
         onRevokeInvite={() => undefined}
+        onResendInvite={() => undefined}
         onCopyInviteLink={() => undefined}
         onMemberAdminAction={() => undefined}
         onExportAudit={() => undefined}

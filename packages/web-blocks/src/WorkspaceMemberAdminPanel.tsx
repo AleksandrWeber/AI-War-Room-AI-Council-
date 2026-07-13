@@ -18,6 +18,7 @@ export type WorkspaceMemberFormState = {
 export type WorkspaceInviteFormState = {
   email: string
   role: InviteRole
+  expiresInHours: number
 }
 
 export type WorkspaceMemberAdminPanelProps = {
@@ -33,6 +34,7 @@ export type WorkspaceMemberAdminPanelProps = {
   onInviteFormChange: (value: WorkspaceInviteFormState) => void
   onCreateInvite: () => void
   onRevokeInvite: (inviteId: string) => void
+  onResendInvite: (inviteId: string) => void
   onCopyInviteLink: () => void
   onMemberAdminAction: (input: {
     action: 'update_member_role' | 'remove_member' | 'add_member'
@@ -56,6 +58,7 @@ export function WorkspaceMemberAdminPanel({
   onInviteFormChange,
   onCreateInvite,
   onRevokeInvite,
+  onResendInvite,
   onCopyInviteLink,
   onMemberAdminAction,
   onExportAudit,
@@ -170,6 +173,21 @@ export function WorkspaceMemberAdminPanel({
               <option value="admin">Admin</option>
             </select>
           </label>
+          <label>
+            Expires in hours
+            <input
+              type="number"
+              min={1}
+              max={720}
+              value={inviteForm.expiresInHours}
+              onChange={(event) =>
+                onInviteFormChange({
+                  ...inviteForm,
+                  expiresInHours: Number(event.target.value) || 168,
+                })
+              }
+            />
+          </label>
           <button
             type="submit"
             disabled={inviteAction !== 'idle' || !inviteForm.email.trim()}
@@ -199,17 +217,30 @@ export function WorkspaceMemberAdminPanel({
                     <p>
                       {formatWorkspaceRole(invite.role)} · {invite.status}
                     </p>
+                    <p className="runtime-note">
+                      Expires {new Date(invite.expiresAt).toLocaleString()}
+                    </p>
                   </div>
-                  {invite.status === 'pending' ? (
+                  {invite.status === 'pending' || invite.status === 'expired' ? (
                     <div className="workspace-member-card__actions">
                       <button
                         type="button"
-                        className="danger-button"
+                        className="secondary-button"
                         disabled={inviteAction !== 'idle'}
-                        onClick={() => onRevokeInvite(invite.inviteId)}
+                        onClick={() => onResendInvite(invite.inviteId)}
                       >
-                        Revoke
+                        Resend link
                       </button>
+                      {invite.status === 'pending' ? (
+                        <button
+                          type="button"
+                          className="danger-button"
+                          disabled={inviteAction !== 'idle'}
+                          onClick={() => onRevokeInvite(invite.inviteId)}
+                        >
+                          Revoke
+                        </button>
+                      ) : null}
                     </div>
                   ) : null}
                 </article>

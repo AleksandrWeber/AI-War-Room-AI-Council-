@@ -115,3 +115,44 @@ test('workspace invite reject when email does not match authenticated user', asy
     { timeout: 30_000 },
   )
 })
+
+test('workspace picker switches active workspace', async ({ page }) => {
+  await page.goto('/')
+  await expect(page.getByText('API status: online')).toBeVisible({
+    timeout: 60_000,
+  })
+  await expect(page.getByTestId('workspace-picker')).toBeVisible({
+    timeout: 30_000,
+  })
+
+  await page.getByTestId('workspace-picker').selectOption('secondary_workspace')
+  await expect(page.getByTestId('active-workspace-id')).toHaveText(
+    'Active workspace: secondary_workspace',
+  )
+
+  await page.getByTestId('workspace-picker').selectOption('local_workspace')
+  await expect(page.getByTestId('active-workspace-id')).toHaveText(
+    'Active workspace: local_workspace',
+  )
+})
+
+test('stale active workspace recovers on boot', async ({ page }) => {
+  await page.addInitScript(() => {
+    localStorage.setItem(
+      'ai-war-room.active-workspace-id',
+      'missing_workspace_from_storage',
+    )
+  })
+
+  await page.goto('/')
+  await expect(page.getByText('API status: online')).toBeVisible({
+    timeout: 60_000,
+  })
+  await expect(page.getByTestId('workspace-recovery-tip')).toContainText(
+    /Stored workspace was unavailable/i,
+    { timeout: 30_000 },
+  )
+  await expect(page.getByTestId('active-workspace-id')).not.toHaveText(
+    'Active workspace: missing_workspace_from_storage',
+  )
+})

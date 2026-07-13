@@ -1,5 +1,9 @@
 import { ForbiddenException, Inject, Injectable } from '@nestjs/common'
-import type { AuthContext, ExternalAuthIdentity } from '@ai-war-room/schemas'
+import {
+  listMyWorkspacesResponseSchema,
+  type AuthContext,
+  type ExternalAuthIdentity,
+} from '@ai-war-room/schemas'
 import {
   WORKSPACE_REPOSITORY,
   toAuthContext,
@@ -47,5 +51,31 @@ export class WorkspaceService {
     }
 
     return toAuthContext(membership)
+  }
+
+  async listMyWorkspaces(userId: string) {
+    const memberships =
+      await this.workspaceRepository.listMembershipsForUser(userId)
+    const workspaces = []
+
+    for (const membership of memberships) {
+      const workspace = await this.workspaceRepository.getWorkspace(
+        membership.workspaceId,
+      )
+      workspaces.push({
+        workspaceId: membership.workspaceId,
+        name: workspace?.name ?? membership.workspaceId,
+        role: membership.role,
+      })
+    }
+
+    workspaces.sort((left, right) =>
+      left.name.localeCompare(right.name, undefined, { sensitivity: 'base' }),
+    )
+
+    return listMyWorkspacesResponseSchema.parse({
+      userId,
+      workspaces,
+    })
   }
 }

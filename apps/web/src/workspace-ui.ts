@@ -1,7 +1,9 @@
 import {
   acceptWorkspaceInviteResponseSchema,
   createWorkspaceInviteResponseSchema,
+  listMyWorkspacesResponseSchema,
   listWorkspaceInvitesResponseSchema,
+  resendWorkspaceInviteResponseSchema,
   revokeWorkspaceInviteResponseSchema,
   workspaceMemberAdminActionResponseSchema,
   workspaceMemberAdminSummaryResponseSchema,
@@ -177,6 +179,7 @@ export async function createWorkspaceInvite(
   input: {
     email: string
     role?: 'admin' | 'member' | 'viewer'
+    expiresInHours?: number
   },
 ) {
   const response = await fetch(
@@ -196,6 +199,21 @@ export async function createWorkspaceInvite(
   }
 
   return createWorkspaceInviteResponseSchema.parse(await response.json())
+}
+
+export async function listMyWorkspaces(
+  apiBaseUrl: string,
+  headers: Record<string, string>,
+) {
+  const response = await fetch(`${apiBaseUrl}/workspaces/mine`, {
+    headers,
+  })
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return listMyWorkspacesResponseSchema.parse(await response.json())
 }
 
 export async function listWorkspaceInvites(
@@ -274,5 +292,31 @@ export async function revokeWorkspaceInvite(
   }
 
   return revokeWorkspaceInviteResponseSchema.parse(await response.json())
+}
+
+export async function resendWorkspaceInvite(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+  inviteId: string,
+  input?: { expiresInHours?: number },
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/workspaces/${encodeURIComponent(workspaceId)}/invites/${encodeURIComponent(inviteId)}/resend`,
+    {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(input ?? {}),
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return resendWorkspaceInviteResponseSchema.parse(await response.json())
 }
 

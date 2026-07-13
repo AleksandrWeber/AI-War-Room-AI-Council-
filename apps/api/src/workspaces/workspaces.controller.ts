@@ -9,6 +9,7 @@ import {
   Query,
   Req,
   Res,
+  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common'
 import type { FastifyReply } from 'fastify'
@@ -16,9 +17,11 @@ import {
   type AuthenticatedRequest,
   WorkspaceAccessGuard,
 } from '../auth/workspace-access.guard.js'
+import { AuthService } from '../auth/auth.service.js'
 import { WorkspaceAdminService } from './workspace-admin.service.js'
 import { WorkspaceAuditService } from './workspace-audit.service.js'
 import { WorkspaceInviteService } from './workspace-invite.service.js'
+import { WorkspaceService } from './workspace.service.js'
 
 type WorkspaceMemberAdminBody = {
   workspaceId?: unknown
@@ -39,6 +42,8 @@ type WorkspaceSettingsAdminBody = {
 @Controller('workspaces')
 export class WorkspacesController {
   constructor(
+    private readonly authService: AuthService,
+    private readonly workspaceService: WorkspaceService,
     private readonly workspaceAdminService: WorkspaceAdminService,
     private readonly workspaceAuditService: WorkspaceAuditService,
     private readonly workspaceInviteService: WorkspaceInviteService,
@@ -47,6 +52,25 @@ export class WorkspacesController {
   @Get('capabilities')
   getCapabilities() {
     return this.workspaceAdminService.getCapabilities()
+  }
+
+  @Get('mine')
+  async listMyWorkspaces(@Req() request: AuthenticatedRequest) {
+    await this.authService.assertApiAccess(request)
+    const authIdentity = this.authService.resolveAuthIdentity(request)
+    const userId =
+      authIdentity?.userId ??
+      (Array.isArray(request.headers['x-user-id'])
+        ? request.headers['x-user-id'][0]
+        : request.headers['x-user-id'])
+
+    if (!userId || typeof userId !== 'string' || userId.trim().length === 0) {
+      throw new UnauthorizedException({
+        message: 'Missing authenticated user for workspace listing.',
+      })
+    }
+
+    return this.workspaceService.listMyWorkspaces(userId)
   }
 
   @Post('invites/accept')
@@ -104,6 +128,24 @@ export class WorkspacesController {
       authContext: request.authContext!,
       workspaceId,
       inviteId,
+    })
+  }
+
+  @Post(':workspaceId/invites/:inviteId/resend')
+  @UseGuards(WorkspaceAccessGuard)
+  resendWorkspaceInvite(
+    @Param('workspaceId') workspaceId: string,
+    @Param('inviteId') inviteId: string,
+    @Body() body: unknown,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    this.assertWorkspaceParam(request, workspaceId)
+
+    return this.workspaceInviteService.resendInvite({
+      authContext: request.authContext!,
+      workspaceId,
+      inviteId,
+      body,
     })
   }
 

@@ -78,6 +78,30 @@ export class PostgresWorkspaceRepository implements WorkspaceRepository {
     }
   }
 
+  async listMembershipsForUser(
+    userId: string,
+  ): Promise<WorkspaceMembershipRecord[]> {
+    const result = await this.postgresService.query<{
+      workspace_id: string
+      user_id: string
+      role: WorkspaceMembershipRecord['role']
+    }>(
+      `
+        SELECT workspace_id, user_id, role
+        FROM workspace_memberships
+        WHERE user_id = $1
+        ORDER BY workspace_id ASC
+      `,
+      [userId],
+    )
+
+    return result.rows.map((row) => ({
+      workspaceId: row.workspace_id,
+      userId: row.user_id,
+      role: row.role,
+    }))
+  }
+
   async provisionExternalMember(
     input: ProvisionExternalMemberInput,
   ): Promise<ProvisionExternalMemberResult> {

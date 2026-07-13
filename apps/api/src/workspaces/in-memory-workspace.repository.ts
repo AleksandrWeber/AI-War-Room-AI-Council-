@@ -28,6 +28,14 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
       },
     ],
     [
+      'user_local:secondary_workspace',
+      {
+        userId: 'user_local',
+        workspaceId: 'secondary_workspace',
+        role: 'member',
+      },
+    ],
+    [
       'user_test:workspace_1',
       {
         userId: 'user_test',
@@ -87,6 +95,14 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
       },
     ],
     [
+      'secondary_workspace',
+      {
+        name: 'Secondary Workspace',
+        shieldDisplaySensitivity: 'medium_and_up',
+        createdAt: '2026-07-04T12:00:00.000Z',
+      },
+    ],
+    [
       'workspace_1',
       {
         name: 'Workspace One',
@@ -129,6 +145,14 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
       email: profile.email,
       displayName: profile.displayName,
     }
+  }
+
+  async listMembershipsForUser(
+    userId: string,
+  ): Promise<WorkspaceMembershipRecord[]> {
+    return [...this.memberships.values()].filter(
+      (membership) => membership.userId === userId,
+    )
   }
 
   async provisionExternalMember(

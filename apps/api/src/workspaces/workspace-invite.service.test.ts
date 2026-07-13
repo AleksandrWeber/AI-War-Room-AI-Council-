@@ -138,6 +138,67 @@ describe('WorkspaceInviteService', () => {
     })
   })
 
+  it('resends a pending invite and invalidates the previous token', async () => {
+    const created = await service.createInvite({
+      authContext: {
+        userId: 'user_test',
+        workspaceId: 'workspace_1',
+        role: 'owner',
+      },
+      workspaceId: 'workspace_1',
+      body: {
+        email: 'rotate.me@example.com',
+        role: 'member',
+        expiresInHours: 24,
+      },
+    })
+
+    const resent = await service.resendInvite({
+      authContext: {
+        userId: 'user_test',
+        workspaceId: 'workspace_1',
+        role: 'owner',
+      },
+      workspaceId: 'workspace_1',
+      inviteId: created.invite.inviteId,
+      body: { expiresInHours: 48 },
+    })
+
+    expect(resent.token).not.toBe(created.token)
+    expect(resent.invite.status).toBe('pending')
+    expect(resent.delivery).toBe('link_only')
+
+    await repository.addWorkspaceMember({
+      workspaceId: 'workspace_other',
+      userId: 'user_rotatee',
+      role: 'member',
+      email: 'rotate.me@example.com',
+    })
+
+    await expect(
+      service.acceptInvite({
+        authContext: {
+          userId: 'user_rotatee',
+          workspaceId: 'workspace_other',
+          role: 'member',
+        },
+        body: { token: created.token },
+      }),
+    ).rejects.toMatchObject({
+      response: { message: 'Invite token was not found.' },
+    })
+
+    const accepted = await service.acceptInvite({
+      authContext: {
+        userId: 'user_rotatee',
+        workspaceId: 'workspace_other',
+        role: 'member',
+      },
+      body: { token: resent.token },
+    })
+    expect(accepted.workspaceId).toBe('workspace_1')
+  })
+
   it('accepts without demoting an existing higher-privilege membership', async () => {
     const created = await service.createInvite({
       authContext: {
