@@ -101,6 +101,8 @@ export const envSchema = z.object({
   STRIPE_METER_EVENT_NAME: optionalEnvStringSchema,
   BILLING_NOTIFICATION_ADAPTER: z.enum(['mock', 'email']).default('mock'),
   BILLING_NOTIFICATION_RECIPIENT: optionalEnvStringSchema,
+  INVITE_EMAIL_ADAPTER: z.enum(['mock', 'email']).default('mock'),
+  INVITE_EMAIL_FROM: optionalEnvStringSchema,
 })
 
 export type ApiEnv = z.infer<typeof envSchema>
@@ -157,6 +159,12 @@ export function validateEnv(config: Record<string, unknown>): ApiEnv {
     ) {
       throw new Error(
         'BILLING_NOTIFICATION_RECIPIENT is required when BILLING_NOTIFICATION_ADAPTER=email.',
+      )
+    }
+
+    if (env.INVITE_EMAIL_ADAPTER === 'email' && !env.INVITE_EMAIL_FROM) {
+      throw new Error(
+        'INVITE_EMAIL_FROM is required when INVITE_EMAIL_ADAPTER=email.',
       )
     }
   }

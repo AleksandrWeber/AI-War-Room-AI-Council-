@@ -33127,11 +33127,17 @@ function App() {
 
           {pipelineResult ? (
             <>
-              {useTemporalWorkflowRuntime ? (
+              {useTemporalWorkflowRuntime &&
+              activeTemporalWorkflow &&
+              !isTemporalTerminalStatus(activeTemporalWorkflow.status) ? (
                 <p className="runtime-note">
-                  Agent regenerate is direct-path only. Switch to Direct REST/SSE
-                  (Temporal off / `VITE_USE_TEMPORAL_WORKFLOWS=false`) to regenerate
-                  a single agent without a full Temporal workflow replay.
+                  Agent regenerate is available after this Temporal workflow
+                  finishes. Mid-run Temporal partial replay stays out of scope.
+                </p>
+              ) : useTemporalWorkflowRuntime ? (
+                <p className="runtime-note">
+                  After a Temporal run completes, regenerate uses the direct
+                  cascade path (not Temporal partial replay).
                 </p>
               ) : null}
               <div className="agent-result-grid">
@@ -33146,10 +33152,17 @@ function App() {
                         {agentOutput.inputTokens + agentOutput.outputTokens} tokens
                       </span>
                     </div>
-                    {draftRun && reviewDraft && !useTemporalWorkflowRuntime ? (
+                    {draftRun &&
+                    reviewDraft &&
+                    !(
+                      useTemporalWorkflowRuntime &&
+                      activeTemporalWorkflow &&
+                      !isTemporalTerminalStatus(activeTemporalWorkflow.status)
+                    ) ? (
                       <button
                         type="button"
                         className="secondary-button"
+                        data-testid={`regenerate-agent-${agentOutput.agentRole}`}
                         disabled={
                           pipelineState === 'running' ||
                           regeneratingAgentRole !== null

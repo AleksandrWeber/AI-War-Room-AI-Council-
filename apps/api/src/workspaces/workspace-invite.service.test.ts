@@ -1,26 +1,31 @@
 import { ConfigService } from '@nestjs/config'
 import { beforeEach, describe, expect, it } from 'vitest'
 import type { ApiEnv } from '../config/env.js'
+import { MockInviteEmailAdapter } from './invite-email.adapter.js'
 import { WorkspaceInviteService } from './workspace-invite.service.js'
 import { InMemoryWorkspaceRepository } from './in-memory-workspace.repository.js'
 
 describe('WorkspaceInviteService', () => {
   let service: WorkspaceInviteService
   let repository: InMemoryWorkspaceRepository
+  let inviteEmailAdapter: MockInviteEmailAdapter
 
   beforeEach(() => {
     repository = new InMemoryWorkspaceRepository()
+    inviteEmailAdapter = new MockInviteEmailAdapter()
     service = new WorkspaceInviteService(
       new ConfigService<ApiEnv>({
         NODE_ENV: 'test',
         WEB_ORIGIN: 'http://127.0.0.1:5173',
+        INVITE_EMAIL_ADAPTER: 'mock',
       }),
       {} as never,
       repository,
+      inviteEmailAdapter,
     )
   })
 
-  it('creates a link-only invite and accepts it when emails match', async () => {
+  it('creates a mock-delivered invite and accepts it when emails match', async () => {
     const created = await service.createInvite({
       authContext: {
         userId: 'user_test',
@@ -34,7 +39,9 @@ describe('WorkspaceInviteService', () => {
       },
     })
 
-    expect(created.delivery).toBe('link_only')
+    expect(created.delivery).toBe('mock')
+    expect(inviteEmailAdapter.lastSent).toHaveLength(1)
+    expect(inviteEmailAdapter.lastSent[0]?.to).toBe('new.member@example.com')
     expect(created.token.length).toBeGreaterThan(16)
     expect(created.inviteUrl).toContain(created.token)
     expect(created.invite.status).toBe('pending')
@@ -166,7 +173,8 @@ describe('WorkspaceInviteService', () => {
 
     expect(resent.token).not.toBe(created.token)
     expect(resent.invite.status).toBe('pending')
-    expect(resent.delivery).toBe('link_only')
+    expect(resent.delivery).toBe('mock')
+    expect(inviteEmailAdapter.lastSent).toHaveLength(2)
 
     await repository.addWorkspaceMember({
       workspaceId: 'workspace_other',

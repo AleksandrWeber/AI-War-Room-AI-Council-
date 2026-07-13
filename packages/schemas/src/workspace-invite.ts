@@ -37,7 +37,7 @@ export const createWorkspaceInviteResponseSchema = z.object({
   invite: workspaceInviteRecordSchema,
   token: nonEmptyStringSchema,
   inviteUrl: nonEmptyStringSchema,
-  delivery: z.literal('link_only'),
+  delivery: z.enum(['link_only', 'mock', 'email_stub']),
   guidance: nonEmptyStringSchema,
 })
 

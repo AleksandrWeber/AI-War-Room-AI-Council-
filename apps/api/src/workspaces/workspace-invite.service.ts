@@ -24,6 +24,10 @@ import {
 import type { ApiEnv } from '../config/env.js'
 import { PostgresService } from '../persistence/postgres.service.js'
 import {
+  INVITE_EMAIL_ADAPTER,
+  type InviteEmailAdapter,
+} from './invite-email.adapter.js'
+import {
   WORKSPACE_REPOSITORY,
   type WorkspaceRepository,
 } from './workspace.repository.js'
@@ -52,6 +56,8 @@ export class WorkspaceInviteService {
     private readonly postgresService: PostgresService,
     @Inject(WORKSPACE_REPOSITORY)
     private readonly workspaceRepository: WorkspaceRepository,
+    @Inject(INVITE_EMAIL_ADAPTER)
+    private readonly inviteEmailAdapter: InviteEmailAdapter,
   ) {}
 
   async createInvite(input: {
@@ -88,17 +94,23 @@ export class WorkspaceInviteService {
     await this.persistInvite(invite)
 
     const inviteUrl = `${this.configService.get('WEB_ORIGIN', { infer: true })}/?inviteToken=${encodeURIComponent(token)}`
+    const deliveryResult = await this.inviteEmailAdapter.send({
+      to: invite.email,
+      inviteUrl,
+      workspaceId: invite.workspaceId,
+      role: invite.role,
+      expiresAt: invite.expiresAt,
+    })
     this.logger.log(
-      `Workspace invite created for ${invite.email} in ${invite.workspaceId} (link_only delivery).`,
+      `Workspace invite created for ${invite.email} in ${invite.workspaceId} (${deliveryResult.delivery} delivery; ref=${deliveryResult.deliveryReference}).`,
     )
 
     return createWorkspaceInviteResponseSchema.parse({
       invite: this.toPublicRecord(invite),
       token,
       inviteUrl,
-      delivery: 'link_only',
-      guidance:
-        'Share the invite URL with the recipient. No email is sent by the API in this thin slice.',
+      delivery: deliveryResult.delivery,
+      guidance: this.deliveryGuidance(deliveryResult.delivery, 'created'),
     })
   }
 
@@ -187,17 +199,23 @@ export class WorkspaceInviteService {
     await this.persistInviteRotation(rotated)
 
     const inviteUrl = `${this.configService.get('WEB_ORIGIN', { infer: true })}/?inviteToken=${encodeURIComponent(token)}`
+    const deliveryResult = await this.inviteEmailAdapter.send({
+      to: rotated.email,
+      inviteUrl,
+      workspaceId: rotated.workspaceId,
+      role: rotated.role,
+      expiresAt: rotated.expiresAt,
+    })
     this.logger.log(
-      `Workspace invite resent for ${rotated.email} in ${rotated.workspaceId} (link_only delivery).`,
+      `Workspace invite resent for ${rotated.email} in ${rotated.workspaceId} (${deliveryResult.delivery} delivery; ref=${deliveryResult.deliveryReference}).`,
     )
 
     return resendWorkspaceInviteResponseSchema.parse({
       invite: this.toPublicRecord(rotated),
       token,
       inviteUrl,
-      delivery: 'link_only',
-      guidance:
-        'Invite link rotated. Share the new URL; the previous token no longer works.',
+      delivery: deliveryResult.delivery,
+      guidance: this.deliveryGuidance(deliveryResult.delivery, 'resent'),
     })
   }
 
@@ -277,6 +295,27 @@ export class WorkspaceInviteService {
         ? 'Invite accepted. You already had access; active membership is unchanged.'
         : 'Invite accepted. Workspace membership is now active for this user.',
     })
+  }
+
+  private deliveryGuidance(
+    delivery: 'mock' | 'email_stub' | 'link_only',
+    mode: 'created' | 'resent',
+  ) {
+    if (delivery === 'email_stub') {
+      return mode === 'created'
+        ? 'Invite email was stub-delivered. The join URL is also returned for copy/share.'
+        : 'Invite email was stub-resent with a rotated link. The previous token no longer works.'
+    }
+
+    if (delivery === 'mock') {
+      return mode === 'created'
+        ? 'Invite recorded with mock email delivery. Share the invite URL with the recipient.'
+        : 'Invite link rotated with mock email delivery. Share the new URL; the previous token no longer works.'
+    }
+
+    return mode === 'created'
+      ? 'Share the invite URL with the recipient. No email is sent by the API in this thin slice.'
+      : 'Invite link rotated. Share the new URL; the previous token no longer works.'
   }
 
   private assertCanManageInvites(

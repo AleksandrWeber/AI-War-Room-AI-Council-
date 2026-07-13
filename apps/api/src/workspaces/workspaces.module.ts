@@ -6,6 +6,11 @@ import { BillingModule } from '../billing/billing.module.js'
 import { PersistenceModule } from '../persistence/persistence.module.js'
 import { UsageModule } from '../usage/usage.module.js'
 import { InMemoryWorkspaceRepository } from './in-memory-workspace.repository.js'
+import {
+  EmailStubInviteEmailAdapter,
+  INVITE_EMAIL_ADAPTER,
+  MockInviteEmailAdapter,
+} from './invite-email.adapter.js'
 import { PostgresWorkspaceRepository } from './postgres-workspace.repository.js'
 import { UserProvisioningService } from './user-provisioning.service.js'
 import { WorkspaceAdminService } from './workspace-admin.service.js'
@@ -40,6 +45,23 @@ import { WORKSPACE_REPOSITORY } from './workspace.repository.js'
         return configService.get('NODE_ENV', { infer: true }) === 'test'
           ? new InMemoryWorkspaceRepository()
           : postgresWorkspaceRepository
+      },
+    },
+    {
+      provide: INVITE_EMAIL_ADAPTER,
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService<ApiEnv, true>) => {
+        const adapter = configService.get('INVITE_EMAIL_ADAPTER', {
+          infer: true,
+        })
+
+        if (adapter === 'email') {
+          return new EmailStubInviteEmailAdapter(
+            configService.get('INVITE_EMAIL_FROM', { infer: true })!,
+          )
+        }
+
+        return new MockInviteEmailAdapter()
       },
     },
   ],

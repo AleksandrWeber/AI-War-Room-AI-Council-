@@ -149,6 +149,25 @@ export function WorkspaceMemberAdminPanel({
                   </button>
                 </>
               ) : null}
+              {summary.availableActions.includes('update_member_role') &&
+              member.role === 'owner' &&
+              summary.stats.ownerCount > 1 ? (
+                <button
+                  className="secondary-button"
+                  type="button"
+                  data-testid="demote-owner"
+                  disabled={memberAdminAction !== 'idle'}
+                  onClick={() =>
+                    onMemberAdminAction({
+                      action: 'update_member_role',
+                      userId: member.userId,
+                      role: 'admin',
+                    })
+                  }
+                >
+                  Make admin
+                </button>
+              ) : null}
               {summary.availableActions.includes('remove_member') ? (
                 <button
                   className="danger-button"
@@ -180,8 +199,8 @@ export function WorkspaceMemberAdminPanel({
           }}
         >
           <p className="runtime-note">
-            Invite by email returns a shareable join link. No email is sent by
-            the API.
+            Invites return a shareable join link. Delivery uses the configured
+            invite email adapter (mock/stub by default — not a live mailbox).
           </p>
           <label>
             Invite email

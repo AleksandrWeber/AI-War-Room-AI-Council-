@@ -27,7 +27,7 @@ Types (`artifactType`): `executive_summary` | `prd` | `development_prompt`.
 
 ### Regenerate Specific Agent (Phase 2)
 
-`POST /api/runs/:runId/agents/:role/regenerate` re-runs one non-moderator agent on the **direct** pipeline path, then cascades chunk summaries → Moderator → all three artifacts. Usage events are **appended** for the regenerated agent plus cascaded moderator/artifacts. Temporal partial replay is out of scope; the UI hides regenerate when the Temporal runtime path is active. Full Temporal runs still use full-pipeline execute.
+`POST /api/runs/:runId/agents/:role/regenerate` re-runs one non-moderator agent on the **direct** pipeline path, then cascades chunk summaries → Moderator → all three artifacts. Usage events are **appended** for the regenerated agent plus cascaded moderator/artifacts. After a Temporal run **completes**, the UI exposes the same regenerate buttons (still direct cascade — not Temporal partial replay). Mid-run Temporal workflows keep regenerate disabled. Full Temporal runs still use full-pipeline execute.
 
 Persisted envelope:
 
