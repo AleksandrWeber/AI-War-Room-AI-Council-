@@ -167,8 +167,15 @@ describe('TemporalRunService', () => {
         taskQueue: 'ai-war-room-runs',
         workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
         input: expect.objectContaining({
-          request,
           authContext,
+          requestedAt: expect.any(String),
+          request: expect.objectContaining({
+            draftRun: expect.objectContaining({
+              runId: 'run_temporal_start_1',
+              workspaceId: 'workspace_1',
+            }),
+            selectedAgents: request.selectedAgents,
+          }),
         }),
       }),
     )
