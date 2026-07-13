@@ -1,4 +1,7 @@
 import {
+  acceptWorkspaceInviteResponseSchema,
+  createWorkspaceInviteResponseSchema,
+  listWorkspaceInvitesResponseSchema,
   workspaceMemberAdminActionResponseSchema,
   workspaceMemberAdminSummaryResponseSchema,
   workspaceSettingsAdminActionResponseSchema,
@@ -164,4 +167,72 @@ export async function downloadWorkspaceAuditExport(
   link.download = filename
   link.click()
   URL.revokeObjectURL(url)
+}
+
+export async function createWorkspaceInvite(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+  input: {
+    email: string
+    role?: 'admin' | 'member' | 'viewer'
+  },
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/workspaces/${encodeURIComponent(workspaceId)}/invites`,
+    {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(input),
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return createWorkspaceInviteResponseSchema.parse(await response.json())
+}
+
+export async function listWorkspaceInvites(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/workspaces/${encodeURIComponent(workspaceId)}/invites`,
+    {
+      headers,
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return listWorkspaceInvitesResponseSchema.parse(await response.json())
+}
+
+export async function acceptWorkspaceInvite(
+  apiBaseUrl: string,
+  headers: Record<string, string>,
+  token: string,
+) {
+  const response = await fetch(`${apiBaseUrl}/workspaces/invites/accept`, {
+    method: 'POST',
+    headers: {
+      ...headers,
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ token }),
+  })
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return acceptWorkspaceInviteResponseSchema.parse(await response.json())
 }

@@ -18,6 +18,7 @@ import {
 } from '../auth/workspace-access.guard.js'
 import { WorkspaceAdminService } from './workspace-admin.service.js'
 import { WorkspaceAuditService } from './workspace-audit.service.js'
+import { WorkspaceInviteService } from './workspace-invite.service.js'
 
 type WorkspaceMemberAdminBody = {
   workspaceId?: unknown
@@ -40,11 +41,54 @@ export class WorkspacesController {
   constructor(
     private readonly workspaceAdminService: WorkspaceAdminService,
     private readonly workspaceAuditService: WorkspaceAuditService,
+    private readonly workspaceInviteService: WorkspaceInviteService,
   ) {}
 
   @Get('capabilities')
   getCapabilities() {
     return this.workspaceAdminService.getCapabilities()
+  }
+
+  @Post('invites/accept')
+  @UseGuards(WorkspaceAccessGuard)
+  acceptWorkspaceInvite(
+    @Body() body: unknown,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.workspaceInviteService.acceptInvite({
+      authContext: request.authContext!,
+      body,
+    })
+  }
+
+  @Get(':workspaceId/invites')
+  @UseGuards(WorkspaceAccessGuard)
+  listWorkspaceInvites(
+    @Param('workspaceId') workspaceId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    this.assertWorkspaceParam(request, workspaceId)
+
+    return this.workspaceInviteService.listInvites({
+      authContext: request.authContext!,
+      workspaceId,
+    })
+  }
+
+  @Post(':workspaceId/invites')
+  @UseGuards(WorkspaceAccessGuard)
+  createWorkspaceInvite(
+    @Param('workspaceId') workspaceId: string,
+    @Body() body: unknown,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    this.assertWorkspaceParam(request, workspaceId)
+
+    return this.workspaceInviteService.createInvite({
+      authContext: request.authContext!,
+      workspaceId,
+      body,
+    })
   }
 
   @Get(':workspaceId/admin/members')

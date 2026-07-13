@@ -33,6 +33,9 @@ export const envSchema = z.object({
   SHIELD_FULL_SCAN_RETAIN_HOURS: z.coerce.number().int().positive().max(168).default(72),
   /** Layer 2 LLM escalation after deterministic Shield hits / high-risk domain cues. */
   SHIELD_LLM_ESCALATION_ENABLED: booleanEnvSchema.default(true),
+  /** Optional LLM compression before Moderator when agent payloads are large. */
+  CHUNK_SUMMARY_LLM_ENABLED: booleanEnvSchema.default(false),
+  CHUNK_SUMMARY_LLM_MIN_CHARS: z.coerce.number().int().positive().default(4_000),
   LLM_PRIMARY_PROVIDER: z.enum(['mock', 'anthropic', 'openai']).default('mock'),
   LLM_FALLBACK_PROVIDER: z.enum(['mock', 'anthropic', 'openai']).default('mock'),
   LLM_PRIMARY_MODEL: z.string().trim().min(1).default('mock-json-v1'),

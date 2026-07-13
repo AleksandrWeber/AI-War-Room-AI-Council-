@@ -26,11 +26,17 @@ describe('WorkspaceAdminPanels', () => {
         newMemberForm={{ userId: '', role: 'member', email: '' }}
         memberAdminAction="idle"
         billingAction="idle"
+        inviteForm={{ email: '', role: 'member' }}
+        inviteAction="idle"
+        invites={[]}
+        latestInviteUrl={null}
         onWorkspaceNameDraftChange={() => undefined}
         onUpdateWorkspaceName={() => undefined}
         onResetWorkspaceName={() => undefined}
         onUpdateShieldDisplaySensitivity={() => undefined}
         onNewMemberFormChange={() => undefined}
+        onInviteFormChange={() => undefined}
+        onCreateInvite={() => undefined}
         onMemberAdminAction={() => undefined}
         onExportAudit={() => undefined}
       />,

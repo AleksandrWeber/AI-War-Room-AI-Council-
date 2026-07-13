@@ -72,6 +72,10 @@ export class MockLlmProvider implements LlmProvider {
       return JSON.stringify(this.createShieldClassifierResponse(request))
     }
 
+    if (request.taskName === 'chunk_summary/v1') {
+      return JSON.stringify(this.createChunkSummaryResponse(request))
+    }
+
     return JSON.stringify({
       summary: `Mock response for ${request.taskName}`,
     })
@@ -343,6 +347,42 @@ export class MockLlmProvider implements LlmProvider {
       outOfScope: completedPrd.nonGoals ?? [],
       toolSpecificGuidance,
     }
+  }
+
+  private createChunkSummaryResponse(request: LlmProviderRequest) {
+    const payload = this.extractPayload(request)
+    const agentOutputs = Array.isArray(payload.agentOutputs)
+      ? payload.agentOutputs
+      : []
+
+    return agentOutputs.map(
+      (agent: {
+        agentRole?: string
+        output?: {
+          summary?: string
+          strengths?: string[]
+          weaknesses?: string[]
+          risks?: string[]
+          recommendations?: string[]
+        }
+      }) => ({
+        agentRole: agent.agentRole ?? 'critic',
+        summary: agent.output?.summary ?? 'Mock compressed agent summary.',
+        topInsights: [
+          ...(agent.output?.strengths ?? []).slice(0, 2),
+          ...(agent.output?.recommendations ?? []).slice(0, 2),
+        ].slice(0, 5),
+        topRisks: (agent.output?.risks ?? []).slice(0, 5),
+        conflicts:
+          agent.output?.weaknesses?.[0] && agent.output?.strengths?.[0]
+            ? [
+                `${agent.agentRole}: strengths vs weaknesses noted in mock compression.`,
+              ]
+            : [],
+        recommendedDecisions: (agent.output?.recommendations ?? []).slice(0, 5),
+        securityNotes: [],
+      }),
+    )
   }
 
   private createShieldClassifierResponse(request: LlmProviderRequest) {

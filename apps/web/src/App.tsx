@@ -5886,6 +5886,15 @@ function App() {
     role: 'member' as 'owner' | 'admin' | 'member' | 'viewer',
     email: '',
   })
+  const [inviteForm, setInviteForm] = useState({
+    email: '',
+    role: 'member' as 'admin' | 'member' | 'viewer',
+  })
+  const [inviteAction, setInviteAction] = useState<'idle' | 'running'>('idle')
+  const [workspaceInvites, setWorkspaceInvites] = useState<
+    import('@ai-war-room/schemas').WorkspaceInviteRecord[]
+  >([])
+  const [latestInviteUrl, setLatestInviteUrl] = useState<string | null>(null)
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
     useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
@@ -6831,7 +6840,13 @@ function App() {
   }
 
   async function handleRegenerateAgent(agentRole: string) {
-    if (!draftRun || !reviewDraft || !pipelineResult || regeneratingAgentRole) {
+    if (
+      !draftRun ||
+      !reviewDraft ||
+      !pipelineResult ||
+      regeneratingAgentRole ||
+      useTemporalWorkflowRuntime
+    ) {
       return
     }
 
@@ -11689,6 +11704,45 @@ function App() {
       )
     } finally {
       setMemberAdminAction('idle')
+    }
+  }
+
+  async function handleCreateWorkspaceInvite() {
+    setInviteAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const created = await callUi(
+        'workspace-ui',
+        'createWorkspaceInvite',
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        {
+          email: inviteForm.email.trim(),
+          role: inviteForm.role,
+        },
+      )
+      setLatestInviteUrl(created.inviteUrl)
+      setBillingMessage(created.guidance)
+      setInviteForm({ email: '', role: 'member' })
+      const listed = await callUi(
+        'workspace-ui',
+        'listWorkspaceInvites',
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setWorkspaceInvites(listed.invites)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to create workspace invite.',
+      )
+    } finally {
+      setInviteAction('idle')
     }
   }
 
@@ -30098,6 +30152,10 @@ function App() {
           newMemberForm={newMemberForm}
           memberAdminAction={memberAdminAction}
           billingAction={billingAction}
+          inviteForm={inviteForm}
+          inviteAction={inviteAction}
+          invites={workspaceInvites}
+          latestInviteUrl={latestInviteUrl}
           onWorkspaceNameDraftChange={setWorkspaceNameDraft}
           onUpdateWorkspaceName={(name) =>
             void handleSettingsAdminAction({
@@ -30117,6 +30175,8 @@ function App() {
             })
           }
           onNewMemberFormChange={setNewMemberForm}
+          onInviteFormChange={setInviteForm}
+          onCreateInvite={() => void handleCreateWorkspaceInvite()}
           onMemberAdminAction={(input) => void handleMemberAdminAction(input)}
           onExportAudit={(format) => void handleExportWorkspaceAudit(format)}
         />
@@ -31882,6 +31942,10 @@ function App() {
           newMemberForm={newMemberForm}
           memberAdminAction={memberAdminAction}
           billingAction={billingAction}
+          inviteForm={inviteForm}
+          inviteAction={inviteAction}
+          invites={workspaceInvites}
+          latestInviteUrl={latestInviteUrl}
           onWorkspaceNameDraftChange={setWorkspaceNameDraft}
           onUpdateWorkspaceName={(name) =>
             void handleSettingsAdminAction({
@@ -31901,6 +31965,8 @@ function App() {
             })
           }
           onNewMemberFormChange={setNewMemberForm}
+          onInviteFormChange={setInviteForm}
+          onCreateInvite={() => void handleCreateWorkspaceInvite()}
           onMemberAdminAction={(input) => void handleMemberAdminAction(input)}
           onExportAudit={(format) => void handleExportWorkspaceAudit(format)}
         />
@@ -32396,37 +32462,50 @@ function App() {
           </div>
 
           {pipelineResult ? (
-            <div className="agent-result-grid">
-              {pipelineResult.agentOutputs.map((agentOutput) => (
-                <article className="agent-card" key={agentOutput.agentRole}>
-                  <h3>{formatAgent(agentOutput.agentRole)}</h3>
-                  <p>{agentOutput.output.summary}</p>
-                  <div className="metadata-row">
-                    <span>{agentOutput.validationStatus}</span>
-                    <span>{agentOutput.modelProvider}</span>
-                    <span>{agentOutput.inputTokens + agentOutput.outputTokens} tokens</span>
-                  </div>
-                  {draftRun && reviewDraft ? (
-                    <button
-                      type="button"
-                      className="secondary-button"
-                      disabled={
-                        pipelineState === 'running' ||
-                        regeneratingAgentRole !== null
-                      }
-                      aria-busy={regeneratingAgentRole === agentOutput.agentRole}
-                      onClick={() =>
-                        void handleRegenerateAgent(agentOutput.agentRole)
-                      }
-                    >
-                      {regeneratingAgentRole === agentOutput.agentRole
-                        ? 'Regenerating…'
-                        : 'Regenerate agent'}
-                    </button>
-                  ) : null}
-                </article>
-              ))}
-            </div>
+            <>
+              {useTemporalWorkflowRuntime ? (
+                <p className="runtime-note">
+                  Agent regenerate is direct-path only. Switch to Direct REST/SSE
+                  (Temporal off / `VITE_USE_TEMPORAL_WORKFLOWS=false`) to regenerate
+                  a single agent without a full Temporal workflow replay.
+                </p>
+              ) : null}
+              <div className="agent-result-grid">
+                {pipelineResult.agentOutputs.map((agentOutput) => (
+                  <article className="agent-card" key={agentOutput.agentRole}>
+                    <h3>{formatAgent(agentOutput.agentRole)}</h3>
+                    <p>{agentOutput.output.summary}</p>
+                    <div className="metadata-row">
+                      <span>{agentOutput.validationStatus}</span>
+                      <span>{agentOutput.modelProvider}</span>
+                      <span>
+                        {agentOutput.inputTokens + agentOutput.outputTokens} tokens
+                      </span>
+                    </div>
+                    {draftRun && reviewDraft && !useTemporalWorkflowRuntime ? (
+                      <button
+                        type="button"
+                        className="secondary-button"
+                        disabled={
+                          pipelineState === 'running' ||
+                          regeneratingAgentRole !== null
+                        }
+                        aria-busy={
+                          regeneratingAgentRole === agentOutput.agentRole
+                        }
+                        onClick={() =>
+                          void handleRegenerateAgent(agentOutput.agentRole)
+                        }
+                      >
+                        {regeneratingAgentRole === agentOutput.agentRole
+                          ? 'Regenerating…'
+                          : 'Regenerate agent'}
+                      </button>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
+            </>
           ) : null}
 
           {visibleArtifacts.length > 0 ? (

@@ -1,7 +1,9 @@
 import type { WorkspaceMemberAdminSummaryResponse } from '@ai-war-room/schemas'
 import type { WorkspaceSettingsAdminSummaryResponse } from '@ai-war-room/schemas'
+import type { WorkspaceInviteRecord } from '@ai-war-room/schemas'
 import {
   WorkspaceMemberAdminPanel,
+  type WorkspaceInviteFormState,
   type WorkspaceMemberFormState,
 } from './WorkspaceMemberAdminPanel.js'
 import { WorkspaceSettingsAdminPanel } from './WorkspaceSettingsAdminPanel.js'
@@ -14,6 +16,10 @@ export type WorkspaceAdminPanelsProps = {
   newMemberForm: WorkspaceMemberFormState
   memberAdminAction: 'idle' | 'running'
   billingAction: 'idle' | 'loading' | 'upgrading' | 'portal' | 'canceling'
+  inviteForm: WorkspaceInviteFormState
+  inviteAction: 'idle' | 'running'
+  invites: WorkspaceInviteRecord[]
+  latestInviteUrl: string | null
   onWorkspaceNameDraftChange: (value: string) => void
   onUpdateWorkspaceName: (name: string) => void
   onResetWorkspaceName: () => void
@@ -21,6 +27,8 @@ export type WorkspaceAdminPanelsProps = {
     sensitivity: 'high_only' | 'medium_and_up' | 'all',
   ) => void
   onNewMemberFormChange: (value: WorkspaceMemberFormState) => void
+  onInviteFormChange: (value: WorkspaceInviteFormState) => void
+  onCreateInvite: () => void
   onMemberAdminAction: (input: {
     action: 'update_member_role' | 'remove_member' | 'add_member'
     userId: string
@@ -38,11 +46,17 @@ export function WorkspaceAdminPanels({
   newMemberForm,
   memberAdminAction,
   billingAction,
+  inviteForm,
+  inviteAction,
+  invites,
+  latestInviteUrl,
   onWorkspaceNameDraftChange,
   onUpdateWorkspaceName,
   onResetWorkspaceName,
   onUpdateShieldDisplaySensitivity,
   onNewMemberFormChange,
+  onInviteFormChange,
+  onCreateInvite,
   onMemberAdminAction,
   onExportAudit,
   mode = 'all',
@@ -68,7 +82,13 @@ export function WorkspaceAdminPanels({
           newMemberForm={newMemberForm}
           memberAdminAction={memberAdminAction}
           billingAction={billingAction}
+          inviteForm={inviteForm}
+          inviteAction={inviteAction}
+          invites={invites}
+          latestInviteUrl={latestInviteUrl}
           onNewMemberFormChange={onNewMemberFormChange}
+          onInviteFormChange={onInviteFormChange}
+          onCreateInvite={onCreateInvite}
           onMemberAdminAction={onMemberAdminAction}
           onExportAudit={onExportAudit}
         />

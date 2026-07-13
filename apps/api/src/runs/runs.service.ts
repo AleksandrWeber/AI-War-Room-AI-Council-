@@ -334,7 +334,10 @@ export class RunsService {
       output.agentRole === agentRole ? regenerated : output,
     )
     const chunkSummaries =
-      this.chunkSummaryService.summarizeAgentOutputs(agentOutputs)
+      await this.chunkSummaryService.summarizeAgentOutputs({
+        agentOutputs,
+        workspaceId: request.draftRun.workspaceId,
+      })
     const moderatorSynthesis = await this.moderatorService.synthesize({
       draftRun: request.draftRun,
       approvedTriage: request.approvedTriage,
@@ -473,9 +476,10 @@ export class RunsService {
       'Prompt-driven Moderator synthesis',
       'running',
     )
-    const chunkSummaries = this.chunkSummaryService.summarizeAgentOutputs(
+    const chunkSummaries = await this.chunkSummaryService.summarizeAgentOutputs({
       agentOutputs,
-    )
+      workspaceId: request.draftRun.workspaceId,
+    })
     const moderatorSynthesis = await this.measurePipelinePhase(
       request,
       'moderator',

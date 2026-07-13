@@ -10,6 +10,7 @@ import { PostgresWorkspaceRepository } from './postgres-workspace.repository.js'
 import { UserProvisioningService } from './user-provisioning.service.js'
 import { WorkspaceAdminService } from './workspace-admin.service.js'
 import { WorkspaceAuditService } from './workspace-audit.service.js'
+import { WorkspaceInviteService } from './workspace-invite.service.js'
 import { WorkspacesController } from './workspaces.controller.js'
 import { WorkspaceService } from './workspace.service.js'
 import { WORKSPACE_REPOSITORY } from './workspace.repository.js'
@@ -27,6 +28,7 @@ import { WORKSPACE_REPOSITORY } from './workspace.repository.js'
     WorkspaceService,
     WorkspaceAdminService,
     WorkspaceAuditService,
+    WorkspaceInviteService,
     UserProvisioningService,
     {
       provide: WORKSPACE_REPOSITORY,

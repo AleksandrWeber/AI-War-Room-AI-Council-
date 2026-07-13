@@ -1,9 +1,13 @@
-import type { WorkspaceMemberAdminSummaryResponse } from '@ai-war-room/schemas'
+import type {
+  WorkspaceInviteRecord,
+  WorkspaceMemberAdminSummaryResponse,
+} from '@ai-war-room/schemas'
 import { formatWorkspaceRole } from './admin.js'
 import { AdminExportActions } from './AdminExportActions.js'
 import { BillingAdminPanel } from './BillingAdminPanel.js'
 
 type MemberRole = 'owner' | 'admin' | 'member' | 'viewer'
+type InviteRole = 'admin' | 'member' | 'viewer'
 
 export type WorkspaceMemberFormState = {
   userId: string
@@ -11,12 +15,23 @@ export type WorkspaceMemberFormState = {
   email: string
 }
 
+export type WorkspaceInviteFormState = {
+  email: string
+  role: InviteRole
+}
+
 export type WorkspaceMemberAdminPanelProps = {
   summary: WorkspaceMemberAdminSummaryResponse
   newMemberForm: WorkspaceMemberFormState
   memberAdminAction: 'idle' | 'running'
   billingAction: 'idle' | 'loading' | 'upgrading' | 'portal' | 'canceling'
+  inviteForm: WorkspaceInviteFormState
+  inviteAction: 'idle' | 'running'
+  invites: WorkspaceInviteRecord[]
+  latestInviteUrl: string | null
   onNewMemberFormChange: (value: WorkspaceMemberFormState) => void
+  onInviteFormChange: (value: WorkspaceInviteFormState) => void
+  onCreateInvite: () => void
   onMemberAdminAction: (input: {
     action: 'update_member_role' | 'remove_member' | 'add_member'
     userId: string
@@ -31,10 +46,18 @@ export function WorkspaceMemberAdminPanel({
   newMemberForm,
   memberAdminAction,
   billingAction,
+  inviteForm,
+  inviteAction,
+  invites,
+  latestInviteUrl,
   onNewMemberFormChange,
+  onInviteFormChange,
+  onCreateInvite,
   onMemberAdminAction,
   onExportAudit,
 }: WorkspaceMemberAdminPanelProps) {
+  const canInvite = summary.role === 'owner' || summary.role === 'admin'
+
   return (
     <BillingAdminPanel
       title="Member admin tools"
@@ -99,6 +122,77 @@ export function WorkspaceMemberAdminPanel({
           </article>
         ))}
       </div>
+      {canInvite ? (
+        <form
+          className="workspace-member-form"
+          onSubmit={(event) => {
+            event.preventDefault()
+            if (!inviteForm.email.trim()) {
+              return
+            }
+            onCreateInvite()
+          }}
+        >
+          <p className="runtime-note">
+            Invite by email returns a shareable join link. No email is sent by
+            the API.
+          </p>
+          <label>
+            Invite email
+            <input
+              type="email"
+              value={inviteForm.email}
+              onChange={(event) =>
+                onInviteFormChange({
+                  ...inviteForm,
+                  email: event.target.value,
+                })
+              }
+            />
+          </label>
+          <label>
+            Invite role
+            <select
+              value={inviteForm.role}
+              onChange={(event) =>
+                onInviteFormChange({
+                  ...inviteForm,
+                  role: event.target.value as InviteRole,
+                })
+              }
+            >
+              <option value="viewer">Viewer</option>
+              <option value="member">Member</option>
+              <option value="admin">Admin</option>
+            </select>
+          </label>
+          <button
+            type="submit"
+            disabled={inviteAction !== 'idle' || !inviteForm.email.trim()}
+          >
+            {inviteAction === 'running' ? 'Creating invite…' : 'Create invite link'}
+          </button>
+          {latestInviteUrl ? (
+            <p className="runtime-note">
+              Latest invite URL: <code>{latestInviteUrl}</code>
+            </p>
+          ) : null}
+          {invites.length > 0 ? (
+            <div className="workspace-member-list">
+              {invites.map((invite) => (
+                <article className="workspace-member-card" key={invite.inviteId}>
+                  <div>
+                    <strong>{invite.email}</strong>
+                    <p>
+                      {formatWorkspaceRole(invite.role)} · {invite.status}
+                    </p>
+                  </div>
+                </article>
+              ))}
+            </div>
+          ) : null}
+        </form>
+      ) : null}
       {summary.availableActions.includes('add_member') ? (
         <form
           className="workspace-member-form"

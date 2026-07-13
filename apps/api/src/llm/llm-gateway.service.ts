@@ -254,6 +254,10 @@ export class LlmGatewayService {
       return 'shield_classifier'
     }
 
+    if (taskName === 'chunk_summary/v1') {
+      return 'moderator'
+    }
+
     if (taskName.startsWith('agents/')) {
       return (taskName.split('/')[1] as ModelRouterRole | undefined) ?? 'critic'
     }
