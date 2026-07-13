@@ -25,6 +25,7 @@
     "test": "npm run test --workspaces --if-present",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium",
+    "test:load": "npm run test:load --workspace @ai-war-room/api",
     "typecheck": "npm run typecheck --workspaces --if-present",
     "worker:temporal": "npm run worker:temporal --workspace @ai-war-room/api",
     "worker:temporal:dev": "npm run worker:temporal:dev --workspace @ai-war-room/api"

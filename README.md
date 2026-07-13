@@ -141,6 +141,12 @@ Run the local persistence gate:
 npm run quality:infra
 ```
 
+Opt-in Redis stream + PostgreSQL write-pressure load probe (not part of `quality:gate`):
+
+```bash
+RUN_LOAD_TESTS=1 npm run test:load
+```
+
 ## MVP Demo Checklist
 
 1. Start infrastructure:

@@ -17,6 +17,7 @@
     "lint": "oxlint .",
     "test": "NODE_OPTIONS='--max-old-space-size=8192' vitest run --fileParallelism=false --retry=2 --pool=forks",
     "test:gate": "node scripts/test-gate.mjs",
+    "test:load": "node scripts/load-persistence.mjs",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "devDependencies": {
