@@ -22,6 +22,10 @@ Idea submission
 
 ## Local Setup
 
+Contributor quickstart (setup, flags, quality commands): [docs/CONTRIBUTING.md](docs/CONTRIBUTING.md).  
+Operator deploy / migrations / incidents: [docs/OPERATOR.md](docs/OPERATOR.md).  
+Artifacts, export, and billing/usage contracts: [docs/ARTIFACTS_AND_BILLING.md](docs/ARTIFACTS_AND_BILLING.md).
+
 Install dependencies:
 
 ```bash
