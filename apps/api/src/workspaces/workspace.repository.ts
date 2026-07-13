@@ -17,6 +17,7 @@ export type WorkspaceMemberRecord = WorkspaceMembershipRecord & {
 export type WorkspaceRecord = {
   workspaceId: string
   name: string
+  shieldDisplaySensitivity: 'high_only' | 'medium_and_up' | 'all'
   createdAt: string
 }
 
@@ -67,6 +68,11 @@ export interface WorkspaceRepository {
   updateWorkspaceName(input: {
     workspaceId: string
     name: string
+  }): Promise<WorkspaceRecord | null>
+
+  updateShieldDisplaySensitivity(input: {
+    workspaceId: string
+    shieldDisplaySensitivity: WorkspaceRecord['shieldDisplaySensitivity']
   }): Promise<WorkspaceRecord | null>
 }
 

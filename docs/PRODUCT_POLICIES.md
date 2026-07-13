@@ -10,10 +10,10 @@ Operational product decisions that shape Shield, storage, and research. Implemen
 
 ## Shield false-positive policy
 
-- **User UX:** low/medium stay quiet or light; high visible in Human Review; critical/blocked require owner/admin **override + reason**. Non-critical findings may be **marked as false positive** into an owner/admin review queue (does not change scan status or unlock critical runs).
+- **User UX:** low/medium stay quiet or light; high visible in Human Review; critical/blocked require owner/admin **override + reason**. Non-critical findings may be **marked as false positive** into an owner/admin review queue (does not change scan status or unlock critical runs). Owners/admins can **accept/reject** queue items.
+- **Display sensitivity:** workspace setting `shieldDisplaySensitivity` (`high_only` | `medium_and_up` default | `all`) filters which findings Human Review surfaces; critical always remains visible.
 - **Quality control:** owner/admin runs the false-positive **review set**; production readiness enforces **false-positive rate ≤ 5%** on that set (failures that are only FPs within budget do not block the regression check).
-- **Observability:** log severity, category, override yes/no — not raw secret plaintext. User FP reports emit `shield_false_positive_reported`.
-- **Post-MVP:** accept/reject queue triage + optional per-workspace sensitivity.
+- **Observability:** log severity, category, override yes/no — not raw secret plaintext. User FP reports emit `shield_false_positive_reported`; triage emits `shield_false_positive_resolved`.
 
 ## Shield storage policy
 

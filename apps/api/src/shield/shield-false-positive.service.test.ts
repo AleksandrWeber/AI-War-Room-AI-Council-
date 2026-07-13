@@ -102,4 +102,49 @@ describe('ShieldFalsePositiveService', () => {
       },
     })
   })
+
+  it('lets owners accept open reports into the triage queue', async () => {
+    const service = createService()
+    const created = await service.createReport({
+      runId: 'run_1',
+      authContext: {
+        userId: 'user_1',
+        workspaceId: 'workspace_1',
+        role: 'member',
+      },
+      body: {
+        findingId: 'finding_high_1',
+        note: 'Benign discussion of prompt injection.',
+        shieldScan: baseScan,
+      },
+    })
+
+    const resolved = await service.resolveReport({
+      authContext: {
+        userId: 'user_admin',
+        workspaceId: 'workspace_1',
+        role: 'admin',
+      },
+      workspaceId: 'workspace_1',
+      reportId: created.reportId,
+      body: {
+        decision: 'accepted',
+        note: 'Confirmed benign.',
+      },
+    })
+
+    expect(resolved.status).toBe('accepted')
+    expect(resolved.reviewedByUserId).toBe('user_admin')
+    expect(resolved.reviewNote).toBe('Confirmed benign.')
+
+    const listed = await service.listWorkspaceReports(
+      {
+        userId: 'user_admin',
+        workspaceId: 'workspace_1',
+        role: 'admin',
+      },
+      'workspace_1',
+    )
+    expect(listed.openCount).toBe(0)
+  })
 })

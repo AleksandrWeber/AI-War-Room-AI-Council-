@@ -169,6 +169,40 @@ export async function fetchShieldFalsePositiveReports(
   return response.json()
 }
 
+export async function resolveShieldFalsePositiveReport(
+  apiBaseUrl: string,
+  workspaceId: string,
+  reportId: string,
+  headers: Record<string, string>,
+  input: {
+    decision: 'accepted' | 'rejected'
+    note?: string
+  },
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/shield/workspace/${encodeURIComponent(workspaceId)}/false-positive-reports/${encodeURIComponent(reportId)}/resolve`,
+    {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(input),
+    },
+  )
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null)
+    throw new Error(
+      typeof body?.message === 'string'
+        ? body.message
+        : `API returned ${response.status}`,
+    )
+  }
+
+  return response.json()
+}
+
 export function formatShieldRolloutStatus(status: 'ready' | 'not_ready') {
   switch (status) {
     case 'ready':

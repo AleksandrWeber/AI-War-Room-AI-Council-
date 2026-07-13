@@ -98,7 +98,11 @@ describe('WorkspaceAdminService', () => {
 
     expect(summary.settings.name).toBe('Workspace One')
     expect(summary.availableActions).toEqual(
-      expect.arrayContaining(['update_workspace_name', 'reset_workspace_name']),
+      expect.arrayContaining([
+        'update_workspace_name',
+        'update_shield_display_sensitivity',
+        'reset_workspace_name',
+      ]),
     )
   })
 

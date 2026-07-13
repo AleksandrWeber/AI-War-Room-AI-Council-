@@ -8,13 +8,20 @@ describe('resolveWorkspaceSettingsAdminActions', () => {
   it('includes reset action outside production', () => {
     expect(
       resolveWorkspaceSettingsAdminActions({ nodeEnv: 'development' }),
-    ).toEqual(['update_workspace_name', 'reset_workspace_name'])
+    ).toEqual([
+      'update_workspace_name',
+      'update_shield_display_sensitivity',
+      'reset_workspace_name',
+    ])
   })
 
   it('hides reset action in production', () => {
     expect(
       resolveWorkspaceSettingsAdminActions({ nodeEnv: 'production' }),
-    ).toEqual(['update_workspace_name'])
+    ).toEqual([
+      'update_workspace_name',
+      'update_shield_display_sensitivity',
+    ])
   })
 })
 

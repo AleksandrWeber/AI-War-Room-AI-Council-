@@ -69,11 +69,46 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
   ])
 
   private readonly users = new Set<string>(['user_local', 'user_test'])
-  private readonly workspaces = new Map<string, { name: string; createdAt: string }>([
-    ['local_workspace', { name: 'Local Workspace', createdAt: '2026-07-04T12:00:00.000Z' }],
-    ['workspace_1', { name: 'Workspace One', createdAt: '2026-07-04T12:00:00.000Z' }],
-    ['workspace_tiny_quota', { name: 'Tiny Quota Workspace', createdAt: '2026-07-04T12:00:00.000Z' }],
-    ['workspace_pro', { name: 'Pro Workspace', createdAt: '2026-07-04T12:00:00.000Z' }],
+  private readonly workspaces = new Map<
+    string,
+    {
+      name: string
+      shieldDisplaySensitivity: WorkspaceRecord['shieldDisplaySensitivity']
+      createdAt: string
+    }
+  >([
+    [
+      'local_workspace',
+      {
+        name: 'Local Workspace',
+        shieldDisplaySensitivity: 'medium_and_up',
+        createdAt: '2026-07-04T12:00:00.000Z',
+      },
+    ],
+    [
+      'workspace_1',
+      {
+        name: 'Workspace One',
+        shieldDisplaySensitivity: 'medium_and_up',
+        createdAt: '2026-07-04T12:00:00.000Z',
+      },
+    ],
+    [
+      'workspace_tiny_quota',
+      {
+        name: 'Tiny Quota Workspace',
+        shieldDisplaySensitivity: 'medium_and_up',
+        createdAt: '2026-07-04T12:00:00.000Z',
+      },
+    ],
+    [
+      'workspace_pro',
+      {
+        name: 'Pro Workspace',
+        shieldDisplaySensitivity: 'medium_and_up',
+        createdAt: '2026-07-04T12:00:00.000Z',
+      },
+    ],
   ])
 
   async findMembership(
@@ -101,6 +136,7 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
     if (!workspaceExists) {
       this.workspaces.set(input.workspaceId, {
         name: `Workspace ${input.workspaceId}`,
+        shieldDisplaySensitivity: 'medium_and_up',
         createdAt: new Date().toISOString(),
       })
       actions.push('created_workspace')
@@ -177,6 +213,7 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
     if (!this.workspaces.has(input.workspaceId)) {
       this.workspaces.set(input.workspaceId, {
         name: `Workspace ${input.workspaceId}`,
+        shieldDisplaySensitivity: 'medium_and_up',
         createdAt: new Date().toISOString(),
       })
     }
@@ -205,6 +242,7 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
     return {
       workspaceId,
       name: workspace.name,
+      shieldDisplaySensitivity: workspace.shieldDisplaySensitivity,
       createdAt: workspace.createdAt,
     }
   }
@@ -228,6 +266,31 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
     return {
       workspaceId: input.workspaceId,
       name: updated.name,
+      shieldDisplaySensitivity: updated.shieldDisplaySensitivity,
+      createdAt: updated.createdAt,
+    }
+  }
+
+  async updateShieldDisplaySensitivity(input: {
+    workspaceId: string
+    shieldDisplaySensitivity: WorkspaceRecord['shieldDisplaySensitivity']
+  }): Promise<WorkspaceRecord | null> {
+    const workspace = this.workspaces.get(input.workspaceId)
+
+    if (!workspace) {
+      return null
+    }
+
+    const updated = {
+      ...workspace,
+      shieldDisplaySensitivity: input.shieldDisplaySensitivity,
+    }
+    this.workspaces.set(input.workspaceId, updated)
+
+    return {
+      workspaceId: input.workspaceId,
+      name: updated.name,
+      shieldDisplaySensitivity: updated.shieldDisplaySensitivity,
       createdAt: updated.createdAt,
     }
   }

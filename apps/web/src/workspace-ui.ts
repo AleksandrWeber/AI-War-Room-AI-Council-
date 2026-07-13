@@ -93,8 +93,12 @@ export async function executeWorkspaceSettingsAdminAction(
   workspaceId: string,
   headers: Record<string, string>,
   input: {
-    action: 'update_workspace_name' | 'reset_workspace_name'
+    action:
+      | 'update_workspace_name'
+      | 'reset_workspace_name'
+      | 'update_shield_display_sensitivity'
     name?: string
+    shieldDisplaySensitivity?: 'high_only' | 'medium_and_up' | 'all'
   },
 ) {
   const response = await fetch(

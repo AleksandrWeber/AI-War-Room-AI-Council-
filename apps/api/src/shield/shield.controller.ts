@@ -149,6 +149,24 @@ export class ShieldController {
     )
   }
 
+  @Post('workspace/:workspaceId/false-positive-reports/:reportId/resolve')
+  @UseGuards(WorkspaceAccessGuard)
+  resolveShieldFalsePositiveReport(
+    @Param('workspaceId') workspaceId: string,
+    @Param('reportId') reportId: string,
+    @Req() request: AuthenticatedRequest,
+    @Body() body: unknown,
+  ) {
+    this.assertWorkspaceParam(request, workspaceId)
+
+    return this.shieldFalsePositiveService.resolveReport({
+      authContext: request.authContext!,
+      workspaceId,
+      reportId,
+      body,
+    })
+  }
+
   private assertWorkspaceParam(
     request: AuthenticatedRequest,
     workspaceId: string,

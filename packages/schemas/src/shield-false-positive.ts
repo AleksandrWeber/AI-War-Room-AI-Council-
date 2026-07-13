@@ -16,6 +16,11 @@ export type ShieldFalsePositiveReportStatus = z.infer<
   typeof shieldFalsePositiveReportStatusSchema
 >
 
+export const shieldFalsePositiveDecisionSchema = z.enum(['accepted', 'rejected'])
+export type ShieldFalsePositiveDecision = z.infer<
+  typeof shieldFalsePositiveDecisionSchema
+>
+
 export const createShieldFalsePositiveReportRequestSchema = z.object({
   findingId: nonEmptyStringSchema,
   note: z.string().trim().max(1_000).optional(),
@@ -23,6 +28,14 @@ export const createShieldFalsePositiveReportRequestSchema = z.object({
 })
 export type CreateShieldFalsePositiveReportRequest = z.infer<
   typeof createShieldFalsePositiveReportRequestSchema
+>
+
+export const resolveShieldFalsePositiveReportRequestSchema = z.object({
+  decision: shieldFalsePositiveDecisionSchema,
+  note: z.string().trim().max(1_000).optional(),
+})
+export type ResolveShieldFalsePositiveReportRequest = z.infer<
+  typeof resolveShieldFalsePositiveReportRequestSchema
 >
 
 export const shieldFalsePositiveReportResponseSchema = z.object({
@@ -37,6 +50,9 @@ export const shieldFalsePositiveReportResponseSchema = z.object({
   actorRole: workspaceRoleSchema,
   note: z.string().nullable(),
   status: shieldFalsePositiveReportStatusSchema,
+  reviewedByUserId: nonEmptyStringSchema.nullable(),
+  reviewedAt: nonEmptyStringSchema.nullable(),
+  reviewNote: z.string().nullable(),
   createdAt: nonEmptyStringSchema,
   updatedAt: nonEmptyStringSchema,
 })

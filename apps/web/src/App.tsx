@@ -1175,6 +1175,7 @@ import type {
   WorkspaceMemberAdminSummaryResponse,
   WorkspaceSettingsAdminSummaryResponse,
 } from '@ai-war-room/schemas'
+import { filterFindingsByDisplaySensitivity } from '@ai-war-room/schemas'
 import { formatPaidTier, settleAbortable } from '@ai-war-room/web-blocks'
 import { CoreOperationsAdminLazyGate, DomainAdminLazyGate } from './features/AdminLazySection'
 import { UsageAdminLazySection } from './features/UsageAdminLazySection'
@@ -11688,8 +11689,12 @@ function App() {
   }
 
   async function handleSettingsAdminAction(input: {
-    action: 'update_workspace_name' | 'reset_workspace_name'
+    action:
+      | 'update_workspace_name'
+      | 'reset_workspace_name'
+      | 'update_shield_display_sensitivity'
     name?: string
+    shieldDisplaySensitivity?: 'high_only' | 'medium_and_up' | 'all'
   }) {
     setSettingsAdminAction('running')
     setBillingError(null)
@@ -11712,6 +11717,41 @@ function App() {
       )
     } finally {
       setSettingsAdminAction('idle')
+    }
+  }
+
+  async function handleResolveFalsePositiveReport(input: {
+    reportId: string
+    decision: 'accepted' | 'rejected'
+  }) {
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      await callUi(
+        'shield-ui',
+        'resolveShieldFalsePositiveReport',
+        apiBaseUrl,
+        defaultWorkspaceId,
+        input.reportId,
+        workspaceAuthHeaders,
+        { decision: input.decision },
+      )
+      const falsePositiveQueue = await callUi(
+        'shield-ui',
+        'fetchShieldFalsePositiveReports',
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setShieldFalsePositiveReports(falsePositiveQueue)
+      setBillingMessage(`False-positive report ${input.decision}.`)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to resolve false-positive report.',
+      )
     }
   }
 
@@ -29104,10 +29144,14 @@ function App() {
     }
   }
 
+  const visibleShieldFindings = filterFindingsByDisplaySensitivity(
+    draftRun?.shieldScan.findings ?? [],
+    settingsAdminSummary?.settings.shieldDisplaySensitivity ?? 'medium_and_up',
+  )
   const activeFinding =
-    draftRun?.shieldScan.findings.find(
+    visibleShieldFindings.find(
       (finding) => finding.findingId === activeFindingId,
-    ) ?? draftRun?.shieldScan.findings[0]
+    ) ?? visibleShieldFindings[0]
   const requiresCriticalShieldOverride =
     draftRun?.shieldScan.status === 'blocked' ||
     draftRun?.shieldScan.maxSeverity === 'critical'
@@ -30062,6 +30106,12 @@ function App() {
               action: 'reset_workspace_name',
             })
           }
+          onUpdateShieldDisplaySensitivity={(sensitivity) =>
+            void handleSettingsAdminAction({
+              action: 'update_shield_display_sensitivity',
+              shieldDisplaySensitivity: sensitivity,
+            })
+          }
           onNewMemberFormChange={setNewMemberForm}
           onMemberAdminAction={(input) => void handleMemberAdminAction(input)}
           onExportAudit={(format) => void handleExportWorkspaceAudit(format)}
@@ -30081,6 +30131,7 @@ function App() {
             handlePromptRegressionAdminAction,
             handleProviderKeyAdminAction,
             handleQuotaAdminAction,
+            handleResolveFalsePositiveReport,
             handleRunHistoryAdminAction,
             handleShieldReviewAdminAction,
             handleStreamRecoveryAdminAction,
@@ -31839,6 +31890,12 @@ function App() {
               action: 'reset_workspace_name',
             })
           }
+          onUpdateShieldDisplaySensitivity={(sensitivity) =>
+            void handleSettingsAdminAction({
+              action: 'update_shield_display_sensitivity',
+              shieldDisplaySensitivity: sensitivity,
+            })
+          }
           onNewMemberFormChange={setNewMemberForm}
           onMemberAdminAction={(input) => void handleMemberAdminAction(input)}
           onExportAudit={(format) => void handleExportWorkspaceAudit(format)}
@@ -31890,26 +31947,28 @@ function App() {
                   {getSeverityLabel(draftRun.shieldScan.maxSeverity)}
                 </strong>
                 <p>
-                  {draftRun.shieldScan.findings.length > 0
-                    ? `${draftRun.shieldScan.findings.length} finding(s) require review before execution.`
-                    : 'No meaningful findings. Shield stays quiet and the run can proceed.'}
+                  {visibleShieldFindings.length > 0
+                    ? `${visibleShieldFindings.length} visible finding(s) for current Shield display sensitivity (${settingsAdminSummary?.settings.shieldDisplaySensitivity ?? 'medium_and_up'}).`
+                    : draftRun.shieldScan.findings.length > 0
+                      ? 'Findings exist but are hidden by Shield display sensitivity.'
+                      : 'No meaningful findings. Shield stays quiet and the run can proceed.'}
                 </p>
               </div>
               <p className="review-idea">
                 {getHighlightedIdea(
                   draftRun.idea.rawIdea,
-                  draftRun.shieldScan.findings,
+                  visibleShieldFindings,
                   setActiveFindingId,
                 )}
               </p>
-              {draftRun.shieldScan.findings.length > 0 ? (
+              {visibleShieldFindings.length > 0 ? (
                 <>
                   <div
                     className="finding-tabs"
                     role="tablist"
                     aria-label="Shield findings"
                   >
-                    {draftRun.shieldScan.findings.map((finding) => {
+                    {visibleShieldFindings.map((finding) => {
                       const selected =
                         finding.findingId === activeFinding?.findingId
                       return (
@@ -31928,7 +31987,7 @@ function App() {
                           tabIndex={selected ? 0 : -1}
                           onClick={() => setActiveFindingId(finding.findingId)}
                           onKeyDown={(event) => {
-                            const findings = draftRun.shieldScan.findings
+                            const findings = visibleShieldFindings
                             const index = findings.findIndex(
                               (item) => item.findingId === finding.findingId,
                             )

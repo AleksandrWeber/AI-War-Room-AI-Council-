@@ -17,6 +17,9 @@ export type WorkspaceAdminPanelsProps = {
   onWorkspaceNameDraftChange: (value: string) => void
   onUpdateWorkspaceName: (name: string) => void
   onResetWorkspaceName: () => void
+  onUpdateShieldDisplaySensitivity: (
+    sensitivity: 'high_only' | 'medium_and_up' | 'all',
+  ) => void
   onNewMemberFormChange: (value: WorkspaceMemberFormState) => void
   onMemberAdminAction: (input: {
     action: 'update_member_role' | 'remove_member' | 'add_member'
@@ -38,6 +41,7 @@ export function WorkspaceAdminPanels({
   onWorkspaceNameDraftChange,
   onUpdateWorkspaceName,
   onResetWorkspaceName,
+  onUpdateShieldDisplaySensitivity,
   onNewMemberFormChange,
   onMemberAdminAction,
   onExportAudit,
@@ -55,6 +59,7 @@ export function WorkspaceAdminPanels({
           onWorkspaceNameDraftChange={onWorkspaceNameDraftChange}
           onUpdateWorkspaceName={onUpdateWorkspaceName}
           onResetWorkspaceName={onResetWorkspaceName}
+          onUpdateShieldDisplaySensitivity={onUpdateShieldDisplaySensitivity}
         />
       ) : null}
       {(mode === 'all' || mode === 'member') && memberAdminSummary ? (

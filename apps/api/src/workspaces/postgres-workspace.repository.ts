@@ -20,6 +20,7 @@ type WorkspaceMembershipRow = {
 type WorkspaceRow = {
   workspace_id: string
   name: string
+  shield_display_sensitivity: WorkspaceRecord['shieldDisplaySensitivity']
   created_at: Date
 }
 
@@ -301,7 +302,7 @@ export class PostgresWorkspaceRepository implements WorkspaceRepository {
   async getWorkspace(workspaceId: string): Promise<WorkspaceRecord | null> {
     const result = await this.postgresService.query<WorkspaceRow>(
       `
-        SELECT workspace_id, name, created_at
+        SELECT workspace_id, name, shield_display_sensitivity, created_at
         FROM workspaces
         WHERE workspace_id = $1
         LIMIT 1
@@ -314,11 +315,7 @@ export class PostgresWorkspaceRepository implements WorkspaceRepository {
       return null
     }
 
-    return {
-      workspaceId: row.workspace_id,
-      name: row.name,
-      createdAt: row.created_at.toISOString(),
-    }
+    return this.mapWorkspace(row)
   }
 
   async updateWorkspaceName(input: {
@@ -330,7 +327,7 @@ export class PostgresWorkspaceRepository implements WorkspaceRepository {
         UPDATE workspaces
         SET name = $2
         WHERE workspace_id = $1
-        RETURNING workspace_id, name, created_at
+        RETURNING workspace_id, name, shield_display_sensitivity, created_at
       `,
       [input.workspaceId, input.name],
     )
@@ -340,9 +337,36 @@ export class PostgresWorkspaceRepository implements WorkspaceRepository {
       return null
     }
 
+    return this.mapWorkspace(row)
+  }
+
+  async updateShieldDisplaySensitivity(input: {
+    workspaceId: string
+    shieldDisplaySensitivity: WorkspaceRecord['shieldDisplaySensitivity']
+  }): Promise<WorkspaceRecord | null> {
+    const result = await this.postgresService.query<WorkspaceRow>(
+      `
+        UPDATE workspaces
+        SET shield_display_sensitivity = $2
+        WHERE workspace_id = $1
+        RETURNING workspace_id, name, shield_display_sensitivity, created_at
+      `,
+      [input.workspaceId, input.shieldDisplaySensitivity],
+    )
+    const row = result.rows[0]
+
+    if (!row) {
+      return null
+    }
+
+    return this.mapWorkspace(row)
+  }
+
+  private mapWorkspace(row: WorkspaceRow): WorkspaceRecord {
     return {
       workspaceId: row.workspace_id,
       name: row.name,
+      shieldDisplaySensitivity: row.shield_display_sensitivity,
       createdAt: row.created_at.toISOString(),
     }
   }

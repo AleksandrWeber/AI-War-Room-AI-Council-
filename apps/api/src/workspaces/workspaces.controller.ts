@@ -32,6 +32,7 @@ type WorkspaceSettingsAdminBody = {
   workspaceId?: unknown
   action?: unknown
   name?: unknown
+  shieldDisplaySensitivity?: unknown
 }
 
 @Controller('workspaces')
@@ -85,7 +86,11 @@ export class WorkspacesController {
 
     const action = body.action
 
-    if (action !== 'update_workspace_name' && action !== 'reset_workspace_name') {
+    if (
+      action !== 'update_workspace_name' &&
+      action !== 'reset_workspace_name' &&
+      action !== 'update_shield_display_sensitivity'
+    ) {
       throw new BadRequestException({
         message: 'Unsupported workspace settings admin action.',
       })
@@ -97,6 +102,12 @@ export class WorkspacesController {
         workspaceId,
         action,
         name: typeof body.name === 'string' ? body.name : undefined,
+        shieldDisplaySensitivity:
+          body.shieldDisplaySensitivity === 'high_only' ||
+          body.shieldDisplaySensitivity === 'medium_and_up' ||
+          body.shieldDisplaySensitivity === 'all'
+            ? body.shieldDisplaySensitivity
+            : undefined,
       },
     )
   }

@@ -8,9 +8,10 @@ const settingsSummary = {
   settings: {
     workspaceId: 'local_workspace',
     name: 'Local workspace',
+    shieldDisplaySensitivity: 'medium_and_up',
     createdAt: '2026-01-01T00:00:00.000Z',
   },
-  availableActions: ['update_workspace_name'],
+  availableActions: ['update_workspace_name', 'update_shield_display_sensitivity'],
 } as const
 
 describe('WorkspaceAdminPanels', () => {
@@ -28,6 +29,7 @@ describe('WorkspaceAdminPanels', () => {
         onWorkspaceNameDraftChange={() => undefined}
         onUpdateWorkspaceName={() => undefined}
         onResetWorkspaceName={() => undefined}
+        onUpdateShieldDisplaySensitivity={() => undefined}
         onNewMemberFormChange={() => undefined}
         onMemberAdminAction={() => undefined}
         onExportAudit={() => undefined}

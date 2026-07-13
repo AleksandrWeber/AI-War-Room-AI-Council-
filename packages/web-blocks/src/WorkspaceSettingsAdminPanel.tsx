@@ -1,4 +1,7 @@
-import type { WorkspaceSettingsAdminSummaryResponse } from '@ai-war-room/schemas'
+import type {
+  ShieldDisplaySensitivity,
+  WorkspaceSettingsAdminSummaryResponse,
+} from '@ai-war-room/schemas'
 import { BillingAdminPanel } from './BillingAdminPanel.js'
 import { AdminRefreshButton } from './AdminRefreshButton.js'
 
@@ -9,6 +12,9 @@ export type WorkspaceSettingsAdminPanelProps = {
   onWorkspaceNameDraftChange: (value: string) => void
   onUpdateWorkspaceName: (name: string) => void
   onResetWorkspaceName: () => void
+  onUpdateShieldDisplaySensitivity: (
+    sensitivity: ShieldDisplaySensitivity,
+  ) => void
 }
 
 export function WorkspaceSettingsAdminPanel({
@@ -18,6 +24,7 @@ export function WorkspaceSettingsAdminPanel({
   onWorkspaceNameDraftChange,
   onUpdateWorkspaceName,
   onResetWorkspaceName,
+  onUpdateShieldDisplaySensitivity,
 }: WorkspaceSettingsAdminPanelProps) {
   return (
     <BillingAdminPanel
@@ -30,6 +37,11 @@ export function WorkspaceSettingsAdminPanel({
           label: 'Workspace name',
           value: summary.settings.name,
           detail: summary.settings.workspaceId,
+        },
+        {
+          label: 'Shield display',
+          value: summary.settings.shieldDisplaySensitivity,
+          detail: 'Human Review finding filter',
         },
         {
           label: 'Created',
@@ -67,6 +79,24 @@ export function WorkspaceSettingsAdminPanel({
             Save workspace name
           </button>
         </form>
+      ) : null}
+      {summary.availableActions.includes('update_shield_display_sensitivity') ? (
+        <label>
+          Shield display sensitivity
+          <select
+            value={summary.settings.shieldDisplaySensitivity}
+            disabled={settingsAdminAction !== 'idle'}
+            onChange={(event) =>
+              onUpdateShieldDisplaySensitivity(
+                event.target.value as ShieldDisplaySensitivity,
+              )
+            }
+          >
+            <option value="high_only">High and critical only</option>
+            <option value="medium_and_up">Medium and above (default)</option>
+            <option value="all">Show all findings</option>
+          </select>
+        </label>
       ) : null}
       <AdminRefreshButton
         visible={summary.availableActions.includes('reset_workspace_name')}

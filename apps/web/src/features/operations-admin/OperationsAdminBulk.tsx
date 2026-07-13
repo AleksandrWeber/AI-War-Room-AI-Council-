@@ -204,6 +204,41 @@ export default function OperationsAdminBulk(props: OperationsAdminBulkProps) {
                             {report.actorUserId}
                           </p>
                           {report.note ? <small>{report.note}</small> : null}
+                          {report.status === 'open' ? (
+                            <div className="estimate-row">
+                              <button
+                                className="secondary-button"
+                                type="button"
+                                onClick={() =>
+                                  void props.handleResolveFalsePositiveReport({
+                                    reportId: report.reportId,
+                                    decision: 'accepted',
+                                  })
+                                }
+                              >
+                                Accept
+                              </button>
+                              <button
+                                className="secondary-button"
+                                type="button"
+                                onClick={() =>
+                                  void props.handleResolveFalsePositiveReport({
+                                    reportId: report.reportId,
+                                    decision: 'rejected',
+                                  })
+                                }
+                              >
+                                Reject
+                              </button>
+                            </div>
+                          ) : report.reviewedByUserId ? (
+                            <small>
+                              Reviewed by {report.reviewedByUserId}
+                              {report.reviewNote
+                                ? `: ${report.reviewNote}`
+                                : ''}
+                            </small>
+                          ) : null}
                         </div>
                       </article>
                     ))}

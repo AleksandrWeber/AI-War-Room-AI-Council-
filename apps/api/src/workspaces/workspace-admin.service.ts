@@ -90,8 +90,12 @@ export class WorkspaceAdminService {
     authContext: AuthContext,
     input: {
       workspaceId: string
-      action: 'update_workspace_name' | 'reset_workspace_name'
+      action:
+        | 'update_workspace_name'
+        | 'reset_workspace_name'
+        | 'update_shield_display_sensitivity'
       name?: string
+      shieldDisplaySensitivity?: 'high_only' | 'medium_and_up' | 'all'
     },
   ) {
     this.assertCanManageWorkspaceSettings(authContext)
@@ -100,6 +104,7 @@ export class WorkspaceAdminService {
       workspaceId: input.workspaceId,
       action: input.action,
       name: input.name,
+      shieldDisplaySensitivity: input.shieldDisplaySensitivity,
     })
 
     if (payload.workspaceId !== authContext.workspaceId) {
@@ -157,6 +162,33 @@ export class WorkspaceAdminService {
           workspaceId: payload.workspaceId,
           action: payload.action,
           message: `Reset workspace name to ${settings.name}.`,
+          settings,
+        })
+      }
+      case 'update_shield_display_sensitivity': {
+        if (!payload.shieldDisplaySensitivity) {
+          throw new BadRequestException({
+            message:
+              'shieldDisplaySensitivity is required for update_shield_display_sensitivity.',
+          })
+        }
+
+        const settings =
+          await this.workspaceRepository.updateShieldDisplaySensitivity({
+            workspaceId: payload.workspaceId,
+            shieldDisplaySensitivity: payload.shieldDisplaySensitivity,
+          })
+
+        if (!settings) {
+          throw new NotFoundException({
+            message: 'Workspace was not found.',
+          })
+        }
+
+        return workspaceSettingsAdminActionResponseSchema.parse({
+          workspaceId: payload.workspaceId,
+          action: payload.action,
+          message: `Updated Shield display sensitivity to ${settings.shieldDisplaySensitivity}.`,
           settings,
         })
       }

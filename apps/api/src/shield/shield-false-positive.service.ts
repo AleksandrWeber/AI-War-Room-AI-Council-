@@ -2,10 +2,12 @@ import {
   BadRequestException,
   ForbiddenException,
   Injectable,
+  NotFoundException,
 } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import {
   createShieldFalsePositiveReportRequestSchema,
+  resolveShieldFalsePositiveReportRequestSchema,
   shieldFalsePositiveReportListResponseSchema,
   shieldFalsePositiveReportResponseSchema,
   type AuthContext,
@@ -17,9 +19,29 @@ import type { ApiEnv } from '../config/env.js'
 import { ObservabilityService } from '../observability/observability.service.js'
 import { PostgresService } from '../persistence/postgres.service.js'
 
+type ReportRow = {
+  report_id: string
+  workspace_id: string
+  run_id: string
+  scan_id: string
+  finding_id: string
+  severity: string
+  category: string
+  actor_user_id: string
+  actor_role: string
+  note: string | null
+  status: string
+  reviewed_by_user_id: string | null
+  reviewed_at: Date | null
+  review_note: string | null
+  created_at: Date
+  updated_at: Date
+}
+
 @Injectable()
 export class ShieldFalsePositiveService {
   private readonly reportsByKey = new Map<string, ShieldFalsePositiveReportResponse>()
+  private readonly reportsById = new Map<string, ShieldFalsePositiveReportResponse>()
 
   constructor(
     private readonly configService: ConfigService<ApiEnv, true>,
@@ -62,11 +84,6 @@ export class ShieldFalsePositiveService {
       })
     }
 
-    const cacheKey = this.buildKey(
-      input.authContext.workspaceId,
-      input.runId,
-      parsed.data.findingId,
-    )
     const existing = await this.findReport({
       workspaceId: input.authContext.workspaceId,
       runId: input.runId,
@@ -90,18 +107,90 @@ export class ShieldFalsePositiveService {
       actorRole: input.authContext.role,
       note: parsed.data.note?.trim() ? parsed.data.note.trim() : null,
       status: 'open',
+      reviewedByUserId: null,
+      reviewedAt: null,
+      reviewNote: null,
       createdAt: now,
       updatedAt: now,
     })
 
     await this.persistReport(report)
-    this.reportsByKey.set(cacheKey, report)
 
     this.observabilityService.record('shield_false_positive_reported', {
       workspaceId: report.workspaceId,
       runId: report.runId,
       actorUserId: report.actorUserId,
       actorRole: report.actorRole,
+      severity: report.severity,
+      category: report.category,
+    })
+
+    return report
+  }
+
+  async resolveReport(input: {
+    authContext: AuthContext
+    workspaceId: string
+    reportId: string
+    body: unknown
+  }): Promise<ShieldFalsePositiveReportResponse> {
+    if (input.authContext.role !== 'owner' && input.authContext.role !== 'admin') {
+      throw new ForbiddenException({
+        message: 'Only workspace owners or admins can triage false-positive reports.',
+      })
+    }
+
+    if (input.authContext.workspaceId !== input.workspaceId) {
+      throw new ForbiddenException({
+        message: 'Workspace header does not match request workspace.',
+      })
+    }
+
+    const parsed = resolveShieldFalsePositiveReportRequestSchema.safeParse(
+      input.body,
+    )
+
+    if (!parsed.success) {
+      throw new BadRequestException({
+        message: 'Invalid Shield false-positive resolve request.',
+        issues: parsed.error.issues,
+      })
+    }
+
+    const existing = await this.findReportById(
+      input.workspaceId,
+      input.reportId,
+    )
+
+    if (!existing) {
+      throw new NotFoundException({
+        message: 'False-positive report was not found.',
+      })
+    }
+
+    if (existing.status !== 'open') {
+      return existing
+    }
+
+    const now = new Date().toISOString()
+    const report = shieldFalsePositiveReportResponseSchema.parse({
+      ...existing,
+      status: parsed.data.decision,
+      reviewedByUserId: input.authContext.userId,
+      reviewedAt: now,
+      reviewNote: parsed.data.note?.trim() ? parsed.data.note.trim() : null,
+      updatedAt: now,
+    })
+
+    await this.persistResolvedReport(report)
+
+    this.observabilityService.record('shield_false_positive_resolved', {
+      workspaceId: report.workspaceId,
+      runId: report.runId,
+      reportId: report.reportId,
+      decision: report.status,
+      actorUserId: input.authContext.userId,
+      actorRole: input.authContext.role,
       severity: report.severity,
       category: report.category,
     })
@@ -147,6 +236,14 @@ export class ShieldFalsePositiveService {
     return `${workspaceId}:${runId}:${findingId}`
   }
 
+  private cacheReport(report: ShieldFalsePositiveReportResponse) {
+    this.reportsByKey.set(
+      this.buildKey(report.workspaceId, report.runId, report.findingId),
+      report,
+    )
+    this.reportsById.set(report.reportId, report)
+  }
+
   private async findReport(input: {
     workspaceId: string
     runId: string
@@ -164,23 +261,10 @@ export class ShieldFalsePositiveService {
       return null
     }
 
-    const result = await this.postgresService.query<{
-      report_id: string
-      workspace_id: string
-      run_id: string
-      scan_id: string
-      finding_id: string
-      severity: string
-      category: string
-      actor_user_id: string
-      actor_role: string
-      note: string | null
-      status: string
-      created_at: Date
-      updated_at: Date
-    }>(
+    const result = await this.postgresService.query<ReportRow>(
       `SELECT report_id, workspace_id, run_id, scan_id, finding_id, severity, category,
-              actor_user_id, actor_role, note, status, created_at, updated_at
+              actor_user_id, actor_role, note, status, reviewed_by_user_id, reviewed_at,
+              review_note, created_at, updated_at
        FROM shield_false_positive_reports
        WHERE workspace_id = $1 AND run_id = $2 AND finding_id = $3
        LIMIT 1`,
@@ -193,10 +277,47 @@ export class ShieldFalsePositiveService {
     }
 
     const report = this.mapRow(row)
-    this.reportsByKey.set(
-      this.buildKey(input.workspaceId, input.runId, input.findingId),
-      report,
+    this.cacheReport(report)
+    return report
+  }
+
+  private async findReportById(
+    workspaceId: string,
+    reportId: string,
+  ): Promise<ShieldFalsePositiveReportResponse | null> {
+    const cached = this.reportsById.get(reportId)
+    if (cached && cached.workspaceId === workspaceId) {
+      return cached
+    }
+
+    for (const report of this.reportsByKey.values()) {
+      if (report.reportId === reportId && report.workspaceId === workspaceId) {
+        this.reportsById.set(reportId, report)
+        return report
+      }
+    }
+
+    if (this.configService.get('NODE_ENV', { infer: true }) === 'test') {
+      return null
+    }
+
+    const result = await this.postgresService.query<ReportRow>(
+      `SELECT report_id, workspace_id, run_id, scan_id, finding_id, severity, category,
+              actor_user_id, actor_role, note, status, reviewed_by_user_id, reviewed_at,
+              review_note, created_at, updated_at
+       FROM shield_false_positive_reports
+       WHERE workspace_id = $1 AND report_id = $2
+       LIMIT 1`,
+      [workspaceId, reportId],
     )
+
+    const row = result.rows[0]
+    if (!row) {
+      return null
+    }
+
+    const report = this.mapRow(row)
+    this.cacheReport(report)
     return report
   }
 
@@ -211,23 +332,10 @@ export class ShieldFalsePositiveService {
       return memoryReports
     }
 
-    const result = await this.postgresService.query<{
-      report_id: string
-      workspace_id: string
-      run_id: string
-      scan_id: string
-      finding_id: string
-      severity: string
-      category: string
-      actor_user_id: string
-      actor_role: string
-      note: string | null
-      status: string
-      created_at: Date
-      updated_at: Date
-    }>(
+    const result = await this.postgresService.query<ReportRow>(
       `SELECT report_id, workspace_id, run_id, scan_id, finding_id, severity, category,
-              actor_user_id, actor_role, note, status, created_at, updated_at
+              actor_user_id, actor_role, note, status, reviewed_by_user_id, reviewed_at,
+              review_note, created_at, updated_at
        FROM shield_false_positive_reports
        WHERE workspace_id = $1
        ORDER BY created_at DESC
@@ -238,21 +346,7 @@ export class ShieldFalsePositiveService {
     return result.rows.map((row) => this.mapRow(row))
   }
 
-  private mapRow(row: {
-    report_id: string
-    workspace_id: string
-    run_id: string
-    scan_id: string
-    finding_id: string
-    severity: string
-    category: string
-    actor_user_id: string
-    actor_role: string
-    note: string | null
-    status: string
-    created_at: Date
-    updated_at: Date
-  }): ShieldFalsePositiveReportResponse {
+  private mapRow(row: ReportRow): ShieldFalsePositiveReportResponse {
     return shieldFalsePositiveReportResponseSchema.parse({
       reportId: row.report_id,
       workspaceId: row.workspace_id,
@@ -265,16 +359,16 @@ export class ShieldFalsePositiveService {
       actorRole: row.actor_role,
       note: row.note,
       status: row.status,
+      reviewedByUserId: row.reviewed_by_user_id,
+      reviewedAt: row.reviewed_at ? row.reviewed_at.toISOString() : null,
+      reviewNote: row.review_note,
       createdAt: row.created_at.toISOString(),
       updatedAt: row.updated_at.toISOString(),
     })
   }
 
   private async persistReport(report: ShieldFalsePositiveReportResponse) {
-    this.reportsByKey.set(
-      this.buildKey(report.workspaceId, report.runId, report.findingId),
-      report,
-    )
+    this.cacheReport(report)
 
     if (this.configService.get('NODE_ENV', { infer: true }) === 'test') {
       return
@@ -283,8 +377,9 @@ export class ShieldFalsePositiveService {
     await this.postgresService.query(
       `INSERT INTO shield_false_positive_reports (
          report_id, workspace_id, run_id, scan_id, finding_id, severity, category,
-         actor_user_id, actor_role, note, status, created_at, updated_at
-       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
+         actor_user_id, actor_role, note, status, reviewed_by_user_id, reviewed_at,
+         review_note, created_at, updated_at
+       ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
        ON CONFLICT (workspace_id, run_id, finding_id) DO NOTHING`,
       [
         report.reportId,
@@ -298,8 +393,40 @@ export class ShieldFalsePositiveService {
         report.actorRole,
         report.note,
         report.status,
+        report.reviewedByUserId,
+        report.reviewedAt,
+        report.reviewNote,
         report.createdAt,
         report.updatedAt,
+      ],
+    )
+  }
+
+  private async persistResolvedReport(report: ShieldFalsePositiveReportResponse) {
+    this.cacheReport(report)
+
+    if (this.configService.get('NODE_ENV', { infer: true }) === 'test') {
+      return
+    }
+
+    await this.postgresService.query(
+      `UPDATE shield_false_positive_reports
+       SET status = $2,
+           reviewed_by_user_id = $3,
+           reviewed_at = $4,
+           review_note = $5,
+           updated_at = $6
+       WHERE report_id = $1
+         AND workspace_id = $7
+         AND status = 'open'`,
+      [
+        report.reportId,
+        report.status,
+        report.reviewedByUserId,
+        report.reviewedAt,
+        report.reviewNote,
+        report.updatedAt,
+        report.workspaceId,
       ],
     )
   }
