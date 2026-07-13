@@ -44,6 +44,7 @@ export async function executeIdempotencyAdminAction(
     action:
       | 'refresh_idempotency_summary'
       | 'clear_workspace_idempotency_reservations'
+      | 'purge_expired_idempotency_keys'
   },
 ) {
   const response = await fetch(
