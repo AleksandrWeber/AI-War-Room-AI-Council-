@@ -23,6 +23,8 @@ Types (`artifactType`): `executive_summary` | `prd` | `development_prompt`.
 | PRD | `prdSchema` | goals, MVP scope, functional/non-functional requirements |
 | Development Prompt | `developmentPromptSchema` | stack, modules, implementation order, outOfScope |
 
+**Target tool (product decision 2026-07-13):** MVP is **Cursor-first** — one Cursor-optimized Development Prompt derived from the PRD. Post-MVP: multi-tool adapters (Claude Code, Bolt, Lovable) without forking the PRD; tracked in TODO §10.
+
 Persisted envelope:
 
 - `artifactMetadataSchema` — ids, versions, model, token usage, cost, Shield status, validation status (`valid` | `repaired` | `fallback`)
