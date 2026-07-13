@@ -21,11 +21,13 @@ import { TemporalRolloutService } from '../temporal/temporal-rollout.service.js'
 import type { PipelineStreamEvent } from './pipeline-stream-event.js'
 import { isTerminalPipelineStreamEvent } from './pipeline-stream-event.js'
 import { RunsService } from './runs.service.js'
+import { RunFeedbackService } from './run-feedback.service.js'
 
 @Controller('runs')
 export class RunsController {
   constructor(
     private readonly runsService: RunsService,
+    private readonly runFeedbackService: RunFeedbackService,
     private readonly streamEventBufferService: StreamEventBufferService,
     private readonly temporalRunService: TemporalRunService,
     private readonly temporalHealthService: TemporalHealthService,
@@ -57,6 +59,30 @@ export class RunsController {
 
     reply.header('Content-Type', 'text/markdown; charset=utf-8')
     reply.send(markdown)
+  }
+
+  @Post('feedback')
+  @UseGuards(WorkspaceAccessGuard)
+  createRunFeedback(
+    @Body() body: unknown,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.runFeedbackService.createFeedback({
+      authContext: request.authContext!,
+      body,
+    })
+  }
+
+  @Get(':runId/feedback')
+  @UseGuards(WorkspaceAccessGuard)
+  listRunFeedback(
+    @Param('runId') runId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.runFeedbackService.listForRun({
+      workspaceId: request.authContext!.workspaceId,
+      runId,
+    })
   }
 
   @Post('draft')

@@ -20,6 +20,7 @@ import { UsageModule } from '../usage/usage.module.js'
 import { BillingModule } from '../billing/billing.module.js'
 import { WorkspacesModule } from '../workspaces/workspaces.module.js'
 import { RunsController } from './runs.controller.js'
+import { RunFeedbackService } from './run-feedback.service.js'
 import { RunHistoryAdminService } from './run-history-admin.service.js'
 import { RunHistoryController } from './run-history.controller.js'
 import { StreamRecoveryAdminService } from './stream-recovery-admin.service.js'
@@ -44,6 +45,7 @@ import {
   controllers: [RunsController, RunHistoryController, StreamReplayController],
   providers: [
     RunsService,
+    RunFeedbackService,
     {
       provide: APPROVED_RUN_EXECUTOR,
       useExisting: RunsService,

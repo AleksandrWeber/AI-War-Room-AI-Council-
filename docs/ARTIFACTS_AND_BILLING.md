@@ -54,6 +54,21 @@ Schemas: `packages/schemas/src/usage.ts`.
 - Workspace limits (`workspaceUsageLimitSchema`) key off `paidTier`: `free` | `pro` | `business` (daily token + cost caps).
 - Limits are enforced server-side; UI surfaces remaining budget via usage/billing panels.
 
+## Run / artifact feedback
+
+Lightweight usefulness loop (schemas: `packages/schemas/src/run-feedback.ts`):
+
+| Rating | Meaning |
+| --- | --- |
+| `useful` | Ready to act on |
+| `partially_useful` | Needs edits but directionally right |
+| `not_useful` | Missed the mark |
+
+- `POST /api/runs/feedback` — upsert per workspace user + target (`run` or `artifact`); optional comment ≤ 1000 chars.
+- `GET /api/runs/:runId/feedback` — list feedback for a run.
+- UI: artifact viewer rating buttons + overall run rating after completion.
+- Persisted in `run_feedback` (migration `013_run_feedback.sql`); observability event `run_feedback_recorded`.
+
 ## Billing behavior
 
 Schemas: `packages/schemas/src/billing.ts`. Capabilities: `GET /api/billing/capabilities`.

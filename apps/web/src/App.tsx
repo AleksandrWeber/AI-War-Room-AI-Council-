@@ -2873,6 +2873,14 @@ function App() {
   )
   const [artifactHistory, setArtifactHistory] = useState<ArtifactHistoryItem[]>([])
   const [historyError, setHistoryError] = useState<string | null>(null)
+  const [feedbackComment, setFeedbackComment] = useState('')
+  const [feedbackState, setFeedbackState] = useState<
+    'idle' | 'submitting' | 'success' | 'error'
+  >('idle')
+  const [feedbackError, setFeedbackError] = useState<string | null>(null)
+  const [feedbackByTarget, setFeedbackByTarget] = useState<
+    Record<string, 'useful' | 'partially_useful' | 'not_useful'>
+  >({})
   const [providerCredentials, setProviderCredentials] =
     useState<ProviderCredentialListResponse | null>(null)
   const [providerCredentialForm, setProviderCredentialForm] =
@@ -7188,6 +7196,54 @@ function App() {
     } catch (error) {
       setHistoryError(
         error instanceof Error ? error.message : 'Failed to export Markdown.',
+      )
+    }
+  }
+
+  async function handleSubmitRunFeedback(input: {
+    targetType: 'run' | 'artifact'
+    runId: string
+    artifactId?: string
+    usefulness: 'useful' | 'partially_useful' | 'not_useful'
+  }) {
+    setFeedbackState('submitting')
+    setFeedbackError(null)
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/runs/feedback`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...workspaceAuthHeaders,
+        },
+        body: JSON.stringify({
+          targetType: input.targetType,
+          runId: input.runId,
+          artifactId: input.artifactId,
+          usefulness: input.usefulness,
+          comment: feedbackComment.trim() || undefined,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`)
+      }
+
+      const targetKey =
+        input.targetType === 'artifact'
+          ? input.artifactId!
+          : `run:${input.runId}`
+      setFeedbackByTarget((current) => ({
+        ...current,
+        [targetKey]: input.usefulness,
+      }))
+      setFeedbackState('success')
+    } catch (error) {
+      setFeedbackState('error')
+      setFeedbackError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to save feedback.',
       )
     }
   }
@@ -32196,8 +32252,120 @@ function App() {
                       </div>
                     ),
                   )}
+                  <div
+                    className="feedback-panel"
+                    aria-label="Artifact usefulness feedback"
+                  >
+                    <p className="feedback-label">
+                      Was this{' '}
+                      {formatArtifactTitle(
+                        selectedArtifact.metadata.artifactType,
+                      ).toLowerCase()}{' '}
+                      useful?
+                    </p>
+                    <div className="feedback-actions" role="group">
+                      {(
+                        [
+                          ['useful', 'Useful'],
+                          ['partially_useful', 'Partial'],
+                          ['not_useful', 'Not useful'],
+                        ] as const
+                      ).map(([value, label]) => {
+                        const selected =
+                          feedbackByTarget[
+                            selectedArtifact.metadata.artifactId
+                          ] === value
+                        return (
+                          <button
+                            key={value}
+                            type="button"
+                            className={
+                              selected
+                                ? 'feedback-button feedback-button--selected'
+                                : 'feedback-button'
+                            }
+                            aria-pressed={selected}
+                            disabled={feedbackState === 'submitting'}
+                            onClick={() =>
+                              handleSubmitRunFeedback({
+                                targetType: 'artifact',
+                                runId: selectedArtifact.metadata.runId,
+                                artifactId:
+                                  selectedArtifact.metadata.artifactId,
+                                usefulness: value,
+                              })
+                            }
+                          >
+                            {label}
+                          </button>
+                        )
+                      })}
+                    </div>
+                    <label className="feedback-comment">
+                      Optional note
+                      <textarea
+                        rows={2}
+                        value={feedbackComment}
+                        onChange={(event) =>
+                          setFeedbackComment(event.target.value)
+                        }
+                        placeholder="What should improve next time?"
+                      />
+                    </label>
+                    {feedbackState === 'success' ? (
+                      <p className="clear-copy" role="status">
+                        Thanks — feedback saved for this workspace.
+                      </p>
+                    ) : null}
+                    {feedbackError ? (
+                      <p className="form-error">{feedbackError}</p>
+                    ) : null}
+                  </div>
                 </article>
               ) : null}
+            </div>
+          ) : null}
+
+          {pipelineState === 'completed' && draftRun ? (
+            <div
+              className="feedback-panel feedback-panel--run"
+              aria-label="Overall run quality feedback"
+            >
+              <p className="feedback-label">Overall run quality?</p>
+              <div className="feedback-actions" role="group">
+                {(
+                  [
+                    ['useful', 'Useful'],
+                    ['partially_useful', 'Partial'],
+                    ['not_useful', 'Not useful'],
+                  ] as const
+                ).map(([value, label]) => {
+                  const selected =
+                    feedbackByTarget[`run:${draftRun.runId}`] === value
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      className={
+                        selected
+                          ? 'feedback-button feedback-button--selected'
+                          : 'feedback-button'
+                      }
+                      aria-pressed={selected}
+                      disabled={feedbackState === 'submitting'}
+                      onClick={() =>
+                        handleSubmitRunFeedback({
+                          targetType: 'run',
+                          runId: draftRun.runId,
+                          usefulness: value,
+                        })
+                      }
+                    >
+                      {label}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
           ) : null}
         </section>
