@@ -78,6 +78,40 @@ export async function executeShieldReviewAdminAction(
   return shieldReviewAdminActionResponseSchema.parse(await response.json())
 }
 
+export async function createShieldOverride(
+  apiBaseUrl: string,
+  runId: string,
+  headers: Record<string, string>,
+  input: {
+    reason: string
+    findingIds: string[]
+    shieldScan: unknown
+  },
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/shield/runs/${encodeURIComponent(runId)}/override`,
+    {
+      method: 'POST',
+      headers: {
+        ...headers,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(input),
+    },
+  )
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => null)
+    throw new Error(
+      typeof body?.message === 'string'
+        ? body.message
+        : `API returned ${response.status}`,
+    )
+  }
+
+  return response.json()
+}
+
 export function formatShieldRolloutStatus(status: 'ready' | 'not_ready') {
   switch (status) {
     case 'ready':

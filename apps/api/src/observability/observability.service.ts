@@ -12,6 +12,7 @@ export const supportedPipelineObservabilityEvents = [
   'shield_scan_completed',
   'shield_scan_classified',
   'shield_abuse_signal',
+  'shield_override_recorded',
   'llm_call_completed',
   'llm_provider_failure',
   'llm_validation_failure',

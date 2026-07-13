@@ -14,6 +14,7 @@ import {
   WorkspaceAccessGuard,
 } from '../auth/workspace-access.guard.js'
 import { ShieldAdminService } from './shield-admin.service.js'
+import { ShieldOverrideService } from './shield-override.service.js'
 
 type ShieldReviewAdminBody = {
   workspaceId?: unknown
@@ -22,7 +23,10 @@ type ShieldReviewAdminBody = {
 
 @Controller('shield')
 export class ShieldController {
-  constructor(private readonly shieldAdminService: ShieldAdminService) {}
+  constructor(
+    private readonly shieldAdminService: ShieldAdminService,
+    private readonly shieldOverrideService: ShieldOverrideService,
+  ) {}
 
   @Get('capabilities')
   getCapabilities() {
@@ -78,6 +82,20 @@ export class ShieldController {
         action,
       },
     )
+  }
+
+  @Post('runs/:runId/override')
+  @UseGuards(WorkspaceAccessGuard)
+  createShieldOverride(
+    @Param('runId') runId: string,
+    @Req() request: AuthenticatedRequest,
+    @Body() body: unknown,
+  ) {
+    return this.shieldOverrideService.createOverride({
+      runId,
+      authContext: request.authContext!,
+      body,
+    })
   }
 
   private assertWorkspaceParam(

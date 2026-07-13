@@ -1652,6 +1652,18 @@ function App() {
   const [submitState, setSubmitState] = useState<SubmitState>('idle')
   const [submitError, setSubmitError] = useState<string | null>(null)
   const [draftRun, setDraftRun] = useState<DraftRun | null>(null)
+  const [shieldOverride, setShieldOverride] = useState<{
+    overrideId: string
+    reason: string
+    actorUserId: string
+  } | null>(null)
+  const [shieldOverrideReason, setShieldOverrideReason] = useState('')
+  const [shieldOverrideState, setShieldOverrideState] = useState<
+    'idle' | 'submitting' | 'error'
+  >('idle')
+  const [shieldOverrideError, setShieldOverrideError] = useState<string | null>(
+    null,
+  )
   const [reviewDraft, setReviewDraft] = useState<ReviewDraft | null>(() => {
     const saved = localStorage.getItem(reviewStorageKey)
 
@@ -13322,6 +13334,10 @@ function App() {
 
       const nextDraftRun = (await response.json()) as DraftRun
       setDraftRun(nextDraftRun)
+      setShieldOverride(null)
+      setShieldOverrideReason('')
+      setShieldOverrideState('idle')
+      setShieldOverrideError(null)
       setReviewDraft({
         triage: nextDraftRun.triage,
         selectedAgents: nextDraftRun.selectedAgents,
@@ -13395,6 +13411,46 @@ function App() {
     }
 
     await handleExecuteStreamedPipeline()
+  }
+
+  async function handleRecordShieldOverride() {
+    if (!draftRun) {
+      return
+    }
+
+    setShieldOverrideState('submitting')
+    setShieldOverrideError(null)
+
+    try {
+      const override = await callUi(
+        'shield-ui',
+        'createShieldOverride',
+        apiBaseUrl,
+        draftRun.runId,
+        workspaceAuthHeaders,
+        {
+          reason: shieldOverrideReason.trim(),
+          findingIds: draftRun.shieldScan.findings.map(
+            (finding) => finding.findingId,
+          ),
+          shieldScan: draftRun.shieldScan,
+        },
+      )
+
+      setShieldOverride({
+        overrideId: override.overrideId,
+        reason: override.reason,
+        actorUserId: override.actorUserId,
+      })
+      setShieldOverrideState('idle')
+    } catch (error) {
+      setShieldOverrideState('error')
+      setShieldOverrideError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to record Shield override.',
+      )
+    }
   }
 
   async function handleExecuteStreamedPipeline() {
@@ -35453,6 +35509,9 @@ function App() {
     draftRun?.shieldScan.findings.find(
       (finding) => finding.findingId === activeFindingId,
     ) ?? draftRun?.shieldScan.findings[0]
+  const requiresCriticalShieldOverride =
+    draftRun?.shieldScan.status === 'blocked' ||
+    draftRun?.shieldScan.maxSeverity === 'critical'
   const selectedArtifact =
     (pipelineResult?.artifacts ?? streamedArtifacts).find(
       (artifact) => artifact.metadata.artifactType === activeArtifactType,
@@ -38242,6 +38301,51 @@ function App() {
               ) : (
                 <p className="clear-copy">No meaningful Shield findings.</p>
               )}
+              {requiresCriticalShieldOverride ? (
+                <div className="finding-detail">
+                  <strong>Critical Shield override required</strong>
+                  <p>
+                    Owner or admin must record who/why before this run can
+                    execute. The override is audited.
+                  </p>
+                  {shieldOverride ? (
+                    <p className="clear-copy">
+                      Override recorded by {shieldOverride.actorUserId}:{' '}
+                      {shieldOverride.reason}
+                    </p>
+                  ) : (
+                    <>
+                      <label>
+                        Override reason
+                        <textarea
+                          rows={3}
+                          value={shieldOverrideReason}
+                          onChange={(event) =>
+                            setShieldOverrideReason(event.target.value)
+                          }
+                          placeholder="Explain why this critical finding is accepted for execution."
+                        />
+                      </label>
+                      <button
+                        className="secondary-button"
+                        type="button"
+                        disabled={
+                          shieldOverrideState === 'submitting' ||
+                          shieldOverrideReason.trim().length < 8
+                        }
+                        onClick={handleRecordShieldOverride}
+                      >
+                        {shieldOverrideState === 'submitting'
+                          ? 'Recording override...'
+                          : 'Record Shield override'}
+                      </button>
+                      {shieldOverrideError ? (
+                        <p className="form-error">{shieldOverrideError}</p>
+                      ) : null}
+                    </>
+                  )}
+                </div>
+              ) : null}
             </div>
 
             <div className="review-card">
@@ -38369,7 +38473,9 @@ function App() {
               className="execute-button"
               type="button"
               disabled={
-                pipelineState === 'running' || reviewDraft.selectedAgents.length < 3
+                pipelineState === 'running' ||
+                reviewDraft.selectedAgents.length < 3 ||
+                (Boolean(requiresCriticalShieldOverride) && !shieldOverride)
               }
               onClick={handleExecuteApprovedRun}
             >

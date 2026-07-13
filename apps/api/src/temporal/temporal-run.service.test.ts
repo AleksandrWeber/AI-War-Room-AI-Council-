@@ -123,6 +123,9 @@ function createService(input: {
     streamEventBufferService,
     temporalWorkflowRepository,
     input.temporalRunClient,
+    {
+      assertExecutionAllowed: vi.fn(async () => undefined),
+    } as never,
   )
 
   return {

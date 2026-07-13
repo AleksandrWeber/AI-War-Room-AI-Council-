@@ -32,6 +32,7 @@ import {
   isTerminalPipelineStreamEvent,
   type PipelineStreamEvent,
 } from '../runs/pipeline-stream-event.js'
+import { ShieldOverrideService } from '../shield/shield-override.service.js'
 import { getTemporalWorkerConfig } from './temporal-worker.config.js'
 import {
   TEMPORAL_RUN_CLIENT,
@@ -48,6 +49,7 @@ export class TemporalRunService {
     private readonly temporalWorkflowRepository: TemporalWorkflowRepository,
     @Inject(TEMPORAL_RUN_CLIENT)
     private readonly temporalRunClient: TemporalRunClient,
+    private readonly shieldOverrideService: ShieldOverrideService,
   ) {}
 
   async startApprovedRun(input: unknown, authContext: AuthContext) {
@@ -61,6 +63,13 @@ export class TemporalRunService {
         temporalEnabled: false,
       })
     }
+
+    await this.shieldOverrideService.assertExecutionAllowed({
+      runId: request.draftRun.runId,
+      workspaceId: request.draftRun.workspaceId,
+      shieldStatus: request.draftRun.shieldScan.status,
+      maxSeverity: request.draftRun.shieldScan.maxSeverity,
+    })
 
     const workflowId = this.createWorkflowId(request)
     const startedAt = new Date().toISOString()

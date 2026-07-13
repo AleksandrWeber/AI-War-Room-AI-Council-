@@ -1,7 +1,6 @@
 import {
   BadRequestException,
   ConflictException,
-  ForbiddenException,
   NotFoundException,
   Inject,
   Injectable,
@@ -35,6 +34,7 @@ import {
   RUN_REPOSITORY,
   type RunRepository,
 } from '../persistence/run.repository.js'
+import { ShieldOverrideService } from '../shield/shield-override.service.js'
 import { TriageService } from '../triage/triage.service.js'
 import { UsageService } from '../usage/usage.service.js'
 import { BillingMeterUsageService } from '../billing/billing-meter-usage.service.js'
@@ -62,6 +62,7 @@ export class RunsService {
     private readonly billingMeterUsageService: BillingMeterUsageService,
     private readonly billingNotificationService: BillingNotificationService,
     private readonly observabilityService: ObservabilityService,
+    private readonly shieldOverrideService: ShieldOverrideService,
   ) {}
 
   getCapabilities() {
@@ -174,13 +175,6 @@ export class RunsService {
       findingCount: shieldScan.findings.length,
     })
 
-    if (shieldScan.status === 'blocked') {
-      throw new ForbiddenException({
-        message: 'Shield blocked critical input before execution.',
-        shieldScan,
-      })
-    }
-
     const triage = await this.triageService.triageIdea(request, shieldScan)
     const now = new Date().toISOString()
 
@@ -255,6 +249,13 @@ export class RunsService {
         message: 'At least one non-moderator agent is required.',
       })
     }
+
+    await this.shieldOverrideService.assertExecutionAllowed({
+      runId: request.draftRun.runId,
+      workspaceId: request.draftRun.workspaceId,
+      shieldStatus: request.draftRun.shieldScan.status,
+      maxSeverity: request.draftRun.shieldScan.maxSeverity,
+    })
 
     await this.observabilityService.measure(
       'pipeline_quota_check_completed',
