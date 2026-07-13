@@ -11,6 +11,39 @@ export type WorkspacePerformanceDomainInventory = {
   tableExists: boolean
 }
 
+export type PipelinePhaseLatencySample = {
+  phase: string
+  durationMs: number
+  runId?: string
+}
+
+export function rankSlowestPipelinePhases(
+  events: Array<{
+    eventName: string
+    attributes: Record<string, string | number | boolean | null>
+  }>,
+  limit = 5,
+): PipelinePhaseLatencySample[] {
+  return events
+    .filter(
+      (event) =>
+        event.eventName === 'pipeline_phase_completed' &&
+        typeof event.attributes.durationMs === 'number' &&
+        typeof event.attributes.phase === 'string' &&
+        event.attributes.phase.length > 0,
+    )
+    .map((event) => ({
+      phase: String(event.attributes.phase),
+      durationMs: Number(event.attributes.durationMs),
+      runId:
+        typeof event.attributes.runId === 'string'
+          ? event.attributes.runId
+          : undefined,
+    }))
+    .sort((left, right) => right.durationMs - left.durationMs)
+    .slice(0, limit)
+}
+
 export function buildPerformanceAdminRecords(
   inventory: WorkspacePerformanceDomainInventory[],
 ): PerformanceAdminRecord[] {
@@ -28,6 +61,7 @@ export function buildPerformanceAdminStats(input: {
   pipelineEventCount: number
   latencyEventCount: number
   averageLatencyMs: number
+  slowestPipelinePhases?: PipelinePhaseLatencySample[]
 }): PerformanceAdminStats {
   const coveredDomains = input.records.filter(
     (record) => record.tableExists,
@@ -47,6 +81,7 @@ export function buildPerformanceAdminStats(input: {
     postgresConnectivity: input.postgresConnectivity,
     averageLatencyMs: input.averageLatencyMs,
     latencySignalPercent,
+    slowestPipelinePhases: input.slowestPipelinePhases ?? [],
   }
 }
 
@@ -67,6 +102,12 @@ export function getPerformanceAdminGuidance(input: {
 
   if (input.stats.averageLatencyMs >= 5_000) {
     return 'Workspace owners and admins can inspect elevated average pipeline latency above 5000ms and refresh the performance summary.'
+  }
+
+  const slowest = input.stats.slowestPipelinePhases[0]
+
+  if (slowest && slowest.durationMs >= 5_000) {
+    return `Workspace owners and admins can inspect the slowest recent pipeline phase (${slowest.phase} at ${slowest.durationMs}ms) and refresh the performance summary.`
   }
 
   return 'Workspace owners and admins can inspect workspace performance coverage and refresh the performance summary.'

@@ -846,6 +846,19 @@ export default function DomainAdminBulkPart1(
                   signal coverage</>,
             },
             {
+              label: 'Slowest phase',
+              value: props.performanceAdminSummary.stats.slowestPipelinePhases[0]
+                ? `${props.performanceAdminSummary.stats.slowestPipelinePhases[0].phase}`
+                : 'n/a',
+              detail: (
+                <>
+                  {props.performanceAdminSummary.stats.slowestPipelinePhases[0]
+                    ? `${props.performanceAdminSummary.stats.slowestPipelinePhases[0].durationMs}ms recent max`
+                    : 'No pipeline_phase_completed samples yet'}
+                </>
+              ),
+            },
+            {
               label: 'Performance signals',
               value: props.performanceAdminSummary.stats.totalRecords,
               detail: <>{props.performanceAdminSummary.stats.postgresConnectivity

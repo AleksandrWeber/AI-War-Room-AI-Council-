@@ -15,6 +15,7 @@ import {
   buildPerformanceAdminRecords,
   buildPerformanceAdminStats,
   getPerformanceAdminGuidance,
+  rankSlowestPipelinePhases,
   resolvePerformanceAdminActions,
 } from './performance-admin.helpers.js'
 import { evaluatePerformanceRollout } from './performance-rollout.helpers.js'
@@ -86,6 +87,7 @@ export class PerformanceAdminService {
       pipelineEventCount: latencyMetrics.pipelineEventCount,
       latencyEventCount: latencyMetrics.latencyEventCount,
       averageLatencyMs: latencyMetrics.averageLatencyMs,
+      slowestPipelinePhases: latencyMetrics.slowestPipelinePhases,
     })
 
     return performanceAdminSummaryResponseSchema.parse({
@@ -155,6 +157,7 @@ export class PerformanceAdminService {
       pipelineEventCount: workspaceEvents.length,
       latencyEventCount: latencyEvents.length,
       averageLatencyMs,
+      slowestPipelinePhases: rankSlowestPipelinePhases(workspaceEvents),
     }
   }
 

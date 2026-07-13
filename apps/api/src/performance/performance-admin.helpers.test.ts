@@ -3,6 +3,7 @@ import {
   buildPerformanceAdminRecords,
   buildPerformanceAdminStats,
   getPerformanceAdminGuidance,
+  rankSlowestPipelinePhases,
   resolvePerformanceAdminActions,
 } from './performance-admin.helpers.js'
 
@@ -29,6 +30,9 @@ describe('performance admin helpers', () => {
       pipelineEventCount: 5,
       latencyEventCount: 4,
       averageLatencyMs: 250,
+      slowestPipelinePhases: [
+        { phase: 'persistence', durationMs: 800, runId: 'run_1' },
+      ],
     })
 
     expect(records).toHaveLength(2)
@@ -37,7 +41,40 @@ describe('performance admin helpers', () => {
       coveredDomains: 2,
       averageLatencyMs: 250,
       latencySignalPercent: 80,
+      slowestPipelinePhases: [
+        { phase: 'persistence', durationMs: 800, runId: 'run_1' },
+      ],
     })
+  })
+
+  it('ranks the slowest pipeline phases by duration', () => {
+    expect(
+      rankSlowestPipelinePhases([
+        {
+          eventName: 'pipeline_phase_completed',
+          attributes: {
+            phase: 'artifacts',
+            durationMs: 200,
+            runId: 'run_a',
+          },
+        },
+        {
+          eventName: 'pipeline_quota_check_completed',
+          attributes: { durationMs: 900 },
+        },
+        {
+          eventName: 'pipeline_phase_completed',
+          attributes: {
+            phase: 'persistence',
+            durationMs: 800,
+            runId: 'run_b',
+          },
+        },
+      ]),
+    ).toEqual([
+      { phase: 'persistence', durationMs: 800, runId: 'run_b' },
+      { phase: 'artifacts', durationMs: 200, runId: 'run_a' },
+    ])
   })
 
   it('returns guidance and actions', () => {
@@ -50,6 +87,7 @@ describe('performance admin helpers', () => {
           postgresConnectivity: false,
           averageLatencyMs: 0,
           latencySignalPercent: 100,
+          slowestPipelinePhases: [],
         },
       }),
     ).toContain('PostgreSQL connectivity')

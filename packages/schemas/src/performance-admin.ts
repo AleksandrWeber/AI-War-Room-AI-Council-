@@ -27,6 +27,16 @@ export const performanceAdminStatsSchema = z.object({
   postgresConnectivity: z.boolean(),
   averageLatencyMs: z.number().nonnegative(),
   latencySignalPercent: z.number().min(0).max(100),
+  slowestPipelinePhases: z
+    .array(
+      z.object({
+        phase: nonEmptyStringSchema,
+        durationMs: z.number().nonnegative(),
+        runId: nonEmptyStringSchema.optional(),
+      }),
+    )
+    .max(5)
+    .default([]),
 })
 export type PerformanceAdminStats = z.infer<typeof performanceAdminStatsSchema>
 
