@@ -441,6 +441,17 @@ export class TemporalRunService {
     workflowId: string
     taskQueue: string
   }) {
+    const existing = await this.temporalWorkflowRepository.findWorkflowById({
+      workspaceId: input.workspaceId,
+      workflowId: input.workflowId,
+    })
+
+    if (!existing) {
+      throw new NotFoundException({
+        message: 'Temporal workflow metadata was not found.',
+      })
+    }
+
     const workerConfig = getTemporalWorkerConfig(this.configService)
     const description = await this.observabilityService.measure(
       'temporal_workflow_status_checked',
@@ -458,6 +469,21 @@ export class TemporalRunService {
     )
     const status = this.normalizeStatus(description.status)
     const checkedAt = new Date().toISOString()
+    const temporalRunId = description.temporalRunId ?? existing.temporalRunId
+    const statusUnchanged =
+      existing.status === status &&
+      (existing.temporalRunId ?? undefined) === (temporalRunId ?? undefined)
+
+    if (statusUnchanged) {
+      return {
+        record: existing,
+        workflowId: description.workflowId,
+        temporalRunId,
+        status,
+        checkedAt,
+      }
+    }
+
     const record = await this.temporalWorkflowRepository.updateWorkflowStatus({
       workspaceId: input.workspaceId,
       workflowId: description.workflowId,

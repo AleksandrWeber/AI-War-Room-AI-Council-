@@ -236,6 +236,76 @@ describe('TemporalRunService', () => {
     })
   })
 
+  it('skips postgres and redis writes when Temporal status is unchanged', async () => {
+    const describeDurableRun = vi.fn(async () => ({
+      workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+      temporalRunId: 'temporal_run_1',
+      status: 'WORKFLOW_EXECUTION_STATUS_RUNNING',
+    }))
+    const { service, temporalWorkflowRepository, streamEventBufferService } =
+      createService({
+        enabled: true,
+        temporalRunClient: {
+          startDurableRun: vi.fn(),
+          describeDurableRun,
+        },
+      })
+    await temporalWorkflowRepository.saveStartedWorkflow({
+      runId: 'run_temporal_start_1',
+      workspaceId: 'workspace_1',
+      workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+      temporalRunId: 'temporal_run_1',
+      taskQueue: 'ai-war-room-runs',
+      status: 'running',
+      startedAt: now,
+    })
+    const updateSpy = vi.spyOn(temporalWorkflowRepository, 'updateWorkflowStatus')
+    const appendCallsBefore = streamEventBufferService.append.mock.calls.length
+
+    await expect(
+      service.getWorkflowStatus({
+        workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+        authContext,
+      }),
+    ).resolves.toMatchObject({
+      status: 'running',
+      temporalRunId: 'temporal_run_1',
+    })
+    await expect(
+      service.getWorkflowStatus({
+        workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+        authContext,
+      }),
+    ).resolves.toMatchObject({
+      status: 'running',
+    })
+
+    expect(updateSpy).not.toHaveBeenCalled()
+    expect(streamEventBufferService.append.mock.calls.length).toBe(
+      appendCallsBefore,
+    )
+    expect(describeDurableRun).toHaveBeenCalledTimes(2)
+
+    describeDurableRun.mockResolvedValueOnce({
+      workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+      temporalRunId: 'temporal_run_1',
+      status: 'WORKFLOW_EXECUTION_STATUS_COMPLETED',
+    })
+
+    await expect(
+      service.getWorkflowStatus({
+        workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+        authContext,
+      }),
+    ).resolves.toMatchObject({
+      status: 'completed',
+    })
+    expect(updateSpy).toHaveBeenCalledTimes(1)
+    expect(streamEventBufferService.append.mock.calls.length).toBe(
+      appendCallsBefore + 1,
+    )
+  })
+
   it('returns persisted workflow observation and workflow stream events', async () => {
     const request = createRequest()
     const { service, streamEventBufferService } = createService({
