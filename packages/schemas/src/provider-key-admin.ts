@@ -16,6 +16,7 @@ export const providerKeyAdminStatsSchema = z.object({
   untestedCredentials: z.number().int().nonnegative(),
   anthropicCredentials: z.number().int().nonnegative(),
   openaiCredentials: z.number().int().nonnegative(),
+  geminiCredentials: z.number().int().nonnegative(),
 })
 export type ProviderKeyAdminStats = z.infer<typeof providerKeyAdminStatsSchema>
 

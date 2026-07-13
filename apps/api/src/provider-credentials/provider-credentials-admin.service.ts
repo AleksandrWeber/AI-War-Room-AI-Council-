@@ -32,7 +32,7 @@ export class ProviderCredentialsAdminService {
     return providerCredentialsCapabilitiesResponseSchema.parse({
       supportsProviderCredentialsRollout: true,
       supportsProviderKeyAdminTools: true,
-      managedProviders: ['anthropic', 'openai'],
+      managedProviders: ['anthropic', 'openai', 'gemini'],
       guidance: getProviderCredentialsRolloutGuidance(),
     })
   }
@@ -56,6 +56,7 @@ export class ProviderCredentialsAdminService {
         infer: true,
       }),
       openaiApiKey: this.configService.get('OPENAI_API_KEY', { infer: true }),
+      geminiApiKey: this.configService.get('GEMINI_API_KEY', { infer: true }),
     })
 
     return providerCredentialsRolloutResponseSchema.parse({

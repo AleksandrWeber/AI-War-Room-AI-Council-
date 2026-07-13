@@ -24,6 +24,9 @@ export function buildProviderKeyAdminStats(
     openaiCredentials: credentials.filter(
       (credential) => credential.providerId === 'openai',
     ).length,
+    geminiCredentials: credentials.filter(
+      (credential) => credential.providerId === 'gemini',
+    ).length,
   }
 }
 

@@ -18,6 +18,9 @@ export class ProviderCredentialTesterService {
       case 'openai':
         await this.testOpenAi(input.apiKey)
         return
+      case 'gemini':
+        await this.testGemini(input.apiKey)
+        return
       case 'tavily':
         await this.testTavily(input.apiKey)
         return
@@ -77,6 +80,41 @@ export class ProviderCredentialTesterService {
 
     if (!response.ok) {
       throw new Error(`OpenAI test failed with ${response.status}.`)
+    }
+  }
+
+  private async testGemini(apiKey: string) {
+    const baseUrl = this.configService
+      .get('GEMINI_API_URL', { infer: true })
+      .replace(/\/$/, '')
+    const response = await fetch(
+      `${baseUrl}/models/gemini-2.0-flash:generateContent`,
+      {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-goog-api-key': apiKey,
+        },
+        body: JSON.stringify({
+          contents: [
+            {
+              role: 'user',
+              parts: [{ text: 'Return {"ok":true} as JSON.' }],
+            },
+          ],
+          generationConfig: {
+            temperature: 0,
+            responseMimeType: 'application/json',
+          },
+        }),
+        signal: AbortSignal.timeout(
+          this.configService.get('LLM_REQUEST_TIMEOUT_MS', { infer: true }),
+        ),
+      },
+    )
+
+    if (!response.ok) {
+      throw new Error(`Gemini test failed with ${response.status}.`)
     }
   }
 

@@ -31,7 +31,7 @@ export type ProviderCredentialsRolloutStatus = z.infer<
 export const providerCredentialsCapabilitiesResponseSchema = z.object({
   supportsProviderCredentialsRollout: z.literal(true),
   supportsProviderKeyAdminTools: z.literal(true),
-  managedProviders: z.array(z.enum(['anthropic', 'openai'])).min(1),
+  managedProviders: z.array(z.enum(['anthropic', 'openai', 'gemini'])).min(1),
   guidance: nonEmptyStringSchema,
 })
 export type ProviderCredentialsCapabilitiesResponse = z.infer<

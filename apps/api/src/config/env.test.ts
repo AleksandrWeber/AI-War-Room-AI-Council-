@@ -73,4 +73,18 @@ describe('validateEnv LLM opt-in guardrails', () => {
       ),
     ).toThrow(/ANTHROPIC_API_KEY/)
   })
+
+  it('allows gemini when opted in with GEMINI_API_KEY', () => {
+    const env = validateEnv(
+      baseConfig({
+        LLM_PRIMARY_PROVIDER: 'gemini',
+        LLM_PRIMARY_MODEL: 'gemini-2.0-flash',
+        GEMINI_API_KEY: 'gemini-test',
+        LLM_ALLOW_REAL_PROVIDERS: 'true',
+      }),
+    )
+
+    expect(env.LLM_PRIMARY_PROVIDER).toBe('gemini')
+    expect(env.GEMINI_API_KEY).toBe('gemini-test')
+  })
 })

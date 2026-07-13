@@ -212,6 +212,16 @@ export class ProviderCredentialsService {
           'Paste it here. The backend stores only an encrypted copy.',
         ],
       },
+      gemini: {
+        label: 'Google Gemini',
+        url: 'https://aistudio.google.com/apikey',
+        steps: [
+          'Open Google AI Studio.',
+          'Create or copy an API key.',
+          'Paste it here for workspace Gemini BYOK.',
+          'Platform GEMINI_API_KEY remains the fallback when no workspace key is set.',
+        ],
+      },
       tavily: {
         label: 'Tavily (research)',
         url: 'https://app.tavily.com/home',
@@ -248,7 +258,8 @@ export class ProviderCredentialsService {
     const hasWorkspaceCredential = credentials.length > 0
     const hasSystemCredential = Boolean(
       this.configService.get('ANTHROPIC_API_KEY', { infer: true }) ||
-        this.configService.get('OPENAI_API_KEY', { infer: true }),
+        this.configService.get('OPENAI_API_KEY', { infer: true }) ||
+        this.configService.get('GEMINI_API_KEY', { infer: true }),
     )
 
     return !hasWorkspaceCredential && !hasSystemCredential

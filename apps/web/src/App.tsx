@@ -1357,7 +1357,7 @@ type ArtifactHistoryResponse = {
 type ProviderCredential = {
   credentialId: string
   workspaceId: string
-  providerId: 'anthropic' | 'openai' | 'tavily' | 'serper'
+  providerId: 'anthropic' | 'openai' | 'gemini' | 'tavily' | 'serper'
   label: string
   maskedKey: string
   createdByUserId: string
@@ -1369,7 +1369,7 @@ type ProviderCredential = {
 }
 
 type ProviderCredentialInstructions = Record<
-  'anthropic' | 'openai' | 'tavily' | 'serper',
+  'anthropic' | 'openai' | 'gemini' | 'tavily' | 'serper',
   {
     label: string
     url: string
@@ -1386,7 +1386,7 @@ type ProviderCredentialListResponse = {
 
 type ProviderCredentialForm = {
   credentialId?: string
-  providerId: 'anthropic' | 'openai' | 'tavily' | 'serper'
+  providerId: 'anthropic' | 'openai' | 'gemini' | 'tavily' | 'serper'
   label: string
   apiKey: string
 }
@@ -30107,22 +30107,31 @@ function App() {
                 value={providerCredentialForm.providerId}
                 disabled={Boolean(providerCredentialForm.credentialId)}
                 onChange={(event) =>
-                  setProviderCredentialForm((current) => ({
-                    ...current,
-                    providerId: event.target.value as ProviderCredentialForm['providerId'],
-                    label:
-                      event.target.value === 'anthropic'
-                        ? 'Anthropic workspace key'
-                        : event.target.value === 'openai'
-                          ? 'OpenAI workspace key'
-                          : event.target.value === 'tavily'
-                            ? 'Tavily research key'
-                            : 'Serper research key',
-                  }))
+                  setProviderCredentialForm((current) => {
+                    const providerId = event.target
+                      .value as ProviderCredentialForm['providerId']
+                    const labelByProvider: Record<
+                      ProviderCredentialForm['providerId'],
+                      string
+                    > = {
+                      anthropic: 'Anthropic workspace key',
+                      openai: 'OpenAI workspace key',
+                      gemini: 'Gemini workspace key',
+                      tavily: 'Tavily research key',
+                      serper: 'Serper research key',
+                    }
+
+                    return {
+                      ...current,
+                      providerId,
+                      label: labelByProvider[providerId],
+                    }
+                  })
                 }
               >
                 <option value="anthropic">Anthropic</option>
                 <option value="openai">OpenAI</option>
+                <option value="gemini">Google Gemini</option>
                 <option value="tavily">Tavily (research)</option>
                 <option value="serper">Serper (research failover)</option>
               </select>

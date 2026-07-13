@@ -26,6 +26,7 @@ export function createDefaultModelRegistry(
     configService,
   )
   const openAiStatus = resolveConfiguredProviderStatus('openai', configService)
+  const geminiStatus = resolveConfiguredProviderStatus('gemini', configService)
 
   return [
     {
@@ -122,11 +123,33 @@ export function createDefaultModelRegistry(
       consecutiveFailures: 0,
       updatedAt: now,
     },
+    {
+      modelId: 'gemini-flash-candidate',
+      providerId: 'gemini',
+      modelName: resolveConfiguredModel(
+        'gemini',
+        'gemini-2.0-flash',
+        configService,
+      ),
+      supportedRoles: allModelRouterRoles,
+      contextWindowTokens: 1_048_576,
+      maxOutputTokens: 8_192,
+      inputCostPerMillionTokensUsd: 0.1,
+      outputCostPerMillionTokensUsd: 0.4,
+      latencyP95Ms: 900,
+      evaluationScore: 0.87,
+      safetyScore: 0.86,
+      reliabilityScore: 0.91,
+      lifecycleStatus: geminiStatus,
+      healthStatus: 'healthy',
+      consecutiveFailures: 0,
+      updatedAt: now,
+    },
   ]
 }
 
 function resolveConfiguredProviderStatus(
-  providerId: 'anthropic' | 'openai',
+  providerId: 'anthropic' | 'openai' | 'gemini',
   configService?: ConfigService<ApiEnv, true>,
 ): ModelRegistryEntry['lifecycleStatus'] {
   const primaryProvider = configService?.get('LLM_PRIMARY_PROVIDER', {
@@ -142,7 +165,7 @@ function resolveConfiguredProviderStatus(
 }
 
 function resolveConfiguredModel(
-  providerId: 'anthropic' | 'openai',
+  providerId: 'anthropic' | 'openai' | 'gemini',
   defaultModel: string,
   configService?: ConfigService<ApiEnv, true>,
 ) {

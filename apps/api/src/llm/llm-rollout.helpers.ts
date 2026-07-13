@@ -24,6 +24,7 @@ export type LlmRolloutInput = {
   llmFallbackModel: string
   anthropicApiKey?: string
   openaiApiKey?: string
+  geminiApiKey?: string
 }
 
 function hasProviderCredential(
@@ -36,6 +37,10 @@ function hasProviderCredential(
 
   if (provider === 'openai') {
     return Boolean(input.openaiApiKey)
+  }
+
+  if (provider === 'gemini') {
+    return Boolean(input.geminiApiKey)
   }
 
   return true
@@ -107,6 +112,19 @@ export function evaluateLlmRollout(input: LlmRolloutInput): LlmRolloutEvaluation
         : input.openaiApiKey
           ? 'OpenAI API key is configured.'
           : 'OPENAI_API_KEY is required for platform readiness when OpenAI is an active provider. Workspace BYOK overrides are separate and are not checked here.',
+    },
+    {
+      name: 'gemini_api_key',
+      label: 'Gemini API key',
+      status:
+        !activeProviders.has('gemini') || hasProviderCredential('gemini', input)
+          ? 'pass'
+          : 'fail',
+      detail: !activeProviders.has('gemini')
+        ? 'Gemini is not configured as a primary or fallback provider.'
+        : input.geminiApiKey
+          ? 'Gemini API key is configured.'
+          : 'GEMINI_API_KEY is required for platform readiness when Gemini is an active provider. Workspace BYOK overrides are separate and are not checked here.',
     },
   ]
 

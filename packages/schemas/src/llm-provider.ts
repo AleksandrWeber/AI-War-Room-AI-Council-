@@ -1,7 +1,12 @@
 import { z } from 'zod'
 import { nonEmptyStringSchema, utcDateStringSchema } from './common.js'
 
-export const llmGatewayProviderIdSchema = z.enum(['mock', 'anthropic', 'openai'])
+export const llmGatewayProviderIdSchema = z.enum([
+  'mock',
+  'anthropic',
+  'openai',
+  'gemini',
+])
 export type LlmGatewayProviderId = z.infer<typeof llmGatewayProviderIdSchema>
 
 export const llmCapabilitiesResponseSchema = z.object({

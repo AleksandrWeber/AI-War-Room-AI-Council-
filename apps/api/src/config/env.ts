@@ -36,8 +36,12 @@ export const envSchema = z.object({
   /** Optional LLM compression before Moderator when agent payloads are large. */
   CHUNK_SUMMARY_LLM_ENABLED: booleanEnvSchema.default(false),
   CHUNK_SUMMARY_LLM_MIN_CHARS: z.coerce.number().int().positive().default(4_000),
-  LLM_PRIMARY_PROVIDER: z.enum(['mock', 'anthropic', 'openai']).default('mock'),
-  LLM_FALLBACK_PROVIDER: z.enum(['mock', 'anthropic', 'openai']).default('mock'),
+  LLM_PRIMARY_PROVIDER: z
+    .enum(['mock', 'anthropic', 'openai', 'gemini'])
+    .default('mock'),
+  LLM_FALLBACK_PROVIDER: z
+    .enum(['mock', 'anthropic', 'openai', 'gemini'])
+    .default('mock'),
   LLM_PRIMARY_MODEL: z.string().trim().min(1).default('mock-json-v1'),
   LLM_FALLBACK_MODEL: z.string().trim().min(1).default('mock-json-v1'),
   LLM_MAX_ATTEMPTS: z.coerce.number().int().positive().max(5).default(3),
@@ -50,6 +54,10 @@ export const envSchema = z.object({
   OPENAI_API_URL: z
     .url()
     .default('https://api.openai.com/v1/chat/completions'),
+  GEMINI_API_KEY: optionalEnvStringSchema,
+  GEMINI_API_URL: z
+    .url()
+    .default('https://generativelanguage.googleapis.com/v1beta'),
   RESEARCH_PROVIDER: z.enum(['mock', 'tavily']).default('mock'),
   RESEARCH_SECONDARY_PROVIDER: z.enum(['none', 'serper']).default('none'),
   TAVILY_API_KEY: optionalEnvStringSchema,
@@ -241,6 +249,18 @@ export function validateEnv(config: Record<string, unknown>): ApiEnv {
   if (env.LLM_FALLBACK_PROVIDER === 'openai' && !env.OPENAI_API_KEY) {
     throw new Error(
       'OPENAI_API_KEY is required when LLM_FALLBACK_PROVIDER=openai.',
+    )
+  }
+
+  if (env.LLM_PRIMARY_PROVIDER === 'gemini' && !env.GEMINI_API_KEY) {
+    throw new Error(
+      'GEMINI_API_KEY is required when LLM_PRIMARY_PROVIDER=gemini.',
+    )
+  }
+
+  if (env.LLM_FALLBACK_PROVIDER === 'gemini' && !env.GEMINI_API_KEY) {
+    throw new Error(
+      'GEMINI_API_KEY is required when LLM_FALLBACK_PROVIDER=gemini.',
     )
   }
 

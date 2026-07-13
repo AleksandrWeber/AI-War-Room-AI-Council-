@@ -3,6 +3,7 @@ import { ModelRouterModule } from '../model-router/model-router.module.js'
 import { ObservabilityModule } from '../observability/observability.module.js'
 import { ProviderCredentialsModule } from '../provider-credentials/provider-credentials.module.js'
 import { AnthropicLlmProvider } from './anthropic-llm.provider.js'
+import { GeminiLlmProvider } from './gemini-llm.provider.js'
 import { LlmController } from './llm.controller.js'
 import { LlmGatewayService } from './llm-gateway.service.js'
 import { LlmProviderRegistry } from './llm-provider.registry.js'
@@ -20,6 +21,7 @@ import { OpenAiLlmProvider } from './openai-llm.provider.js'
     MockLlmProvider,
     AnthropicLlmProvider,
     OpenAiLlmProvider,
+    GeminiLlmProvider,
   ],
   exports: [LlmService, LlmGatewayService],
 })

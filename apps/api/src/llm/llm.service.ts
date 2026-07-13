@@ -57,6 +57,7 @@ export class LlmService {
         infer: true,
       }),
       openaiApiKey: this.configService.get('OPENAI_API_KEY', { infer: true }),
+      geminiApiKey: this.configService.get('GEMINI_API_KEY', { infer: true }),
     })
 
     return llmRolloutResponseSchema.parse({

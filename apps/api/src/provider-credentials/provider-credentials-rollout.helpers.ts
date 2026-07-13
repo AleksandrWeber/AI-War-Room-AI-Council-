@@ -26,15 +26,22 @@ export type ProviderCredentialsRolloutInput = {
   llmFallbackProvider: ApiEnv['LLM_FALLBACK_PROVIDER']
   anthropicApiKey?: string
   openaiApiKey?: string
+  geminiApiKey?: string
 }
 
-const managedProviders: ManagedLlmProviderId[] = ['anthropic', 'openai']
+const managedProviders: ManagedLlmProviderId[] = [
+  'anthropic',
+  'openai',
+  'gemini',
+]
 
 function activeRealProviders(input: ProviderCredentialsRolloutInput) {
   return new Set(
     [input.llmPrimaryProvider, input.llmFallbackProvider].filter(
       (provider): provider is ManagedLlmProviderId =>
-        provider === 'anthropic' || provider === 'openai',
+        provider === 'anthropic' ||
+        provider === 'openai' ||
+        provider === 'gemini',
     ),
   )
 }
@@ -115,6 +122,19 @@ export function evaluateProviderCredentialsRollout(
         : input.openaiApiKey
           ? 'OpenAI system API key is configured for fallback routing.'
           : 'OPENAI_API_KEY is required for platform readiness when OpenAI is an active provider. Workspace BYOK overrides are separate and are not checked here.',
+    },
+    {
+      name: 'gemini_system_key',
+      label: 'Gemini system key',
+      status:
+        !activeProviders.has('gemini') || Boolean(input.geminiApiKey)
+          ? 'pass'
+          : 'fail',
+      detail: !activeProviders.has('gemini')
+        ? 'Gemini is not configured as an active LLM provider.'
+        : input.geminiApiKey
+          ? 'Gemini system API key is configured for fallback routing.'
+          : 'GEMINI_API_KEY is required for platform readiness when Gemini is an active provider. Workspace BYOK overrides are separate and are not checked here.',
     },
   ]
 

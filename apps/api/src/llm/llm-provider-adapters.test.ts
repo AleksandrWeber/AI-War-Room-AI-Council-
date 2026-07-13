@@ -2,6 +2,7 @@ import { ConfigService } from '@nestjs/config'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { ApiEnv } from '../config/env.js'
 import { AnthropicLlmProvider } from './anthropic-llm.provider.js'
+import { GeminiLlmProvider } from './gemini-llm.provider.js'
 import type { LlmProviderRequest } from './llm.types.js'
 import { OpenAiLlmProvider } from './openai-llm.provider.js'
 
@@ -20,6 +21,7 @@ function createConfig(overrides: Partial<ApiEnv>) {
     LLM_REQUEST_TIMEOUT_MS: 30_000,
     ANTHROPIC_API_URL: 'https://anthropic.test/v1/messages',
     OPENAI_API_URL: 'https://openai.test/v1/chat/completions',
+    GEMINI_API_URL: 'https://gemini.test/v1beta',
     ...overrides,
   })
 }
@@ -85,6 +87,46 @@ describe('LLM provider adapters', () => {
     expect(init.headers.authorization).toBe('Bearer test-key')
     expect(body.response_format).toEqual({ type: 'json_object' })
     expect(body.messages.some((message) => message.role === 'system')).toBe(true)
+  })
+
+  it('sends Gemini generateContent with JSON mime type', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        candidates: [{ content: { parts: [{ text: '{"ok":true}' }] } }],
+        usageMetadata: { promptTokenCount: 15, candidatesTokenCount: 4 },
+      }),
+    })
+    vi.stubGlobal('fetch', fetchMock)
+
+    const provider = new GeminiLlmProvider(
+      createConfig({ GEMINI_API_KEY: 'test-key' }) as never,
+    )
+    const result = await provider.completeJson({
+      ...request,
+      model: 'gemini-2.0-flash',
+    })
+    const [url, init] = fetchMock.mock.calls[0]
+    const body = JSON.parse(String(init.body)) as {
+      systemInstruction: { parts: Array<{ text: string }> }
+      contents: Array<{ role: string; parts: Array<{ text: string }> }>
+      generationConfig: { responseMimeType: string }
+    }
+
+    expect(result.rawText).toBe('{"ok":true}')
+    expect(result.usage.inputTokens).toBe(15)
+    expect(result.usage.outputTokens).toBe(4)
+    expect(url).toBe(
+      'https://gemini.test/v1beta/models/gemini-2.0-flash:generateContent',
+    )
+    expect(init.headers['x-goog-api-key']).toBe('test-key')
+    expect(body.generationConfig.responseMimeType).toBe('application/json')
+    expect(body.systemInstruction.parts[0]?.text).toContain(
+      'strict JSON generator',
+    )
+    expect(body.contents).toEqual([
+      { role: 'user', parts: [{ text: 'Return {"ok": true}.' }] },
+    ])
   })
 
   it('fails fast when a configured real provider is missing its API key', async () => {

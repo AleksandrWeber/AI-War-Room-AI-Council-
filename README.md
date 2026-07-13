@@ -467,7 +467,7 @@ Provider credentials rollout readiness:
 
 - `GET /api/provider-credentials/readiness` returns operator-facing production provider credential checklist results (`ready` or `not_ready`).
 - Checks cover encryption key configuration, encryption roundtrip, PostgreSQL persistence, and active LLM provider system keys.
-- Platform readiness requires env system keys (`ANTHROPIC_API_KEY` / `OPENAI_API_KEY`) when those providers are active. Workspace BYOK is a per-workspace override and is not a substitute for those checks.
+- Platform readiness requires env system keys (`ANTHROPIC_API_KEY` / `OPENAI_API_KEY` / `GEMINI_API_KEY`) when those providers are active. Workspace BYOK is a per-workspace override and is not a substitute for those checks.
 - Rotate a workspace provider key by re-saving it through the provider-credentials API (`PUT`); plaintext is never returned after save.
 - Changing `APP_ENCRYPTION_KEY` without a re-encrypt migration orphans existing BYOK ciphertext and also invalidates signed auth sessions. There is no dual-key rotation path yet.
 - Production startup rejects the default `APP_ENCRYPTION_KEY`.
@@ -3365,13 +3365,13 @@ Current `v4.3` behavior:
 - Model registry and model health events are persisted in PostgreSQL outside of test mode.
 - `GET /api/model-router/registry/:modelId/health-events` returns degradation/recovery audit events.
 - `POST /api/model-router/registry/:modelId/recover` resets a degraded model to healthy for recovery workflows (owner/admin only).
-- Anthropic and OpenAI provider adapters are available behind the same LLM Gateway contract.
+- Anthropic, OpenAI, and Gemini provider adapters are available behind the same LLM Gateway contract.
 - Real provider API keys are read from local `.env` variables and must not be committed.
-- Anthropic/OpenAI registry entries remain `candidate` by default and become active only when selected through `LLM_PRIMARY_PROVIDER` or `LLM_FALLBACK_PROVIDER`.
+- Anthropic/OpenAI/Gemini registry entries remain `candidate` by default and become active only when selected through `LLM_PRIMARY_PROVIDER` or `LLM_FALLBACK_PROVIDER`.
 - Workspace owners/admins can add, edit, delete, and test provider keys from the frontend Provider Keys panel.
 - Workspace provider keys are sent directly to the backend, encrypted with `APP_ENCRYPTION_KEY`, and stored in PostgreSQL.
 - The frontend only receives masked keys such as `sk-...1234`; full keys are never returned after save.
-- If no workspace or backend provider key exists, the frontend shows a first-connect setup prompt with Anthropic/OpenAI instructions.
+- If no workspace or backend provider key exists, the frontend shows a first-connect setup prompt with Anthropic/OpenAI/Gemini instructions.
 - Temporal SDK packages are installed as API dev dependencies for the first durable workflow skeleton.
 - `durableRunWorkflow` validates approved run input, then executes the existing pipeline through Temporal activities.
 - The Temporal worker is a separate process and does not change current REST/SSE execution behavior yet.
@@ -3397,10 +3397,12 @@ To enable real providers locally, copy `.env.example` to `.env`, add provider ke
 
 ```bash
 LLM_ALLOW_REAL_PROVIDERS=true
-LLM_PRIMARY_PROVIDER=anthropic
-LLM_PRIMARY_MODEL=claude-3-5-sonnet-latest
-ANTHROPIC_API_KEY=...
+LLM_PRIMARY_PROVIDER=gemini
+LLM_PRIMARY_MODEL=gemini-2.0-flash
+GEMINI_API_KEY=...
 ```
+
+Anthropic / OpenAI remain supported the same way (`LLM_PRIMARY_PROVIDER=anthropic|openai` plus the matching `*_API_KEY`).
 
 Without `LLM_ALLOW_REAL_PROVIDERS=true`, non-mock `LLM_*_PROVIDER` values are rejected at API startup outside production (and the gateway also refuses non-mock calls).
 
