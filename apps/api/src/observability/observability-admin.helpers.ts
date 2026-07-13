@@ -7,6 +7,8 @@ import type {
 import type { ObservabilityEvent } from './observability.service.js'
 
 export const STREAM_LAG_WARNING_MS = 60_000
+/** Warn when a non-terminal Redis/local stream retains this many events (near MAXLEN trim pressure). */
+export const STREAM_BACKLOG_WARNING_COUNT = 80
 
 export function buildObservabilityAdminStats(
   events: ObservabilityAdminEvent[],
@@ -34,6 +36,7 @@ export function buildObservabilityAlerts(input: {
     runId: string
     lastEventAt?: string
     terminal: boolean
+    eventCount?: number
   }>
   recentEvents: ObservabilityEvent[]
 }): ObservabilityAlert[] {
@@ -70,6 +73,26 @@ export function buildObservabilityAlerts(input: {
       type: 'stream_lag',
       severity: laggedStreams.length >= 3 ? 'critical' : 'warning',
       message: `${laggedStreams.length} non-terminal stream(s) have no events for at least ${STREAM_LAG_WARNING_MS / 1000}s.`,
+      createdAt,
+    })
+  }
+
+  const backlogStreams = input.streamSummaries.filter(
+    (summary) =>
+      !summary.terminal &&
+      (summary.eventCount ?? 0) >= STREAM_BACKLOG_WARNING_COUNT,
+  )
+
+  if (backlogStreams.length > 0) {
+    const maxCount = Math.max(
+      ...backlogStreams.map((summary) => summary.eventCount ?? 0),
+    )
+    alerts.push({
+      alertId: `${input.workspaceId}:stream_backlog`,
+      workspaceId: input.workspaceId,
+      type: 'stream_backlog',
+      severity: maxCount >= 100 ? 'critical' : 'warning',
+      message: `${backlogStreams.length} non-terminal stream(s) retain >= ${STREAM_BACKLOG_WARNING_COUNT} events (max ${maxCount}); Redis MAXLEN trim pressure or slow consumers.`,
       createdAt,
     })
   }
@@ -117,7 +140,7 @@ export function getObservabilityAdminGuidance(input: {
   }
 
   if ((input.alerts?.length ?? 0) > 0) {
-    return 'Workspace owners and admins can inspect active observability alerts for worker health, stream lag, and provider failures.'
+    return 'Workspace owners and admins can inspect active observability alerts for worker health, stream lag/backlog, and provider failures.'
   }
 
   if (input.stats.errorEvents > 0) {

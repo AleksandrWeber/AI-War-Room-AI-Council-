@@ -31,7 +31,7 @@ describe('observability admin helpers', () => {
     })
   })
 
-  it('builds worker, stream lag, and provider failure alerts', () => {
+  it('builds worker, stream lag, backlog, and provider failure alerts', () => {
     const nowMs = Date.parse('2026-01-01T00:02:00.000Z')
 
     expect(
@@ -46,6 +46,13 @@ describe('observability admin helpers', () => {
             runId: 'run_lagging',
             lastEventAt: '2026-01-01T00:00:00.000Z',
             terminal: false,
+            eventCount: 12,
+          },
+          {
+            runId: 'run_backlog',
+            lastEventAt: '2026-01-01T00:01:50.000Z',
+            terminal: false,
+            eventCount: 95,
           },
         ],
         recentEvents: [
@@ -68,6 +75,11 @@ describe('observability admin helpers', () => {
         type: 'stream_lag',
         severity: 'warning',
         message: expect.stringContaining(`${STREAM_LAG_WARNING_MS / 1000}s`),
+      }),
+      expect.objectContaining({
+        type: 'stream_backlog',
+        severity: 'warning',
+        message: expect.stringContaining('95'),
       }),
       expect.objectContaining({
         type: 'provider_failure',

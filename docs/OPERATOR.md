@@ -86,7 +86,20 @@ When `TEMPORAL_ENABLED=true`:
 3. Confirm `GET /api/runs/temporal/readiness` and worker heartbeat in observability admin.
 4. Production rejects loopback Temporal addresses.
 
-If workflows stick in `running` with empty stream replay, check worker health first, then Redis stream lag / observability admin alerts.
+If workflows stick in `running` with empty stream replay, check worker health first, then Redis stream lag / backlog / observability admin alerts.
+
+Stream lag vs backlog:
+
+- **stream_lag** — non-terminal run streams with no new events for ≥ 60s.
+- **stream_backlog** — non-terminal streams retaining ≥ 80 events (near Redis `MAXLEN~100` trim pressure).
+
+Opt-in load probes (not part of `quality:gate`):
+
+```bash
+RUN_LOAD_TESTS=1 npm run test:load
+```
+
+Covers Redis XADD throughput, concurrent multi-run streams + lag budget, and PostgreSQL write pressure.
 
 ## Incident handling (first 15 minutes)
 

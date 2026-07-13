@@ -32,6 +32,7 @@ export type ObservabilityAdminStats = z.infer<
 export const observabilityAlertTypeSchema = z.enum([
   'worker_health',
   'stream_lag',
+  'stream_backlog',
   'provider_failure',
 ])
 export type ObservabilityAlertType = z.infer<typeof observabilityAlertTypeSchema>

@@ -95,6 +95,7 @@ export class ObservabilityAdminService {
       streamSummaries: streamSummaries.map((summary) => ({
         runId: summary.runId,
         lastEventAt: summary.lastEvent?.timestamp,
+        eventCount: summary.eventCount,
         terminal: summary.lastEvent
           ? isTerminalPipelineStreamEvent(summary.lastEvent)
           : false,

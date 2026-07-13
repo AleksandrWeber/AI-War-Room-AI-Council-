@@ -82,7 +82,7 @@ Custom ports must keep CORS aligned (`WEB_ORIGIN` ↔ `VITE_API_URL`). See READM
 | `npm run quality:infra` | Bring up Docker deps and apply migrations. |
 | `npm run test` | Workspace unit/integration tests. |
 | `npm run test:e2e` | Playwright happy path (`npm run test:e2e:install` once). |
-| `RUN_LOAD_TESTS=1 npm run test:load` | Opt-in Redis/PG write-pressure probe (not part of `quality:gate`). |
+| `RUN_LOAD_TESTS=1 npm run test:load` | Opt-in Redis/PG write-pressure + concurrent stream lag probe (not part of `quality:gate`). |
 | `npm run db:migrate -- --status` | List applied vs pending migrations without writing. |
 
 ## Package map
