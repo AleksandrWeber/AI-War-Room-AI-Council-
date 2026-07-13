@@ -575,6 +575,94 @@ describe('TemporalRunService', () => {
     ).resolves.toEqual([])
   })
 
+  it('falls back to publishing workflow_status on empty incremental replay by default', async () => {
+    const request = createRequest()
+    const { service, streamEventBufferService } = createService({
+      enabled: true,
+      temporalRunClient: {
+        startDurableRun: vi.fn(async () => ({
+          workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+          temporalRunId: 'temporal_run_1',
+        })),
+        describeDurableRun: vi.fn(),
+        checkServerReachable: vi.fn(async () => false),
+      },
+    })
+
+    await service.startApprovedRun(request, authContext)
+    const appendCallsBefore = streamEventBufferService.append.mock.calls.length
+    vi.mocked(streamEventBufferService.replayAfter).mockResolvedValueOnce([])
+
+    await expect(
+      service.getWorkflowStreamEvents({
+        workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+        authContext,
+        afterEventId: 'event_existing_1',
+      }),
+    ).resolves.toEqual([
+      expect.objectContaining({
+        type: 'workflow_status',
+        workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+        status: 'running',
+      }),
+    ])
+    expect(streamEventBufferService.append.mock.calls.length).toBe(
+      appendCallsBefore + 1,
+    )
+  })
+
+  it('publishes workflow_status when Temporal status flips to failed', async () => {
+    const describeDurableRun = vi.fn(async () => ({
+      workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+      temporalRunId: 'temporal_run_1',
+      status: 'WORKFLOW_EXECUTION_STATUS_FAILED',
+    }))
+    const { service, temporalWorkflowRepository, streamEventBufferService } =
+      createService({
+        enabled: true,
+        temporalRunClient: {
+          startDurableRun: vi.fn(),
+          describeDurableRun,
+        },
+      })
+    await temporalWorkflowRepository.saveStartedWorkflow({
+      runId: 'run_temporal_start_1',
+      workspaceId: 'workspace_1',
+      workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+      temporalRunId: 'temporal_run_1',
+      taskQueue: 'ai-war-room-runs',
+      status: 'running',
+      startedAt: now,
+    })
+    const appendCallsBefore = streamEventBufferService.append.mock.calls.length
+
+    await expect(
+      service.getWorkflowStatus({
+        workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+        authContext,
+      }),
+    ).resolves.toMatchObject({
+      status: 'failed',
+    })
+    await expect(
+      temporalWorkflowRepository.findWorkflowById({
+        workspaceId: 'workspace_1',
+        workflowId: 'ai-war-room-workspace_1-run_temporal_start_1',
+      }),
+    ).resolves.toMatchObject({
+      status: 'failed',
+    })
+    expect(streamEventBufferService.append.mock.calls.length).toBe(
+      appendCallsBefore + 1,
+    )
+    expect(
+      streamEventBufferService.append.mock.calls.at(-1)?.[0]?.event,
+    ).toMatchObject({
+      type: 'workflow_status',
+      status: 'failed',
+    })
+  })
+
   it('keeps workflow stream observation open until a terminal event arrives', async () => {
     const request = createRequest()
     const runningEvent = {
