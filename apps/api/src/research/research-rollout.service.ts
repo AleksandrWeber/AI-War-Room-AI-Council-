@@ -33,10 +33,15 @@ export class ResearchRolloutService {
       researchProvider: this.configService.get('RESEARCH_PROVIDER', {
         infer: true,
       }),
+      researchSecondaryProvider: this.configService.get(
+        'RESEARCH_SECONDARY_PROVIDER',
+        { infer: true },
+      ),
       tavilyApiKey: this.configService.get('TAVILY_API_KEY', { infer: true }),
       tavilyMaxResults: this.configService.get('TAVILY_MAX_RESULTS', {
         infer: true,
       }),
+      serperApiKey: this.configService.get('SERPER_API_KEY', { infer: true }),
     })
 
     return researchRolloutResponseSchema.parse({

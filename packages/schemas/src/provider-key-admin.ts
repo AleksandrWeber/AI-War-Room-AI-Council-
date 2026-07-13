@@ -1,7 +1,7 @@
 import { z } from 'zod'
 import { nonEmptyStringSchema } from './common.js'
 import {
-  llmProviderIdSchema,
+  managedProviderIdSchema,
   maskedProviderCredentialSchema,
 } from './provider-credentials.js'
 import { workspaceRoleSchema } from './workspace.js'
@@ -57,7 +57,7 @@ export type ProviderKeyAdminActionResponse = z.infer<
 
 export const providerKeyAdminTestResultSchema = z.object({
   credentialId: nonEmptyStringSchema,
-  providerId: llmProviderIdSchema,
+  providerId: managedProviderIdSchema,
   status: z.enum(['passed', 'failed']),
   message: nonEmptyStringSchema,
 })

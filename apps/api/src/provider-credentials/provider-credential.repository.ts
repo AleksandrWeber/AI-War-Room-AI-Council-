@@ -1,5 +1,5 @@
 import type {
-  ManagedLlmProviderId,
+  ManagedProviderId,
   MaskedProviderCredential,
 } from '@ai-war-room/schemas'
 
@@ -18,7 +18,7 @@ export type ProviderCredentialRecord = Omit<
 export type SaveProviderCredentialInput = {
   credentialId: string
   workspaceId: string
-  providerId: ManagedLlmProviderId
+  providerId: ManagedProviderId
   label: string
   encryptedApiKey: string
   keyHint: string
@@ -34,7 +34,7 @@ export interface ProviderCredentialRepository {
   ): Promise<ProviderCredentialRecord | null>
   findByProvider(
     workspaceId: string,
-    providerId: ManagedLlmProviderId,
+    providerId: ManagedProviderId,
   ): Promise<ProviderCredentialRecord | null>
   save(input: SaveProviderCredentialInput): Promise<ProviderCredentialRecord>
   delete(workspaceId: string, credentialId: string): Promise<boolean>

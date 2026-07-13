@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import type { ApiEnv } from '../config/env.js'
+import { ProviderCredentialsService } from '../provider-credentials/provider-credentials.service.js'
 import type {
   ResearchDocument,
   ResearchProvider,
@@ -20,13 +21,22 @@ type TavilySearchResponse = {
 export class TavilyResearchProvider implements ResearchProvider {
   readonly providerId = 'tavily'
 
-  constructor(private readonly configService: ConfigService<ApiEnv, true>) {}
+  constructor(
+    private readonly configService: ConfigService<ApiEnv, true>,
+    private readonly providerCredentialsService: ProviderCredentialsService,
+  ) {}
 
   async search(request: ResearchProviderRequest): Promise<ResearchDocument[]> {
-    const apiKey = this.configService.get('TAVILY_API_KEY', { infer: true })
+    const apiKey =
+      (await this.providerCredentialsService.resolveApiKey({
+        workspaceId: request.draftRun.workspaceId,
+        providerId: 'tavily',
+      })) ?? this.configService.get('TAVILY_API_KEY', { infer: true })
 
     if (!apiKey) {
-      throw new Error('TAVILY_API_KEY is required for Tavily research provider.')
+      throw new Error(
+        'Tavily research requires a workspace BYOK key or TAVILY_API_KEY.',
+      )
     }
 
     const response = await fetch(

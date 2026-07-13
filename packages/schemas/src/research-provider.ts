@@ -46,5 +46,5 @@ export function getResearchProviderGuidance(input: {
     return 'Mock research provider is active for local development and tests.'
   }
 
-  return 'Tavily research is configured. Ensure TAVILY_API_KEY is set before production rollout.'
+  return 'Tavily research is configured. Workspace BYOK can override the platform key; set RESEARCH_SECONDARY_PROVIDER=serper for failover.'
 }

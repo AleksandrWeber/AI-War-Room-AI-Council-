@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import type { ManagedLlmProviderId } from '@ai-war-room/schemas'
+import type { ManagedProviderId } from '@ai-war-room/schemas'
 import type { ApiEnv } from '../config/env.js'
 
 @Injectable()
@@ -8,15 +8,23 @@ export class ProviderCredentialTesterService {
   constructor(private readonly configService: ConfigService<ApiEnv, true>) {}
 
   async testCredential(input: {
-    providerId: ManagedLlmProviderId
+    providerId: ManagedProviderId
     apiKey: string
   }): Promise<void> {
-    if (input.providerId === 'anthropic') {
-      await this.testAnthropic(input.apiKey)
-      return
+    switch (input.providerId) {
+      case 'anthropic':
+        await this.testAnthropic(input.apiKey)
+        return
+      case 'openai':
+        await this.testOpenAi(input.apiKey)
+        return
+      case 'tavily':
+        await this.testTavily(input.apiKey)
+        return
+      case 'serper':
+        await this.testSerper(input.apiKey)
+        return
     }
-
-    await this.testOpenAi(input.apiKey)
   }
 
   private async testAnthropic(apiKey: string) {
@@ -69,6 +77,56 @@ export class ProviderCredentialTesterService {
 
     if (!response.ok) {
       throw new Error(`OpenAI test failed with ${response.status}.`)
+    }
+  }
+
+  private async testTavily(apiKey: string) {
+    const response = await fetch(
+      this.configService.get('TAVILY_API_URL', { infer: true }),
+      {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify({
+          api_key: apiKey,
+          query: 'ai war room connectivity test',
+          search_depth: 'basic',
+          include_answer: false,
+          max_results: 1,
+        }),
+        signal: AbortSignal.timeout(
+          this.configService.get('LLM_REQUEST_TIMEOUT_MS', { infer: true }),
+        ),
+      },
+    )
+
+    if (!response.ok) {
+      throw new Error(`Tavily test failed with ${response.status}.`)
+    }
+  }
+
+  private async testSerper(apiKey: string) {
+    const response = await fetch(
+      this.configService.get('SERPER_API_URL', { infer: true }),
+      {
+        method: 'POST',
+        headers: {
+          'content-type': 'application/json',
+          'x-api-key': apiKey,
+        },
+        body: JSON.stringify({
+          q: 'ai war room connectivity test',
+          num: 1,
+        }),
+        signal: AbortSignal.timeout(
+          this.configService.get('LLM_REQUEST_TIMEOUT_MS', { infer: true }),
+        ),
+      },
+    )
+
+    if (!response.ok) {
+      throw new Error(`Serper test failed with ${response.status}.`)
     }
   }
 }

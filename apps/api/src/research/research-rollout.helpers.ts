@@ -18,8 +18,10 @@ export type ResearchRolloutEvaluation = {
 export type ResearchRolloutInput = {
   nodeEnv: ApiEnv['NODE_ENV']
   researchProvider: ApiEnv['RESEARCH_PROVIDER']
+  researchSecondaryProvider: ApiEnv['RESEARCH_SECONDARY_PROVIDER']
   tavilyApiKey?: string
   tavilyMaxResults: number
+  serperApiKey?: string
 }
 
 export function evaluateResearchRollout(
@@ -50,7 +52,7 @@ export function evaluateResearchRollout(
           ? 'Tavily is not configured as the research provider.'
           : input.tavilyApiKey
             ? 'Tavily API key is configured.'
-            : 'TAVILY_API_KEY is required when RESEARCH_PROVIDER=tavily.',
+            : 'TAVILY_API_KEY is required when RESEARCH_PROVIDER=tavily (workspace BYOK can override per run).',
     },
     {
       name: 'tavily_max_results',
@@ -64,6 +66,19 @@ export function evaluateResearchRollout(
         input.researchProvider !== 'tavily'
           ? 'Tavily max results is only validated when Tavily is active.'
           : `Tavily max results is ${input.tavilyMaxResults}.`,
+    },
+    {
+      name: 'research_failover',
+      label: 'Research failover',
+      status: 'pass',
+      detail:
+        input.researchSecondaryProvider === 'none'
+          ? 'Secondary research failover is disabled.'
+          : input.researchProvider === 'mock'
+            ? 'Failover is unused while RESEARCH_PROVIDER=mock.'
+            : input.serperApiKey
+              ? 'Serper failover is enabled with a platform SERPER_API_KEY (workspace BYOK can override).'
+              : 'Serper failover is enabled; runtime uses workspace BYOK or SERPER_API_KEY.',
     },
   ]
 

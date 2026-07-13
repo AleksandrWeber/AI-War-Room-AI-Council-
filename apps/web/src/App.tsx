@@ -1346,7 +1346,7 @@ type ArtifactHistoryResponse = {
 type ProviderCredential = {
   credentialId: string
   workspaceId: string
-  providerId: 'anthropic' | 'openai'
+  providerId: 'anthropic' | 'openai' | 'tavily' | 'serper'
   label: string
   maskedKey: string
   createdByUserId: string
@@ -1358,7 +1358,7 @@ type ProviderCredential = {
 }
 
 type ProviderCredentialInstructions = Record<
-  'anthropic' | 'openai',
+  'anthropic' | 'openai' | 'tavily' | 'serper',
   {
     label: string
     url: string
@@ -1375,7 +1375,7 @@ type ProviderCredentialListResponse = {
 
 type ProviderCredentialForm = {
   credentialId?: string
-  providerId: 'anthropic' | 'openai'
+  providerId: 'anthropic' | 'openai' | 'tavily' | 'serper'
   label: string
   apiKey: string
 }
@@ -29262,12 +29262,18 @@ function App() {
                     label:
                       event.target.value === 'anthropic'
                         ? 'Anthropic workspace key'
-                        : 'OpenAI workspace key',
+                        : event.target.value === 'openai'
+                          ? 'OpenAI workspace key'
+                          : event.target.value === 'tavily'
+                            ? 'Tavily research key'
+                            : 'Serper research key',
                   }))
                 }
               >
                 <option value="anthropic">Anthropic</option>
                 <option value="openai">OpenAI</option>
+                <option value="tavily">Tavily (research)</option>
+                <option value="serper">Serper (research failover)</option>
               </select>
             </label>
             <label>

@@ -26,11 +26,11 @@ Operational product decisions that shape Shield, storage, and research. Implemen
 ## External research provider strategy
 
 - **Local default:** `RESEARCH_PROVIDER=mock`.
-- **Production live adapter:** **Tavily only** in MVP (`RESEARCH_PROVIDER=tavily` + `TAVILY_API_KEY`). Production rejects `mock`.
-- **Availability:** research remains available without waiting for paid tiers (including free workspaces); usage metered to the workspace; platform system key for MVP.
-- **Failure mode:** **fail-soft** — if live research throws / is unavailable, Market Research Agent continues with a degraded note; the pipeline is not blocked.
+- **Production live adapter:** **Tavily** (`RESEARCH_PROVIDER=tavily` + `TAVILY_API_KEY`). Production rejects `mock`.
+- **BYOK:** workspace encrypted keys for `tavily` / `serper` via Provider Keys (same `workspace_provider_credentials` table); preferred over platform env keys at search time.
+- **Failover:** optional `RESEARCH_SECONDARY_PROVIDER=serper` wraps Tavily → Serper behind `FailoverResearchProvider`; Market Research still **fail-soft** if all providers fail.
+- **Availability:** research remains available without waiting for paid tiers (including free workspaces); usage metered to the workspace.
 - **Trust:** retrieved content is Shield-scanned before agent consumption (existing path).
-- **Post-MVP:** BYOK research keys; second-provider failover behind the same adapter interface.
 
 ## Real LLM opt-in
 

@@ -6,6 +6,7 @@ function createInput(overrides: Partial<ResearchRolloutInput>): ResearchRolloutI
   return {
     nodeEnv: 'production',
     researchProvider: 'tavily',
+    researchSecondaryProvider: 'none',
     tavilyApiKey: 'tvly-test',
     tavilyMaxResults: 5,
     ...overrides,

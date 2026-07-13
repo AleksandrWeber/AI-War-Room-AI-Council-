@@ -75,6 +75,7 @@ describe('TavilyResearchProvider', () => {
 
     const provider = new TavilyResearchProvider(
       createConfig({ TAVILY_API_KEY: 'test-key' }) as never,
+      { resolveApiKey: async () => null } as never,
     )
     const documents = await provider.search(request)
     const [, init] = fetchMock.mock.calls[0]
@@ -103,10 +104,12 @@ describe('TavilyResearchProvider', () => {
   it('fails fast without a Tavily API key', async () => {
     const fetchMock = vi.fn()
     vi.stubGlobal('fetch', fetchMock)
-    const provider = new TavilyResearchProvider(createConfig({}) as never)
+    const provider = new TavilyResearchProvider(createConfig({}) as never, {
+      resolveApiKey: async () => null,
+    } as never)
 
     await expect(provider.search(request)).rejects.toThrow(
-      'TAVILY_API_KEY is required',
+      /Tavily research requires/,
     )
     expect(fetchMock).not.toHaveBeenCalled()
   })

@@ -46,9 +46,13 @@ export const envSchema = z.object({
     .url()
     .default('https://api.openai.com/v1/chat/completions'),
   RESEARCH_PROVIDER: z.enum(['mock', 'tavily']).default('mock'),
+  RESEARCH_SECONDARY_PROVIDER: z.enum(['none', 'serper']).default('none'),
   TAVILY_API_KEY: optionalEnvStringSchema,
   TAVILY_API_URL: z.url().default('https://api.tavily.com/search'),
   TAVILY_MAX_RESULTS: z.coerce.number().int().positive().max(10).default(5),
+  SERPER_API_KEY: optionalEnvStringSchema,
+  SERPER_API_URL: z.url().default('https://google.serper.dev/search'),
+  SERPER_MAX_RESULTS: z.coerce.number().int().positive().max(10).default(5),
   TEMPORAL_ENABLED: booleanEnvSchema.default(false),
   TEMPORAL_ADDRESS: z.string().trim().min(1).default('127.0.0.1:7233'),
   TEMPORAL_NAMESPACE: z.string().trim().min(1).default('default'),

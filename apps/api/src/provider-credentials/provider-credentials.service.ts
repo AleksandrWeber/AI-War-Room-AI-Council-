@@ -9,7 +9,7 @@ import { ConfigService } from '@nestjs/config'
 import { randomUUID } from 'node:crypto'
 import {
   type AuthContext,
-  type ManagedLlmProviderId,
+  type ManagedProviderId,
   type MaskedProviderCredential,
   type ProviderCredentialListResponse,
   type ProviderCredentialTestResponse,
@@ -174,7 +174,7 @@ export class ProviderCredentialsService {
 
   async resolveApiKey(input: {
     workspaceId?: string
-    providerId: ManagedLlmProviderId
+    providerId: ManagedProviderId
   }): Promise<string | null> {
     if (!input.workspaceId) {
       return null
@@ -210,6 +210,25 @@ export class ProviderCredentialsService {
           'Go to API Keys.',
           'Create a new secret key and copy it once.',
           'Paste it here. The backend stores only an encrypted copy.',
+        ],
+      },
+      tavily: {
+        label: 'Tavily (research)',
+        url: 'https://app.tavily.com/home',
+        steps: [
+          'Open the Tavily dashboard.',
+          'Create or copy an API key.',
+          'Paste it here for workspace Market Research BYOK.',
+          'Platform TAVILY_API_KEY remains the fallback when no workspace key is set.',
+        ],
+      },
+      serper: {
+        label: 'Serper (research failover)',
+        url: 'https://serper.dev/api-key',
+        steps: [
+          'Open Serper and copy an API key.',
+          'Paste it here for research failover BYOK.',
+          'Platform SERPER_API_KEY remains the fallback when no workspace key is set.',
         ],
       },
     }

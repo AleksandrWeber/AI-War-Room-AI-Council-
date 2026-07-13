@@ -1,5 +1,5 @@
 import type {
-  ManagedLlmProviderId,
+  ManagedProviderId,
   MaskedProviderCredential,
 } from '@ai-war-room/schemas'
 import type {
@@ -30,7 +30,7 @@ export class InMemoryProviderCredentialRepository
 
   async findByProvider(
     workspaceId: string,
-    providerId: ManagedLlmProviderId,
+    providerId: ManagedProviderId,
   ): Promise<ProviderCredentialRecord | null> {
     return (
       [...this.credentials.values()].find(

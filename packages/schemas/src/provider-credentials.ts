@@ -1,13 +1,29 @@
 import { z } from 'zod'
 import { nonEmptyStringSchema, utcDateStringSchema } from './common.js'
 
+/** LLM-only providers used by the model gateway. */
 export const llmProviderIdSchema = z.enum(['anthropic', 'openai'])
 export type ManagedLlmProviderId = z.infer<typeof llmProviderIdSchema>
+
+/** Research providers that can use workspace BYOK credentials. */
+export const researchCredentialProviderIdSchema = z.enum(['tavily', 'serper'])
+export type ResearchCredentialProviderId = z.infer<
+  typeof researchCredentialProviderIdSchema
+>
+
+/** All providers stored in workspace_provider_credentials. */
+export const managedProviderIdSchema = z.enum([
+  'anthropic',
+  'openai',
+  'tavily',
+  'serper',
+])
+export type ManagedProviderId = z.infer<typeof managedProviderIdSchema>
 
 export const maskedProviderCredentialSchema = z.object({
   credentialId: nonEmptyStringSchema,
   workspaceId: nonEmptyStringSchema,
-  providerId: llmProviderIdSchema,
+  providerId: managedProviderIdSchema,
   label: nonEmptyStringSchema.max(120),
   maskedKey: nonEmptyStringSchema,
   createdByUserId: nonEmptyStringSchema,
@@ -26,7 +42,7 @@ export const providerCredentialListResponseSchema = z.object({
   credentials: z.array(maskedProviderCredentialSchema),
   needsProviderKey: z.boolean(),
   instructions: z.record(
-    llmProviderIdSchema,
+    managedProviderIdSchema,
     z.object({
       label: nonEmptyStringSchema,
       url: z.url(),
@@ -39,7 +55,7 @@ export type ProviderCredentialListResponse = z.infer<
 >
 
 export const upsertProviderCredentialRequestSchema = z.object({
-  providerId: llmProviderIdSchema,
+  providerId: managedProviderIdSchema,
   label: nonEmptyStringSchema.max(120),
   apiKey: nonEmptyStringSchema.min(12).max(4096),
 })
@@ -49,7 +65,7 @@ export type UpsertProviderCredentialRequest = z.infer<
 
 export const providerCredentialTestResponseSchema = z.object({
   credentialId: nonEmptyStringSchema,
-  providerId: llmProviderIdSchema,
+  providerId: managedProviderIdSchema,
   status: z.enum(['passed', 'failed']),
   message: nonEmptyStringSchema,
   testedAt: utcDateStringSchema,

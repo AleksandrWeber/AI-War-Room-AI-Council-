@@ -62,7 +62,8 @@ export class ResearchService {
     this.observabilityService.record('research_context_retrieved', {
       workspaceId: input.workspaceId,
       runId: input.draftRun.runId,
-      providerId: this.provider.providerId,
+      providerId:
+        scannedDocuments[0]?.provider ?? this.provider.providerId,
       documentCount: scannedDocuments.length,
       citationCount: citations.length,
       shieldStatus: combinedShieldScan.status,
@@ -70,7 +71,7 @@ export class ResearchService {
     })
 
     return {
-      providerId: this.provider.providerId,
+      providerId: scannedDocuments[0]?.provider ?? this.provider.providerId,
       citations,
       documents: scannedDocuments.map((document) => ({
         sourceId: document.sourceId,

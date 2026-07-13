@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import type { ManagedLlmProviderId } from '@ai-war-room/schemas'
+import type { ManagedProviderId } from '@ai-war-room/schemas'
 import { PostgresService } from '../persistence/postgres.service.js'
 import type {
   ProviderCredentialRecord,
@@ -10,7 +10,7 @@ import type {
 type ProviderCredentialRow = {
   credential_id: string
   workspace_id: string
-  provider_id: ManagedLlmProviderId
+  provider_id: ManagedProviderId
   label: string
   encrypted_api_key: string
   key_hint: string
@@ -62,7 +62,7 @@ export class PostgresProviderCredentialRepository
 
   async findByProvider(
     workspaceId: string,
-    providerId: ManagedLlmProviderId,
+    providerId: ManagedProviderId,
   ): Promise<ProviderCredentialRecord | null> {
     const result = await this.postgresService.query<ProviderCredentialRow>(
       `
