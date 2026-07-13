@@ -25,6 +25,10 @@ Types (`artifactType`): `executive_summary` | `prd` | `development_prompt`.
 
 **Target tool (product decision 2026-07-13):** MVP is **Cursor-first** — one Cursor-optimized Development Prompt derived from the PRD. Human Review sends `developmentPromptTargetTool` (default `cursor`). Claude Code / Bolt / Lovable use shared-PRD tool guidance profiles in `development-prompt-targets.ts`. Do not fork the PRD per tool.
 
+### Regenerate Specific Agent (Phase 2)
+
+`POST /api/runs/:runId/agents/:role/regenerate` re-runs one non-moderator agent on the **direct** pipeline path, then cascades chunk summaries → Moderator → all three artifacts. Usage events are **appended** for the regenerated agent plus cascaded moderator/artifacts. Temporal partial replay is out of scope; full Temporal runs still use full-pipeline execute.
+
 Persisted envelope:
 
 - `artifactMetadataSchema` — ids, versions, model, token usage, cost, Shield status, validation status (`valid` | `repaired` | `fallback`)

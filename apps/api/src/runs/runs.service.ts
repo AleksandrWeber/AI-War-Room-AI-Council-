@@ -22,6 +22,7 @@ import {
   draftRunSchema,
   mockPipelineRequestSchema,
   mockPipelineResultSchema,
+  regenerateAgentRequestSchema,
   runCapabilitiesResponseSchema,
   runStatusSchema,
 } from '@ai-war-room/schemas'
@@ -240,6 +241,158 @@ export class RunsService {
     const request = this.parseMockPipelineRequest(input)
 
     return this.executeParsedPipeline(request, emit, authContext)
+  }
+
+  async regenerateAgent(input: {
+    runId: string
+    agentRole: string
+    body: unknown
+    authContext: AuthContext
+  }): Promise<MockPipelineResult> {
+    const parsedRole = agentRoleSchema
+      .exclude(['moderator'])
+      .safeParse(input.agentRole)
+
+    if (!parsedRole.success) {
+      throw new BadRequestException({
+        message: 'Invalid agent role for regeneration.',
+        issues: parsedRole.error.issues,
+      })
+    }
+
+    const parsedBody = regenerateAgentRequestSchema.safeParse(input.body)
+
+    if (!parsedBody.success) {
+      throw new BadRequestException({
+        message: 'Invalid regenerate agent request.',
+        issues: parsedBody.error.issues,
+      })
+    }
+
+    const request = parsedBody.data
+    const agentRole = parsedRole.data
+
+    if (request.draftRun.runId !== input.runId) {
+      throw new BadRequestException({
+        message: 'draftRun.runId must match the path runId.',
+      })
+    }
+
+    if (request.previousResult.runId !== input.runId) {
+      throw new BadRequestException({
+        message: 'previousResult.runId must match the path runId.',
+      })
+    }
+
+    if (
+      request.draftRun.workspaceId !== input.authContext.workspaceId ||
+      request.previousResult.workspaceId !== input.authContext.workspaceId
+    ) {
+      throw new BadRequestException({
+        message: 'Run workspace must match the authenticated workspace.',
+      })
+    }
+
+    const storedResult = await this.runRepository.findCompletedPipelineResult(
+      input.authContext.workspaceId,
+      input.runId,
+    )
+    const baseline = storedResult ?? request.previousResult
+
+    if (!baseline.agentOutputs.some((output) => output.agentRole === agentRole)) {
+      throw new NotFoundException({
+        message: `Agent role ${agentRole} was not part of this completed run.`,
+      })
+    }
+
+    await this.shieldOverrideService.assertExecutionAllowed({
+      runId: request.draftRun.runId,
+      workspaceId: request.draftRun.workspaceId,
+      shieldStatus: request.draftRun.shieldScan.status,
+      maxSeverity: request.draftRun.shieldScan.maxSeverity,
+    })
+
+    const estimatedMaxCostUsd = Math.min(
+      request.approvedTriage.estimatedMaxCostUsd,
+      0.75,
+    )
+
+    await this.usageService.assertWorkspaceCanExecute({
+      workspaceId: request.draftRun.workspaceId,
+      estimatedMaxCostUsd,
+    })
+
+    const now = new Date().toISOString()
+    const regenerated = await this.agentService.executeAgent({
+      runId: request.draftRun.runId,
+      agentRole,
+      draftRun: request.draftRun,
+      completedAt: now,
+    })
+
+    const agentOutputs = baseline.agentOutputs.map((output) =>
+      output.agentRole === agentRole ? regenerated : output,
+    )
+    const chunkSummaries =
+      this.chunkSummaryService.summarizeAgentOutputs(agentOutputs)
+    const moderatorSynthesis = await this.moderatorService.synthesize({
+      draftRun: request.draftRun,
+      approvedTriage: request.approvedTriage,
+      agentOutputs,
+      chunkSummaries,
+    })
+    const artifacts = await this.artifactService.generateArtifacts({
+      draftRun: request.draftRun,
+      moderatorSynthesis,
+      completedAt: now,
+      developmentPromptTargetTool: request.developmentPromptTargetTool,
+    })
+
+    const pipelineResult = mockPipelineResultSchema.parse({
+      runId: request.draftRun.runId,
+      workspaceId: request.draftRun.workspaceId,
+      status: 'completed',
+      steps: baseline.steps.map((step) => ({
+        ...step,
+        status: 'completed',
+        completedAt: now,
+      })),
+      agentOutputs,
+      moderatorSynthesis,
+      artifacts,
+      completedAt: now,
+    })
+
+    await this.runRepository.replaceCompletedPipelineResult(pipelineResult)
+
+    const usageSlice = mockPipelineResultSchema.parse({
+      ...pipelineResult,
+      agentOutputs: [regenerated],
+    })
+    const usageEvents = await this.usageService.recordPipelineUsage({
+      authContext: input.authContext,
+      result: usageSlice,
+    })
+    const totalTokens = usageEvents.reduce(
+      (total, event) => total + event.inputTokens + event.outputTokens,
+      0,
+    )
+    await this.billingMeterUsageService.reportRunTokenUsage({
+      workspaceId: request.draftRun.workspaceId,
+      runId: request.draftRun.runId,
+      totalTokens,
+    })
+    await this.billingNotificationService.syncWorkspaceNotifications(
+      request.draftRun.workspaceId,
+    )
+    this.observabilityService.record('agent_regenerated', {
+      workspaceId: request.draftRun.workspaceId,
+      runId: request.draftRun.runId,
+      agentRole,
+      totalTokens,
+    })
+
+    return pipelineResult
   }
 
   private parseMockPipelineRequest(input: unknown): MockPipelineRequest {

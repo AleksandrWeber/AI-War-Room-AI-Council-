@@ -3,7 +3,13 @@ import type {
   DraftRun,
   MockPipelineResult,
 } from '@ai-war-room/schemas'
-import { artifactHistoryItemSchema, draftRunSchema } from '@ai-war-room/schemas'
+import {
+  agentExecutionResultSchema,
+  artifactHistoryItemSchema,
+  draftRunSchema,
+  mockPipelineResultSchema,
+  moderatorSynthesisSchema,
+} from '@ai-war-room/schemas'
 import { Injectable } from '@nestjs/common'
 import type {
   RunRepository,
@@ -261,6 +267,271 @@ export class PostgresRunRepository implements RunRepository {
             )
             VALUES ($1, $2, $3, $4, $5, $6, $7)
             ON CONFLICT (artifact_id) DO NOTHING
+          `,
+          [
+            artifact.metadata.artifactId,
+            artifact.metadata.runId,
+            artifact.metadata.workspaceId,
+            artifact.metadata.artifactType,
+            JSON.stringify(artifact.metadata),
+            JSON.stringify(artifact.artifact.content),
+            artifact.metadata.createdAt,
+          ],
+        )
+      }
+    })
+  }
+
+  async findCompletedPipelineResult(
+    workspaceId: string,
+    runId: string,
+  ): Promise<MockPipelineResult | null> {
+    const runResult = await this.postgresService.query<{
+      run_id: string
+      workspace_id: string
+      status: string
+      completed_at: Date | null
+    }>(
+      `
+        SELECT run_id, workspace_id, status, completed_at
+        FROM runs
+        WHERE run_id = $1
+          AND workspace_id = $2
+        LIMIT 1
+      `,
+      [runId, workspaceId],
+    )
+    const run = runResult.rows[0]
+
+    if (!run || run.status !== 'completed' || !run.completed_at) {
+      return null
+    }
+
+    const agentResult = await this.postgresService.query<{
+      run_id: string
+      agent_role: string
+      output: unknown
+      validation_status: string
+      prompt_version: string
+      model_provider: string
+      model_name: string
+      input_tokens: number
+      output_tokens: number
+      estimated_cost_usd: string
+      shield_scan: unknown
+      completed_at: Date
+    }>(
+      `
+        SELECT
+          run_id,
+          agent_role,
+          output,
+          validation_status,
+          prompt_version,
+          model_provider,
+          model_name,
+          input_tokens,
+          output_tokens,
+          estimated_cost_usd,
+          shield_scan,
+          completed_at
+        FROM agent_outputs
+        WHERE run_id = $1
+        ORDER BY completed_at ASC, agent_role ASC
+      `,
+      [runId],
+    )
+
+    const moderatorResult = await this.postgresService.query<{
+      synthesis: unknown
+    }>(
+      `
+        SELECT synthesis
+        FROM moderator_syntheses
+        WHERE run_id = $1
+        LIMIT 1
+      `,
+      [runId],
+    )
+    const moderatorRow = moderatorResult.rows[0]
+
+    if (!moderatorRow || agentResult.rows.length === 0) {
+      return null
+    }
+
+    const artifactResult = await this.postgresService.query<ArtifactHistoryRow>(
+      `
+        SELECT
+          artifact_id,
+          run_id,
+          workspace_id,
+          artifact_type,
+          metadata,
+          content,
+          created_at
+        FROM artifacts
+        WHERE run_id = $1
+          AND workspace_id = $2
+        ORDER BY created_at ASC, artifact_type ASC
+      `,
+      [runId, workspaceId],
+    )
+
+    if (artifactResult.rows.length !== 3) {
+      return null
+    }
+
+    const completedAt = run.completed_at.toISOString()
+    const agentOutputs = agentResult.rows.map((row) =>
+      agentExecutionResultSchema.parse({
+        runId: row.run_id,
+        agentRole: row.agent_role,
+        output: row.output,
+        validationStatus: row.validation_status,
+        promptVersion: row.prompt_version,
+        modelProvider: row.model_provider,
+        modelName: row.model_name,
+        inputTokens: row.input_tokens,
+        outputTokens: row.output_tokens,
+        estimatedCostUsd: Number(row.estimated_cost_usd),
+        shieldScan: row.shield_scan ?? undefined,
+        completedAt: row.completed_at.toISOString(),
+      }),
+    )
+
+    return mockPipelineResultSchema.parse({
+      runId: run.run_id,
+      workspaceId: run.workspace_id,
+      status: 'completed',
+      steps: [
+        {
+          stepId: 'shield_scan',
+          label: 'Shield scan',
+          status: 'completed',
+          completedAt,
+        },
+        {
+          stepId: 'triage',
+          label: 'Triage',
+          status: 'completed',
+          completedAt,
+        },
+        {
+          stepId: 'agent_pool',
+          label: 'Prompt-driven agent pool',
+          status: 'completed',
+          completedAt,
+        },
+        {
+          stepId: 'moderator',
+          label: 'Prompt-driven Moderator synthesis',
+          status: 'completed',
+          completedAt,
+        },
+        {
+          stepId: 'artifacts',
+          label: 'Prompt-driven artifact generation',
+          status: 'completed',
+          completedAt,
+        },
+      ],
+      agentOutputs,
+      moderatorSynthesis: moderatorSynthesisSchema.parse(moderatorRow.synthesis),
+      artifacts: artifactResult.rows.map((row) => {
+        const history = this.parseArtifactHistoryRow(row)
+        return {
+          metadata: history.metadata,
+          artifact: history.artifact,
+        }
+      }),
+      completedAt,
+    })
+  }
+
+  async replaceCompletedPipelineResult(result: MockPipelineResult): Promise<void> {
+    await this.postgresService.transaction(async (client) => {
+      await client.query(
+        `
+          UPDATE runs
+          SET status = $2,
+              completed_at = $3,
+              updated_at = $3
+          WHERE run_id = $1
+            AND workspace_id = $4
+        `,
+        [result.runId, result.status, result.completedAt, result.workspaceId],
+      )
+
+      await client.query(`DELETE FROM agent_outputs WHERE run_id = $1`, [
+        result.runId,
+      ])
+
+      for (const agentOutput of result.agentOutputs) {
+        await client.query(
+          `
+            INSERT INTO agent_outputs (
+              run_id,
+              agent_role,
+              output,
+              validation_status,
+              prompt_version,
+              model_provider,
+              model_name,
+              input_tokens,
+              output_tokens,
+              estimated_cost_usd,
+              shield_scan,
+              completed_at
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
+          `,
+          [
+            agentOutput.runId,
+            agentOutput.agentRole,
+            JSON.stringify(agentOutput.output),
+            agentOutput.validationStatus,
+            agentOutput.promptVersion,
+            agentOutput.modelProvider,
+            agentOutput.modelName,
+            agentOutput.inputTokens,
+            agentOutput.outputTokens,
+            agentOutput.estimatedCostUsd,
+            JSON.stringify(agentOutput.shieldScan ?? null),
+            agentOutput.completedAt,
+          ],
+        )
+      }
+
+      await client.query(
+        `
+          INSERT INTO moderator_syntheses (run_id, synthesis, created_at)
+          VALUES ($1, $2, $3)
+          ON CONFLICT (run_id)
+          DO UPDATE SET synthesis = EXCLUDED.synthesis,
+                        created_at = EXCLUDED.created_at
+        `,
+        [
+          result.runId,
+          JSON.stringify(result.moderatorSynthesis),
+          result.completedAt,
+        ],
+      )
+
+      await client.query(`DELETE FROM artifacts WHERE run_id = $1`, [result.runId])
+
+      for (const artifact of result.artifacts) {
+        await client.query(
+          `
+            INSERT INTO artifacts (
+              artifact_id,
+              run_id,
+              workspace_id,
+              artifact_type,
+              metadata,
+              content,
+              created_at
+            )
+            VALUES ($1, $2, $3, $4, $5, $6, $7)
           `,
           [
             artifact.metadata.artifactId,

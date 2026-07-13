@@ -20,6 +20,11 @@ export interface RunRepository {
   ): Promise<DraftRun | null>
   saveDraftRun(input: SaveDraftRunInput): Promise<void>
   saveMockPipelineResult(result: MockPipelineResult): Promise<void>
+  findCompletedPipelineResult(
+    workspaceId: string,
+    runId: string,
+  ): Promise<MockPipelineResult | null>
+  replaceCompletedPipelineResult(result: MockPipelineResult): Promise<void>
   listArtifacts(workspaceId: string): Promise<ArtifactHistoryItem[]>
   listIdempotencyRecords(workspaceId: string): Promise<IdempotencyRecord[]>
   purgeExpiredIdempotencyKeys(workspaceId: string): Promise<number>

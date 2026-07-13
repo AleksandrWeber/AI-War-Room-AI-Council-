@@ -97,6 +97,22 @@ export class RunsController {
     })
   }
 
+  @Post(':runId/agents/:role/regenerate')
+  @UseGuards(WorkspaceAccessGuard)
+  regenerateAgent(
+    @Param('runId') runId: string,
+    @Param('role') role: string,
+    @Body() body: unknown,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.runsService.regenerateAgent({
+      runId,
+      agentRole: role,
+      body,
+      authContext: request.authContext!,
+    })
+  }
+
   @Get(':runId/feedback')
   @UseGuards(WorkspaceAccessGuard)
   listRunFeedback(

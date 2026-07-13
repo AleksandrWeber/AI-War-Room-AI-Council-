@@ -561,6 +561,46 @@ describe('API skeleton', () => {
 
     expect(pdfResponse.headers['content-type']).toContain('application/pdf')
     expect(Buffer.isBuffer(pdfResponse.body)).toBe(true)
+
+    const regenerateRole = pipelineResponse.body.agentOutputs[0].agentRole
+    const regenerateResponse = await request(app!.getHttpServer())
+      .post(
+        `/api/runs/${pipelineResponse.body.runId}/agents/${regenerateRole}/regenerate`,
+      )
+      .set(authHeaders)
+      .send({
+        draftRun: draftResponse.body,
+        approvedTriage: draftResponse.body.triage,
+        previousResult: pipelineResponse.body,
+        developmentPromptTargetTool: 'cursor',
+      })
+      .expect(201)
+
+    expect(regenerateResponse.body.status).toBe('completed')
+    expect(regenerateResponse.body.agentOutputs).toHaveLength(
+      pipelineResponse.body.agentOutputs.length,
+    )
+    expect(
+      regenerateResponse.body.agentOutputs.find(
+        (output: { agentRole: string }) => output.agentRole === regenerateRole,
+      )?.completedAt,
+    ).not.toBe(pipelineResponse.body.agentOutputs[0].completedAt)
+    expect(regenerateResponse.body.artifacts).toHaveLength(3)
+    expect(regenerateResponse.body.artifacts[0].metadata.artifactId).not.toBe(
+      pipelineResponse.body.artifacts[0].metadata.artifactId,
+    )
+
+    const postRegenHistory = await request(app!.getHttpServer())
+      .get('/api/runs/artifacts/history')
+      .set(authHeaders)
+      .expect(200)
+    expect(
+      postRegenHistory.body.artifacts.some(
+        (artifact: { artifactId: string }) =>
+          artifact.artifactId ===
+          regenerateResponse.body.artifacts[0].metadata.artifactId,
+      ),
+    ).toBe(true)
     expect(pdfResponse.body.subarray(0, 4).toString()).toBe('%PDF')
     expect(exportResponse.text).toContain(`Artifact ID: ${exportedArtifact.artifactId}`)
 

@@ -41,7 +41,24 @@ export class InMemoryRunRepository implements RunRepository {
   }
 
   async saveMockPipelineResult(result: MockPipelineResult): Promise<void> {
-    this.pipelineResultsByRunId.set(result.runId, result)
+    this.pipelineResultsByRunId.set(result.runId, structuredClone(result))
+  }
+
+  async findCompletedPipelineResult(
+    workspaceId: string,
+    runId: string,
+  ): Promise<MockPipelineResult | null> {
+    const result = this.pipelineResultsByRunId.get(runId)
+
+    if (!result || result.workspaceId !== workspaceId) {
+      return null
+    }
+
+    return structuredClone(result)
+  }
+
+  async replaceCompletedPipelineResult(result: MockPipelineResult): Promise<void> {
+    this.pipelineResultsByRunId.set(result.runId, structuredClone(result))
   }
 
   async listArtifacts(workspaceId: string): Promise<ArtifactHistoryItem[]> {

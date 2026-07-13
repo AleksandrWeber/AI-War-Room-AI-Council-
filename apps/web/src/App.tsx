@@ -1636,6 +1636,9 @@ function App() {
   })
   const [pipelineState, setPipelineState] = useState<PipelineState>('idle')
   const [pipelineError, setPipelineError] = useState<string | null>(null)
+  const [regeneratingAgentRole, setRegeneratingAgentRole] = useState<string | null>(
+    null,
+  )
   const [pipelineResult, setPipelineResult] = useState<MockPipelineResult | null>(
     () => {
       const saved = localStorage.getItem(pipelineResultStorageKey)
@@ -6824,6 +6827,51 @@ function App() {
       selectedAgents: reviewDraft.selectedAgents,
       developmentPromptTargetTool:
         reviewDraft.developmentPromptTargetTool ?? 'cursor',
+    }
+  }
+
+  async function handleRegenerateAgent(agentRole: string) {
+    if (!draftRun || !reviewDraft || !pipelineResult || regeneratingAgentRole) {
+      return
+    }
+
+    setRegeneratingAgentRole(agentRole)
+    setPipelineError(null)
+
+    try {
+      const response = await fetch(
+        `${apiBaseUrl}/runs/${encodeURIComponent(draftRun.runId)}/agents/${encodeURIComponent(agentRole)}/regenerate`,
+        {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...workspaceAuthHeaders,
+          },
+          body: JSON.stringify({
+            draftRun,
+            approvedTriage: reviewDraft.triage,
+            previousResult: pipelineResult,
+            developmentPromptTargetTool:
+              reviewDraft.developmentPromptTargetTool ?? 'cursor',
+          }),
+        },
+      )
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`)
+      }
+
+      const result = (await response.json()) as MockPipelineResult
+      setPipelineResult(result)
+      setPipelineState('completed')
+    } catch (error) {
+      setPipelineError(
+        error instanceof Error
+          ? error.message
+          : `Failed to regenerate ${formatAgent(agentRole)}.`,
+      )
+    } finally {
+      setRegeneratingAgentRole(null)
     }
   }
 
@@ -32358,6 +32406,24 @@ function App() {
                     <span>{agentOutput.modelProvider}</span>
                     <span>{agentOutput.inputTokens + agentOutput.outputTokens} tokens</span>
                   </div>
+                  {draftRun && reviewDraft ? (
+                    <button
+                      type="button"
+                      className="secondary-button"
+                      disabled={
+                        pipelineState === 'running' ||
+                        regeneratingAgentRole !== null
+                      }
+                      aria-busy={regeneratingAgentRole === agentOutput.agentRole}
+                      onClick={() =>
+                        void handleRegenerateAgent(agentOutput.agentRole)
+                      }
+                    >
+                      {regeneratingAgentRole === agentOutput.agentRole
+                        ? 'Regenerating…'
+                        : 'Regenerate agent'}
+                    </button>
+                  ) : null}
                 </article>
               ))}
             </div>
