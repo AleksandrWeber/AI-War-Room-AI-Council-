@@ -20,6 +20,12 @@ function createDeploymentAdminService() {
     new ReadinessService(
       {} as PostgresService,
       new StreamEventBufferService(configService),
+      configService as never,
+      {
+        getRuntimeHealth: async () => ({
+          serverReachable: true,
+        }),
+      } as never,
     ),
   )
 }

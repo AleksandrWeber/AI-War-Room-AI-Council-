@@ -55,5 +55,6 @@ import { RunsService } from './runs.service.js'
       useClass: TemporalSdkRunClient,
     },
   ],
+  exports: [TemporalHealthService],
 })
 export class RunsModule {}

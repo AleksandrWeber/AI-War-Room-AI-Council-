@@ -5,7 +5,7 @@ export const dependencyHealthStatusSchema = z.enum(['up', 'down'])
 export type DependencyHealthStatus = z.infer<typeof dependencyHealthStatusSchema>
 
 export const dependencyHealthSchema = z.object({
-  name: z.enum(['postgres', 'redis']),
+  name: z.enum(['postgres', 'redis', 'temporal']),
   status: dependencyHealthStatusSchema,
   detail: nonEmptyStringSchema.optional(),
 })

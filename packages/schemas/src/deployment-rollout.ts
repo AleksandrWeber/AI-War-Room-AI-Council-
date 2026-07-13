@@ -21,7 +21,7 @@ export const deploymentCapabilitiesResponseSchema = z.object({
   supportsDeploymentRollout: z.literal(true),
   supportsDeploymentAdminTools: z.literal(true),
   supportsApiReadinessProbe: z.literal(true),
-  supportedDependencies: z.array(z.enum(['postgres', 'redis'])),
+  supportedDependencies: z.array(z.enum(['postgres', 'redis', 'temporal'])),
   guidance: nonEmptyStringSchema,
 })
 export type DeploymentCapabilitiesResponse = z.infer<
