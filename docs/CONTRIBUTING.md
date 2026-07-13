@@ -55,6 +55,7 @@ Copy from `.env.example`. Flags most contributors touch:
 | Flag | Default | Notes |
 | --- | --- | --- |
 | `LLM_PRIMARY_PROVIDER` / `LLM_FALLBACK_PROVIDER` | `mock` | Keep mock unless you explicitly opt into real providers. |
+| `LLM_ALLOW_REAL_PROVIDERS` | `false` | Required outside production when any `LLM_*_PROVIDER` is not `mock`. |
 | `AUTH_PROVIDER` | `headers` | `bearer` / `session` / `external` for auth rollouts. |
 | `TEMPORAL_ENABLED` | `false` | Set `true` only with a reachable Temporal server + worker. |
 | `VITE_USE_TEMPORAL_WORKFLOWS` | `auto` | Follows API Temporal capability; force with `true` / `false`. |

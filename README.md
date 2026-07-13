@@ -3393,13 +3393,16 @@ Current `v4.3` behavior:
 - Temporal activities buffer `status`, `artifact`, and `completed` pipeline stream events into the same Redis/in-memory run stream used by direct SSE execution.
 - `GET /api/runs/temporal/health` helps verify Temporal server reachability and worker heartbeat before executing approved runs.
 
-To enable real providers locally, copy `.env.example` to `.env`, add provider keys, and explicitly select the provider/model:
+To enable real providers locally, copy `.env.example` to `.env`, add provider keys, **opt in**, and explicitly select the provider/model:
 
 ```bash
+LLM_ALLOW_REAL_PROVIDERS=true
 LLM_PRIMARY_PROVIDER=anthropic
 LLM_PRIMARY_MODEL=claude-3-5-sonnet-latest
 ANTHROPIC_API_KEY=...
 ```
+
+Without `LLM_ALLOW_REAL_PROVIDERS=true`, non-mock `LLM_*_PROVIDER` values are rejected at API startup outside production (and the gateway also refuses non-mock calls).
 
 For user-managed workspace keys, use the Provider Keys panel in the web app.
 

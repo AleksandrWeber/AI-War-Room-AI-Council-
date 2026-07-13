@@ -49,9 +49,10 @@ npm run test:e2e:install      # once
 npm run test:e2e              # Playwright happy path
 ```
 
-## What you do *not* need on day 1
+What you do *not* need on day 1
 
 - Real Anthropic/OpenAI keys (mock gateway is enough)
+- `LLM_ALLOW_REAL_PROVIDERS=true` (leave false; required only for intentional live LLM calls)
 - Temporal (`TEMPORAL_ENABLED=false` by default)
 - Stripe (`STRIPE_ENABLED=false`)
 - Rollout/admin panels (load only when debugging ops)

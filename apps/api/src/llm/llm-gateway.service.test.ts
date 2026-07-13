@@ -153,11 +153,13 @@ function createGateway(
   selectedProviderId: LlmProviderId = 'mock',
 ) {
   const config = new ConfigService<ApiEnv>({
+    NODE_ENV: 'development',
     LLM_PRIMARY_PROVIDER: 'mock',
     LLM_FALLBACK_PROVIDER: 'mock',
     LLM_PRIMARY_MODEL: 'primary-model',
     LLM_FALLBACK_MODEL: 'fallback-model',
     LLM_MAX_ATTEMPTS: 3,
+    LLM_ALLOW_REAL_PROVIDERS: selectedProviderId !== 'mock',
   })
 
   const observability = new TestObservability()

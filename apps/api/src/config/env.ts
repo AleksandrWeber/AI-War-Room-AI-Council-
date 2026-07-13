@@ -34,6 +34,8 @@ export const envSchema = z.object({
   LLM_FALLBACK_MODEL: z.string().trim().min(1).default('mock-json-v1'),
   LLM_MAX_ATTEMPTS: z.coerce.number().int().positive().max(5).default(3),
   LLM_REQUEST_TIMEOUT_MS: z.coerce.number().int().positive().default(30_000),
+  /** Outside production, non-mock LLM providers require this explicit opt-in. */
+  LLM_ALLOW_REAL_PROVIDERS: booleanEnvSchema.default(false),
   ANTHROPIC_API_KEY: optionalEnvStringSchema,
   ANTHROPIC_API_URL: z.url().default('https://api.anthropic.com/v1/messages'),
   OPENAI_API_KEY: optionalEnvStringSchema,
@@ -183,6 +185,43 @@ export function validateEnv(config: Record<string, unknown>): ApiEnv {
 
   if (env.NODE_ENV === 'production' && env.LLM_PRIMARY_PROVIDER === 'mock') {
     throw new Error('LLM_PRIMARY_PROVIDER=mock cannot be used in production.')
+  }
+
+  const usesRealLlmProvider =
+    env.LLM_PRIMARY_PROVIDER !== 'mock' || env.LLM_FALLBACK_PROVIDER !== 'mock'
+
+  if (
+    usesRealLlmProvider &&
+    env.NODE_ENV !== 'production' &&
+    !env.LLM_ALLOW_REAL_PROVIDERS
+  ) {
+    throw new Error(
+      'Non-mock LLM providers require LLM_ALLOW_REAL_PROVIDERS=true outside production. Keep LLM_*_PROVIDER=mock for local/default runs, or opt in explicitly.',
+    )
+  }
+
+  if (env.LLM_PRIMARY_PROVIDER === 'anthropic' && !env.ANTHROPIC_API_KEY) {
+    throw new Error(
+      'ANTHROPIC_API_KEY is required when LLM_PRIMARY_PROVIDER=anthropic.',
+    )
+  }
+
+  if (env.LLM_FALLBACK_PROVIDER === 'anthropic' && !env.ANTHROPIC_API_KEY) {
+    throw new Error(
+      'ANTHROPIC_API_KEY is required when LLM_FALLBACK_PROVIDER=anthropic.',
+    )
+  }
+
+  if (env.LLM_PRIMARY_PROVIDER === 'openai' && !env.OPENAI_API_KEY) {
+    throw new Error(
+      'OPENAI_API_KEY is required when LLM_PRIMARY_PROVIDER=openai.',
+    )
+  }
+
+  if (env.LLM_FALLBACK_PROVIDER === 'openai' && !env.OPENAI_API_KEY) {
+    throw new Error(
+      'OPENAI_API_KEY is required when LLM_FALLBACK_PROVIDER=openai.',
+    )
   }
 
   if (env.NODE_ENV === 'production' && env.RESEARCH_PROVIDER === 'mock') {

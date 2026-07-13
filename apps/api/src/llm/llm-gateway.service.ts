@@ -45,6 +45,17 @@ export class LlmGatewayService {
       const providerId = modelDecision.selected.providerId
       const model = modelDecision.selected.modelName
       lastModelId = modelDecision.selected.modelId
+
+      if (
+        providerId !== 'mock' &&
+        this.configService.get('NODE_ENV', { infer: true }) !== 'production' &&
+        !this.configService.get('LLM_ALLOW_REAL_PROVIDERS', { infer: true })
+      ) {
+        throw new Error(
+          'Refusing non-mock LLM call without LLM_ALLOW_REAL_PROVIDERS=true outside production.',
+        )
+      }
+
       const provider = this.providerRegistry.getProvider(providerId)
       const apiKeyOverride =
         providerId === 'mock'

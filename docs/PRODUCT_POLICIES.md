@@ -30,3 +30,9 @@ Operational product decisions that shape Shield, storage, and research. Implemen
 - **Failure mode:** **fail-soft** — if live research throws / is unavailable, Market Research Agent continues with a degraded note; the pipeline is not blocked.
 - **Trust:** retrieved content is Shield-scanned before agent consumption (existing path).
 - **Post-MVP:** BYOK research keys; second-provider failover behind the same adapter interface.
+
+## Real LLM opt-in
+
+- **Local/default:** `LLM_*_PROVIDER=mock` — no paid API calls.
+- **Local real providers:** require `LLM_ALLOW_REAL_PROVIDERS=true` plus provider selection and API keys. Startup and gateway both enforce this outside production.
+- **Production:** non-mock primary is required; the local opt-in flag is not needed.
