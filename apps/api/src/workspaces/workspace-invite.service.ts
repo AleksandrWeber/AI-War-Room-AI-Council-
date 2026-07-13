@@ -160,12 +160,44 @@ export class WorkspaceInviteService {
       })
     }
 
-    const member = await this.workspaceRepository.addWorkspaceMember({
-      workspaceId: invite.workspaceId,
-      userId: input.authContext.userId,
-      role: invite.role,
-      email: invite.email,
-    })
+    const profile = await this.workspaceRepository.findUserProfile(
+      input.authContext.userId,
+    )
+    const actorEmail = profile?.email?.trim().toLowerCase()
+
+    if (!profile || !actorEmail) {
+      throw new BadRequestException({
+        message:
+          'Your account has no email on file. Sign in with an email identity before accepting an invite.',
+      })
+    }
+
+    if (actorEmail !== invite.email) {
+      throw new ForbiddenException({
+        message: `This invite was issued for ${invite.email}. Sign in as that email to accept.`,
+      })
+    }
+
+    const existingMembership = await this.workspaceRepository.findMembership(
+      input.authContext.userId,
+      invite.workspaceId,
+    )
+
+    const member = existingMembership
+      ? {
+          workspaceId: existingMembership.workspaceId,
+          userId: existingMembership.userId,
+          role: existingMembership.role,
+          email: invite.email,
+          displayName: profile.displayName,
+        }
+      : await this.workspaceRepository.addWorkspaceMember({
+          workspaceId: invite.workspaceId,
+          userId: input.authContext.userId,
+          role: invite.role,
+          email: invite.email,
+          displayName: profile.displayName ?? undefined,
+        })
 
     const acceptedAt = new Date().toISOString()
     await this.markAccepted({
@@ -176,10 +208,12 @@ export class WorkspaceInviteService {
 
     return acceptWorkspaceInviteResponseSchema.parse({
       workspaceId: invite.workspaceId,
-      role: invite.role,
+      role: member.role,
       memberUserId: member.userId,
       inviteId: invite.inviteId,
-      guidance: 'Invite accepted. Workspace membership is now active for this user.',
+      guidance: existingMembership
+        ? 'Invite accepted. You already had access; active membership is unchanged.'
+        : 'Invite accepted. Workspace membership is now active for this user.',
     })
   }
 

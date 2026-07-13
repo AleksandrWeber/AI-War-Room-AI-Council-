@@ -1197,7 +1197,9 @@ import {
 import {
   buildBootstrapAuthHeaders,
   buildWorkspaceAuthHeaders,
+  loadStoredActiveWorkspaceId,
   loadStoredAuthSession,
+  saveStoredActiveWorkspaceId,
   saveStoredAuthSession,
 } from './auth-headers'
 import {
@@ -1404,7 +1406,7 @@ type TemporalRunStatusResponse = {
 }
 
 const apiBaseUrl = import.meta.env.VITE_API_URL ?? 'http://127.0.0.1:3000/api'
-const defaultWorkspaceId = 'local_workspace'
+const fallbackWorkspaceId = 'local_workspace'
 const reviewStorageKey = 'ai-war-room.review-draft'
 const ideaStorageKey = 'ai-war-room.idea-draft'
 const pipelineResultStorageKey = 'ai-war-room.pipeline-result'
@@ -1651,6 +1653,7 @@ function App() {
   const [lastStreamEventId, setLastStreamEventId] = useState<string | null>(null)
   const lastStreamEventIdRef = useRef<string | null>(null)
   const processedInviteTokensRef = useRef(new Set<string>())
+  const inFlightInviteTokensRef = useRef(new Set<string>())
   const [lastStreamRunId, setLastStreamRunId] = useState<string | null>(null)
   const [runCapabilities, setRunCapabilities] =
     useState<RunCapabilitiesResponse | null>(null)
@@ -2844,9 +2847,13 @@ function App() {
   const [authSession, setAuthSession] = useState<AuthSessionResponse | null>(
     () => loadStoredAuthSession(),
   )
+  const [activeWorkspaceId, setActiveWorkspaceId] = useState(() =>
+    loadStoredActiveWorkspaceId(fallbackWorkspaceId),
+  )
   const workspaceAuthHeaders = buildWorkspaceAuthHeaders(
     authCapabilities,
     authSession,
+    { workspaceId: activeWorkspaceId },
   )
   const [temporalRuntimeHealth, setTemporalRuntimeHealth] =
     useState<TemporalRuntimeHealthResponse | null>(null)
@@ -2889,6 +2896,10 @@ function App() {
     useState<BillingWorkspaceStatusResponse | null>(null)
   const [billingError, setBillingError] = useState<string | null>(null)
   const [billingMessage, setBillingMessage] = useState<string | null>(null)
+  const [inviteStatusMessage, setInviteStatusMessage] = useState<string | null>(
+    null,
+  )
+  const [inviteStatusError, setInviteStatusError] = useState<string | null>(null)
   const [billingAction, setBillingAction] = useState<
     'idle' | 'loading' | 'upgrading' | 'portal' | 'canceling'
   >('idle')
@@ -6697,7 +6708,7 @@ function App() {
 
   useEffect(() => {
     void handleLoadBillingStatus()
-  }, [authCapabilities, authSession])
+  }, [authCapabilities, authSession, activeWorkspaceId])
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
@@ -6707,16 +6718,19 @@ function App() {
       return
     }
 
-    if (processedInviteTokensRef.current.has(inviteToken)) {
+    if (
+      processedInviteTokensRef.current.has(inviteToken) ||
+      inFlightInviteTokensRef.current.has(inviteToken)
+    ) {
       return
     }
-    processedInviteTokensRef.current.add(inviteToken)
+    inFlightInviteTokensRef.current.add(inviteToken)
 
     let cancelled = false
 
     void (async () => {
-      setBillingError(null)
-      setBillingMessage(null)
+      setInviteStatusError(null)
+      setInviteStatusMessage(null)
 
       try {
         const accepted = await callUi(
@@ -6727,24 +6741,28 @@ function App() {
           inviteToken,
         )
         if (cancelled) {
+          inFlightInviteTokensRef.current.delete(inviteToken)
           return
         }
 
+        processedInviteTokensRef.current.add(inviteToken)
+        inFlightInviteTokensRef.current.delete(inviteToken)
         params.delete('inviteToken')
         const nextQuery = params.toString()
         const nextUrl = `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ''}${window.location.hash}`
         window.history.replaceState({}, '', nextUrl)
-        setBillingMessage(
+        saveStoredActiveWorkspaceId(accepted.workspaceId)
+        setActiveWorkspaceId(accepted.workspaceId)
+        setInviteStatusMessage(
           `${accepted.guidance} Joined ${accepted.workspaceId} as ${accepted.role}.`,
         )
-        await handleLoadBillingStatus()
       } catch (error) {
+        inFlightInviteTokensRef.current.delete(inviteToken)
         if (cancelled) {
           return
         }
 
-        processedInviteTokensRef.current.delete(inviteToken)
-        setBillingError(
+        setInviteStatusError(
           error instanceof Error
             ? error.message
             : 'Failed to accept workspace invite.',
@@ -6754,8 +6772,9 @@ function App() {
 
     return () => {
       cancelled = true
+      inFlightInviteTokensRef.current.delete(inviteToken)
     }
-  }, [authCapabilities, authSession, workspaceAuthHeaders['x-user-id']])
+  }, [workspaceAuthHeaders['x-user-id'], workspaceAuthHeaders['x-workspace-id']])
 
   useEffect(() => {
     const returnHint = readBillingReturnHint()
@@ -7444,21 +7463,21 @@ function App() {
     try {
       const usageAdmin = await callUi('usage-ui', 'fetchUsageAdminSummary',
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setUsageAdminSummary(usageAdmin)
 
       const modelHealthAdmin = await callUi('model-router-ui', 'fetchModelHealthAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setModelHealthAdminSummary(modelHealthAdmin)
 
       const shieldReviewAdmin = await callUi('shield-ui', 'fetchShieldReviewAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setShieldReviewAdminSummary(shieldReviewAdmin)
@@ -7467,4116 +7486,4116 @@ function App() {
         'shield-ui',
         'fetchShieldFalsePositiveReports',
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setShieldFalsePositiveReports(falsePositiveQueue)
 
       const providerKeyAdmin = await callUi('provider-credentials-ui', 'fetchProviderKeyAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setProviderKeyAdminSummary(providerKeyAdmin)
 
       const observabilityAdmin = await callUi('observability-ui', 'fetchObservabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setObservabilityAdminSummary(observabilityAdmin)
 
       const promptRegressionAdmin = await callUi('evaluation-ui', 'fetchPromptRegressionAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPromptRegressionAdminSummary(promptRegressionAdmin)
 
       const runHistoryAdmin = await callUi('run-history-ui', 'fetchRunHistoryAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRunHistoryAdminSummary(runHistoryAdmin)
 
       const streamRecoveryAdmin = await callUi('stream-replay-ui', 'fetchStreamRecoveryAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setStreamRecoveryAdminSummary(streamRecoveryAdmin)
 
       const idempotencyAdmin = await callUi('idempotency-ui', 'fetchIdempotencyAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setIdempotencyAdminSummary(idempotencyAdmin)
 
       const quotaAdmin = await callUi('usage-limits-ui', 'fetchQuotaAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setQuotaAdminSummary(quotaAdmin)
 
       const deploymentAdmin = await callUi('deployment-ui', 'fetchDeploymentAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDeploymentAdminSummary(deploymentAdmin)
 
       const migrationAdmin = await callUi('migrations-ui', 'fetchMigrationAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMigrationAdminSummary(migrationAdmin)
 
       const backupAdmin = await callUi('backup-ui', 'fetchBackupAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBackupAdminSummary(backupAdmin)
 
       const auditAdmin = await callUi('audit-trail-ui', 'fetchAuditAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAuditAdminSummary(auditAdmin)
 
       const complianceAdmin = await callUi('compliance-ui', 'fetchComplianceAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setComplianceAdminSummary(complianceAdmin)
 
       const incidentAdmin = await callUi('incident-response-ui', 'fetchIncidentAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setIncidentAdminSummary(incidentAdmin)
 
       const releaseAdmin = await callUi('release-ui', 'fetchReleaseAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setReleaseAdminSummary(releaseAdmin)
 
       const sloAdmin = await callUi('slo-ui', 'fetchSloAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSloAdminSummary(sloAdmin)
 
       const capacityAdmin = await callUi('capacity-ui', 'fetchCapacityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCapacityAdminSummary(capacityAdmin)
 
       const performanceAdmin = await callUi('performance-ui', 'fetchPerformanceAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPerformanceAdminSummary(performanceAdmin)
 
       const resilienceAdmin = await callUi('resilience-ui', 'fetchResilienceAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setResilienceAdminSummary(resilienceAdmin)
 
       const availabilityAdmin = await callUi('availability-ui', 'fetchAvailabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAvailabilityAdminSummary(availabilityAdmin)
 
       const reliabilityAdmin = await callUi('reliability-ui', 'fetchReliabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setReliabilityAdminSummary(reliabilityAdmin)
 
       const stabilityAdmin = await callUi('stability-ui', 'fetchStabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setStabilityAdminSummary(stabilityAdmin)
 
       const consistencyAdmin = await callUi('consistency-ui', 'fetchConsistencyAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setConsistencyAdminSummary(consistencyAdmin)
 
       const integrityAdmin = await callUi('integrity-ui', 'fetchIntegrityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setIntegrityAdminSummary(integrityAdmin)
 
       const durabilityAdmin = await callUi('durability-ui', 'fetchDurabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDurabilityAdminSummary(durabilityAdmin)
 
       const recoverabilityAdmin = await callUi('recoverability-ui', 'fetchRecoverabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRecoverabilityAdminSummary(recoverabilityAdmin)
 
       const maintainabilityAdmin = await callUi('maintainability-ui', 'fetchMaintainabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMaintainabilityAdminSummary(maintainabilityAdmin)
 
       const scalabilityAdmin = await callUi('scalability-ui', 'fetchScalabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setScalabilityAdminSummary(scalabilityAdmin)
 
       const traceabilityAdmin = await callUi('traceability-ui', 'fetchTraceabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTraceabilityAdminSummary(traceabilityAdmin)
 
       const efficiencyAdmin = await callUi('efficiency-ui', 'fetchEfficiencyAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setEfficiencyAdminSummary(efficiencyAdmin)
 
       const optimizationAdmin = await callUi('optimization-ui', 'fetchOptimizationAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setOptimizationAdminSummary(optimizationAdmin)
 
       const utilizationAdmin = await callUi('utilization-ui', 'fetchUtilizationAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setUtilizationAdminSummary(utilizationAdmin)
 
       const sustainabilityAdmin = await callUi('sustainability-ui', 'fetchSustainabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSustainabilityAdminSummary(sustainabilityAdmin)
 
       const governanceAdmin = await callUi('governance-ui', 'fetchGovernanceAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setGovernanceAdminSummary(governanceAdmin)
 
       const oversightAdmin = await callUi('oversight-ui', 'fetchOversightAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setOversightAdminSummary(oversightAdmin)
 
       const assuranceAdmin = await callUi('assurance-ui', 'fetchAssuranceAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAssuranceAdminSummary(assuranceAdmin)
 
       const accountabilityAdmin = await callUi('accountability-ui', 'fetchAccountabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAccountabilityAdminSummary(accountabilityAdmin)
 
       const transparencyAdmin = await callUi('transparency-ui', 'fetchTransparencyAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTransparencyAdminSummary(transparencyAdmin)
 
       const attestationAdmin = await callUi('attestation-ui', 'fetchAttestationAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAttestationAdminSummary(attestationAdmin)
 
       const authenticityAdmin = await callUi('authenticity-ui', 'fetchAuthenticityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAuthenticityAdminSummary(authenticityAdmin)
 
       const provenanceAdmin = await callUi('provenance-ui', 'fetchProvenanceAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setProvenanceAdminSummary(provenanceAdmin)
 
       const verifiabilityAdmin = await callUi('verifiability-ui', 'fetchVerifiabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setVerifiabilityAdminSummary(verifiabilityAdmin)
 
       const confirmabilityAdmin = await callUi('confirmability-ui', 'fetchConfirmabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setConfirmabilityAdminSummary(confirmabilityAdmin)
 
       const validityAdmin = await callUi('validity-ui', 'fetchValidityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setValidityAdminSummary(validityAdmin)
 
       const credibilityAdmin = await callUi('credibility-ui', 'fetchCredibilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCredibilityAdminSummary(credibilityAdmin)
 
       const reproducibilityAdmin = await callUi('reproducibility-ui', 'fetchReproducibilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setReproducibilityAdminSummary(reproducibilityAdmin)
 
       const defensibilityAdmin = await callUi('defensibility-ui', 'fetchDefensibilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDefensibilityAdminSummary(defensibilityAdmin)
 
       const auditabilityAdmin = await callUi('auditability-ui', 'fetchAuditabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAuditabilityAdminSummary(auditabilityAdmin)
 
       const inspectabilityAdmin = await callUi('inspectability-ui', 'fetchInspectabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setInspectabilityAdminSummary(inspectabilityAdmin)
 
       const explainabilityAdmin = await callUi('explainability-ui', 'fetchExplainabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setExplainabilityAdminSummary(explainabilityAdmin)
 
       const demonstrabilityAdmin = await callUi('demonstrability-ui', 'fetchDemonstrabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDemonstrabilityAdminSummary(demonstrabilityAdmin)
 
       const justifiabilityAdmin = await callUi('justifiability-ui', 'fetchJustifiabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setJustifiabilityAdminSummary(justifiabilityAdmin)
 
       const reviewabilityAdmin = await callUi('reviewability-ui', 'fetchReviewabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setReviewabilityAdminSummary(reviewabilityAdmin)
 
       const assessabilityAdmin = await callUi('assessability-ui', 'fetchAssessabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAssessabilityAdminSummary(assessabilityAdmin)
 
       const measurabilityAdmin = await callUi('measurability-ui', 'fetchMeasurabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMeasurabilityAdminSummary(measurabilityAdmin)
 
       const certifiabilityAdmin = await callUi('certifiability-ui', 'fetchCertifiabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCertifiabilityAdminSummary(certifiabilityAdmin)
 
       const substantiabilityAdmin = await callUi('substantiability-ui', 'fetchSubstantiabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSubstantiabilityAdminSummary(substantiabilityAdmin)
 
       const warrantabilityAdmin = await callUi('warrantability-ui', 'fetchWarrantabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setWarrantabilityAdminSummary(warrantabilityAdmin)
 
       const attributabilityAdmin = await callUi('attributability-ui', 'fetchAttributabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAttributabilityAdminSummary(attributabilityAdmin)
 
       const identifiabilityAdmin = await callUi('identifiability-ui', 'fetchIdentifiabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setIdentifiabilityAdminSummary(identifiabilityAdmin)
 
       const comparabilityAdmin = await callUi('comparability-ui', 'fetchComparabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setComparabilityAdminSummary(comparabilityAdmin)
 
       const distinguishabilityAdmin = await callUi('distinguishability-ui', 'fetchDistinguishabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDistinguishabilityAdminSummary(distinguishabilityAdmin)
 
       const assignabilityAdmin = await callUi('assignability-ui', 'fetchAssignabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAssignabilityAdminSummary(assignabilityAdmin)
 
       const referencabilityAdmin = await callUi('referencability-ui', 'fetchReferencabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setReferencabilityAdminSummary(referencabilityAdmin)
 
       const locatabilityAdmin = await callUi('locatability-ui', 'fetchLocatabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setLocatabilityAdminSummary(locatabilityAdmin)
 
       const retrievabilityAdmin = await callUi('retrievability-ui', 'fetchRetrievabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRetrievabilityAdminSummary(retrievabilityAdmin)
 
       const discoverabilityAdmin = await callUi('discoverability-ui', 'fetchDiscoverabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDiscoverabilityAdminSummary(discoverabilityAdmin)
 
       const navigabilityAdmin = await callUi('navigability-ui', 'fetchNavigabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setNavigabilityAdminSummary(navigabilityAdmin)
 
       const connectabilityAdmin = await callUi('connectability-ui', 'fetchConnectabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setConnectabilityAdminSummary(connectabilityAdmin)
 
       const linkabilityAdmin = await callUi('linkability-ui', 'fetchLinkabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setLinkabilityAdminSummary(linkabilityAdmin)
 
       const interchangeabilityAdmin = await callUi('interchangeability-ui', 'fetchInterchangeabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setInterchangeabilityAdminSummary(interchangeabilityAdmin)
 
       const transferabilityAdmin = await callUi('transferability-ui', 'fetchTransferabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTransferabilityAdminSummary(transferabilityAdmin)
 
       const portabilityAdmin = await callUi('portability-ui', 'fetchPortabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPortabilityAdminSummary(portabilityAdmin)
 
       const compatibilityAdmin = await callUi('compatibility-ui', 'fetchCompatibilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCompatibilityAdminSummary(compatibilityAdmin)
 
       const adaptabilityAdmin = await callUi('adaptability-ui', 'fetchAdaptabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAdaptabilityAdminSummary(adaptabilityAdmin)
 
       const flexibilityAdmin = await callUi('flexibility-ui', 'fetchFlexibilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setFlexibilityAdminSummary(flexibilityAdmin)
 
       const extensibilityAdmin = await callUi('extensibility-ui', 'fetchExtensibilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setExtensibilityAdminSummary(extensibilityAdmin)
 
       const modifiabilityAdmin = await callUi('modifiability-ui', 'fetchModifiabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setModifiabilityAdminSummary(modifiabilityAdmin)
 
       const configurabilityAdmin = await callUi('configurability-ui', 'fetchConfigurabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setConfigurabilityAdminSummary(configurabilityAdmin)
 
       const customizabilityAdmin = await callUi('customizability-ui', 'fetchCustomizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCustomizabilityAdminSummary(customizabilityAdmin)
 
       const operabilityAdmin = await callUi('operability-ui', 'fetchOperabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setOperabilityAdminSummary(operabilityAdmin)
 
       const tunabilityAdmin = await callUi('tunability-ui', 'fetchTunabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTunabilityAdminSummary(tunabilityAdmin)
 
       const adjustabilityAdmin = await callUi('adjustability-ui', 'fetchAdjustabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAdjustabilityAdminSummary(adjustabilityAdmin)
 
       const programmabilityAdmin = await callUi('programmability-ui', 'fetchProgrammabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setProgrammabilityAdminSummary(programmabilityAdmin)
 
       const deployabilityAdmin = await callUi('deployability-ui', 'fetchDeployabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDeployabilityAdminSummary(deployabilityAdmin)
 
       const manageabilityAdmin = await callUi('manageability-ui', 'fetchManageabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setManageabilityAdminSummary(manageabilityAdmin)
 
       const controllabilityAdmin = await callUi('controllability-ui', 'fetchControllabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setControllabilityAdminSummary(controllabilityAdmin)
 
       const integrabilityAdmin = await callUi('integrability-ui', 'fetchIntegrabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setIntegrabilityAdminSummary(integrabilityAdmin)
 
       const orchestrabilityAdmin = await callUi('orchestrability-ui', 'fetchOrchestrabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setOrchestrabilityAdminSummary(orchestrabilityAdmin)
 
       const schedulabilityAdmin = await callUi('schedulability-ui', 'fetchSchedulabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSchedulabilityAdminSummary(schedulabilityAdmin)
 
       const automatabilityAdmin = await callUi('automatability-ui', 'fetchAutomatabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAutomatabilityAdminSummary(automatabilityAdmin)
 
       const monitorabilityAdmin = await callUi('monitorability-ui', 'fetchMonitorabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMonitorabilityAdminSummary(monitorabilityAdmin)
 
       const predictabilityAdmin = await callUi('predictability-ui', 'fetchPredictabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPredictabilityAdminSummary(predictabilityAdmin)
 
       const repeatabilityAdmin = await callUi('repeatability-ui', 'fetchRepeatabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRepeatabilityAdminSummary(repeatabilityAdmin)
 
       const responsivenessAdmin = await callUi('responsiveness-ui', 'fetchResponsivenessAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setResponsivenessAdminSummary(responsivenessAdmin)
 
       const dependabilityAdmin = await callUi('dependability-ui', 'fetchDependabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDependabilityAdminSummary(dependabilityAdmin)
 
       const composabilityAdmin = await callUi('composability-ui', 'fetchComposabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setComposabilityAdminSummary(composabilityAdmin)
 
       const trustworthinessAdmin = await callUi('trustworthiness-ui', 'fetchTrustworthinessAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTrustworthinessAdminSummary(trustworthinessAdmin)
 
       const usabilityAdmin = await callUi('usability-ui', 'fetchUsabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setUsabilityAdminSummary(usabilityAdmin)
 
       const accessibilityAdmin = await callUi('accessibility-ui', 'fetchAccessibilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAccessibilityAdminSummary(accessibilityAdmin)
 
       const effectivenessAdmin = await callUi('effectiveness-ui', 'fetchEffectivenessAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setEffectivenessAdminSummary(effectivenessAdmin)
 
       const appropriatenessAdmin = await callUi('appropriateness-ui', 'fetchAppropriatenessAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAppropriatenessAdminSummary(appropriatenessAdmin)
 
       const survivabilityAdmin = await callUi('survivability-ui', 'fetchSurvivabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSurvivabilityAdminSummary(survivabilityAdmin)
 
       const viabilityAdmin = await callUi('viability-ui', 'fetchViabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setViabilityAdminSummary(viabilityAdmin)
 
       const feasibilityAdmin = await callUi('feasibility-ui', 'fetchFeasibilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setFeasibilityAdminSummary(feasibilityAdmin)
 
       const conformanceAdmin = await callUi('conformance-ui', 'fetchConformanceAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setConformanceAdminSummary(conformanceAdmin)
 
       const adoptabilityAdmin = await callUi('adoptability-ui', 'fetchAdoptabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAdoptabilityAdminSummary(adoptabilityAdmin)
 
       const acceptabilityAdmin = await callUi('acceptability-ui', 'fetchAcceptabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAcceptabilityAdminSummary(acceptabilityAdmin)
 
       const affordabilityAdmin = await callUi('affordability-ui', 'fetchAffordabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAffordabilityAdminSummary(affordabilityAdmin)
 
       const desirabilityAdmin = await callUi('desirability-ui', 'fetchDesirabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDesirabilityAdminSummary(desirabilityAdmin)
 
       const marketabilityAdmin = await callUi('marketability-ui', 'fetchMarketabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMarketabilityAdminSummary(marketabilityAdmin)
 
       const suitabilityAdmin = await callUi('suitability-ui', 'fetchSuitabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSuitabilityAdminSummary(suitabilityAdmin)
 
       const profitabilityAdmin = await callUi('profitability-ui', 'fetchProfitabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setProfitabilityAdminSummary(profitabilityAdmin)
 
       const learnabilityAdmin = await callUi('learnability-ui', 'fetchLearnabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setLearnabilityAdminSummary(learnabilityAdmin)
 
       const deliverabilityAdmin = await callUi('deliverability-ui', 'fetchDeliverabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDeliverabilityAdminSummary(deliverabilityAdmin)
 
       const understandabilityAdmin = await callUi('understandability-ui', 'fetchUnderstandabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setUnderstandabilityAdminSummary(understandabilityAdmin)
 
       const memorabilityAdmin = await callUi('memorability-ui', 'fetchMemorabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMemorabilityAdminSummary(memorabilityAdmin)
 
       const teachabilityAdmin = await callUi('teachability-ui', 'fetchTeachabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTeachabilityAdminSummary(teachabilityAdmin)
 
       const readabilityAdmin = await callUi('readability-ui', 'fetchReadabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setReadabilityAdminSummary(readabilityAdmin)
 
       const clarityAdmin = await callUi('clarity-ui', 'fetchClarityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setClarityAdminSummary(clarityAdmin)
 
       const simplicityAdmin = await callUi('simplicity-ui', 'fetchSimplicityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSimplicityAdminSummary(simplicityAdmin)
 
       const negotiabilityAdmin = await callUi('negotiability-ui', 'fetchNegotiabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setNegotiabilityAdminSummary(negotiabilityAdmin)
 
       const comprehensibilityAdmin = await callUi('comprehensibility-ui', 'fetchComprehensibilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setComprehensibilityAdminSummary(comprehensibilityAdmin)
 
       const intelligibilityAdmin = await callUi('intelligibility-ui', 'fetchIntelligibilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setIntelligibilityAdminSummary(intelligibilityAdmin)
 
       const legibilityAdmin = await callUi('legibility-ui', 'fetchLegibilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setLegibilityAdminSummary(legibilityAdmin)
 
       const parsabilityAdmin = await callUi('parsability-ui', 'fetchParsabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setParsabilityAdminSummary(parsabilityAdmin)
 
       const coherenceAdmin = await callUi('coherence-ui', 'fetchCoherenceAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCoherenceAdminSummary(coherenceAdmin)
 
       const familiarityAdmin = await callUi('familiarity-ui', 'fetchFamiliarityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setFamiliarityAdminSummary(familiarityAdmin)
 
       const recognizabilityAdmin = await callUi('recognizability-ui', 'fetchRecognizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRecognizabilityAdminSummary(recognizabilityAdmin)
 
       const interpretabilityAdmin = await callUi('interpretability-ui', 'fetchInterpretabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setInterpretabilityAdminSummary(interpretabilityAdmin)
 
       const scannabilityAdmin = await callUi('scannability-ui', 'fetchScannabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setScannabilityAdminSummary(scannabilityAdmin)
 
       const perceptibilityAdmin = await callUi('perceptibility-ui', 'fetchPerceptibilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPerceptibilityAdminSummary(perceptibilityAdmin)
 
       const noticeabilityAdmin = await callUi('noticeability-ui', 'fetchNoticeabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setNoticeabilityAdminSummary(noticeabilityAdmin)
 
       const discernibilityAdmin = await callUi('discernibility-ui', 'fetchDiscernibilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDiscernibilityAdminSummary(discernibilityAdmin)
 
       const distinctivenessAdmin = await callUi('distinctiveness-ui', 'fetchDistinctivenessAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDistinctivenessAdminSummary(distinctivenessAdmin)
 
       const conspicuousnessAdmin = await callUi('conspicuousness-ui', 'fetchConspicuousnessAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setConspicuousnessAdminSummary(conspicuousnessAdmin)
 
       const detectabilityAdmin = await callUi('detectability-ui', 'fetchDetectabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDetectabilityAdminSummary(detectabilityAdmin)
 
       const describabilityAdmin = await callUi('describability-ui', 'fetchDescribabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDescribabilityAdminSummary(describabilityAdmin)
 
       const expressivenessAdmin = await callUi('expressiveness-ui', 'fetchExpressivenessAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setExpressivenessAdminSummary(expressivenessAdmin)
 
       const communicabilityAdmin = await callUi('communicability-ui', 'fetchCommunicabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCommunicabilityAdminSummary(communicabilityAdmin)
 
       const articulabilityAdmin = await callUi('articulability-ui', 'fetchArticulabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setArticulabilityAdminSummary(articulabilityAdmin)
 
       const elaboratabilityAdmin = await callUi('elaboratability-ui', 'fetchElaboratabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setElaboratabilityAdminSummary(elaboratabilityAdmin)
 
       const representabilityAdmin = await callUi('representability-ui', 'fetchRepresentabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRepresentabilityAdminSummary(representabilityAdmin)
 
       const presentabilityAdmin = await callUi('presentability-ui', 'fetchPresentabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPresentabilityAdminSummary(presentabilityAdmin)
 
       const enunciabilityAdmin = await callUi('enunciability-ui', 'fetchEnunciabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setEnunciabilityAdminSummary(enunciabilityAdmin)
 
       const formulatabilityAdmin = await callUi('formulatability-ui', 'fetchFormulatabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setFormulatabilityAdminSummary(formulatabilityAdmin)
 
       const narratabilityAdmin = await callUi('narratability-ui', 'fetchNarratabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setNarratabilityAdminSummary(narratabilityAdmin)
 
       const illustratabilityAdmin = await callUi('illustratability-ui', 'fetchIllustratabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setIllustratabilityAdminSummary(illustratabilityAdmin)
 
       const symbolizabilityAdmin = await callUi('symbolizability-ui', 'fetchSymbolizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSymbolizabilityAdminSummary(symbolizabilityAdmin)
 
       const visualizabilityAdmin = await callUi('visualizability-ui', 'fetchVisualizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setVisualizabilityAdminSummary(visualizabilityAdmin)
 
       const evocatabilityAdmin = await callUi('evocatability-ui', 'fetchEvocatabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setEvocatabilityAdminSummary(evocatabilityAdmin)
 
       const signifiabilityAdmin = await callUi('signifiability-ui', 'fetchSignifiabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSignifiabilityAdminSummary(signifiabilityAdmin)
 
       const connotabilityAdmin = await callUi('connotability-ui', 'fetchConnotabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setConnotabilityAdminSummary(connotabilityAdmin)
 
       const typifiabilityAdmin = await callUi('typifiability-ui', 'fetchTypifiabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTypifiabilityAdminSummary(typifiabilityAdmin)
 
       const metaphorizabilityAdmin = await callUi('metaphorizability-ui', 'fetchMetaphorizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMetaphorizabilityAdminSummary(metaphorizabilityAdmin)
 
       const dramatizabilityAdmin = await callUi('dramatizability-ui', 'fetchDramatizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDramatizabilityAdminSummary(dramatizabilityAdmin)
 
       const personifiabilityAdmin = await callUi('personifiability-ui', 'fetchPersonifiabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPersonifiabilityAdminSummary(personifiabilityAdmin)
 
       const materializabilityAdmin = await callUi('materializability-ui', 'fetchMaterializabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMaterializabilityAdminSummary(materializabilityAdmin)
 
       const iconizabilityAdmin = await callUi('iconizability-ui', 'fetchIconizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setIconizabilityAdminSummary(iconizabilityAdmin)
 
       const allegorizabilityAdmin = await callUi('allegorizability-ui', 'fetchAllegorizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAllegorizabilityAdminSummary(allegorizabilityAdmin)
 
       const tokenizabilityAdmin = await callUi('tokenizability-ui', 'fetchTokenizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTokenizabilityAdminSummary(tokenizabilityAdmin)
 
       const stylizabilityAdmin = await callUi('stylizability-ui', 'fetchStylizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setStylizabilityAdminSummary(stylizabilityAdmin)
 
       const emblemizabilityAdmin = await callUi('emblemizability-ui', 'fetchEmblemizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setEmblemizabilityAdminSummary(emblemizabilityAdmin)
 
       const analogizabilityAdmin = await callUi('analogizability-ui', 'fetchAnalogizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAnalogizabilityAdminSummary(analogizabilityAdmin)
 
       const parabolizabilityAdmin = await callUi('parabolizability-ui', 'fetchParabolizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setParabolizabilityAdminSummary(parabolizabilityAdmin)
 
       const archetypizabilityAdmin = await callUi('archetypizability-ui', 'fetchArchetypizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setArchetypizabilityAdminSummary(archetypizabilityAdmin)
 
       const caracterizabilityAdmin = await callUi('caracterizability-ui', 'fetchCaracterizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCaracterizabilityAdminSummary(caracterizabilityAdmin)
 
       const mythicizabilityAdmin = await callUi('mythicizability-ui', 'fetchMythicizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMythicizabilityAdminSummary(mythicizabilityAdmin)
 
       const semiotizabilityAdmin = await callUi('semiotizability-ui', 'fetchSemiotizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSemiotizabilityAdminSummary(semiotizabilityAdmin)
 
       const hermeneutizabilityAdmin = await callUi('hermeneutizability-ui', 'fetchHermeneutizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setHermeneutizabilityAdminSummary(hermeneutizabilityAdmin)
 
       const lexicalizabilityAdmin = await callUi('lexicalizability-ui', 'fetchLexicalizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setLexicalizabilityAdminSummary(lexicalizabilityAdmin)
 
       const semanticizabilityAdmin = await callUi('semanticizability-ui', 'fetchSemanticizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSemanticizabilityAdminSummary(semanticizabilityAdmin)
 
       const pragmatizabilityAdmin = await callUi('pragmatizability-ui', 'fetchPragmatizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPragmatizabilityAdminSummary(pragmatizabilityAdmin)
 
       const syntacticizabilityAdmin = await callUi('syntacticizability-ui', 'fetchSyntacticizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSyntacticizabilityAdminSummary(syntacticizabilityAdmin)
 
       const rhetorizabilityAdmin = await callUi('rhetorizability-ui', 'fetchRhetorizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRhetorizabilityAdminSummary(rhetorizabilityAdmin)
 
       const morphizabilityAdmin = await callUi('morphizability-ui', 'fetchMorphizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMorphizabilityAdminSummary(morphizabilityAdmin)
 
       const codifiabilityAdmin = await callUi('codifiability-ui', 'fetchCodifiabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCodifiabilityAdminSummary(codifiabilityAdmin)
 
       const hermeticizabilityAdmin = await callUi('hermeticizability-ui', 'fetchHermeticizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setHermeticizabilityAdminSummary(hermeticizabilityAdmin)
 
       const epistemizabilityAdmin = await callUi('epistemizability-ui', 'fetchEpistemizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setEpistemizabilityAdminSummary(epistemizabilityAdmin)
 
       const dialectizabilityAdmin = await callUi('dialectizability-ui', 'fetchDialectizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDialectizabilityAdminSummary(dialectizabilityAdmin)
 
       const ontologizabilityAdmin = await callUi('ontologizability-ui', 'fetchOntologizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setOntologizabilityAdminSummary(ontologizabilityAdmin)
 
       const phenomenizabilityAdmin = await callUi('phenomenizability-ui', 'fetchPhenomenizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPhenomenizabilityAdminSummary(phenomenizabilityAdmin)
 
       const axiologizabilityAdmin = await callUi('axiologizability-ui', 'fetchAxiologizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAxiologizabilityAdminSummary(axiologizabilityAdmin)
 
       const teleologizabilityAdmin = await callUi('teleologizability-ui', 'fetchTeleologizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTeleologizabilityAdminSummary(teleologizabilityAdmin)
 
       const gnoseizabilityAdmin = await callUi('gnoseizability-ui', 'fetchGnoseizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setGnoseizabilityAdminSummary(gnoseizabilityAdmin)
 
       const methodizabilityAdmin = await callUi('methodizability-ui', 'fetchMethodizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMethodizabilityAdminSummary(methodizabilityAdmin)
 
       const historizabilityAdmin = await callUi('historizability-ui', 'fetchHistorizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setHistorizabilityAdminSummary(historizabilityAdmin)
 
       const categorizabilityAdmin = await callUi('categorizability-ui', 'fetchCategorizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCategorizabilityAdminSummary(categorizabilityAdmin)
 
       const taxonomizabilityAdmin = await callUi('taxonomizability-ui', 'fetchTaxonomizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTaxonomizabilityAdminSummary(taxonomizabilityAdmin)
 
       const classifiabilityAdmin = await callUi('classifiability-ui', 'fetchClassifiabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setClassifiabilityAdminSummary(classifiabilityAdmin)
 
       const typologizabilityAdmin = await callUi('typologizability-ui', 'fetchTypologizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTypologizabilityAdminSummary(typologizabilityAdmin)
 
       const stratifiabilityAdmin = await callUi('stratifiability-ui', 'fetchStratifiabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setStratifiabilityAdminSummary(stratifiabilityAdmin)
 
       const ordinarizabilityAdmin = await callUi('ordinarizability-ui', 'fetchOrdinarizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setOrdinarizabilityAdminSummary(ordinarizabilityAdmin)
 
       const systematizabilityAdmin = await callUi('systematizability-ui', 'fetchSystematizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSystematizabilityAdminSummary(systematizabilityAdmin)
 
       const hierarchizabilityAdmin = await callUi('hierarchizability-ui', 'fetchHierarchizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setHierarchizabilityAdminSummary(hierarchizabilityAdmin)
 
       const segmentizabilityAdmin = await callUi('segmentizability-ui', 'fetchSegmentizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSegmentizabilityAdminSummary(segmentizabilityAdmin)
 
       const clusterizabilityAdmin = await callUi('clusterizability-ui', 'fetchClusterizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setClusterizabilityAdminSummary(clusterizabilityAdmin)
 
       const nomenclatizabilityAdmin = await callUi('nomenclatizability-ui', 'fetchNomenclatizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setNomenclatizabilityAdminSummary(nomenclatizabilityAdmin)
 
       const catalogizabilityAdmin = await callUi('catalogizability-ui', 'fetchCatalogizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCatalogizabilityAdminSummary(catalogizabilityAdmin)
 
       const indexizabilityAdmin = await callUi('indexizability-ui', 'fetchIndexizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setIndexizabilityAdminSummary(indexizabilityAdmin)
 
       const directoryizabilityAdmin = await callUi('directoryizability-ui', 'fetchDirectoryizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDirectoryizabilityAdminSummary(directoryizabilityAdmin)
 
       const inventoryizabilityAdmin = await callUi('inventoryizability-ui', 'fetchInventoryizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setInventoryizabilityAdminSummary(inventoryizabilityAdmin)
 
       const registryizabilityAdmin = await callUi('registryizability-ui', 'fetchRegistryizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRegistryizabilityAdminSummary(registryizabilityAdmin)
 
       const archivizabilityAdmin = await callUi('archivizability-ui', 'fetchArchivizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setArchivizabilityAdminSummary(archivizabilityAdmin)
 
       const curatizabilityAdmin = await callUi('curatizability-ui', 'fetchCuratizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCuratizabilityAdminSummary(curatizabilityAdmin)
 
       const collectizabilityAdmin = await callUi('collectizability-ui', 'fetchCollectizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCollectizabilityAdminSummary(collectizabilityAdmin)
 
       const aggregatizabilityAdmin = await callUi('aggregatizability-ui', 'fetchAggregatizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAggregatizabilityAdminSummary(aggregatizabilityAdmin)
 
       const compilatizabilityAdmin = await callUi('compilatizability-ui', 'fetchCompilatizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCompilatizabilityAdminSummary(compilatizabilityAdmin)
 
       const bibliographizabilityAdmin = await callUi('bibliographizability-ui', 'fetchBibliographizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBibliographizabilityAdminSummary(bibliographizabilityAdmin)
 
       const referencizabilityAdmin = await callUi('referencizability-ui', 'fetchReferencizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setReferencizabilityAdminSummary(referencizabilityAdmin)
 
       const documentizabilityAdmin = await callUi('documentizability-ui', 'fetchDocumentizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDocumentizabilityAdminSummary(documentizabilityAdmin)
 
       const annotationizabilityAdmin = await callUi('annotationizability-ui', 'fetchAnnotationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAnnotationizabilityAdminSummary(annotationizabilityAdmin)
 
       const citationizabilityAdmin = await callUi('citationizability-ui', 'fetchCitationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCitationizabilityAdminSummary(citationizabilityAdmin)
 
       const consolidatizabilityAdmin = await callUi('consolidatizability-ui', 'fetchConsolidatizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setConsolidatizabilityAdminSummary(consolidatizabilityAdmin)
 
       const harmonizabilityAdmin = await callUi('harmonizability-ui', 'fetchHarmonizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setHarmonizabilityAdminSummary(harmonizabilityAdmin)
 
       const parametrizabilityAdmin = await callUi('parametrizability-ui', 'fetchParametrizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setParametrizabilityAdminSummary(parametrizabilityAdmin)
 
       const serializabilityAdmin = await callUi('serializability-ui', 'fetchSerializabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSerializabilityAdminSummary(serializabilityAdmin)
 
       const normalizabilityAdmin = await callUi('normalizability-ui', 'fetchNormalizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setNormalizabilityAdminSummary(normalizabilityAdmin)
 
       const glossarizabilityAdmin = await callUi('glossarizability-ui', 'fetchGlossarizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setGlossarizabilityAdminSummary(glossarizabilityAdmin)
 
       const thesaurusizabilityAdmin = await callUi('thesaurusizability-ui', 'fetchThesaurusizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setThesaurusizabilityAdminSummary(thesaurusizabilityAdmin)
 
       const terminologizabilityAdmin = await callUi('terminologizability-ui', 'fetchTerminologizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTerminologizabilityAdminSummary(terminologizabilityAdmin)
 
       const vocabularizabilityAdmin = await callUi('vocabularizability-ui', 'fetchVocabularizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setVocabularizabilityAdminSummary(vocabularizabilityAdmin)
 
       const footnotizabilityAdmin = await callUi('footnotizability-ui', 'fetchFootnotizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setFootnotizabilityAdminSummary(footnotizabilityAdmin)
 
       const contextualizabilityAdmin = await callUi('contextualizability-ui', 'fetchContextualizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setContextualizabilityAdminSummary(contextualizabilityAdmin)
 
       const generalizabilityAdmin = await callUi('generalizability-ui', 'fetchGeneralizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setGeneralizabilityAdminSummary(generalizabilityAdmin)
 
       const standardizabilityAdmin = await callUi('standardizability-ui', 'fetchStandardizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setStandardizabilityAdminSummary(standardizabilityAdmin)
 
       const formalizabilityAdmin = await callUi('formalizability-ui', 'fetchFormalizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setFormalizabilityAdminSummary(formalizabilityAdmin)
 
       const canonicalizabilityAdmin = await callUi('canonicalizability-ui', 'fetchCanonicalizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCanonicalizabilityAdminSummary(canonicalizabilityAdmin)
 
       const abstractizabilityAdmin = await callUi('abstractizability-ui', 'fetchAbstractizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAbstractizabilityAdminSummary(abstractizabilityAdmin)
 
       const concretizabilityAdmin = await callUi('concretizability-ui', 'fetchConcretizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setConcretizabilityAdminSummary(concretizabilityAdmin)
 
       const definizabilityAdmin = await callUi('definizability-ui', 'fetchDefinizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDefinizabilityAdminSummary(definizabilityAdmin)
 
       const inferencizabilityAdmin = await callUi('inferencizability-ui', 'fetchInferencizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setInferencizabilityAdminSummary(inferencizabilityAdmin)
 
       const deducizabilityAdmin = await callUi('deducizability-ui', 'fetchDeducizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDeducizabilityAdminSummary(deducizabilityAdmin)
 
       const probabilizabilityAdmin = await callUi('probabilizability-ui', 'fetchProbabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setProbabilizabilityAdminSummary(probabilizabilityAdmin)
 
       const stochasticizabilityAdmin = await callUi('stochasticizability-ui', 'fetchStochasticizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setStochasticizabilityAdminSummary(stochasticizabilityAdmin)
 
       const determinizabilityAdmin = await callUi('determinizability-ui', 'fetchDeterminizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDeterminizabilityAdminSummary(determinizabilityAdmin)
 
       const predictizabilityAdmin = await callUi('predictizability-ui', 'fetchPredictizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPredictizabilityAdminSummary(predictizabilityAdmin)
 
       const extrapolizabilityAdmin = await callUi('extrapolizability-ui', 'fetchExtrapolizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setExtrapolizabilityAdminSummary(extrapolizabilityAdmin)
 
       const inductizabilityAdmin = await callUi('inductizability-ui', 'fetchInductizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setInductizabilityAdminSummary(inductizabilityAdmin)
 
       const abductizabilityAdmin = await callUi('abductizability-ui', 'fetchAbductizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAbductizabilityAdminSummary(abductizabilityAdmin)
 
       const retrodictizabilityAdmin = await callUi('retrodictizability-ui', 'fetchRetrodictizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRetrodictizabilityAdminSummary(retrodictizabilityAdmin)
 
       const corroborizabilityAdmin = await callUi('corroborizability-ui', 'fetchCorroborizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCorroborizabilityAdminSummary(corroborizabilityAdmin)
 
       const falsifiizabilityAdmin = await callUi('falsifiizability-ui', 'fetchFalsifiizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setFalsifiizabilityAdminSummary(falsifiizabilityAdmin)
 
       const interpolizabilityAdmin = await callUi('interpolizability-ui', 'fetchInterpolizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setInterpolizabilityAdminSummary(interpolizabilityAdmin)
 
       const regressizabilityAdmin = await callUi('regressizability-ui', 'fetchRegressizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRegressizabilityAdminSummary(regressizabilityAdmin)
 
       const heuristizabilityAdmin = await callUi('heuristizability-ui', 'fetchHeuristizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setHeuristizabilityAdminSummary(heuristizabilityAdmin)
 
       const simulatizabilityAdmin = await callUi('simulatizability-ui', 'fetchSimulatizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSimulatizabilityAdminSummary(simulatizabilityAdmin)
 
       const optimizabilityAdmin = await callUi('optimizability-ui', 'fetchOptimizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setOptimizabilityAdminSummary(optimizabilityAdmin)
 
       const calibratizabilityAdmin = await callUi('calibratizability-ui', 'fetchCalibratizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCalibratizabilityAdminSummary(calibratizabilityAdmin)
 
       const metricizabilityAdmin = await callUi('metricizability-ui', 'fetchMetricizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMetricizabilityAdminSummary(metricizabilityAdmin)
 
       const benchmarkizabilityAdmin = await callUi('benchmarkizability-ui', 'fetchBenchmarkizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBenchmarkizabilityAdminSummary(benchmarkizabilityAdmin)
 
       const comparizabilityAdmin = await callUi('comparizability-ui', 'fetchComparizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setComparizabilityAdminSummary(comparizabilityAdmin)
 
       const tolerizabilityAdmin = await callUi('tolerizability-ui', 'fetchTolerizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTolerizabilityAdminSummary(tolerizabilityAdmin)
 
       const approximatizabilityAdmin = await callUi('approximatizability-ui', 'fetchApproximatizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setApproximatizabilityAdminSummary(approximatizabilityAdmin)
 
       const iterativizabilityAdmin = await callUi('iterativizability-ui', 'fetchIterativizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setIterativizabilityAdminSummary(iterativizabilityAdmin)
 
       const convergizabilityAdmin = await callUi('convergizability-ui', 'fetchConvergizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setConvergizabilityAdminSummary(convergizabilityAdmin)
 
       const stabilizabilityAdmin = await callUi('stabilizability-ui', 'fetchStabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setStabilizabilityAdminSummary(stabilizabilityAdmin)
 
       const adaptizabilityAdmin = await callUi('adaptizability-ui', 'fetchAdaptizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAdaptizabilityAdminSummary(adaptizabilityAdmin)
 
       const scalabilizabilityAdmin = await callUi('scalabilizability-ui', 'fetchScalabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setScalabilizabilityAdminSummary(scalabilizabilityAdmin)
 
       const elasticizabilityAdmin = await callUi('elasticizability-ui', 'fetchElasticizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setElasticizabilityAdminSummary(elasticizabilityAdmin)
 
       const resilientizabilityAdmin = await callUi('resilientizability-ui', 'fetchResilientizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setResilientizabilityAdminSummary(resilientizabilityAdmin)
 
       const robustizabilityAdmin = await callUi('robustizability-ui', 'fetchRobustizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRobustizabilityAdminSummary(robustizabilityAdmin)
 
       const dependableizabilityAdmin = await callUi('dependableizability-ui', 'fetchDependableizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDependableizabilityAdminSummary(dependableizabilityAdmin)
 
       const recoverizabilityAdmin = await callUi('recoverizability-ui', 'fetchRecoverizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRecoverizabilityAdminSummary(recoverizabilityAdmin)
 
       const redundizabilityAdmin = await callUi('redundizability-ui', 'fetchRedundizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRedundizabilityAdminSummary(redundizabilityAdmin)
 
       const failoverizabilityAdmin = await callUi('failoverizability-ui', 'fetchFailoverizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setFailoverizabilityAdminSummary(failoverizabilityAdmin)
 
       const continuizabilityAdmin = await callUi('continuizability-ui', 'fetchContinuizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setContinuizabilityAdminSummary(continuizabilityAdmin)
 
       const sustainizabilityAdmin = await callUi('sustainizability-ui', 'fetchSustainizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSustainizabilityAdminSummary(sustainizabilityAdmin)
 
       const availabilizabilityAdmin = await callUi('availabilizability-ui', 'fetchAvailabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAvailabilizabilityAdminSummary(availabilizabilityAdmin)
 
       const traceabilizabilityAdmin = await callUi('traceabilizability-ui', 'fetchTraceabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTraceabilizabilityAdminSummary(traceabilizabilityAdmin)
 
       const monitorizabilityAdmin = await callUi('monitorizability-ui', 'fetchMonitorizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMonitorizabilityAdminSummary(monitorizabilityAdmin)
 
       const alertabilizabilityAdmin = await callUi('alertabilizability-ui', 'fetchAlertabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAlertabilizabilityAdminSummary(alertabilizabilityAdmin)
 
       const observabilizabilityAdmin = await callUi('observabilizability-ui', 'fetchObservabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setObservabilizabilityAdminSummary(observabilizabilityAdmin)
 
       const restorabilizabilityAdmin = await callUi('restorabilizability-ui', 'fetchRestorabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRestorabilizabilityAdminSummary(restorabilizabilityAdmin)
 
       const replicabilizabilityAdmin = await callUi('replicabilizability-ui', 'fetchReplicabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setReplicabilizabilityAdminSummary(replicabilizabilityAdmin)
 
       const loadbalancizabilityAdmin = await callUi('loadbalancizability-ui', 'fetchLoadbalancizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setLoadbalancizabilityAdminSummary(loadbalancizabilityAdmin)
 
       const autoscalingizabilityAdmin = await callUi('autoscalingizability-ui', 'fetchAutoscalingizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAutoscalingizabilityAdminSummary(autoscalingizabilityAdmin)
 
       const deployabilizabilityAdmin = await callUi('deployabilizability-ui', 'fetchDeployabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDeployabilizabilityAdminSummary(deployabilizabilityAdmin)
 
       const configurabilizabilityAdmin = await callUi('configurabilizability-ui', 'fetchConfigurabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setConfigurabilizabilityAdminSummary(configurabilizabilityAdmin)
 
       const operabilizabilityAdmin = await callUi('operabilizability-ui', 'fetchOperabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setOperabilizabilityAdminSummary(operabilizabilityAdmin)
 
       const maintainabilizabilityAdmin = await callUi('maintainabilizability-ui', 'fetchMaintainabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMaintainabilizabilityAdminSummary(maintainabilizabilityAdmin)
 
       const diagnosabilizabilityAdmin = await callUi('diagnosabilizability-ui', 'fetchDiagnosabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDiagnosabilizabilityAdminSummary(diagnosabilizabilityAdmin)
 
       const troubleshootizabilityAdmin = await callUi('troubleshootizability-ui', 'fetchTroubleshootizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTroubleshootizabilityAdminSummary(troubleshootizabilityAdmin)
 
       const rollbackabilizabilityAdmin = await callUi('rollbackabilizability-ui', 'fetchRollbackabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRollbackabilizabilityAdminSummary(rollbackabilizabilityAdmin)
 
       const canaryizabilityAdmin = await callUi('canaryizability-ui', 'fetchCanaryizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCanaryizabilityAdminSummary(canaryizabilityAdmin)
 
       const bluegreenizabilityAdmin = await callUi('bluegreenizability-ui', 'fetchBluegreenizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBluegreenizabilityAdminSummary(bluegreenizabilityAdmin)
 
       const progressiveizabilityAdmin = await callUi('progressiveizability-ui', 'fetchProgressiveizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setProgressiveizabilityAdminSummary(progressiveizabilityAdmin)
 
       const featureflagizabilityAdmin = await callUi('featureflagizability-ui', 'fetchFeatureflagizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setFeatureflagizabilityAdminSummary(featureflagizabilityAdmin)
 
       const scriptabilizabilityAdmin = await callUi('scriptabilizability-ui', 'fetchScriptabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setScriptabilizabilityAdminSummary(scriptabilizabilityAdmin)
 
       const automatizabilityAdmin = await callUi('automatizability-ui', 'fetchAutomatizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAutomatizabilityAdminSummary(automatizabilityAdmin)
 
       const orchestrizabilityAdmin = await callUi('orchestrizability-ui', 'fetchOrchestrizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setOrchestrizabilityAdminSummary(orchestrizabilityAdmin)
 
       const schedulizabilityAdmin = await callUi('schedulizability-ui', 'fetchSchedulizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSchedulizabilityAdminSummary(schedulizabilityAdmin)
 
       const triggerizabilityAdmin = await callUi('triggerizability-ui', 'fetchTriggerizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTriggerizabilityAdminSummary(triggerizabilityAdmin)
 
       const releasizabilityAdmin = await callUi('releasizability-ui', 'fetchReleasizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setReleasizabilityAdminSummary(releasizabilityAdmin)
 
       const versionizabilityAdmin = await callUi('versionizability-ui', 'fetchVersionizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setVersionizabilityAdminSummary(versionizabilityAdmin)
 
       const migratizabilityAdmin = await callUi('migratizability-ui', 'fetchMigratizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMigratizabilityAdminSummary(migratizabilityAdmin)
 
       const upgradizabilityAdmin = await callUi('upgradizability-ui', 'fetchUpgradizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setUpgradizabilityAdminSummary(upgradizabilityAdmin)
 
       const patchizabilityAdmin = await callUi('patchizability-ui', 'fetchPatchizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPatchizabilityAdminSummary(patchizabilityAdmin)
 
       const integrabilizabilityAdmin = await callUi('integrabilizability-ui', 'fetchIntegrabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setIntegrabilizabilityAdminSummary(integrabilizabilityAdmin)
 
       const composabilizabilityAdmin = await callUi('composabilizability-ui', 'fetchComposabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setComposabilizabilityAdminSummary(composabilizabilityAdmin)
 
       const modularizabilityAdmin = await callUi('modularizability-ui', 'fetchModularizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setModularizabilityAdminSummary(modularizabilityAdmin)
 
       const extensibilizabilityAdmin = await callUi('extensibilizability-ui', 'fetchExtensibilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setExtensibilizabilityAdminSummary(extensibilizabilityAdmin)
 
       const pluggabilizabilityAdmin = await callUi('pluggabilizability-ui', 'fetchPluggabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPluggabilizabilityAdminSummary(pluggabilizabilityAdmin)
 
       const compatibilizabilityAdmin = await callUi('compatibilizability-ui', 'fetchCompatibilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCompatibilizabilityAdminSummary(compatibilizabilityAdmin)
 
       const interoperabilizabilityAdmin = await callUi('interoperabilizability-ui', 'fetchInteroperabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setInteroperabilizabilityAdminSummary(interoperabilizabilityAdmin)
 
       const connectabilizabilityAdmin = await callUi('connectabilizability-ui', 'fetchConnectabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setConnectabilizabilityAdminSummary(connectabilizabilityAdmin)
 
       const interfabilizabilityAdmin = await callUi('interfabilizability-ui', 'fetchInterfabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setInterfabilizabilityAdminSummary(interfabilizabilityAdmin)
 
       const protocolizabilityAdmin = await callUi('protocolizability-ui', 'fetchProtocolizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setProtocolizabilityAdminSummary(protocolizabilityAdmin)
 
       const encapsulizabilityAdmin = await callUi('encapsulizability-ui', 'fetchEncapsulizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setEncapsulizabilityAdminSummary(encapsulizabilityAdmin)
 
       const isolatizabilityAdmin = await callUi('isolatizability-ui', 'fetchIsolatizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setIsolatizabilityAdminSummary(isolatizabilityAdmin)
 
       const sandboxizabilityAdmin = await callUi('sandboxizability-ui', 'fetchSandboxizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSandboxizabilityAdminSummary(sandboxizabilityAdmin)
 
       const containerizabilityAdmin = await callUi('containerizability-ui', 'fetchContainerizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setContainerizabilityAdminSummary(containerizabilityAdmin)
 
       const boundarizabilityAdmin = await callUi('boundarizability-ui', 'fetchBoundarizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBoundarizabilityAdminSummary(boundarizabilityAdmin)
 
       const virtualizabilityAdmin = await callUi('virtualizability-ui', 'fetchVirtualizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setVirtualizabilityAdminSummary(virtualizabilityAdmin)
 
       const distributizabilityAdmin = await callUi('distributizability-ui', 'fetchDistributizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDistributizabilityAdminSummary(distributizabilityAdmin)
 
       const federatizabilityAdmin = await callUi('federatizability-ui', 'fetchFederatizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setFederatizabilityAdminSummary(federatizabilityAdmin)
 
       const decentralizabilityAdmin = await callUi('decentralizability-ui', 'fetchDecentralizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDecentralizabilityAdminSummary(decentralizabilityAdmin)
 
       const meshabilizabilityAdmin = await callUi('meshabilizability-ui', 'fetchMeshabilizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMeshabilizabilityAdminSummary(meshabilizabilityAdmin)
 
       const topologizabilityAdmin = await callUi('topologizability-ui', 'fetchTopologizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTopologizabilityAdminSummary(topologizabilityAdmin)
 
       const networkizabilityAdmin = await callUi('networkizability-ui', 'fetchNetworkizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setNetworkizabilityAdminSummary(networkizabilityAdmin)
 
       const gatewayizabilityAdmin = await callUi('gatewayizability-ui', 'fetchGatewayizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setGatewayizabilityAdminSummary(gatewayizabilityAdmin)
 
       const brokerizabilityAdmin = await callUi('brokerizability-ui', 'fetchBrokerizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBrokerizabilityAdminSummary(brokerizabilityAdmin)
 
       const relayizabilityAdmin = await callUi('relayizability-ui', 'fetchRelayizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRelayizabilityAdminSummary(relayizabilityAdmin)
 
       const routizabilityAdmin = await callUi('routizability-ui', 'fetchRoutizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRoutizabilityAdminSummary(routizabilityAdmin)
 
       const queueizabilityAdmin = await callUi('queueizability-ui', 'fetchQueueizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setQueueizabilityAdminSummary(queueizabilityAdmin)
 
       const eventizabilityAdmin = await callUi('eventizability-ui', 'fetchEventizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setEventizabilityAdminSummary(eventizabilityAdmin)
 
       const channelizabilityAdmin = await callUi('channelizability-ui', 'fetchChannelizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setChannelizabilityAdminSummary(channelizabilityAdmin)
 
       const notifizabilityAdmin = await callUi('notifizability-ui', 'fetchNotifizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setNotifizabilityAdminSummary(notifizabilityAdmin)
 
       const subscribizabilityAdmin = await callUi('subscribizability-ui', 'fetchSubscribizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSubscribizabilityAdminSummary(subscribizabilityAdmin)
 
       const publishizabilityAdmin = await callUi('publishizability-ui', 'fetchPublishizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPublishizabilityAdminSummary(publishizabilityAdmin)
 
       const consumizabilityAdmin = await callUi('consumizability-ui', 'fetchConsumizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setConsumizabilityAdminSummary(consumizabilityAdmin)
 
       const deliverizabilityAdmin = await callUi('deliverizability-ui', 'fetchDeliverizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDeliverizabilityAdminSummary(deliverizabilityAdmin)
 
       const dispatchizabilityAdmin = await callUi('dispatchizability-ui', 'fetchDispatchizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDispatchizabilityAdminSummary(dispatchizabilityAdmin)
 
       const handoffizabilityAdmin = await callUi('handoffizability-ui', 'fetchHandoffizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setHandoffizabilityAdminSummary(handoffizabilityAdmin)
 
       const synchronizabilityAdmin = await callUi('synchronizability-ui', 'fetchSynchronizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSynchronizabilityAdminSummary(synchronizabilityAdmin)
 
       const asynchronizabilityAdmin = await callUi('asynchronizability-ui', 'fetchAsynchronizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAsynchronizabilityAdminSummary(asynchronizabilityAdmin)
 
       const broadcastizabilityAdmin = await callUi('broadcastizability-ui', 'fetchBroadcastizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBroadcastizabilityAdminSummary(broadcastizabilityAdmin)
 
       const multicastizabilityAdmin = await callUi('multicastizability-ui', 'fetchMulticastizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMulticastizabilityAdminSummary(multicastizabilityAdmin)
 
       const unicastizabilityAdmin = await callUi('unicastizability-ui', 'fetchUnicastizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setUnicastizabilityAdminSummary(unicastizabilityAdmin)
 
       const fanoutizabilityAdmin = await callUi('fanoutizability-ui', 'fetchFanoutizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setFanoutizabilityAdminSummary(fanoutizabilityAdmin)
 
       const backpressureizabilityAdmin = await callUi('backpressureizability-ui', 'fetchBackpressureizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBackpressureizabilityAdminSummary(backpressureizabilityAdmin)
 
       const throttleizabilityAdmin = await callUi('throttleizability-ui', 'fetchThrottleizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setThrottleizabilityAdminSummary(throttleizabilityAdmin)
 
       const debouncizabilityAdmin = await callUi('debouncizability-ui', 'fetchDebouncizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDebouncizabilityAdminSummary(debouncizabilityAdmin)
 
       const bufferizabilityAdmin = await callUi('bufferizability-ui', 'fetchBufferizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBufferizabilityAdminSummary(bufferizabilityAdmin)
 
       const batchizabilityAdmin = await callUi('batchizability-ui', 'fetchBatchizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBatchizabilityAdminSummary(batchizabilityAdmin)
 
       const retryizabilityAdmin = await callUi('retryizability-ui', 'fetchRetryizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRetryizabilityAdminSummary(retryizabilityAdmin)
 
       const circuitizabilityAdmin = await callUi('circuitizability-ui', 'fetchCircuitizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCircuitizabilityAdminSummary(circuitizabilityAdmin)
 
       const timeoutizabilityAdmin = await callUi('timeoutizability-ui', 'fetchTimeoutizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTimeoutizabilityAdminSummary(timeoutizabilityAdmin)
 
       const ackizabilityAdmin = await callUi('ackizability-ui', 'fetchAckizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAckizabilityAdminSummary(ackizabilityAdmin)
 
       const nackizabilityAdmin = await callUi('nackizability-ui', 'fetchNackizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setNackizabilityAdminSummary(nackizabilityAdmin)
 
       const deadletterizabilityAdmin = await callUi('deadletterizability-ui', 'fetchDeadletterizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDeadletterizabilityAdminSummary(deadletterizabilityAdmin)
 
       const dedupizabilityAdmin = await callUi('dedupizability-ui', 'fetchDedupizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDedupizabilityAdminSummary(dedupizabilityAdmin)
 
       const sequencizabilityAdmin = await callUi('sequencizability-ui', 'fetchSequencizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSequencizabilityAdminSummary(sequencizabilityAdmin)
 
       const partitionizabilityAdmin = await callUi('partitionizability-ui', 'fetchPartitionizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPartitionizabilityAdminSummary(partitionizabilityAdmin)
 
       const shardingizabilityAdmin = await callUi('shardingizability-ui', 'fetchShardingizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setShardingizabilityAdminSummary(shardingizabilityAdmin)
 
       const orderingizabilityAdmin = await callUi('orderingizability-ui', 'fetchOrderingizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setOrderingizabilityAdminSummary(orderingizabilityAdmin)
 
       const checkpointizabilityAdmin = await callUi('checkpointizability-ui', 'fetchCheckpointizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCheckpointizabilityAdminSummary(checkpointizabilityAdmin)
 
       const recoveryizabilityAdmin = await callUi('recoveryizability-ui', 'fetchRecoveryizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRecoveryizabilityAdminSummary(recoveryizabilityAdmin)
 
       const compactionizabilityAdmin = await callUi('compactionizability-ui', 'fetchCompactionizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCompactionizabilityAdminSummary(compactionizabilityAdmin)
 
       const rebalanceizabilityAdmin = await callUi('rebalanceizability-ui', 'fetchRebalanceizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRebalanceizabilityAdminSummary(rebalanceizabilityAdmin)
 
       const leaderizabilityAdmin = await callUi('leaderizability-ui', 'fetchLeaderizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setLeaderizabilityAdminSummary(leaderizabilityAdmin)
 
       const followerizabilityAdmin = await callUi('followerizability-ui', 'fetchFollowerizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setFollowerizabilityAdminSummary(followerizabilityAdmin)
 
       const consensusizabilityAdmin = await callUi('consensusizability-ui', 'fetchConsensusizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setConsensusizabilityAdminSummary(consensusizabilityAdmin)
 
       const quorumizabilityAdmin = await callUi('quorumizability-ui', 'fetchQuorumizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setQuorumizabilityAdminSummary(quorumizabilityAdmin)
 
       const snapshotizabilityAdmin = await callUi('snapshotizability-ui', 'fetchSnapshotizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSnapshotizabilityAdminSummary(snapshotizabilityAdmin)
 
       const journalizabilityAdmin = await callUi('journalizability-ui', 'fetchJournalizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setJournalizabilityAdminSummary(journalizabilityAdmin)
 
       const appendizabilityAdmin = await callUi('appendizability-ui', 'fetchAppendizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAppendizabilityAdminSummary(appendizabilityAdmin)
 
       const walizabilityAdmin = await callUi('walizability-ui', 'fetchWalizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setWalizabilityAdminSummary(walizabilityAdmin)
 
       const replicationizabilityAdmin = await callUi('replicationizability-ui', 'fetchReplicationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setReplicationizabilityAdminSummary(replicationizabilityAdmin)
 
       const mirroringizabilityAdmin = await callUi('mirroringizability-ui', 'fetchMirroringizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMirroringizabilityAdminSummary(mirroringizabilityAdmin)
 
       const cloningizabilityAdmin = await callUi('cloningizability-ui', 'fetchCloningizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCloningizabilityAdminSummary(cloningizabilityAdmin)
 
       const propagationizabilityAdmin = await callUi('propagationizability-ui', 'fetchPropagationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPropagationizabilityAdminSummary(propagationizabilityAdmin)
 
       const materializationizabilityAdmin = await callUi('materializationizability-ui', 'fetchMaterializationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMaterializationizabilityAdminSummary(materializationizabilityAdmin)
 
       const hydrationizabilityAdmin = await callUi('hydrationizability-ui', 'fetchHydrationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setHydrationizabilityAdminSummary(hydrationizabilityAdmin)
 
       const invalidationizabilityAdmin = await callUi('invalidationizability-ui', 'fetchInvalidationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setInvalidationizabilityAdminSummary(invalidationizabilityAdmin)
 
       const evictionizabilityAdmin = await callUi('evictionizability-ui', 'fetchEvictionizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setEvictionizabilityAdminSummary(evictionizabilityAdmin)
 
       const ttlizabilityAdmin = await callUi('ttlizability-ui', 'fetchTtlizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTtlizabilityAdminSummary(ttlizabilityAdmin)
 
       const expirationizabilityAdmin = await callUi('expirationizability-ui', 'fetchExpirationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setExpirationizabilityAdminSummary(expirationizabilityAdmin)
 
       const refreshizabilityAdmin = await callUi('refreshizability-ui', 'fetchRefreshizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRefreshizabilityAdminSummary(refreshizabilityAdmin)
 
       const warmizabilityAdmin = await callUi('warmizability-ui', 'fetchWarmizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setWarmizabilityAdminSummary(warmizabilityAdmin)
 
       const coldizabilityAdmin = await callUi('coldizability-ui', 'fetchColdizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setColdizabilityAdminSummary(coldizabilityAdmin)
 
       const prefetchizabilityAdmin = await callUi('prefetchizability-ui', 'fetchPrefetchizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPrefetchizabilityAdminSummary(prefetchizabilityAdmin)
 
       const cacheizabilityAdmin = await callUi('cacheizability-ui', 'fetchCacheizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCacheizabilityAdminSummary(cacheizabilityAdmin)
 
       const memorizabilityAdmin = await callUi('memorizability-ui', 'fetchMemorizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMemorizabilityAdminSummary(memorizabilityAdmin)
 
       const persistizabilityAdmin = await callUi('persistizability-ui', 'fetchPersistizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPersistizabilityAdminSummary(persistizabilityAdmin)
 
       const compressizabilityAdmin = await callUi('compressizability-ui', 'fetchCompressizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCompressizabilityAdminSummary(compressizabilityAdmin)
 
       const decompressizabilityAdmin = await callUi('decompressizability-ui', 'fetchDecompressizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDecompressizabilityAdminSummary(decompressizabilityAdmin)
 
       const archiveizabilityAdmin = await callUi('archiveizability-ui', 'fetchArchiveizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setArchiveizabilityAdminSummary(archiveizabilityAdmin)
 
       const restoreizabilityAdmin = await callUi('restoreizability-ui', 'fetchRestoreizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRestoreizabilityAdminSummary(restoreizabilityAdmin)
 
       const backupizabilityAdmin = await callUi('backupizability-ui', 'fetchBackupizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBackupizabilityAdminSummary(backupizabilityAdmin)
 
       const exportizabilityAdmin = await callUi('exportizability-ui', 'fetchExportizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setExportizabilityAdminSummary(exportizabilityAdmin)
 
       const importizabilityAdmin = await callUi('importizability-ui', 'fetchImportizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setImportizabilityAdminSummary(importizabilityAdmin)
 
       const indexingizabilityAdmin = await callUi('indexingizability-ui', 'fetchIndexingizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setIndexingizabilityAdminSummary(indexingizabilityAdmin)
 
       const searchizabilityAdmin = await callUi('searchizability-ui', 'fetchSearchizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSearchizabilityAdminSummary(searchizabilityAdmin)
 
       const versioningizabilityAdmin = await callUi('versioningizability-ui', 'fetchVersioningizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setVersioningizabilityAdminSummary(versioningizabilityAdmin)
 
       const compactizabilityAdmin = await callUi('compactizability-ui', 'fetchCompactizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCompactizabilityAdminSummary(compactizabilityAdmin)
 
       const expandizabilityAdmin = await callUi('expandizability-ui', 'fetchExpandizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setExpandizabilityAdminSummary(expandizabilityAdmin)
 
       const retentionizabilityAdmin = await callUi('retentionizability-ui', 'fetchRetentionizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRetentionizabilityAdminSummary(retentionizabilityAdmin)
 
       const queryizabilityAdmin = await callUi('queryizability-ui', 'fetchQueryizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setQueryizabilityAdminSummary(queryizabilityAdmin)
 
       const filterizabilityAdmin = await callUi('filterizability-ui', 'fetchFilterizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setFilterizabilityAdminSummary(filterizabilityAdmin)
 
       const sortizabilityAdmin = await callUi('sortizability-ui', 'fetchSortizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSortizabilityAdminSummary(sortizabilityAdmin)
 
       const paginizabilityAdmin = await callUi('paginizability-ui', 'fetchPaginizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPaginizabilityAdminSummary(paginizabilityAdmin)
 
       const pivotizabilityAdmin = await callUi('pivotizability-ui', 'fetchPivotizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPivotizabilityAdminSummary(pivotizabilityAdmin)
 
       const groupizabilityAdmin = await callUi('groupizability-ui', 'fetchGroupizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setGroupizabilityAdminSummary(groupizabilityAdmin)
 
       const joinizabilityAdmin = await callUi('joinizability-ui', 'fetchJoinizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setJoinizabilityAdminSummary(joinizabilityAdmin)
 
       const mergeizabilityAdmin = await callUi('mergeizability-ui', 'fetchMergeizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMergeizabilityAdminSummary(mergeizabilityAdmin)
 
       const splitizabilityAdmin = await callUi('splitizability-ui', 'fetchSplitizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSplitizabilityAdminSummary(splitizabilityAdmin)
 
       const projectizabilityAdmin = await callUi('projectizability-ui', 'fetchProjectizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setProjectizabilityAdminSummary(projectizabilityAdmin)
 
       const transformizabilityAdmin = await callUi('transformizability-ui', 'fetchTransformizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTransformizabilityAdminSummary(transformizabilityAdmin)
 
       const mapizabilityAdmin = await callUi('mapizability-ui', 'fetchMapizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMapizabilityAdminSummary(mapizabilityAdmin)
 
       const reduceizabilityAdmin = await callUi('reduceizability-ui', 'fetchReduceizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setReduceizabilityAdminSummary(reduceizabilityAdmin)
 
       const foldizabilityAdmin = await callUi('foldizability-ui', 'fetchFoldizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setFoldizabilityAdminSummary(foldizabilityAdmin)
 
       const scanizabilityAdmin = await callUi('scanizability-ui', 'fetchScanizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setScanizabilityAdminSummary(scanizabilityAdmin)
 
       const chainingizabilityAdmin = await callUi('chainingizability-ui', 'fetchChainingizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setChainingizabilityAdminSummary(chainingizabilityAdmin)
 
       const pipeliningizabilityAdmin = await callUi('pipeliningizability-ui', 'fetchPipeliningizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPipeliningizabilityAdminSummary(pipeliningizabilityAdmin)
 
       const batchingizabilityAdmin = await callUi('batchingizability-ui', 'fetchBatchingizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBatchingizabilityAdminSummary(batchingizabilityAdmin)
 
       const streamizabilityAdmin = await callUi('streamizability-ui', 'fetchStreamizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setStreamizabilityAdminSummary(streamizabilityAdmin)
 
       const windowizabilityAdmin = await callUi('windowizability-ui', 'fetchWindowizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setWindowizabilityAdminSummary(windowizabilityAdmin)
 
       const orchestrationizabilityAdmin = await callUi('orchestrationizability-ui', 'fetchOrchestrationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setOrchestrationizabilityAdminSummary(orchestrationizabilityAdmin)
 
       const schedulingizabilityAdmin = await callUi('schedulingizability-ui', 'fetchSchedulingizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSchedulingizabilityAdminSummary(schedulingizabilityAdmin)
 
       const triggeringizabilityAdmin = await callUi('triggeringizability-ui', 'fetchTriggeringizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTriggeringizabilityAdminSummary(triggeringizabilityAdmin)
 
       const routingizabilityAdmin = await callUi('routingizability-ui', 'fetchRoutingizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRoutingizabilityAdminSummary(routingizabilityAdmin)
 
       const balancingizabilityAdmin = await callUi('balancingizability-ui', 'fetchBalancingizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBalancingizabilityAdminSummary(balancingizabilityAdmin)
 
       const nodelizabilityAdmin = await callUi('nodelizability-ui', 'fetchNodelizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setNodelizabilityAdminSummary(nodelizabilityAdmin)
 
       const coordinationizabilityAdmin = await callUi('coordinationizability-ui', 'fetchCoordinationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCoordinationizabilityAdminSummary(coordinationizabilityAdmin)
 
       const partitioningizabilityAdmin = await callUi('partitioningizability-ui', 'fetchPartitioningizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPartitioningizabilityAdminSummary(partitioningizabilityAdmin)
 
       const clusteringizabilityAdmin = await callUi('clusteringizability-ui', 'fetchClusteringizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setClusteringizabilityAdminSummary(clusteringizabilityAdmin)
 
       const meshingizabilityAdmin = await callUi('meshingizability-ui', 'fetchMeshingizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMeshingizabilityAdminSummary(meshingizabilityAdmin)
 
       const discoveryizabilityAdmin = await callUi('discoveryizability-ui', 'fetchDiscoveryizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDiscoveryizabilityAdminSummary(discoveryizabilityAdmin)
 
       const registrationizabilityAdmin = await callUi('registrationizability-ui', 'fetchRegistrationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRegistrationizabilityAdminSummary(registrationizabilityAdmin)
 
       const provisioningizabilityAdmin = await callUi('provisioningizability-ui', 'fetchProvisioningizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setProvisioningizabilityAdminSummary(provisioningizabilityAdmin)
 
       const allocationizabilityAdmin = await callUi('allocationizability-ui', 'fetchAllocationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAllocationizabilityAdminSummary(allocationizabilityAdmin)
 
       const deallocationizabilityAdmin = await callUi('deallocationizability-ui', 'fetchDeallocationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDeallocationizabilityAdminSummary(deallocationizabilityAdmin)
 
       const scalingizabilityAdmin = await callUi('scalingizability-ui', 'fetchScalingizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setScalingizabilityAdminSummary(scalingizabilityAdmin)
 
       const healingizabilityAdmin = await callUi('healingizability-ui', 'fetchHealingizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setHealingizabilityAdminSummary(healingizabilityAdmin)
 
       const remediationizabilityAdmin = await callUi('remediationizability-ui', 'fetchRemediationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRemediationizabilityAdminSummary(remediationizabilityAdmin)
 
       const reconciliationizabilityAdmin = await callUi('reconciliationizability-ui', 'fetchReconciliationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setReconciliationizabilityAdminSummary(reconciliationizabilityAdmin)
 
       const governanceizabilityAdmin = await callUi('governanceizability-ui', 'fetchGovernanceizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setGovernanceizabilityAdminSummary(governanceizabilityAdmin)
 
       const complianceizabilityAdmin = await callUi('complianceizability-ui', 'fetchComplianceizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setComplianceizabilityAdminSummary(complianceizabilityAdmin)
 
       const policyizabilityAdmin = await callUi('policyizability-ui', 'fetchPolicyizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPolicyizabilityAdminSummary(policyizabilityAdmin)
 
       const enforcementizabilityAdmin = await callUi('enforcementizability-ui', 'fetchEnforcementizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setEnforcementizabilityAdminSummary(enforcementizabilityAdmin)
 
       const assuranceizabilityAdmin = await callUi('assuranceizability-ui', 'fetchAssuranceizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAssuranceizabilityAdminSummary(assuranceizabilityAdmin)
 
       const attestationizabilityAdmin = await callUi('attestationizability-ui', 'fetchAttestationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAttestationizabilityAdminSummary(attestationizabilityAdmin)
 
       const certificationizabilityAdmin = await callUi('certificationizability-ui', 'fetchCertificationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCertificationizabilityAdminSummary(certificationizabilityAdmin)
 
       const accreditationizabilityAdmin = await callUi('accreditationizability-ui', 'fetchAccreditationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAccreditationizabilityAdminSummary(accreditationizabilityAdmin)
 
       const specificationizabilityAdmin = await callUi('specificationizability-ui', 'fetchSpecificationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSpecificationizabilityAdminSummary(specificationizabilityAdmin)
 
       const instrumentationizabilityAdmin = await callUi('instrumentationizability-ui', 'fetchInstrumentationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setInstrumentationizabilityAdminSummary(instrumentationizabilityAdmin)
 
       const telemetryizabilityAdmin = await callUi('telemetryizability-ui', 'fetchTelemetryizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTelemetryizabilityAdminSummary(telemetryizabilityAdmin)
 
       const auditingizabilityAdmin = await callUi('auditingizability-ui', 'fetchAuditingizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAuditingizabilityAdminSummary(auditingizabilityAdmin)
 
       const accountabilityizabilityAdmin = await callUi('accountabilityizability-ui', 'fetchAccountabilityizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAccountabilityizabilityAdminSummary(accountabilityizabilityAdmin)
 
       const transparencyizabilityAdmin = await callUi('transparencyizability-ui', 'fetchTransparencyizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTransparencyizabilityAdminSummary(transparencyizabilityAdmin)
 
       const oversightizabilityAdmin = await callUi('oversightizability-ui', 'fetchOversightizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setOversightizabilityAdminSummary(oversightizabilityAdmin)
 
       const controlizabilityAdmin = await callUi('controlizability-ui', 'fetchControlizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setControlizabilityAdminSummary(controlizabilityAdmin)
 
       const entitlementizabilityAdmin = await callUi('entitlementizability-ui', 'fetchEntitlementizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setEntitlementizabilityAdminSummary(entitlementizabilityAdmin)
 
       const permissionizabilityAdmin = await callUi('permissionizability-ui', 'fetchPermissionizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPermissionizabilityAdminSummary(permissionizabilityAdmin)
 
       const authorizationizabilityAdmin = await callUi('authorizationizability-ui', 'fetchAuthorizationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAuthorizationizabilityAdminSummary(authorizationizabilityAdmin)
 
       const authenticationizabilityAdmin = await callUi('authenticationizability-ui', 'fetchAuthenticationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAuthenticationizabilityAdminSummary(authenticationizabilityAdmin)
 
       const identityizabilityAdmin = await callUi('identityizability-ui', 'fetchIdentityizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setIdentityizabilityAdminSummary(identityizabilityAdmin)
 
       const riskizabilityAdmin = await callUi('riskizability-ui', 'fetchRiskizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRiskizabilityAdminSummary(riskizabilityAdmin)
 
       const securityizabilityAdmin = await callUi('securityizability-ui', 'fetchSecurityizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSecurityizabilityAdminSummary(securityizabilityAdmin)
 
       const privacyizabilityAdmin = await callUi('privacyizability-ui', 'fetchPrivacyizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPrivacyizabilityAdminSummary(privacyizabilityAdmin)
 
       const trustizabilityAdmin = await callUi('trustizability-ui', 'fetchTrustizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTrustizabilityAdminSummary(trustizabilityAdmin)
 
       const integrityizabilityAdmin = await callUi('integrityizability-ui', 'fetchIntegrityizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setIntegrityizabilityAdminSummary(integrityizabilityAdmin)
 
       const threatizabilityAdmin = await callUi('threatizability-ui', 'fetchThreatizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setThreatizabilityAdminSummary(threatizabilityAdmin)
 
       const vulnerabilityizabilityAdmin = await callUi('vulnerabilityizability-ui', 'fetchVulnerabilityizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setVulnerabilityizabilityAdminSummary(vulnerabilityizabilityAdmin)
 
       const mitigationizabilityAdmin = await callUi('mitigationizability-ui', 'fetchMitigationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMitigationizabilityAdminSummary(mitigationizabilityAdmin)
 
       const hardeningizabilityAdmin = await callUi('hardeningizability-ui', 'fetchHardeningizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setHardeningizabilityAdminSummary(hardeningizabilityAdmin)
 
       const segregationizabilityAdmin = await callUi('segregationizability-ui', 'fetchSegregationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSegregationizabilityAdminSummary(segregationizabilityAdmin)
 
       const confidentialityizabilityAdmin = await callUi('confidentialityizability-ui', 'fetchConfidentialityizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setConfidentialityizabilityAdminSummary(confidentialityizabilityAdmin)
 
       const nonrepudiationizabilityAdmin = await callUi('nonrepudiationizability-ui', 'fetchNonrepudiationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setNonrepudiationizabilityAdminSummary(nonrepudiationizabilityAdmin)
 
       const accesscontrolizabilityAdmin = await callUi('accesscontrolizability-ui', 'fetchAccesscontrolizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAccesscontrolizabilityAdminSummary(accesscontrolizabilityAdmin)
 
       const leastprivilegeizabilityAdmin = await callUi('leastprivilegeizability-ui', 'fetchLeastprivilegeizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setLeastprivilegeizabilityAdminSummary(leastprivilegeizabilityAdmin)
 
       const zerotrustizabilityAdmin = await callUi('zerotrustizability-ui', 'fetchZerotrustizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setZerotrustizabilityAdminSummary(zerotrustizabilityAdmin)
 
       const identityproofizabilityAdmin = await callUi('identityproofizability-ui', 'fetchIdentityproofizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setIdentityproofizabilityAdminSummary(identityproofizabilityAdmin)
 
       const keymanagementizabilityAdmin = await callUi('keymanagementizability-ui', 'fetchKeymanagementizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setKeymanagementizabilityAdminSummary(keymanagementizabilityAdmin)
 
       const secretmanagementizabilityAdmin = await callUi('secretmanagementizability-ui', 'fetchSecretmanagementizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSecretmanagementizabilityAdminSummary(secretmanagementizabilityAdmin)
 
       const cryptographyizabilityAdmin = await callUi('cryptographyizability-ui', 'fetchCryptographyizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCryptographyizabilityAdminSummary(cryptographyizabilityAdmin)
 
       const complianceguardizabilityAdmin = await callUi('complianceguardizability-ui', 'fetchComplianceguardizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setComplianceguardizabilityAdminSummary(complianceguardizabilityAdmin)
 
       const provenanceizabilityAdmin = await callUi('provenanceizability-ui', 'fetchProvenanceizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setProvenanceizabilityAdminSummary(provenanceizabilityAdmin)
 
       const lineageizabilityAdmin = await callUi('lineageizability-ui', 'fetchLineageizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setLineageizabilityAdminSummary(lineageizabilityAdmin)
 
       const forensicizabilityAdmin = await callUi('forensicizability-ui', 'fetchForensicizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setForensicizabilityAdminSummary(forensicizabilityAdmin)
 
       const audittrailizabilityAdmin = await callUi('audittrailizability-ui', 'fetchAudittrailizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAudittrailizabilityAdminSummary(audittrailizabilityAdmin)
 
       const complianceproofizabilityAdmin = await callUi('complianceproofizability-ui', 'fetchComplianceproofizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setComplianceproofizabilityAdminSummary(complianceproofizabilityAdmin)
 
       const governancetrackizabilityAdmin = await callUi('governancetrackizability-ui', 'fetchGovernancetrackizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setGovernancetrackizabilityAdminSummary(governancetrackizabilityAdmin)
 
       const attesttrackizabilityAdmin = await callUi('attesttrackizability-ui', 'fetchAttesttrackizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAttesttrackizabilityAdminSummary(attesttrackizabilityAdmin)
 
       const evidencizabilityAdmin = await callUi('evidencizability-ui', 'fetchEvidencizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setEvidencizabilityAdminSummary(evidencizabilityAdmin)
 
       const chainofcustodyizabilityAdmin = await callUi('chainofcustodyizability-ui', 'fetchChainofcustodyizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setChainofcustodyizabilityAdminSummary(chainofcustodyizabilityAdmin)
 
       const tamperproofizabilityAdmin = await callUi('tamperproofizability-ui', 'fetchTamperproofizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTamperproofizabilityAdminSummary(tamperproofizabilityAdmin)
 
       const policyproofizabilityAdmin = await callUi('policyproofizability-ui', 'fetchPolicyproofizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPolicyproofizabilityAdminSummary(policyproofizabilityAdmin)
 
       const notarizationizabilityAdmin = await callUi('notarizationizability-ui', 'fetchNotarizationizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setNotarizationizabilityAdminSummary(notarizationizabilityAdmin)
 
       const witnessizabilityAdmin = await callUi('witnessizability-ui', 'fetchWitnessizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setWitnessizabilityAdminSummary(witnessizabilityAdmin)
 
       const ledgerizabilityAdmin = await callUi('ledgerizability-ui', 'fetchLedgerizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setLedgerizabilityAdminSummary(ledgerizabilityAdmin)
 
       const signatureproofizabilityAdmin = await callUi('signatureproofizability-ui', 'fetchSignatureproofizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSignatureproofizabilityAdminSummary(signatureproofizabilityAdmin)
 
       const ruleproofizabilityAdmin = await callUi('ruleproofizability-ui', 'fetchRuleproofizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRuleproofizabilityAdminSummary(ruleproofizabilityAdmin)
 
       const traceproofizabilityAdmin = await callUi('traceproofizability-ui', 'fetchTraceproofizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTraceproofizabilityAdminSummary(traceproofizabilityAdmin)
 
       const disclosureizabilityAdmin = await callUi('disclosureizability-ui', 'fetchDisclosureizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDisclosureizabilityAdminSummary(disclosureizabilityAdmin)
 
       const registrarizabilityAdmin = await callUi('registrarizability-ui', 'fetchRegistrarizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRegistrarizabilityAdminSummary(registrarizabilityAdmin)
 
       const auditproofizabilityAdmin = await callUi('auditproofizability-ui', 'fetchAuditproofizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAuditproofizabilityAdminSummary(auditproofizabilityAdmin)
 
       const compliancechainizabilityAdmin = await callUi('compliancechainizability-ui', 'fetchCompliancechainizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCompliancechainizabilityAdminSummary(compliancechainizabilityAdmin)
 
       const attestledgerizabilityAdmin = await callUi('attestledgerizability-ui', 'fetchAttestledgerizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAttestledgerizabilityAdminSummary(attestledgerizabilityAdmin)
 
       const evidencetrackizabilityAdmin = await callUi('evidencetrackizability-ui', 'fetchEvidencetrackizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setEvidencetrackizabilityAdminSummary(evidencetrackizabilityAdmin)
 
       const prooflineizabilityAdmin = await callUi('prooflineizability-ui', 'fetchProoflineizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setProoflineizabilityAdminSummary(prooflineizabilityAdmin)
 
       const notarproofizabilityAdmin = await callUi('notarproofizability-ui', 'fetchNotarproofizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setNotarproofizabilityAdminSummary(notarproofizabilityAdmin)
 
       const auditlineizabilityAdmin = await callUi('auditlineizability-ui', 'fetchAuditlineizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAuditlineizabilityAdminSummary(auditlineizabilityAdmin)
 
       const traceledgerizabilityAdmin = await callUi('traceledgerizability-ui', 'fetchTraceledgerizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTraceledgerizabilityAdminSummary(traceledgerizabilityAdmin)
 
       const disclosureproofizabilityAdmin = await callUi('disclosureproofizability-ui', 'fetchDisclosureproofizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDisclosureproofizabilityAdminSummary(disclosureproofizabilityAdmin)
 
       const registrarproofizabilityAdmin = await callUi('registrarproofizability-ui', 'fetchRegistrarproofizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRegistrarproofizabilityAdminSummary(registrarproofizabilityAdmin)
 
       const witnessproofizabilityAdmin = await callUi('witnessproofizability-ui', 'fetchWitnessproofizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setWitnessproofizabilityAdminSummary(witnessproofizabilityAdmin)
 
       const complianceledgerizabilityAdmin = await callUi('complianceledgerizability-ui', 'fetchComplianceledgerizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setComplianceledgerizabilityAdminSummary(complianceledgerizabilityAdmin)
 
       const notarledgerizabilityAdmin = await callUi('notarledgerizability-ui', 'fetchNotarledgerizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setNotarledgerizabilityAdminSummary(notarledgerizabilityAdmin)
 
       const witnessledgerizabilityAdmin = await callUi('witnessledgerizability-ui', 'fetchWitnessledgerizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setWitnessledgerizabilityAdminSummary(witnessledgerizabilityAdmin)
 
       const proofregistryizabilityAdmin = await callUi('proofregistryizability-ui', 'fetchProofregistryizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setProofregistryizabilityAdminSummary(proofregistryizabilityAdmin)
 
       const auditregistryizabilityAdmin = await callUi('auditregistryizability-ui', 'fetchAuditregistryizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAuditregistryizabilityAdminSummary(auditregistryizabilityAdmin)
 
       const compliancejournalizabilityAdmin = await callUi('compliancejournalizability-ui', 'fetchCompliancejournalizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCompliancejournalizabilityAdminSummary(compliancejournalizabilityAdmin)
 
       const notarjournalizabilityAdmin = await callUi('notarjournalizability-ui', 'fetchNotarjournalizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setNotarjournalizabilityAdminSummary(notarjournalizabilityAdmin)
 
       const witnessjournalizabilityAdmin = await callUi('witnessjournalizability-ui', 'fetchWitnessjournalizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setWitnessjournalizabilityAdminSummary(witnessjournalizabilityAdmin)
 
       const proofjournalizabilityAdmin = await callUi('proofjournalizability-ui', 'fetchProofjournalizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setProofjournalizabilityAdminSummary(proofjournalizabilityAdmin)
 
       const auditjournalizabilityAdmin = await callUi('auditjournalizability-ui', 'fetchAuditjournalizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAuditjournalizabilityAdminSummary(auditjournalizabilityAdmin)
 
       const registryjournalizabilityAdmin = await callUi('registryjournalizability-ui', 'fetchRegistryjournalizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRegistryjournalizabilityAdminSummary(registryjournalizabilityAdmin)
 
       const tracejournalizabilityAdmin = await callUi('tracejournalizability-ui', 'fetchTracejournalizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTracejournalizabilityAdminSummary(tracejournalizabilityAdmin)
 
       const evidencejournalizabilityAdmin = await callUi('evidencejournalizability-ui', 'fetchEvidencejournalizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setEvidencejournalizabilityAdminSummary(evidencejournalizabilityAdmin)
 
       const attestjournalizabilityAdmin = await callUi('attestjournalizability-ui', 'fetchAttestjournalizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAttestjournalizabilityAdminSummary(attestjournalizabilityAdmin)
 
       const integrityjournalizabilityAdmin = await callUi('integrityjournalizability-ui', 'fetchIntegrityjournalizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setIntegrityjournalizabilityAdminSummary(integrityjournalizabilityAdmin)
 
       const registryvaultizabilityAdmin = await callUi('registryvaultizability-ui', 'fetchRegistryvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRegistryvaultizabilityAdminSummary(registryvaultizabilityAdmin)
 
       const tracevaultizabilityAdmin = await callUi('tracevaultizability-ui', 'fetchTracevaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTracevaultizabilityAdminSummary(tracevaultizabilityAdmin)
 
       const evidencevaultizabilityAdmin = await callUi('evidencevaultizability-ui', 'fetchEvidencevaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setEvidencevaultizabilityAdminSummary(evidencevaultizabilityAdmin)
 
       const auditvaultizabilityAdmin = await callUi('auditvaultizability-ui', 'fetchAuditvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAuditvaultizabilityAdminSummary(auditvaultizabilityAdmin)
 
       const compliancevaultizabilityAdmin = await callUi('compliancevaultizability-ui', 'fetchCompliancevaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCompliancevaultizabilityAdminSummary(compliancevaultizabilityAdmin)
 
       const validityvaultizabilityAdmin = await callUi('validityvaultizability-ui', 'fetchValidityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setValidityvaultizabilityAdminSummary(validityvaultizabilityAdmin)
 
       const authenticityvaultizabilityAdmin = await callUi('authenticityvaultizability-ui', 'fetchAuthenticityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAuthenticityvaultizabilityAdminSummary(authenticityvaultizabilityAdmin)
 
       const provenancevaultizabilityAdmin = await callUi('provenancevaultizability-ui', 'fetchProvenancevaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setProvenancevaultizabilityAdminSummary(provenancevaultizabilityAdmin)
 
       const verificationvaultizabilityAdmin = await callUi('verificationvaultizability-ui', 'fetchVerificationvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setVerificationvaultizabilityAdminSummary(verificationvaultizabilityAdmin)
 
       const attestationvaultizabilityAdmin = await callUi('attestationvaultizability-ui', 'fetchAttestationvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAttestationvaultizabilityAdminSummary(attestationvaultizabilityAdmin)
 
       const assurancevaultizabilityAdmin = await callUi('assurancevaultizability-ui', 'fetchAssurancevaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAssurancevaultizabilityAdminSummary(assurancevaultizabilityAdmin)
 
       const auditabilityvaultizabilityAdmin = await callUi('auditabilityvaultizability-ui', 'fetchAuditabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAuditabilityvaultizabilityAdminSummary(auditabilityvaultizabilityAdmin)
 
       const inspectabilityvaultizabilityAdmin = await callUi('inspectabilityvaultizability-ui', 'fetchInspectabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setInspectabilityvaultizabilityAdminSummary(inspectabilityvaultizabilityAdmin)
 
       const reproducibilityvaultizabilityAdmin = await callUi('reproducibilityvaultizability-ui', 'fetchReproducibilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setReproducibilityvaultizabilityAdminSummary(reproducibilityvaultizabilityAdmin)
 
       const credibilityvaultizabilityAdmin = await callUi('credibilityvaultizability-ui', 'fetchCredibilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCredibilityvaultizabilityAdminSummary(credibilityvaultizabilityAdmin)
 
       const defensibilityvaultizabilityAdmin = await callUi('defensibilityvaultizability-ui', 'fetchDefensibilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDefensibilityvaultizabilityAdminSummary(defensibilityvaultizabilityAdmin)
 
       const explainabilityvaultizabilityAdmin = await callUi('explainabilityvaultizability-ui', 'fetchExplainabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setExplainabilityvaultizabilityAdminSummary(explainabilityvaultizabilityAdmin)
 
       const demonstrabilityvaultizabilityAdmin = await callUi('demonstrabilityvaultizability-ui', 'fetchDemonstrabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDemonstrabilityvaultizabilityAdminSummary(demonstrabilityvaultizabilityAdmin)
 
       const justifiabilityvaultizabilityAdmin = await callUi('justifiabilityvaultizability-ui', 'fetchJustifiabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setJustifiabilityvaultizabilityAdminSummary(justifiabilityvaultizabilityAdmin)
 
       const reviewabilityvaultizabilityAdmin = await callUi('reviewabilityvaultizability-ui', 'fetchReviewabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setReviewabilityvaultizabilityAdminSummary(reviewabilityvaultizabilityAdmin)
 
       const assessabilityvaultizabilityAdmin = await callUi('assessabilityvaultizability-ui', 'fetchAssessabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAssessabilityvaultizabilityAdminSummary(assessabilityvaultizabilityAdmin)
 
       const measurabilityvaultizabilityAdmin = await callUi('measurabilityvaultizability-ui', 'fetchMeasurabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMeasurabilityvaultizabilityAdminSummary(measurabilityvaultizabilityAdmin)
 
       const certifiabilityvaultizabilityAdmin = await callUi('certifiabilityvaultizability-ui', 'fetchCertifiabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCertifiabilityvaultizabilityAdminSummary(certifiabilityvaultizabilityAdmin)
 
       const substantiabilityvaultizabilityAdmin = await callUi('substantiabilityvaultizability-ui', 'fetchSubstantiabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSubstantiabilityvaultizabilityAdminSummary(substantiabilityvaultizabilityAdmin)
 
       const warrantabilityvaultizabilityAdmin = await callUi('warrantabilityvaultizability-ui', 'fetchWarrantabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setWarrantabilityvaultizabilityAdminSummary(warrantabilityvaultizabilityAdmin)
 
       const attributabilityvaultizabilityAdmin = await callUi('attributabilityvaultizability-ui', 'fetchAttributabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAttributabilityvaultizabilityAdminSummary(attributabilityvaultizabilityAdmin)
 
       const identifiabilityvaultizabilityAdmin = await callUi('identifiabilityvaultizability-ui', 'fetchIdentifiabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setIdentifiabilityvaultizabilityAdminSummary(identifiabilityvaultizabilityAdmin)
 
       const comparabilityvaultizabilityAdmin = await callUi('comparabilityvaultizability-ui', 'fetchComparabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setComparabilityvaultizabilityAdminSummary(comparabilityvaultizabilityAdmin)
 
       const distinguishabilityvaultizabilityAdmin = await callUi('distinguishabilityvaultizability-ui', 'fetchDistinguishabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDistinguishabilityvaultizabilityAdminSummary(distinguishabilityvaultizabilityAdmin)
 
       const assignabilityvaultizabilityAdmin = await callUi('assignabilityvaultizability-ui', 'fetchAssignabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAssignabilityvaultizabilityAdminSummary(assignabilityvaultizabilityAdmin)
 
       const referencabilityvaultizabilityAdmin = await callUi('referencabilityvaultizability-ui', 'fetchReferencabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setReferencabilityvaultizabilityAdminSummary(referencabilityvaultizabilityAdmin)
 
       const locatabilityvaultizabilityAdmin = await callUi('locatabilityvaultizability-ui', 'fetchLocatabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setLocatabilityvaultizabilityAdminSummary(locatabilityvaultizabilityAdmin)
 
       const retrievabilityvaultizabilityAdmin = await callUi('retrievabilityvaultizability-ui', 'fetchRetrievabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRetrievabilityvaultizabilityAdminSummary(retrievabilityvaultizabilityAdmin)
 
       const discoverabilityvaultizabilityAdmin = await callUi('discoverabilityvaultizability-ui', 'fetchDiscoverabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDiscoverabilityvaultizabilityAdminSummary(discoverabilityvaultizabilityAdmin)
 
       const navigabilityvaultizabilityAdmin = await callUi('navigabilityvaultizability-ui', 'fetchNavigabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setNavigabilityvaultizabilityAdminSummary(navigabilityvaultizabilityAdmin)
 
       const connectabilityvaultizabilityAdmin = await callUi('connectabilityvaultizability-ui', 'fetchConnectabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setConnectabilityvaultizabilityAdminSummary(connectabilityvaultizabilityAdmin)
 
       const linkabilityvaultizabilityAdmin = await callUi('linkabilityvaultizability-ui', 'fetchLinkabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setLinkabilityvaultizabilityAdminSummary(linkabilityvaultizabilityAdmin)
 
       const interchangeabilityvaultizabilityAdmin = await callUi('interchangeabilityvaultizability-ui', 'fetchInterchangeabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setInterchangeabilityvaultizabilityAdminSummary(interchangeabilityvaultizabilityAdmin)
 
       const transferabilityvaultizabilityAdmin = await callUi('transferabilityvaultizability-ui', 'fetchTransferabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTransferabilityvaultizabilityAdminSummary(transferabilityvaultizabilityAdmin)
 
       const portabilityvaultizabilityAdmin = await callUi('portabilityvaultizability-ui', 'fetchPortabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPortabilityvaultizabilityAdminSummary(portabilityvaultizabilityAdmin)
 
       const compatibilityvaultizabilityAdmin = await callUi('compatibilityvaultizability-ui', 'fetchCompatibilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCompatibilityvaultizabilityAdminSummary(compatibilityvaultizabilityAdmin)
 
       const adaptabilityvaultizabilityAdmin = await callUi('adaptabilityvaultizability-ui', 'fetchAdaptabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAdaptabilityvaultizabilityAdminSummary(adaptabilityvaultizabilityAdmin)
 
       const flexibilityvaultizabilityAdmin = await callUi('flexibilityvaultizability-ui', 'fetchFlexibilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setFlexibilityvaultizabilityAdminSummary(flexibilityvaultizabilityAdmin)
 
       const extensibilityvaultizabilityAdmin = await callUi('extensibilityvaultizability-ui', 'fetchExtensibilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setExtensibilityvaultizabilityAdminSummary(extensibilityvaultizabilityAdmin)
 
       const modifiabilityvaultizabilityAdmin = await callUi('modifiabilityvaultizability-ui', 'fetchModifiabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setModifiabilityvaultizabilityAdminSummary(modifiabilityvaultizabilityAdmin)
 
       const configurabilityvaultizabilityAdmin = await callUi('configurabilityvaultizability-ui', 'fetchConfigurabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setConfigurabilityvaultizabilityAdminSummary(configurabilityvaultizabilityAdmin)
 
       const customizabilityvaultizabilityAdmin = await callUi('customizabilityvaultizability-ui', 'fetchCustomizabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setCustomizabilityvaultizabilityAdminSummary(customizabilityvaultizabilityAdmin)
 
       const operabilityvaultizabilityAdmin = await callUi('operabilityvaultizability-ui', 'fetchOperabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setOperabilityvaultizabilityAdminSummary(operabilityvaultizabilityAdmin)
 
       const tunabilityvaultizabilityAdmin = await callUi('tunabilityvaultizability-ui', 'fetchTunabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTunabilityvaultizabilityAdminSummary(tunabilityvaultizabilityAdmin)
 
       const adjustabilityvaultizabilityAdmin = await callUi('adjustabilityvaultizability-ui', 'fetchAdjustabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAdjustabilityvaultizabilityAdminSummary(adjustabilityvaultizabilityAdmin)
 
       const programmabilityvaultizabilityAdmin = await callUi('programmabilityvaultizability-ui', 'fetchProgrammabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setProgrammabilityvaultizabilityAdminSummary(programmabilityvaultizabilityAdmin)
 
       const deployabilityvaultizabilityAdmin = await callUi('deployabilityvaultizability-ui', 'fetchDeployabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDeployabilityvaultizabilityAdminSummary(deployabilityvaultizabilityAdmin)
 
       const manageabilityvaultizabilityAdmin = await callUi('manageabilityvaultizability-ui', 'fetchManageabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setManageabilityvaultizabilityAdminSummary(manageabilityvaultizabilityAdmin)
 
       const controllabilityvaultizabilityAdmin = await callUi('controllabilityvaultizability-ui', 'fetchControllabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setControllabilityvaultizabilityAdminSummary(controllabilityvaultizabilityAdmin)
 
       const integrabilityvaultizabilityAdmin = await callUi('integrabilityvaultizability-ui', 'fetchIntegrabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setIntegrabilityvaultizabilityAdminSummary(integrabilityvaultizabilityAdmin)
 
       const orchestrabilityvaultizabilityAdmin = await callUi('orchestrabilityvaultizability-ui', 'fetchOrchestrabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setOrchestrabilityvaultizabilityAdminSummary(orchestrabilityvaultizabilityAdmin)
 
       const schedulabilityvaultizabilityAdmin = await callUi('schedulabilityvaultizability-ui', 'fetchSchedulabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSchedulabilityvaultizabilityAdminSummary(schedulabilityvaultizabilityAdmin)
 
       const automatabilityvaultizabilityAdmin = await callUi('automatabilityvaultizability-ui', 'fetchAutomatabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setAutomatabilityvaultizabilityAdminSummary(automatabilityvaultizabilityAdmin)
 
       const monitorabilityvaultizabilityAdmin = await callUi('monitorabilityvaultizability-ui', 'fetchMonitorabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMonitorabilityvaultizabilityAdminSummary(monitorabilityvaultizabilityAdmin)
 
       const predictabilityvaultizabilityAdmin = await callUi('predictabilityvaultizability-ui', 'fetchPredictabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setPredictabilityvaultizabilityAdminSummary(predictabilityvaultizabilityAdmin)
 
       const repeatabilityvaultizabilityAdmin = await callUi('repeatabilityvaultizability-ui', 'fetchRepeatabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setRepeatabilityvaultizabilityAdminSummary(repeatabilityvaultizabilityAdmin)
 
       const responsivenessvaultizabilityAdmin = await callUi('responsivenessvaultizability-ui', 'fetchResponsivenessvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setResponsivenessvaultizabilityAdminSummary(responsivenessvaultizabilityAdmin)
 
       const dependabilityvaultizabilityAdmin = await callUi('dependabilityvaultizability-ui', 'fetchDependabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setDependabilityvaultizabilityAdminSummary(dependabilityvaultizabilityAdmin)
 
       const composabilityvaultizabilityAdmin = await callUi('composabilityvaultizability-ui', 'fetchComposabilityvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setComposabilityvaultizabilityAdminSummary(composabilityvaultizabilityAdmin)
 
       const trustworthinessvaultizabilityAdmin = await callUi('trustworthinessvaultizability-ui', 'fetchTrustworthinessvaultizabilityAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setTrustworthinessvaultizabilityAdminSummary(trustworthinessvaultizabilityAdmin)
@@ -11596,63 +11615,63 @@ function App() {
     try {
       const status = await callUi('billing-ui', 'fetchBillingWorkspaceStatus', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBillingStatus(status)
 
       const events = await callUi('billing-ui', 'fetchBillingWebhookEvents', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBillingWebhookEvents(events.events)
 
       const invoices = await callUi('billing-ui', 'fetchBillingInvoices', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBillingInvoices(invoices.invoices)
 
       const usage = await callUi('billing-ui', 'fetchBillingUsageSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBillingUsageSummary(usage)
 
       const alerts = await callUi('billing-ui', 'fetchBillingAlerts', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBillingAlerts(alerts.alerts)
 
       const meterUsage = await callUi('billing-ui', 'fetchBillingMeterUsageReports', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBillingMeterUsageReports(meterUsage.reports)
 
       const notifications = await callUi('billing-ui', 'fetchBillingNotifications', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBillingNotifications(notifications.notifications)
 
       const adminSummary = await callUi('billing-ui', 'fetchBillingAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBillingAdminSummary(adminSummary)
 
       const membersAdmin = await callUi('workspace-ui', 'fetchWorkspaceMemberAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setMemberAdminSummary(membersAdmin)
@@ -11663,7 +11682,7 @@ function App() {
             'workspace-ui',
             'listWorkspaceInvites',
             apiBaseUrl,
-            defaultWorkspaceId,
+            activeWorkspaceId,
             workspaceAuthHeaders,
           )
           setWorkspaceInvites(listed.invites)
@@ -11676,7 +11695,7 @@ function App() {
 
       const settingsAdmin = await callUi('workspace-ui', 'fetchWorkspaceSettingsAdminSummary', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setSettingsAdminSummary(settingsAdmin)
@@ -11704,7 +11723,7 @@ function App() {
     try {
       const result = await callUi('billing-ui', 'executeBillingAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         action,
       )
@@ -11729,7 +11748,7 @@ function App() {
     try {
       const result = await callUi('usage-ui', 'executeUsageAdminAction',
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         action,
       )
@@ -11759,7 +11778,7 @@ function App() {
     try {
       const result = await callUi('workspace-ui', 'executeWorkspaceMemberAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         input,
       )
@@ -11793,7 +11812,7 @@ function App() {
         'workspace-ui',
         'createWorkspaceInvite',
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         {
           email: inviteForm.email.trim(),
@@ -11807,7 +11826,7 @@ function App() {
         'workspace-ui',
         'listWorkspaceInvites',
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setWorkspaceInvites(listed.invites)
@@ -11832,7 +11851,7 @@ function App() {
         'workspace-ui',
         'revokeWorkspaceInvite',
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         inviteId,
       )
@@ -11841,7 +11860,7 @@ function App() {
         'workspace-ui',
         'listWorkspaceInvites',
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setWorkspaceInvites(listed.invites)
@@ -11882,7 +11901,7 @@ function App() {
     try {
       const result = await callUi('workspace-ui', 'executeWorkspaceSettingsAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         input,
       )
@@ -11911,7 +11930,7 @@ function App() {
         'shield-ui',
         'resolveShieldFalsePositiveReport',
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         input.reportId,
         workspaceAuthHeaders,
         { decision: input.decision },
@@ -11920,7 +11939,7 @@ function App() {
         'shield-ui',
         'fetchShieldFalsePositiveReports',
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setShieldFalsePositiveReports(falsePositiveQueue)
@@ -11942,7 +11961,7 @@ function App() {
     try {
       const result = await callUi('model-router-ui', 'executeModelHealthAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         {
           action: 'recover_model',
@@ -11972,7 +11991,7 @@ function App() {
     try {
       const result = await callUi('shield-ui', 'executeShieldReviewAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -11999,7 +12018,7 @@ function App() {
     try {
       const result = await callUi('provider-credentials-ui', 'executeProviderKeyAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12027,7 +12046,7 @@ function App() {
     try {
       const result = await callUi('observability-ui', 'executeObservabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12054,7 +12073,7 @@ function App() {
     try {
       const result = await callUi('evaluation-ui', 'executePromptRegressionAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12083,7 +12102,7 @@ function App() {
     try {
       const result = await callUi('run-history-ui', 'executeRunHistoryAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12112,7 +12131,7 @@ function App() {
     try {
       const result = await callUi('stream-replay-ui', 'executeStreamRecoveryAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12144,7 +12163,7 @@ function App() {
     try {
       const result = await callUi('idempotency-ui', 'executeIdempotencyAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12171,7 +12190,7 @@ function App() {
     try {
       const result = await callUi('usage-limits-ui', 'executeQuotaAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12198,7 +12217,7 @@ function App() {
     try {
       const result = await callUi('deployment-ui', 'executeDeploymentAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12225,7 +12244,7 @@ function App() {
     try {
       const result = await callUi('migrations-ui', 'executeMigrationAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12252,7 +12271,7 @@ function App() {
     try {
       const result = await callUi('backup-ui', 'executeBackupAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12279,7 +12298,7 @@ function App() {
     try {
       const result = await callUi('audit-trail-ui', 'executeAuditAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12306,7 +12325,7 @@ function App() {
     try {
       const result = await callUi('compliance-ui', 'executeComplianceAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12333,7 +12352,7 @@ function App() {
     try {
       const result = await callUi('incident-response-ui', 'executeIncidentAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12360,7 +12379,7 @@ function App() {
     try {
       const result = await callUi('release-ui', 'executeReleaseAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12387,7 +12406,7 @@ function App() {
     try {
       const result = await callUi('slo-ui', 'executeSloAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12414,7 +12433,7 @@ function App() {
     try {
       const result = await callUi('capacity-ui', 'executeCapacityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12443,7 +12462,7 @@ function App() {
     try {
       const result = await callUi('performance-ui', 'executePerformanceAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12472,7 +12491,7 @@ function App() {
     try {
       const result = await callUi('resilience-ui', 'executeResilienceAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12501,7 +12520,7 @@ function App() {
     try {
       const result = await callUi('availability-ui', 'executeAvailabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12530,7 +12549,7 @@ function App() {
     try {
       const result = await callUi('reliability-ui', 'executeReliabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12559,7 +12578,7 @@ function App() {
     try {
       const result = await callUi('stability-ui', 'executeStabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12588,7 +12607,7 @@ function App() {
     try {
       const result = await callUi('consistency-ui', 'executeConsistencyAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12617,7 +12636,7 @@ function App() {
     try {
       const result = await callUi('integrity-ui', 'executeIntegrityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12646,7 +12665,7 @@ function App() {
     try {
       const result = await callUi('durability-ui', 'executeDurabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12675,7 +12694,7 @@ function App() {
     try {
       const result = await callUi('recoverability-ui', 'executeRecoverabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12704,7 +12723,7 @@ function App() {
     try {
       const result = await callUi('maintainability-ui', 'executeMaintainabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12733,7 +12752,7 @@ function App() {
     try {
       const result = await callUi('scalability-ui', 'executeScalabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12762,7 +12781,7 @@ function App() {
     try {
       const result = await callUi('traceability-ui', 'executeTraceabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12791,7 +12810,7 @@ function App() {
     try {
       const result = await callUi('efficiency-ui', 'executeEfficiencyAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12820,7 +12839,7 @@ function App() {
     try {
       const result = await callUi('optimization-ui', 'executeOptimizationAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12849,7 +12868,7 @@ function App() {
     try {
       const result = await callUi('utilization-ui', 'executeUtilizationAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12878,7 +12897,7 @@ function App() {
     try {
       const result = await callUi('sustainability-ui', 'executeSustainabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12907,7 +12926,7 @@ function App() {
     try {
       const result = await callUi('governance-ui', 'executeGovernanceAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12936,7 +12955,7 @@ function App() {
     try {
       const result = await callUi('oversight-ui', 'executeOversightAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12965,7 +12984,7 @@ function App() {
     try {
       const result = await callUi('assurance-ui', 'executeAssuranceAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -12994,7 +13013,7 @@ function App() {
     try {
       const result = await callUi('accountability-ui', 'executeAccountabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13023,7 +13042,7 @@ function App() {
     try {
       const result = await callUi('transparency-ui', 'executeTransparencyAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13052,7 +13071,7 @@ function App() {
     try {
       const result = await callUi('trustworthinessvaultizability-ui', 'executeTrustworthinessvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13081,7 +13100,7 @@ function App() {
     try {
       const result = await callUi('composabilityvaultizability-ui', 'executeComposabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13110,7 +13129,7 @@ function App() {
     try {
       const result = await callUi('dependabilityvaultizability-ui', 'executeDependabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13139,7 +13158,7 @@ function App() {
     try {
       const result = await callUi('responsivenessvaultizability-ui', 'executeResponsivenessvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13168,7 +13187,7 @@ function App() {
     try {
       const result = await callUi('repeatabilityvaultizability-ui', 'executeRepeatabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13197,7 +13216,7 @@ function App() {
     try {
       const result = await callUi('predictabilityvaultizability-ui', 'executePredictabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13226,7 +13245,7 @@ function App() {
     try {
       const result = await callUi('monitorabilityvaultizability-ui', 'executeMonitorabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13255,7 +13274,7 @@ function App() {
     try {
       const result = await callUi('automatabilityvaultizability-ui', 'executeAutomatabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13284,7 +13303,7 @@ function App() {
     try {
       const result = await callUi('schedulabilityvaultizability-ui', 'executeSchedulabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13313,7 +13332,7 @@ function App() {
     try {
       const result = await callUi('orchestrabilityvaultizability-ui', 'executeOrchestrabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13342,7 +13361,7 @@ function App() {
     try {
       const result = await callUi('integrabilityvaultizability-ui', 'executeIntegrabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13371,7 +13390,7 @@ function App() {
     try {
       const result = await callUi('controllabilityvaultizability-ui', 'executeControllabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13400,7 +13419,7 @@ function App() {
     try {
       const result = await callUi('manageabilityvaultizability-ui', 'executeManageabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13429,7 +13448,7 @@ function App() {
     try {
       const result = await callUi('deployabilityvaultizability-ui', 'executeDeployabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13458,7 +13477,7 @@ function App() {
     try {
       const result = await callUi('programmabilityvaultizability-ui', 'executeProgrammabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13487,7 +13506,7 @@ function App() {
     try {
       const result = await callUi('adjustabilityvaultizability-ui', 'executeAdjustabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13516,7 +13535,7 @@ function App() {
     try {
       const result = await callUi('tunabilityvaultizability-ui', 'executeTunabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13545,7 +13564,7 @@ function App() {
     try {
       const result = await callUi('operabilityvaultizability-ui', 'executeOperabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13574,7 +13593,7 @@ function App() {
     try {
       const result = await callUi('customizabilityvaultizability-ui', 'executeCustomizabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13603,7 +13622,7 @@ function App() {
     try {
       const result = await callUi('configurabilityvaultizability-ui', 'executeConfigurabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13632,7 +13651,7 @@ function App() {
     try {
       const result = await callUi('modifiabilityvaultizability-ui', 'executeModifiabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13661,7 +13680,7 @@ function App() {
     try {
       const result = await callUi('extensibilityvaultizability-ui', 'executeExtensibilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13690,7 +13709,7 @@ function App() {
     try {
       const result = await callUi('flexibilityvaultizability-ui', 'executeFlexibilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13719,7 +13738,7 @@ function App() {
     try {
       const result = await callUi('adaptabilityvaultizability-ui', 'executeAdaptabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13748,7 +13767,7 @@ function App() {
     try {
       const result = await callUi('compatibilityvaultizability-ui', 'executeCompatibilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13777,7 +13796,7 @@ function App() {
     try {
       const result = await callUi('portabilityvaultizability-ui', 'executePortabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13806,7 +13825,7 @@ function App() {
     try {
       const result = await callUi('transferabilityvaultizability-ui', 'executeTransferabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13835,7 +13854,7 @@ function App() {
     try {
       const result = await callUi('interchangeabilityvaultizability-ui', 'executeInterchangeabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13864,7 +13883,7 @@ function App() {
     try {
       const result = await callUi('linkabilityvaultizability-ui', 'executeLinkabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13893,7 +13912,7 @@ function App() {
     try {
       const result = await callUi('connectabilityvaultizability-ui', 'executeConnectabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13922,7 +13941,7 @@ function App() {
     try {
       const result = await callUi('navigabilityvaultizability-ui', 'executeNavigabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13951,7 +13970,7 @@ function App() {
     try {
       const result = await callUi('discoverabilityvaultizability-ui', 'executeDiscoverabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -13980,7 +13999,7 @@ function App() {
     try {
       const result = await callUi('retrievabilityvaultizability-ui', 'executeRetrievabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14009,7 +14028,7 @@ function App() {
     try {
       const result = await callUi('locatabilityvaultizability-ui', 'executeLocatabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14038,7 +14057,7 @@ function App() {
     try {
       const result = await callUi('referencabilityvaultizability-ui', 'executeReferencabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14067,7 +14086,7 @@ function App() {
     try {
       const result = await callUi('assignabilityvaultizability-ui', 'executeAssignabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14096,7 +14115,7 @@ function App() {
     try {
       const result = await callUi('distinguishabilityvaultizability-ui', 'executeDistinguishabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14125,7 +14144,7 @@ function App() {
     try {
       const result = await callUi('comparabilityvaultizability-ui', 'executeComparabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14154,7 +14173,7 @@ function App() {
     try {
       const result = await callUi('identifiabilityvaultizability-ui', 'executeIdentifiabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14183,7 +14202,7 @@ function App() {
     try {
       const result = await callUi('attributabilityvaultizability-ui', 'executeAttributabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14212,7 +14231,7 @@ function App() {
     try {
       const result = await callUi('warrantabilityvaultizability-ui', 'executeWarrantabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14241,7 +14260,7 @@ function App() {
     try {
       const result = await callUi('substantiabilityvaultizability-ui', 'executeSubstantiabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14270,7 +14289,7 @@ function App() {
     try {
       const result = await callUi('certifiabilityvaultizability-ui', 'executeCertifiabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14299,7 +14318,7 @@ function App() {
     try {
       const result = await callUi('measurabilityvaultizability-ui', 'executeMeasurabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14328,7 +14347,7 @@ function App() {
     try {
       const result = await callUi('assessabilityvaultizability-ui', 'executeAssessabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14357,7 +14376,7 @@ function App() {
     try {
       const result = await callUi('reviewabilityvaultizability-ui', 'executeReviewabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14386,7 +14405,7 @@ function App() {
     try {
       const result = await callUi('justifiabilityvaultizability-ui', 'executeJustifiabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14415,7 +14434,7 @@ function App() {
     try {
       const result = await callUi('demonstrabilityvaultizability-ui', 'executeDemonstrabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14444,7 +14463,7 @@ function App() {
     try {
       const result = await callUi('explainabilityvaultizability-ui', 'executeExplainabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14473,7 +14492,7 @@ function App() {
     try {
       const result = await callUi('defensibilityvaultizability-ui', 'executeDefensibilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14502,7 +14521,7 @@ function App() {
     try {
       const result = await callUi('credibilityvaultizability-ui', 'executeCredibilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14531,7 +14550,7 @@ function App() {
     try {
       const result = await callUi('reproducibilityvaultizability-ui', 'executeReproducibilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14560,7 +14579,7 @@ function App() {
     try {
       const result = await callUi('inspectabilityvaultizability-ui', 'executeInspectabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14589,7 +14608,7 @@ function App() {
     try {
       const result = await callUi('auditabilityvaultizability-ui', 'executeAuditabilityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14618,7 +14637,7 @@ function App() {
     try {
       const result = await callUi('assurancevaultizability-ui', 'executeAssurancevaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14647,7 +14666,7 @@ function App() {
     try {
       const result = await callUi('attestationvaultizability-ui', 'executeAttestationvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14676,7 +14695,7 @@ function App() {
     try {
       const result = await callUi('verificationvaultizability-ui', 'executeVerificationvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14705,7 +14724,7 @@ function App() {
     try {
       const result = await callUi('provenancevaultizability-ui', 'executeProvenancevaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14734,7 +14753,7 @@ function App() {
     try {
       const result = await callUi('authenticityvaultizability-ui', 'executeAuthenticityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14763,7 +14782,7 @@ function App() {
     try {
       const result = await callUi('validityvaultizability-ui', 'executeValidityvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14792,7 +14811,7 @@ function App() {
     try {
       const result = await callUi('compliancevaultizability-ui', 'executeCompliancevaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14821,7 +14840,7 @@ function App() {
     try {
       const result = await callUi('auditvaultizability-ui', 'executeAuditvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14850,7 +14869,7 @@ function App() {
     try {
       const result = await callUi('evidencevaultizability-ui', 'executeEvidencevaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14879,7 +14898,7 @@ function App() {
     try {
       const result = await callUi('tracevaultizability-ui', 'executeTracevaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14908,7 +14927,7 @@ function App() {
     try {
       const result = await callUi('registryvaultizability-ui', 'executeRegistryvaultizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14937,7 +14956,7 @@ function App() {
     try {
       const result = await callUi('integrityjournalizability-ui', 'executeIntegrityjournalizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14966,7 +14985,7 @@ function App() {
     try {
       const result = await callUi('attestjournalizability-ui', 'executeAttestjournalizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -14995,7 +15014,7 @@ function App() {
     try {
       const result = await callUi('evidencejournalizability-ui', 'executeEvidencejournalizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15024,7 +15043,7 @@ function App() {
     try {
       const result = await callUi('tracejournalizability-ui', 'executeTracejournalizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15053,7 +15072,7 @@ function App() {
     try {
       const result = await callUi('registryjournalizability-ui', 'executeRegistryjournalizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15082,7 +15101,7 @@ function App() {
     try {
       const result = await callUi('auditjournalizability-ui', 'executeAuditjournalizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15111,7 +15130,7 @@ function App() {
     try {
       const result = await callUi('proofjournalizability-ui', 'executeProofjournalizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15140,7 +15159,7 @@ function App() {
     try {
       const result = await callUi('witnessjournalizability-ui', 'executeWitnessjournalizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15169,7 +15188,7 @@ function App() {
     try {
       const result = await callUi('notarjournalizability-ui', 'executeNotarjournalizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15198,7 +15217,7 @@ function App() {
     try {
       const result = await callUi('compliancejournalizability-ui', 'executeCompliancejournalizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15227,7 +15246,7 @@ function App() {
     try {
       const result = await callUi('auditregistryizability-ui', 'executeAuditregistryizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15256,7 +15275,7 @@ function App() {
     try {
       const result = await callUi('proofregistryizability-ui', 'executeProofregistryizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15285,7 +15304,7 @@ function App() {
     try {
       const result = await callUi('witnessledgerizability-ui', 'executeWitnessledgerizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15314,7 +15333,7 @@ function App() {
     try {
       const result = await callUi('notarledgerizability-ui', 'executeNotarledgerizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15343,7 +15362,7 @@ function App() {
     try {
       const result = await callUi('complianceledgerizability-ui', 'executeComplianceledgerizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15372,7 +15391,7 @@ function App() {
     try {
       const result = await callUi('witnessproofizability-ui', 'executeWitnessproofizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15401,7 +15420,7 @@ function App() {
     try {
       const result = await callUi('registrarproofizability-ui', 'executeRegistrarproofizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15430,7 +15449,7 @@ function App() {
     try {
       const result = await callUi('disclosureproofizability-ui', 'executeDisclosureproofizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15459,7 +15478,7 @@ function App() {
     try {
       const result = await callUi('traceledgerizability-ui', 'executeTraceledgerizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15488,7 +15507,7 @@ function App() {
     try {
       const result = await callUi('auditlineizability-ui', 'executeAuditlineizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15517,7 +15536,7 @@ function App() {
     try {
       const result = await callUi('notarproofizability-ui', 'executeNotarproofizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15546,7 +15565,7 @@ function App() {
     try {
       const result = await callUi('prooflineizability-ui', 'executeProoflineizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15575,7 +15594,7 @@ function App() {
     try {
       const result = await callUi('evidencetrackizability-ui', 'executeEvidencetrackizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15604,7 +15623,7 @@ function App() {
     try {
       const result = await callUi('attestledgerizability-ui', 'executeAttestledgerizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15633,7 +15652,7 @@ function App() {
     try {
       const result = await callUi('compliancechainizability-ui', 'executeCompliancechainizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15662,7 +15681,7 @@ function App() {
     try {
       const result = await callUi('auditproofizability-ui', 'executeAuditproofizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15691,7 +15710,7 @@ function App() {
     try {
       const result = await callUi('registrarizability-ui', 'executeRegistrarizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15720,7 +15739,7 @@ function App() {
     try {
       const result = await callUi('disclosureizability-ui', 'executeDisclosureizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15749,7 +15768,7 @@ function App() {
     try {
       const result = await callUi('traceproofizability-ui', 'executeTraceproofizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15778,7 +15797,7 @@ function App() {
     try {
       const result = await callUi('ruleproofizability-ui', 'executeRuleproofizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15807,7 +15826,7 @@ function App() {
     try {
       const result = await callUi('signatureproofizability-ui', 'executeSignatureproofizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15836,7 +15855,7 @@ function App() {
     try {
       const result = await callUi('ledgerizability-ui', 'executeLedgerizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15865,7 +15884,7 @@ function App() {
     try {
       const result = await callUi('witnessizability-ui', 'executeWitnessizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15894,7 +15913,7 @@ function App() {
     try {
       const result = await callUi('notarizationizability-ui', 'executeNotarizationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15923,7 +15942,7 @@ function App() {
     try {
       const result = await callUi('policyproofizability-ui', 'executePolicyproofizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15952,7 +15971,7 @@ function App() {
     try {
       const result = await callUi('tamperproofizability-ui', 'executeTamperproofizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -15981,7 +16000,7 @@ function App() {
     try {
       const result = await callUi('chainofcustodyizability-ui', 'executeChainofcustodyizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16010,7 +16029,7 @@ function App() {
     try {
       const result = await callUi('evidencizability-ui', 'executeEvidencizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16039,7 +16058,7 @@ function App() {
     try {
       const result = await callUi('attesttrackizability-ui', 'executeAttesttrackizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16068,7 +16087,7 @@ function App() {
     try {
       const result = await callUi('governancetrackizability-ui', 'executeGovernancetrackizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16097,7 +16116,7 @@ function App() {
     try {
       const result = await callUi('complianceproofizability-ui', 'executeComplianceproofizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16126,7 +16145,7 @@ function App() {
     try {
       const result = await callUi('audittrailizability-ui', 'executeAudittrailizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16155,7 +16174,7 @@ function App() {
     try {
       const result = await callUi('forensicizability-ui', 'executeForensicizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16184,7 +16203,7 @@ function App() {
     try {
       const result = await callUi('lineageizability-ui', 'executeLineageizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16213,7 +16232,7 @@ function App() {
     try {
       const result = await callUi('provenanceizability-ui', 'executeProvenanceizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16242,7 +16261,7 @@ function App() {
     try {
       const result = await callUi('complianceguardizability-ui', 'executeComplianceguardizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16271,7 +16290,7 @@ function App() {
     try {
       const result = await callUi('cryptographyizability-ui', 'executeCryptographyizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16300,7 +16319,7 @@ function App() {
     try {
       const result = await callUi('secretmanagementizability-ui', 'executeSecretmanagementizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16329,7 +16348,7 @@ function App() {
     try {
       const result = await callUi('keymanagementizability-ui', 'executeKeymanagementizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16358,7 +16377,7 @@ function App() {
     try {
       const result = await callUi('identityproofizability-ui', 'executeIdentityproofizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16387,7 +16406,7 @@ function App() {
     try {
       const result = await callUi('zerotrustizability-ui', 'executeZerotrustizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16416,7 +16435,7 @@ function App() {
     try {
       const result = await callUi('leastprivilegeizability-ui', 'executeLeastprivilegeizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16445,7 +16464,7 @@ function App() {
     try {
       const result = await callUi('accesscontrolizability-ui', 'executeAccesscontrolizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16474,7 +16493,7 @@ function App() {
     try {
       const result = await callUi('nonrepudiationizability-ui', 'executeNonrepudiationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16503,7 +16522,7 @@ function App() {
     try {
       const result = await callUi('confidentialityizability-ui', 'executeConfidentialityizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16532,7 +16551,7 @@ function App() {
     try {
       const result = await callUi('segregationizability-ui', 'executeSegregationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16561,7 +16580,7 @@ function App() {
     try {
       const result = await callUi('hardeningizability-ui', 'executeHardeningizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16590,7 +16609,7 @@ function App() {
     try {
       const result = await callUi('mitigationizability-ui', 'executeMitigationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16619,7 +16638,7 @@ function App() {
     try {
       const result = await callUi('vulnerabilityizability-ui', 'executeVulnerabilityizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16648,7 +16667,7 @@ function App() {
     try {
       const result = await callUi('threatizability-ui', 'executeThreatizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16677,7 +16696,7 @@ function App() {
     try {
       const result = await callUi('integrityizability-ui', 'executeIntegrityizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16706,7 +16725,7 @@ function App() {
     try {
       const result = await callUi('trustizability-ui', 'executeTrustizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16735,7 +16754,7 @@ function App() {
     try {
       const result = await callUi('privacyizability-ui', 'executePrivacyizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16764,7 +16783,7 @@ function App() {
     try {
       const result = await callUi('securityizability-ui', 'executeSecurityizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16793,7 +16812,7 @@ function App() {
     try {
       const result = await callUi('riskizability-ui', 'executeRiskizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16822,7 +16841,7 @@ function App() {
     try {
       const result = await callUi('identityizability-ui', 'executeIdentityizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16851,7 +16870,7 @@ function App() {
     try {
       const result = await callUi('authenticationizability-ui', 'executeAuthenticationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16880,7 +16899,7 @@ function App() {
     try {
       const result = await callUi('authorizationizability-ui', 'executeAuthorizationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16909,7 +16928,7 @@ function App() {
     try {
       const result = await callUi('permissionizability-ui', 'executePermissionizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16938,7 +16957,7 @@ function App() {
     try {
       const result = await callUi('entitlementizability-ui', 'executeEntitlementizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16967,7 +16986,7 @@ function App() {
     try {
       const result = await callUi('controlizability-ui', 'executeControlizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -16996,7 +17015,7 @@ function App() {
     try {
       const result = await callUi('oversightizability-ui', 'executeOversightizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17025,7 +17044,7 @@ function App() {
     try {
       const result = await callUi('transparencyizability-ui', 'executeTransparencyizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17054,7 +17073,7 @@ function App() {
     try {
       const result = await callUi('accountabilityizability-ui', 'executeAccountabilityizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17083,7 +17102,7 @@ function App() {
     try {
       const result = await callUi('auditingizability-ui', 'executeAuditingizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17112,7 +17131,7 @@ function App() {
     try {
       const result = await callUi('telemetryizability-ui', 'executeTelemetryizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17141,7 +17160,7 @@ function App() {
     try {
       const result = await callUi('instrumentationizability-ui', 'executeInstrumentationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17170,7 +17189,7 @@ function App() {
     try {
       const result = await callUi('specificationizability-ui', 'executeSpecificationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17199,7 +17218,7 @@ function App() {
     try {
       const result = await callUi('accreditationizability-ui', 'executeAccreditationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17228,7 +17247,7 @@ function App() {
     try {
       const result = await callUi('certificationizability-ui', 'executeCertificationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17257,7 +17276,7 @@ function App() {
     try {
       const result = await callUi('attestationizability-ui', 'executeAttestationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17286,7 +17305,7 @@ function App() {
     try {
       const result = await callUi('assuranceizability-ui', 'executeAssuranceizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17315,7 +17334,7 @@ function App() {
     try {
       const result = await callUi('enforcementizability-ui', 'executeEnforcementizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17344,7 +17363,7 @@ function App() {
     try {
       const result = await callUi('policyizability-ui', 'executePolicyizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17373,7 +17392,7 @@ function App() {
     try {
       const result = await callUi('complianceizability-ui', 'executeComplianceizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17402,7 +17421,7 @@ function App() {
     try {
       const result = await callUi('governanceizability-ui', 'executeGovernanceizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17431,7 +17450,7 @@ function App() {
     try {
       const result = await callUi('reconciliationizability-ui', 'executeReconciliationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17460,7 +17479,7 @@ function App() {
     try {
       const result = await callUi('remediationizability-ui', 'executeRemediationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17489,7 +17508,7 @@ function App() {
     try {
       const result = await callUi('healingizability-ui', 'executeHealingizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17518,7 +17537,7 @@ function App() {
     try {
       const result = await callUi('scalingizability-ui', 'executeScalingizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17547,7 +17566,7 @@ function App() {
     try {
       const result = await callUi('deallocationizability-ui', 'executeDeallocationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17576,7 +17595,7 @@ function App() {
     try {
       const result = await callUi('allocationizability-ui', 'executeAllocationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17605,7 +17624,7 @@ function App() {
     try {
       const result = await callUi('provisioningizability-ui', 'executeProvisioningizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17634,7 +17653,7 @@ function App() {
     try {
       const result = await callUi('registrationizability-ui', 'executeRegistrationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17663,7 +17682,7 @@ function App() {
     try {
       const result = await callUi('discoveryizability-ui', 'executeDiscoveryizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17692,7 +17711,7 @@ function App() {
     try {
       const result = await callUi('meshingizability-ui', 'executeMeshingizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17721,7 +17740,7 @@ function App() {
     try {
       const result = await callUi('clusteringizability-ui', 'executeClusteringizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17750,7 +17769,7 @@ function App() {
     try {
       const result = await callUi('partitioningizability-ui', 'executePartitioningizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17779,7 +17798,7 @@ function App() {
     try {
       const result = await callUi('coordinationizability-ui', 'executeCoordinationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17808,7 +17827,7 @@ function App() {
     try {
       const result = await callUi('nodelizability-ui', 'executeNodelizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17837,7 +17856,7 @@ function App() {
     try {
       const result = await callUi('balancingizability-ui', 'executeBalancingizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17866,7 +17885,7 @@ function App() {
     try {
       const result = await callUi('routingizability-ui', 'executeRoutingizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17895,7 +17914,7 @@ function App() {
     try {
       const result = await callUi('triggeringizability-ui', 'executeTriggeringizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17924,7 +17943,7 @@ function App() {
     try {
       const result = await callUi('schedulingizability-ui', 'executeSchedulingizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17953,7 +17972,7 @@ function App() {
     try {
       const result = await callUi('orchestrationizability-ui', 'executeOrchestrationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -17982,7 +18001,7 @@ function App() {
     try {
       const result = await callUi('windowizability-ui', 'executeWindowizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18011,7 +18030,7 @@ function App() {
     try {
       const result = await callUi('streamizability-ui', 'executeStreamizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18040,7 +18059,7 @@ function App() {
     try {
       const result = await callUi('batchingizability-ui', 'executeBatchingizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18069,7 +18088,7 @@ function App() {
     try {
       const result = await callUi('pipeliningizability-ui', 'executePipeliningizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18098,7 +18117,7 @@ function App() {
     try {
       const result = await callUi('chainingizability-ui', 'executeChainingizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18127,7 +18146,7 @@ function App() {
     try {
       const result = await callUi('scanizability-ui', 'executeScanizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18156,7 +18175,7 @@ function App() {
     try {
       const result = await callUi('foldizability-ui', 'executeFoldizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18185,7 +18204,7 @@ function App() {
     try {
       const result = await callUi('reduceizability-ui', 'executeReduceizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18214,7 +18233,7 @@ function App() {
     try {
       const result = await callUi('mapizability-ui', 'executeMapizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18243,7 +18262,7 @@ function App() {
     try {
       const result = await callUi('transformizability-ui', 'executeTransformizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18272,7 +18291,7 @@ function App() {
     try {
       const result = await callUi('projectizability-ui', 'executeProjectizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18301,7 +18320,7 @@ function App() {
     try {
       const result = await callUi('splitizability-ui', 'executeSplitizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18330,7 +18349,7 @@ function App() {
     try {
       const result = await callUi('mergeizability-ui', 'executeMergeizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18359,7 +18378,7 @@ function App() {
     try {
       const result = await callUi('joinizability-ui', 'executeJoinizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18388,7 +18407,7 @@ function App() {
     try {
       const result = await callUi('groupizability-ui', 'executeGroupizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18417,7 +18436,7 @@ function App() {
     try {
       const result = await callUi('pivotizability-ui', 'executePivotizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18446,7 +18465,7 @@ function App() {
     try {
       const result = await callUi('paginizability-ui', 'executePaginizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18475,7 +18494,7 @@ function App() {
     try {
       const result = await callUi('sortizability-ui', 'executeSortizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18504,7 +18523,7 @@ function App() {
     try {
       const result = await callUi('filterizability-ui', 'executeFilterizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18533,7 +18552,7 @@ function App() {
     try {
       const result = await callUi('queryizability-ui', 'executeQueryizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18562,7 +18581,7 @@ function App() {
     try {
       const result = await callUi('retentionizability-ui', 'executeRetentionizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18591,7 +18610,7 @@ function App() {
     try {
       const result = await callUi('expandizability-ui', 'executeExpandizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18620,7 +18639,7 @@ function App() {
     try {
       const result = await callUi('compactizability-ui', 'executeCompactizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18649,7 +18668,7 @@ function App() {
     try {
       const result = await callUi('versioningizability-ui', 'executeVersioningizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18678,7 +18697,7 @@ function App() {
     try {
       const result = await callUi('searchizability-ui', 'executeSearchizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18707,7 +18726,7 @@ function App() {
     try {
       const result = await callUi('indexingizability-ui', 'executeIndexingizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18736,7 +18755,7 @@ function App() {
     try {
       const result = await callUi('importizability-ui', 'executeImportizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18765,7 +18784,7 @@ function App() {
     try {
       const result = await callUi('exportizability-ui', 'executeExportizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18794,7 +18813,7 @@ function App() {
     try {
       const result = await callUi('backupizability-ui', 'executeBackupizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18823,7 +18842,7 @@ function App() {
     try {
       const result = await callUi('restoreizability-ui', 'executeRestoreizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18852,7 +18871,7 @@ function App() {
     try {
       const result = await callUi('archiveizability-ui', 'executeArchiveizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18881,7 +18900,7 @@ function App() {
     try {
       const result = await callUi('decompressizability-ui', 'executeDecompressizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18910,7 +18929,7 @@ function App() {
     try {
       const result = await callUi('compressizability-ui', 'executeCompressizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18939,7 +18958,7 @@ function App() {
     try {
       const result = await callUi('persistizability-ui', 'executePersistizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18968,7 +18987,7 @@ function App() {
     try {
       const result = await callUi('memorizability-ui', 'executeMemorizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -18997,7 +19016,7 @@ function App() {
     try {
       const result = await callUi('cacheizability-ui', 'executeCacheizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19026,7 +19045,7 @@ function App() {
     try {
       const result = await callUi('prefetchizability-ui', 'executePrefetchizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19055,7 +19074,7 @@ function App() {
     try {
       const result = await callUi('coldizability-ui', 'executeColdizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19084,7 +19103,7 @@ function App() {
     try {
       const result = await callUi('warmizability-ui', 'executeWarmizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19113,7 +19132,7 @@ function App() {
     try {
       const result = await callUi('refreshizability-ui', 'executeRefreshizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19142,7 +19161,7 @@ function App() {
     try {
       const result = await callUi('expirationizability-ui', 'executeExpirationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19171,7 +19190,7 @@ function App() {
     try {
       const result = await callUi('ttlizability-ui', 'executeTtlizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19200,7 +19219,7 @@ function App() {
     try {
       const result = await callUi('evictionizability-ui', 'executeEvictionizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19229,7 +19248,7 @@ function App() {
     try {
       const result = await callUi('invalidationizability-ui', 'executeInvalidationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19258,7 +19277,7 @@ function App() {
     try {
       const result = await callUi('hydrationizability-ui', 'executeHydrationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19287,7 +19306,7 @@ function App() {
     try {
       const result = await callUi('materializationizability-ui', 'executeMaterializationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19316,7 +19335,7 @@ function App() {
     try {
       const result = await callUi('propagationizability-ui', 'executePropagationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19345,7 +19364,7 @@ function App() {
     try {
       const result = await callUi('cloningizability-ui', 'executeCloningizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19374,7 +19393,7 @@ function App() {
     try {
       const result = await callUi('mirroringizability-ui', 'executeMirroringizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19403,7 +19422,7 @@ function App() {
     try {
       const result = await callUi('replicationizability-ui', 'executeReplicationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19432,7 +19451,7 @@ function App() {
     try {
       const result = await callUi('walizability-ui', 'executeWalizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19461,7 +19480,7 @@ function App() {
     try {
       const result = await callUi('appendizability-ui', 'executeAppendizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19490,7 +19509,7 @@ function App() {
     try {
       const result = await callUi('journalizability-ui', 'executeJournalizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19519,7 +19538,7 @@ function App() {
     try {
       const result = await callUi('snapshotizability-ui', 'executeSnapshotizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19548,7 +19567,7 @@ function App() {
     try {
       const result = await callUi('quorumizability-ui', 'executeQuorumizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19577,7 +19596,7 @@ function App() {
     try {
       const result = await callUi('consensusizability-ui', 'executeConsensusizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19606,7 +19625,7 @@ function App() {
     try {
       const result = await callUi('followerizability-ui', 'executeFollowerizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19635,7 +19654,7 @@ function App() {
     try {
       const result = await callUi('leaderizability-ui', 'executeLeaderizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19664,7 +19683,7 @@ function App() {
     try {
       const result = await callUi('rebalanceizability-ui', 'executeRebalanceizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19693,7 +19712,7 @@ function App() {
     try {
       const result = await callUi('compactionizability-ui', 'executeCompactionizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19722,7 +19741,7 @@ function App() {
     try {
       const result = await callUi('recoveryizability-ui', 'executeRecoveryizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19751,7 +19770,7 @@ function App() {
     try {
       const result = await callUi('checkpointizability-ui', 'executeCheckpointizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19780,7 +19799,7 @@ function App() {
     try {
       const result = await callUi('orderingizability-ui', 'executeOrderingizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19809,7 +19828,7 @@ function App() {
     try {
       const result = await callUi('shardingizability-ui', 'executeShardingizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19838,7 +19857,7 @@ function App() {
     try {
       const result = await callUi('partitionizability-ui', 'executePartitionizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19867,7 +19886,7 @@ function App() {
     try {
       const result = await callUi('sequencizability-ui', 'executeSequencizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19896,7 +19915,7 @@ function App() {
     try {
       const result = await callUi('dedupizability-ui', 'executeDedupizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19925,7 +19944,7 @@ function App() {
     try {
       const result = await callUi('deadletterizability-ui', 'executeDeadletterizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19954,7 +19973,7 @@ function App() {
     try {
       const result = await callUi('nackizability-ui', 'executeNackizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -19983,7 +20002,7 @@ function App() {
     try {
       const result = await callUi('ackizability-ui', 'executeAckizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20012,7 +20031,7 @@ function App() {
     try {
       const result = await callUi('timeoutizability-ui', 'executeTimeoutizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20041,7 +20060,7 @@ function App() {
     try {
       const result = await callUi('circuitizability-ui', 'executeCircuitizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20070,7 +20089,7 @@ function App() {
     try {
       const result = await callUi('retryizability-ui', 'executeRetryizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20099,7 +20118,7 @@ function App() {
     try {
       const result = await callUi('batchizability-ui', 'executeBatchizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20128,7 +20147,7 @@ function App() {
     try {
       const result = await callUi('bufferizability-ui', 'executeBufferizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20157,7 +20176,7 @@ function App() {
     try {
       const result = await callUi('debouncizability-ui', 'executeDebouncizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20186,7 +20205,7 @@ function App() {
     try {
       const result = await callUi('throttleizability-ui', 'executeThrottleizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20215,7 +20234,7 @@ function App() {
     try {
       const result = await callUi('backpressureizability-ui', 'executeBackpressureizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20244,7 +20263,7 @@ function App() {
     try {
       const result = await callUi('fanoutizability-ui', 'executeFanoutizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20273,7 +20292,7 @@ function App() {
     try {
       const result = await callUi('unicastizability-ui', 'executeUnicastizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20302,7 +20321,7 @@ function App() {
     try {
       const result = await callUi('multicastizability-ui', 'executeMulticastizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20331,7 +20350,7 @@ function App() {
     try {
       const result = await callUi('broadcastizability-ui', 'executeBroadcastizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20360,7 +20379,7 @@ function App() {
     try {
       const result = await callUi('asynchronizability-ui', 'executeAsynchronizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20389,7 +20408,7 @@ function App() {
     try {
       const result = await callUi('synchronizability-ui', 'executeSynchronizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20418,7 +20437,7 @@ function App() {
     try {
       const result = await callUi('handoffizability-ui', 'executeHandoffizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20447,7 +20466,7 @@ function App() {
     try {
       const result = await callUi('dispatchizability-ui', 'executeDispatchizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20476,7 +20495,7 @@ function App() {
     try {
       const result = await callUi('deliverizability-ui', 'executeDeliverizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20505,7 +20524,7 @@ function App() {
     try {
       const result = await callUi('consumizability-ui', 'executeConsumizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20534,7 +20553,7 @@ function App() {
     try {
       const result = await callUi('publishizability-ui', 'executePublishizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20563,7 +20582,7 @@ function App() {
     try {
       const result = await callUi('subscribizability-ui', 'executeSubscribizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20592,7 +20611,7 @@ function App() {
     try {
       const result = await callUi('notifizability-ui', 'executeNotifizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20621,7 +20640,7 @@ function App() {
     try {
       const result = await callUi('channelizability-ui', 'executeChannelizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20650,7 +20669,7 @@ function App() {
     try {
       const result = await callUi('eventizability-ui', 'executeEventizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20679,7 +20698,7 @@ function App() {
     try {
       const result = await callUi('queueizability-ui', 'executeQueueizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20708,7 +20727,7 @@ function App() {
     try {
       const result = await callUi('routizability-ui', 'executeRoutizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20737,7 +20756,7 @@ function App() {
     try {
       const result = await callUi('relayizability-ui', 'executeRelayizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20766,7 +20785,7 @@ function App() {
     try {
       const result = await callUi('brokerizability-ui', 'executeBrokerizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20795,7 +20814,7 @@ function App() {
     try {
       const result = await callUi('gatewayizability-ui', 'executeGatewayizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20824,7 +20843,7 @@ function App() {
     try {
       const result = await callUi('networkizability-ui', 'executeNetworkizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20853,7 +20872,7 @@ function App() {
     try {
       const result = await callUi('topologizability-ui', 'executeTopologizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20882,7 +20901,7 @@ function App() {
     try {
       const result = await callUi('meshabilizability-ui', 'executeMeshabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20911,7 +20930,7 @@ function App() {
     try {
       const result = await callUi('decentralizability-ui', 'executeDecentralizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20940,7 +20959,7 @@ function App() {
     try {
       const result = await callUi('federatizability-ui', 'executeFederatizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20969,7 +20988,7 @@ function App() {
     try {
       const result = await callUi('distributizability-ui', 'executeDistributizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -20998,7 +21017,7 @@ function App() {
     try {
       const result = await callUi('virtualizability-ui', 'executeVirtualizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21027,7 +21046,7 @@ function App() {
     try {
       const result = await callUi('boundarizability-ui', 'executeBoundarizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21056,7 +21075,7 @@ function App() {
     try {
       const result = await callUi('containerizability-ui', 'executeContainerizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21085,7 +21104,7 @@ function App() {
     try {
       const result = await callUi('sandboxizability-ui', 'executeSandboxizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21114,7 +21133,7 @@ function App() {
     try {
       const result = await callUi('isolatizability-ui', 'executeIsolatizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21143,7 +21162,7 @@ function App() {
     try {
       const result = await callUi('encapsulizability-ui', 'executeEncapsulizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21172,7 +21191,7 @@ function App() {
     try {
       const result = await callUi('protocolizability-ui', 'executeProtocolizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21201,7 +21220,7 @@ function App() {
     try {
       const result = await callUi('interfabilizability-ui', 'executeInterfabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21230,7 +21249,7 @@ function App() {
     try {
       const result = await callUi('connectabilizability-ui', 'executeConnectabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21259,7 +21278,7 @@ function App() {
     try {
       const result = await callUi('interoperabilizability-ui', 'executeInteroperabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21288,7 +21307,7 @@ function App() {
     try {
       const result = await callUi('compatibilizability-ui', 'executeCompatibilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21317,7 +21336,7 @@ function App() {
     try {
       const result = await callUi('pluggabilizability-ui', 'executePluggabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21346,7 +21365,7 @@ function App() {
     try {
       const result = await callUi('extensibilizability-ui', 'executeExtensibilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21375,7 +21394,7 @@ function App() {
     try {
       const result = await callUi('modularizability-ui', 'executeModularizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21404,7 +21423,7 @@ function App() {
     try {
       const result = await callUi('composabilizability-ui', 'executeComposabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21433,7 +21452,7 @@ function App() {
     try {
       const result = await callUi('integrabilizability-ui', 'executeIntegrabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21462,7 +21481,7 @@ function App() {
     try {
       const result = await callUi('patchizability-ui', 'executePatchizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21491,7 +21510,7 @@ function App() {
     try {
       const result = await callUi('upgradizability-ui', 'executeUpgradizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21520,7 +21539,7 @@ function App() {
     try {
       const result = await callUi('migratizability-ui', 'executeMigratizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21549,7 +21568,7 @@ function App() {
     try {
       const result = await callUi('versionizability-ui', 'executeVersionizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21578,7 +21597,7 @@ function App() {
     try {
       const result = await callUi('releasizability-ui', 'executeReleasizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21607,7 +21626,7 @@ function App() {
     try {
       const result = await callUi('triggerizability-ui', 'executeTriggerizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21636,7 +21655,7 @@ function App() {
     try {
       const result = await callUi('schedulizability-ui', 'executeSchedulizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21665,7 +21684,7 @@ function App() {
     try {
       const result = await callUi('orchestrizability-ui', 'executeOrchestrizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21694,7 +21713,7 @@ function App() {
     try {
       const result = await callUi('automatizability-ui', 'executeAutomatizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21723,7 +21742,7 @@ function App() {
     try {
       const result = await callUi('scriptabilizability-ui', 'executeScriptabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21752,7 +21771,7 @@ function App() {
     try {
       const result = await callUi('featureflagizability-ui', 'executeFeatureflagizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21781,7 +21800,7 @@ function App() {
     try {
       const result = await callUi('progressiveizability-ui', 'executeProgressiveizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21810,7 +21829,7 @@ function App() {
     try {
       const result = await callUi('bluegreenizability-ui', 'executeBluegreenizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21839,7 +21858,7 @@ function App() {
     try {
       const result = await callUi('canaryizability-ui', 'executeCanaryizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21868,7 +21887,7 @@ function App() {
     try {
       const result = await callUi('rollbackabilizability-ui', 'executeRollbackabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21897,7 +21916,7 @@ function App() {
     try {
       const result = await callUi('troubleshootizability-ui', 'executeTroubleshootizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21926,7 +21945,7 @@ function App() {
     try {
       const result = await callUi('diagnosabilizability-ui', 'executeDiagnosabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21955,7 +21974,7 @@ function App() {
     try {
       const result = await callUi('maintainabilizability-ui', 'executeMaintainabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -21984,7 +22003,7 @@ function App() {
     try {
       const result = await callUi('operabilizability-ui', 'executeOperabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22013,7 +22032,7 @@ function App() {
     try {
       const result = await callUi('configurabilizability-ui', 'executeConfigurabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22042,7 +22061,7 @@ function App() {
     try {
       const result = await callUi('deployabilizability-ui', 'executeDeployabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22071,7 +22090,7 @@ function App() {
     try {
       const result = await callUi('autoscalingizability-ui', 'executeAutoscalingizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22100,7 +22119,7 @@ function App() {
     try {
       const result = await callUi('loadbalancizability-ui', 'executeLoadbalancizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22129,7 +22148,7 @@ function App() {
     try {
       const result = await callUi('replicabilizability-ui', 'executeReplicabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22158,7 +22177,7 @@ function App() {
     try {
       const result = await callUi('restorabilizability-ui', 'executeRestorabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22187,7 +22206,7 @@ function App() {
     try {
       const result = await callUi('observabilizability-ui', 'executeObservabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22216,7 +22235,7 @@ function App() {
     try {
       const result = await callUi('alertabilizability-ui', 'executeAlertabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22245,7 +22264,7 @@ function App() {
     try {
       const result = await callUi('monitorizability-ui', 'executeMonitorizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22274,7 +22293,7 @@ function App() {
     try {
       const result = await callUi('traceabilizability-ui', 'executeTraceabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22303,7 +22322,7 @@ function App() {
     try {
       const result = await callUi('availabilizability-ui', 'executeAvailabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22332,7 +22351,7 @@ function App() {
     try {
       const result = await callUi('sustainizability-ui', 'executeSustainizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22361,7 +22380,7 @@ function App() {
     try {
       const result = await callUi('continuizability-ui', 'executeContinuizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22390,7 +22409,7 @@ function App() {
     try {
       const result = await callUi('failoverizability-ui', 'executeFailoverizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22419,7 +22438,7 @@ function App() {
     try {
       const result = await callUi('redundizability-ui', 'executeRedundizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22448,7 +22467,7 @@ function App() {
     try {
       const result = await callUi('recoverizability-ui', 'executeRecoverizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22477,7 +22496,7 @@ function App() {
     try {
       const result = await callUi('dependableizability-ui', 'executeDependableizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22506,7 +22525,7 @@ function App() {
     try {
       const result = await callUi('robustizability-ui', 'executeRobustizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22535,7 +22554,7 @@ function App() {
     try {
       const result = await callUi('resilientizability-ui', 'executeResilientizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22564,7 +22583,7 @@ function App() {
     try {
       const result = await callUi('elasticizability-ui', 'executeElasticizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22593,7 +22612,7 @@ function App() {
     try {
       const result = await callUi('scalabilizability-ui', 'executeScalabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22622,7 +22641,7 @@ function App() {
     try {
       const result = await callUi('adaptizability-ui', 'executeAdaptizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22651,7 +22670,7 @@ function App() {
     try {
       const result = await callUi('stabilizability-ui', 'executeStabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22680,7 +22699,7 @@ function App() {
     try {
       const result = await callUi('convergizability-ui', 'executeConvergizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22709,7 +22728,7 @@ function App() {
     try {
       const result = await callUi('iterativizability-ui', 'executeIterativizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22738,7 +22757,7 @@ function App() {
     try {
       const result = await callUi('approximatizability-ui', 'executeApproximatizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22767,7 +22786,7 @@ function App() {
     try {
       const result = await callUi('tolerizability-ui', 'executeTolerizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22796,7 +22815,7 @@ function App() {
     try {
       const result = await callUi('comparizability-ui', 'executeComparizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22825,7 +22844,7 @@ function App() {
     try {
       const result = await callUi('benchmarkizability-ui', 'executeBenchmarkizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22854,7 +22873,7 @@ function App() {
     try {
       const result = await callUi('metricizability-ui', 'executeMetricizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22883,7 +22902,7 @@ function App() {
     try {
       const result = await callUi('calibratizability-ui', 'executeCalibratizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22912,7 +22931,7 @@ function App() {
     try {
       const result = await callUi('optimizability-ui', 'executeOptimizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22941,7 +22960,7 @@ function App() {
     try {
       const result = await callUi('simulatizability-ui', 'executeSimulatizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22970,7 +22989,7 @@ function App() {
     try {
       const result = await callUi('heuristizability-ui', 'executeHeuristizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -22999,7 +23018,7 @@ function App() {
     try {
       const result = await callUi('regressizability-ui', 'executeRegressizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23028,7 +23047,7 @@ function App() {
     try {
       const result = await callUi('interpolizability-ui', 'executeInterpolizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23057,7 +23076,7 @@ function App() {
     try {
       const result = await callUi('falsifiizability-ui', 'executeFalsifiizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23086,7 +23105,7 @@ function App() {
     try {
       const result = await callUi('corroborizability-ui', 'executeCorroborizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23115,7 +23134,7 @@ function App() {
     try {
       const result = await callUi('retrodictizability-ui', 'executeRetrodictizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23144,7 +23163,7 @@ function App() {
     try {
       const result = await callUi('abductizability-ui', 'executeAbductizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23173,7 +23192,7 @@ function App() {
     try {
       const result = await callUi('inductizability-ui', 'executeInductizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23202,7 +23221,7 @@ function App() {
     try {
       const result = await callUi('extrapolizability-ui', 'executeExtrapolizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23231,7 +23250,7 @@ function App() {
     try {
       const result = await callUi('predictizability-ui', 'executePredictizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23260,7 +23279,7 @@ function App() {
     try {
       const result = await callUi('determinizability-ui', 'executeDeterminizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23289,7 +23308,7 @@ function App() {
     try {
       const result = await callUi('stochasticizability-ui', 'executeStochasticizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23318,7 +23337,7 @@ function App() {
     try {
       const result = await callUi('probabilizability-ui', 'executeProbabilizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23347,7 +23366,7 @@ function App() {
     try {
       const result = await callUi('deducizability-ui', 'executeDeducizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23376,7 +23395,7 @@ function App() {
     try {
       const result = await callUi('inferencizability-ui', 'executeInferencizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23405,7 +23424,7 @@ function App() {
     try {
       const result = await callUi('definizability-ui', 'executeDefinizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23434,7 +23453,7 @@ function App() {
     try {
       const result = await callUi('concretizability-ui', 'executeConcretizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23463,7 +23482,7 @@ function App() {
     try {
       const result = await callUi('abstractizability-ui', 'executeAbstractizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23492,7 +23511,7 @@ function App() {
     try {
       const result = await callUi('canonicalizability-ui', 'executeCanonicalizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23521,7 +23540,7 @@ function App() {
     try {
       const result = await callUi('formalizability-ui', 'executeFormalizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23550,7 +23569,7 @@ function App() {
     try {
       const result = await callUi('standardizability-ui', 'executeStandardizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23579,7 +23598,7 @@ function App() {
     try {
       const result = await callUi('generalizability-ui', 'executeGeneralizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23608,7 +23627,7 @@ function App() {
     try {
       const result = await callUi('contextualizability-ui', 'executeContextualizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23637,7 +23656,7 @@ function App() {
     try {
       const result = await callUi('footnotizability-ui', 'executeFootnotizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23666,7 +23685,7 @@ function App() {
     try {
       const result = await callUi('vocabularizability-ui', 'executeVocabularizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23695,7 +23714,7 @@ function App() {
     try {
       const result = await callUi('terminologizability-ui', 'executeTerminologizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23724,7 +23743,7 @@ function App() {
     try {
       const result = await callUi('thesaurusizability-ui', 'executeThesaurusizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23753,7 +23772,7 @@ function App() {
     try {
       const result = await callUi('glossarizability-ui', 'executeGlossarizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23782,7 +23801,7 @@ function App() {
     try {
       const result = await callUi('normalizability-ui', 'executeNormalizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23811,7 +23830,7 @@ function App() {
     try {
       const result = await callUi('serializability-ui', 'executeSerializabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23840,7 +23859,7 @@ function App() {
     try {
       const result = await callUi('parametrizability-ui', 'executeParametrizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23869,7 +23888,7 @@ function App() {
     try {
       const result = await callUi('harmonizability-ui', 'executeHarmonizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23898,7 +23917,7 @@ function App() {
     try {
       const result = await callUi('consolidatizability-ui', 'executeConsolidatizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23927,7 +23946,7 @@ function App() {
     try {
       const result = await callUi('citationizability-ui', 'executeCitationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23956,7 +23975,7 @@ function App() {
     try {
       const result = await callUi('annotationizability-ui', 'executeAnnotationizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -23985,7 +24004,7 @@ function App() {
     try {
       const result = await callUi('documentizability-ui', 'executeDocumentizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24014,7 +24033,7 @@ function App() {
     try {
       const result = await callUi('referencizability-ui', 'executeReferencizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24043,7 +24062,7 @@ function App() {
     try {
       const result = await callUi('bibliographizability-ui', 'executeBibliographizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24072,7 +24091,7 @@ function App() {
     try {
       const result = await callUi('compilatizability-ui', 'executeCompilatizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24101,7 +24120,7 @@ function App() {
     try {
       const result = await callUi('aggregatizability-ui', 'executeAggregatizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24130,7 +24149,7 @@ function App() {
     try {
       const result = await callUi('collectizability-ui', 'executeCollectizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24159,7 +24178,7 @@ function App() {
     try {
       const result = await callUi('curatizability-ui', 'executeCuratizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24188,7 +24207,7 @@ function App() {
     try {
       const result = await callUi('archivizability-ui', 'executeArchivizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24217,7 +24236,7 @@ function App() {
     try {
       const result = await callUi('registryizability-ui', 'executeRegistryizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24246,7 +24265,7 @@ function App() {
     try {
       const result = await callUi('inventoryizability-ui', 'executeInventoryizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24275,7 +24294,7 @@ function App() {
     try {
       const result = await callUi('directoryizability-ui', 'executeDirectoryizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24304,7 +24323,7 @@ function App() {
     try {
       const result = await callUi('indexizability-ui', 'executeIndexizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24333,7 +24352,7 @@ function App() {
     try {
       const result = await callUi('catalogizability-ui', 'executeCatalogizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24362,7 +24381,7 @@ function App() {
     try {
       const result = await callUi('nomenclatizability-ui', 'executeNomenclatizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24391,7 +24410,7 @@ function App() {
     try {
       const result = await callUi('clusterizability-ui', 'executeClusterizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24420,7 +24439,7 @@ function App() {
     try {
       const result = await callUi('segmentizability-ui', 'executeSegmentizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24449,7 +24468,7 @@ function App() {
     try {
       const result = await callUi('hierarchizability-ui', 'executeHierarchizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24478,7 +24497,7 @@ function App() {
     try {
       const result = await callUi('systematizability-ui', 'executeSystematizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24507,7 +24526,7 @@ function App() {
     try {
       const result = await callUi('ordinarizability-ui', 'executeOrdinarizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24536,7 +24555,7 @@ function App() {
     try {
       const result = await callUi('stratifiability-ui', 'executeStratifiabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24565,7 +24584,7 @@ function App() {
     try {
       const result = await callUi('typologizability-ui', 'executeTypologizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24594,7 +24613,7 @@ function App() {
     try {
       const result = await callUi('classifiability-ui', 'executeClassifiabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24623,7 +24642,7 @@ function App() {
     try {
       const result = await callUi('taxonomizability-ui', 'executeTaxonomizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24652,7 +24671,7 @@ function App() {
     try {
       const result = await callUi('categorizability-ui', 'executeCategorizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24681,7 +24700,7 @@ function App() {
     try {
       const result = await callUi('historizability-ui', 'executeHistorizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24710,7 +24729,7 @@ function App() {
     try {
       const result = await callUi('methodizability-ui', 'executeMethodizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24739,7 +24758,7 @@ function App() {
     try {
       const result = await callUi('gnoseizability-ui', 'executeGnoseizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24768,7 +24787,7 @@ function App() {
     try {
       const result = await callUi('teleologizability-ui', 'executeTeleologizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24797,7 +24816,7 @@ function App() {
     try {
       const result = await callUi('axiologizability-ui', 'executeAxiologizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24826,7 +24845,7 @@ function App() {
     try {
       const result = await callUi('phenomenizability-ui', 'executePhenomenizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24855,7 +24874,7 @@ function App() {
     try {
       const result = await callUi('ontologizability-ui', 'executeOntologizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24884,7 +24903,7 @@ function App() {
     try {
       const result = await callUi('dialectizability-ui', 'executeDialectizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24913,7 +24932,7 @@ function App() {
     try {
       const result = await callUi('epistemizability-ui', 'executeEpistemizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24942,7 +24961,7 @@ function App() {
     try {
       const result = await callUi('hermeticizability-ui', 'executeHermeticizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -24971,7 +24990,7 @@ function App() {
     try {
       const result = await callUi('codifiability-ui', 'executeCodifiabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25000,7 +25019,7 @@ function App() {
     try {
       const result = await callUi('morphizability-ui', 'executeMorphizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25029,7 +25048,7 @@ function App() {
     try {
       const result = await callUi('rhetorizability-ui', 'executeRhetorizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25058,7 +25077,7 @@ function App() {
     try {
       const result = await callUi('syntacticizability-ui', 'executeSyntacticizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25087,7 +25106,7 @@ function App() {
     try {
       const result = await callUi('pragmatizability-ui', 'executePragmatizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25116,7 +25135,7 @@ function App() {
     try {
       const result = await callUi('semanticizability-ui', 'executeSemanticizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25145,7 +25164,7 @@ function App() {
     try {
       const result = await callUi('lexicalizability-ui', 'executeLexicalizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25174,7 +25193,7 @@ function App() {
     try {
       const result = await callUi('hermeneutizability-ui', 'executeHermeneutizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25203,7 +25222,7 @@ function App() {
     try {
       const result = await callUi('semiotizability-ui', 'executeSemiotizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25232,7 +25251,7 @@ function App() {
     try {
       const result = await callUi('mythicizability-ui', 'executeMythicizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25261,7 +25280,7 @@ function App() {
     try {
       const result = await callUi('caracterizability-ui', 'executeCaracterizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25290,7 +25309,7 @@ function App() {
     try {
       const result = await callUi('archetypizability-ui', 'executeArchetypizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25319,7 +25338,7 @@ function App() {
     try {
       const result = await callUi('parabolizability-ui', 'executeParabolizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25348,7 +25367,7 @@ function App() {
     try {
       const result = await callUi('analogizability-ui', 'executeAnalogizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25377,7 +25396,7 @@ function App() {
     try {
       const result = await callUi('emblemizability-ui', 'executeEmblemizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25406,7 +25425,7 @@ function App() {
     try {
       const result = await callUi('stylizability-ui', 'executeStylizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25435,7 +25454,7 @@ function App() {
     try {
       const result = await callUi('tokenizability-ui', 'executeTokenizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25464,7 +25483,7 @@ function App() {
     try {
       const result = await callUi('allegorizability-ui', 'executeAllegorizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25493,7 +25512,7 @@ function App() {
     try {
       const result = await callUi('iconizability-ui', 'executeIconizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25522,7 +25541,7 @@ function App() {
     try {
       const result = await callUi('materializability-ui', 'executeMaterializabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25551,7 +25570,7 @@ function App() {
     try {
       const result = await callUi('personifiability-ui', 'executePersonifiabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25580,7 +25599,7 @@ function App() {
     try {
       const result = await callUi('dramatizability-ui', 'executeDramatizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25609,7 +25628,7 @@ function App() {
     try {
       const result = await callUi('metaphorizability-ui', 'executeMetaphorizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25638,7 +25657,7 @@ function App() {
     try {
       const result = await callUi('typifiability-ui', 'executeTypifiabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25667,7 +25686,7 @@ function App() {
     try {
       const result = await callUi('connotability-ui', 'executeConnotabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25696,7 +25715,7 @@ function App() {
     try {
       const result = await callUi('signifiability-ui', 'executeSignifiabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25725,7 +25744,7 @@ function App() {
     try {
       const result = await callUi('evocatability-ui', 'executeEvocatabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25754,7 +25773,7 @@ function App() {
     try {
       const result = await callUi('visualizability-ui', 'executeVisualizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25783,7 +25802,7 @@ function App() {
     try {
       const result = await callUi('symbolizability-ui', 'executeSymbolizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25812,7 +25831,7 @@ function App() {
     try {
       const result = await callUi('illustratability-ui', 'executeIllustratabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25841,7 +25860,7 @@ function App() {
     try {
       const result = await callUi('narratability-ui', 'executeNarratabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25870,7 +25889,7 @@ function App() {
     try {
       const result = await callUi('formulatability-ui', 'executeFormulatabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25899,7 +25918,7 @@ function App() {
     try {
       const result = await callUi('enunciability-ui', 'executeEnunciabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25928,7 +25947,7 @@ function App() {
     try {
       const result = await callUi('presentability-ui', 'executePresentabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25957,7 +25976,7 @@ function App() {
     try {
       const result = await callUi('representability-ui', 'executeRepresentabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -25986,7 +26005,7 @@ function App() {
     try {
       const result = await callUi('elaboratability-ui', 'executeElaboratabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26015,7 +26034,7 @@ function App() {
     try {
       const result = await callUi('articulability-ui', 'executeArticulabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26044,7 +26063,7 @@ function App() {
     try {
       const result = await callUi('communicability-ui', 'executeCommunicabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26073,7 +26092,7 @@ function App() {
     try {
       const result = await callUi('expressiveness-ui', 'executeExpressivenessAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26102,7 +26121,7 @@ function App() {
     try {
       const result = await callUi('describability-ui', 'executeDescribabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26131,7 +26150,7 @@ function App() {
     try {
       const result = await callUi('detectability-ui', 'executeDetectabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26160,7 +26179,7 @@ function App() {
     try {
       const result = await callUi('conspicuousness-ui', 'executeConspicuousnessAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26189,7 +26208,7 @@ function App() {
     try {
       const result = await callUi('distinctiveness-ui', 'executeDistinctivenessAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26218,7 +26237,7 @@ function App() {
     try {
       const result = await callUi('discernibility-ui', 'executeDiscernibilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26247,7 +26266,7 @@ function App() {
     try {
       const result = await callUi('noticeability-ui', 'executeNoticeabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26276,7 +26295,7 @@ function App() {
     try {
       const result = await callUi('perceptibility-ui', 'executePerceptibilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26305,7 +26324,7 @@ function App() {
     try {
       const result = await callUi('scannability-ui', 'executeScannabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26334,7 +26353,7 @@ function App() {
     try {
       const result = await callUi('interpretability-ui', 'executeInterpretabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26363,7 +26382,7 @@ function App() {
     try {
       const result = await callUi('recognizability-ui', 'executeRecognizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26392,7 +26411,7 @@ function App() {
     try {
       const result = await callUi('familiarity-ui', 'executeFamiliarityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26421,7 +26440,7 @@ function App() {
     try {
       const result = await callUi('coherence-ui', 'executeCoherenceAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26450,7 +26469,7 @@ function App() {
     try {
       const result = await callUi('parsability-ui', 'executeParsabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26479,7 +26498,7 @@ function App() {
     try {
       const result = await callUi('legibility-ui', 'executeLegibilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26508,7 +26527,7 @@ function App() {
     try {
       const result = await callUi('intelligibility-ui', 'executeIntelligibilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26537,7 +26556,7 @@ function App() {
     try {
       const result = await callUi('comprehensibility-ui', 'executeComprehensibilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26566,7 +26585,7 @@ function App() {
     try {
       const result = await callUi('negotiability-ui', 'executeNegotiabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26595,7 +26614,7 @@ function App() {
     try {
       const result = await callUi('simplicity-ui', 'executeSimplicityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26624,7 +26643,7 @@ function App() {
     try {
       const result = await callUi('clarity-ui', 'executeClarityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26653,7 +26672,7 @@ function App() {
     try {
       const result = await callUi('readability-ui', 'executeReadabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26682,7 +26701,7 @@ function App() {
     try {
       const result = await callUi('teachability-ui', 'executeTeachabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26711,7 +26730,7 @@ function App() {
     try {
       const result = await callUi('memorability-ui', 'executeMemorabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26740,7 +26759,7 @@ function App() {
     try {
       const result = await callUi('understandability-ui', 'executeUnderstandabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26769,7 +26788,7 @@ function App() {
     try {
       const result = await callUi('deliverability-ui', 'executeDeliverabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26798,7 +26817,7 @@ function App() {
     try {
       const result = await callUi('learnability-ui', 'executeLearnabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26827,7 +26846,7 @@ function App() {
     try {
       const result = await callUi('profitability-ui', 'executeProfitabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26856,7 +26875,7 @@ function App() {
     try {
       const result = await callUi('suitability-ui', 'executeSuitabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26885,7 +26904,7 @@ function App() {
     try {
       const result = await callUi('marketability-ui', 'executeMarketabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26914,7 +26933,7 @@ function App() {
     try {
       const result = await callUi('desirability-ui', 'executeDesirabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26943,7 +26962,7 @@ function App() {
     try {
       const result = await callUi('affordability-ui', 'executeAffordabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -26972,7 +26991,7 @@ function App() {
     try {
       const result = await callUi('acceptability-ui', 'executeAcceptabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27001,7 +27020,7 @@ function App() {
     try {
       const result = await callUi('adoptability-ui', 'executeAdoptabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27030,7 +27049,7 @@ function App() {
     try {
       const result = await callUi('conformance-ui', 'executeConformanceAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27059,7 +27078,7 @@ function App() {
     try {
       const result = await callUi('feasibility-ui', 'executeFeasibilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27088,7 +27107,7 @@ function App() {
     try {
       const result = await callUi('viability-ui', 'executeViabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27117,7 +27136,7 @@ function App() {
     try {
       const result = await callUi('survivability-ui', 'executeSurvivabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27146,7 +27165,7 @@ function App() {
     try {
       const result = await callUi('appropriateness-ui', 'executeAppropriatenessAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27175,7 +27194,7 @@ function App() {
     try {
       const result = await callUi('effectiveness-ui', 'executeEffectivenessAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27204,7 +27223,7 @@ function App() {
     try {
       const result = await callUi('accessibility-ui', 'executeAccessibilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27233,7 +27252,7 @@ function App() {
     try {
       const result = await callUi('usability-ui', 'executeUsabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27262,7 +27281,7 @@ function App() {
     try {
       const result = await callUi('trustworthiness-ui', 'executeTrustworthinessAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27291,7 +27310,7 @@ function App() {
     try {
       const result = await callUi('composability-ui', 'executeComposabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27320,7 +27339,7 @@ function App() {
     try {
       const result = await callUi('dependability-ui', 'executeDependabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27349,7 +27368,7 @@ function App() {
     try {
       const result = await callUi('responsiveness-ui', 'executeResponsivenessAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27378,7 +27397,7 @@ function App() {
     try {
       const result = await callUi('repeatability-ui', 'executeRepeatabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27407,7 +27426,7 @@ function App() {
     try {
       const result = await callUi('predictability-ui', 'executePredictabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27436,7 +27455,7 @@ function App() {
     try {
       const result = await callUi('monitorability-ui', 'executeMonitorabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27465,7 +27484,7 @@ function App() {
     try {
       const result = await callUi('automatability-ui', 'executeAutomatabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27494,7 +27513,7 @@ function App() {
     try {
       const result = await callUi('schedulability-ui', 'executeSchedulabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27523,7 +27542,7 @@ function App() {
     try {
       const result = await callUi('orchestrability-ui', 'executeOrchestrabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27552,7 +27571,7 @@ function App() {
     try {
       const result = await callUi('integrability-ui', 'executeIntegrabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27581,7 +27600,7 @@ function App() {
     try {
       const result = await callUi('controllability-ui', 'executeControllabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27610,7 +27629,7 @@ function App() {
     try {
       const result = await callUi('manageability-ui', 'executeManageabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27639,7 +27658,7 @@ function App() {
     try {
       const result = await callUi('deployability-ui', 'executeDeployabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27668,7 +27687,7 @@ function App() {
     try {
       const result = await callUi('programmability-ui', 'executeProgrammabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27697,7 +27716,7 @@ function App() {
     try {
       const result = await callUi('adjustability-ui', 'executeAdjustabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27726,7 +27745,7 @@ function App() {
     try {
       const result = await callUi('tunability-ui', 'executeTunabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27755,7 +27774,7 @@ function App() {
     try {
       const result = await callUi('operability-ui', 'executeOperabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27784,7 +27803,7 @@ function App() {
     try {
       const result = await callUi('customizability-ui', 'executeCustomizabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27813,7 +27832,7 @@ function App() {
     try {
       const result = await callUi('configurability-ui', 'executeConfigurabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27842,7 +27861,7 @@ function App() {
     try {
       const result = await callUi('modifiability-ui', 'executeModifiabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27871,7 +27890,7 @@ function App() {
     try {
       const result = await callUi('extensibility-ui', 'executeExtensibilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27900,7 +27919,7 @@ function App() {
     try {
       const result = await callUi('flexibility-ui', 'executeFlexibilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27929,7 +27948,7 @@ function App() {
     try {
       const result = await callUi('adaptability-ui', 'executeAdaptabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27958,7 +27977,7 @@ function App() {
     try {
       const result = await callUi('compatibility-ui', 'executeCompatibilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -27987,7 +28006,7 @@ function App() {
     try {
       const result = await callUi('portability-ui', 'executePortabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28016,7 +28035,7 @@ function App() {
     try {
       const result = await callUi('transferability-ui', 'executeTransferabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28045,7 +28064,7 @@ function App() {
     try {
       const result = await callUi('interchangeability-ui', 'executeInterchangeabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28074,7 +28093,7 @@ function App() {
     try {
       const result = await callUi('linkability-ui', 'executeLinkabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28103,7 +28122,7 @@ function App() {
     try {
       const result = await callUi('connectability-ui', 'executeConnectabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28132,7 +28151,7 @@ function App() {
     try {
       const result = await callUi('navigability-ui', 'executeNavigabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28161,7 +28180,7 @@ function App() {
     try {
       const result = await callUi('discoverability-ui', 'executeDiscoverabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28190,7 +28209,7 @@ function App() {
     try {
       const result = await callUi('retrievability-ui', 'executeRetrievabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28219,7 +28238,7 @@ function App() {
     try {
       const result = await callUi('locatability-ui', 'executeLocatabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28248,7 +28267,7 @@ function App() {
     try {
       const result = await callUi('referencability-ui', 'executeReferencabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28277,7 +28296,7 @@ function App() {
     try {
       const result = await callUi('assignability-ui', 'executeAssignabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28306,7 +28325,7 @@ function App() {
     try {
       const result = await callUi('distinguishability-ui', 'executeDistinguishabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28335,7 +28354,7 @@ function App() {
     try {
       const result = await callUi('comparability-ui', 'executeComparabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28364,7 +28383,7 @@ function App() {
     try {
       const result = await callUi('identifiability-ui', 'executeIdentifiabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28393,7 +28412,7 @@ function App() {
     try {
       const result = await callUi('attributability-ui', 'executeAttributabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28422,7 +28441,7 @@ function App() {
     try {
       const result = await callUi('warrantability-ui', 'executeWarrantabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28451,7 +28470,7 @@ function App() {
     try {
       const result = await callUi('substantiability-ui', 'executeSubstantiabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28480,7 +28499,7 @@ function App() {
     try {
       const result = await callUi('certifiability-ui', 'executeCertifiabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28509,7 +28528,7 @@ function App() {
     try {
       const result = await callUi('measurability-ui', 'executeMeasurabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28538,7 +28557,7 @@ function App() {
     try {
       const result = await callUi('assessability-ui', 'executeAssessabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28567,7 +28586,7 @@ function App() {
     try {
       const result = await callUi('reviewability-ui', 'executeReviewabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28596,7 +28615,7 @@ function App() {
     try {
       const result = await callUi('justifiability-ui', 'executeJustifiabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28625,7 +28644,7 @@ function App() {
     try {
       const result = await callUi('demonstrability-ui', 'executeDemonstrabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28654,7 +28673,7 @@ function App() {
     try {
       const result = await callUi('explainability-ui', 'executeExplainabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28683,7 +28702,7 @@ function App() {
     try {
       const result = await callUi('inspectability-ui', 'executeInspectabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28712,7 +28731,7 @@ function App() {
     try {
       const result = await callUi('auditability-ui', 'executeAuditabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28741,7 +28760,7 @@ function App() {
     try {
       const result = await callUi('defensibility-ui', 'executeDefensibilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28770,7 +28789,7 @@ function App() {
     try {
       const result = await callUi('reproducibility-ui', 'executeReproducibilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28799,7 +28818,7 @@ function App() {
     try {
       const result = await callUi('credibility-ui', 'executeCredibilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28828,7 +28847,7 @@ function App() {
     try {
       const result = await callUi('validity-ui', 'executeValidityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28857,7 +28876,7 @@ function App() {
     try {
       const result = await callUi('confirmability-ui', 'executeConfirmabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28886,7 +28905,7 @@ function App() {
     try {
       const result = await callUi('verifiability-ui', 'executeVerifiabilityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28915,7 +28934,7 @@ function App() {
     try {
       const result = await callUi('provenance-ui', 'executeProvenanceAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28944,7 +28963,7 @@ function App() {
     try {
       const result = await callUi('authenticity-ui', 'executeAuthenticityAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28973,7 +28992,7 @@ function App() {
     try {
       const result = await callUi('attestation-ui', 'executeAttestationAdminAction', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         { action },
       )
@@ -28998,7 +29017,7 @@ function App() {
     try {
       await callUi('run-history-ui', 'downloadRunHistoryExport', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         format,
       )
@@ -29017,7 +29036,7 @@ function App() {
     try {
       await callUi('billing-ui', 'downloadBillingInvoiceExport', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         format,
       )
@@ -29036,7 +29055,7 @@ function App() {
     try {
       await callUi('workspace-ui', 'downloadWorkspaceAuditExport', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
         format,
       )
@@ -29058,7 +29077,7 @@ function App() {
     try {
       const session = await callUi('billing-ui', 'createBillingCheckoutSession', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         paidTier,
         workspaceAuthHeaders,
       )
@@ -29092,7 +29111,7 @@ function App() {
     try {
       const session = await callUi('billing-ui', 'createCustomerPortalSession', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
 
@@ -29122,7 +29141,7 @@ function App() {
     try {
       const status = await callUi('billing-ui', 'cancelMockCustomerPortalSubscription', 
         apiBaseUrl,
-        defaultWorkspaceId,
+        activeWorkspaceId,
         workspaceAuthHeaders,
       )
       setBillingStatus(status)
@@ -29417,6 +29436,22 @@ function App() {
           <div className={`api-status api-status--${apiHealth}`}>
             API status: {apiHealth}
           </div>
+          <div
+            className="active-workspace-status"
+            data-testid="active-workspace-id"
+          >
+            Active workspace: {activeWorkspaceId}
+          </div>
+          {inviteStatusMessage ? (
+            <p className="invite-status invite-status--ok" data-testid="invite-status">
+              {inviteStatusMessage}
+            </p>
+          ) : null}
+          {inviteStatusError ? (
+            <p className="invite-status invite-status--error" data-testid="invite-status">
+              {inviteStatusError}
+            </p>
+          ) : null}
           {apiHealth === 'offline' ? (
             <p className="local-setup-tip">
               Local API is offline. Run{' '}
@@ -30230,7 +30265,7 @@ function App() {
 
         <BillingWorkspaceLazySection
           mode="overview"
-          workspaceId={defaultWorkspaceId}
+          workspaceId={activeWorkspaceId}
           capabilities={billingCapabilities}
           rollout={billingRollout}
           status={billingStatus}
@@ -32098,7 +32133,7 @@ function App() {
 
         <BillingWorkspaceLazySection
           mode="details"
-          workspaceId={defaultWorkspaceId}
+          workspaceId={activeWorkspaceId}
           capabilities={billingCapabilities}
           billingAction={billingAction}
           meterUsageReports={billingMeterUsageReports}

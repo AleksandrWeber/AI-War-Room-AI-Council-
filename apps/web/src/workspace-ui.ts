@@ -232,7 +232,24 @@ export async function acceptWorkspaceInvite(
   })
 
   if (!response.ok) {
-    throw new Error(`API returned ${response.status}`)
+    let detail = `API returned ${response.status}`
+    try {
+      const payload = (await response.json()) as {
+        message?: string | { message?: string }
+      }
+      if (typeof payload.message === 'string' && payload.message.trim()) {
+        detail = payload.message
+      } else if (
+        payload.message &&
+        typeof payload.message === 'object' &&
+        typeof payload.message.message === 'string'
+      ) {
+        detail = payload.message.message
+      }
+    } catch {
+      // keep status fallback
+    }
+    throw new Error(detail)
   }
 
   return acceptWorkspaceInviteResponseSchema.parse(await response.json())

@@ -52,7 +52,7 @@ export const acceptWorkspaceInviteRequestSchema = z.object({
 
 export const acceptWorkspaceInviteResponseSchema = z.object({
   workspaceId: nonEmptyStringSchema,
-  role: workspaceInviteRoleSchema,
+  role: workspaceRoleSchema,
   memberUserId: nonEmptyStringSchema,
   inviteId: nonEmptyStringSchema,
   guidance: nonEmptyStringSchema,

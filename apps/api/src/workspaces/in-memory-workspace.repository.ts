@@ -5,6 +5,7 @@ import type {
   WorkspaceMembershipRecord,
   WorkspaceRecord,
   WorkspaceRepository,
+  WorkspaceUserProfile,
 } from './workspace.repository.js'
 
 export class InMemoryWorkspaceRepository implements WorkspaceRepository {
@@ -118,6 +119,18 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
     return this.memberships.get(`${userId}:${workspaceId}`) ?? null
   }
 
+  async findUserProfile(userId: string): Promise<WorkspaceUserProfile | null> {
+    const profile = this.userProfiles.get(userId)
+    if (!profile) {
+      return null
+    }
+
+    return {
+      email: profile.email,
+      displayName: profile.displayName,
+    }
+  }
+
   async provisionExternalMember(
     input: ProvisionExternalMemberInput,
   ): Promise<ProvisionExternalMemberResult> {
@@ -217,9 +230,11 @@ export class InMemoryWorkspaceRepository implements WorkspaceRepository {
         createdAt: new Date().toISOString(),
       })
     }
+    const existingProfile = this.userProfiles.get(input.userId)
     this.userProfiles.set(input.userId, {
-      email: input.email ?? null,
-      displayName: input.displayName ?? input.userId,
+      email: input.email ?? existingProfile?.email ?? null,
+      displayName:
+        input.displayName ?? existingProfile?.displayName ?? input.userId,
     })
 
     const membership: WorkspaceMembershipRecord = {

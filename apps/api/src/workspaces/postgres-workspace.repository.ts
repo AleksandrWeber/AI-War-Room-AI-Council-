@@ -55,6 +55,29 @@ export class PostgresWorkspaceRepository implements WorkspaceRepository {
     }
   }
 
+  async findUserProfile(userId: string): Promise<{
+    email: string | null
+    displayName: string | null
+  } | null> {
+    const profile = await this.postgresService.query<{
+      email: string | null
+      display_name: string | null
+    }>(
+      `SELECT email, display_name FROM app_users WHERE user_id = $1 LIMIT 1`,
+      [userId],
+    )
+    const row = profile.rows[0]
+
+    if (!row) {
+      return null
+    }
+
+    return {
+      email: row.email,
+      displayName: row.display_name,
+    }
+  }
+
   async provisionExternalMember(
     input: ProvisionExternalMemberInput,
   ): Promise<ProvisionExternalMemberResult> {

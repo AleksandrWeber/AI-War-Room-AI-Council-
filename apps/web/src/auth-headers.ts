@@ -4,6 +4,7 @@ import type {
 } from '@ai-war-room/schemas'
 
 const sessionStorageKey = 'ai-war-room.auth-session'
+export const activeWorkspaceStorageKey = 'ai-war-room.active-workspace-id'
 
 const defaultWorkspaceAuthHeaders = {
   'x-user-id': 'user_local',
@@ -42,6 +43,23 @@ export function saveStoredAuthSession(session: AuthSessionResponse | null) {
   localStorage.setItem(sessionStorageKey, JSON.stringify(session))
 }
 
+export function loadStoredActiveWorkspaceId(fallback = 'local_workspace') {
+  try {
+    const saved = localStorage.getItem(activeWorkspaceStorageKey)?.trim()
+    return saved && saved.length > 0 ? saved : fallback
+  } catch {
+    return fallback
+  }
+}
+
+export function saveStoredActiveWorkspaceId(workspaceId: string) {
+  try {
+    localStorage.setItem(activeWorkspaceStorageKey, workspaceId)
+  } catch {
+    // ignore quota / private mode
+  }
+}
+
 export function buildBootstrapAuthHeaders(
   authCapabilities?: Pick<
     AuthCapabilitiesResponse,
@@ -71,6 +89,10 @@ export function buildWorkspaceAuthHeaders(
     'provider' | 'requiresBearerToken' | 'workspaceHeadersRequired'
   > | null,
   session?: Pick<AuthSessionResponse, 'token' | 'expiresAt'> | null,
+  options?: {
+    workspaceId?: string
+    userId?: string
+  },
 ) {
   const headers: Record<string, string> = {}
   const externalToken = import.meta.env.VITE_AUTH_EXTERNAL_TOKEN
@@ -86,8 +108,10 @@ export function buildWorkspaceAuthHeaders(
   }
 
   if (authCapabilities?.workspaceHeadersRequired !== false) {
-    headers['x-user-id'] = defaultWorkspaceAuthHeaders['x-user-id']
-    headers['x-workspace-id'] = defaultWorkspaceAuthHeaders['x-workspace-id']
+    headers['x-user-id'] =
+      options?.userId ?? defaultWorkspaceAuthHeaders['x-user-id']
+    headers['x-workspace-id'] =
+      options?.workspaceId ?? defaultWorkspaceAuthHeaders['x-workspace-id']
   }
 
   const bearerToken = import.meta.env.VITE_AUTH_BEARER_TOKEN

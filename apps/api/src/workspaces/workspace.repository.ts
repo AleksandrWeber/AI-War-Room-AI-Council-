@@ -32,11 +32,18 @@ export type ProvisionExternalMemberResult = WorkspaceMembershipRecord & {
   actions: UserProvisioningAction[]
 }
 
+export type WorkspaceUserProfile = {
+  email: string | null
+  displayName: string | null
+}
+
 export interface WorkspaceRepository {
   findMembership(
     userId: string,
     workspaceId: string,
   ): Promise<WorkspaceMembershipRecord | null>
+
+  findUserProfile(userId: string): Promise<WorkspaceUserProfile | null>
 
   provisionExternalMember(
     input: ProvisionExternalMemberInput,

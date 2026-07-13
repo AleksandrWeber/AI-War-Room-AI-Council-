@@ -3,6 +3,8 @@ import { expect, test } from '@playwright/test'
 const idea =
   'Build an AI War Room SaaS that turns founder ideas into PRDs and development prompts.'
 
+const e2eApiUrl = `http://127.0.0.1:${process.env.E2E_API_PORT ?? '3017'}/api`
+
 test('standard run happy path: draft, human review, mock pipeline, artifacts', async ({
   page,
 }) => {
@@ -37,4 +39,79 @@ test('standard run happy path: draft, human review, mock pipeline, artifacts', a
       name: 'Artifacts generated from isolated prompt-driven agents.',
     }),
   ).toBeVisible()
+})
+
+test('workspace invite accept via ?inviteToken= switches active workspace', async ({
+  page,
+  request,
+}) => {
+  const createResponse = await request.post(
+    `${e2eApiUrl}/workspaces/local_workspace/invites`,
+    {
+      headers: {
+        'content-type': 'application/json',
+        'x-user-id': 'user_local',
+        'x-workspace-id': 'local_workspace',
+      },
+      data: {
+        email: 'local@ai-war-room.dev',
+        role: 'member',
+      },
+    },
+  )
+
+  expect(createResponse.ok()).toBeTruthy()
+  const created = (await createResponse.json()) as {
+    token: string
+    inviteUrl: string
+  }
+  expect(created.token.length).toBeGreaterThan(16)
+
+  await page.goto(`/?inviteToken=${encodeURIComponent(created.token)}`)
+
+  await expect(page.getByText('API status: online')).toBeVisible({
+    timeout: 60_000,
+  })
+  await expect(page.getByTestId('invite-status')).toContainText(/Invite accepted/i, {
+    timeout: 30_000,
+  })
+  await expect(page.getByTestId('invite-status')).toContainText(
+    /Joined local_workspace as owner/i,
+  )
+  await expect(page.getByTestId('active-workspace-id')).toHaveText(
+    'Active workspace: local_workspace',
+  )
+})
+
+test('workspace invite reject when email does not match authenticated user', async ({
+  page,
+  request,
+}) => {
+  const createResponse = await request.post(
+    `${e2eApiUrl}/workspaces/local_workspace/invites`,
+    {
+      headers: {
+        'content-type': 'application/json',
+        'x-user-id': 'user_local',
+        'x-workspace-id': 'local_workspace',
+      },
+      data: {
+        email: 'someone.else@example.com',
+        role: 'viewer',
+      },
+    },
+  )
+
+  expect(createResponse.ok()).toBeTruthy()
+  const created = (await createResponse.json()) as { token: string }
+
+  await page.goto(`/?inviteToken=${encodeURIComponent(created.token)}`)
+
+  await expect(page.getByText('API status: online')).toBeVisible({
+    timeout: 60_000,
+  })
+  await expect(page.getByTestId('invite-status')).toContainText(
+    /This invite was issued for someone\.else@example\.com/i,
+    { timeout: 30_000 },
+  )
 })
