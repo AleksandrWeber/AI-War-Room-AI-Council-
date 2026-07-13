@@ -3,6 +3,7 @@ import { nonEmptyStringSchema, utcDateStringSchema } from './common.js'
 
 export const usagePhaseSchema = z.enum([
   'agent',
+  'chunk_summary',
   'moderator',
   'executive_summary',
   'prd',

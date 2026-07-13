@@ -58,6 +58,11 @@ export const acceptWorkspaceInviteResponseSchema = z.object({
   guidance: nonEmptyStringSchema,
 })
 
+export const revokeWorkspaceInviteResponseSchema = z.object({
+  invite: workspaceInviteRecordSchema,
+  guidance: nonEmptyStringSchema,
+})
+
 export type CreateWorkspaceInviteRequest = z.infer<
   typeof createWorkspaceInviteRequestSchema
 >
@@ -73,4 +78,7 @@ export type AcceptWorkspaceInviteRequest = z.infer<
 >
 export type AcceptWorkspaceInviteResponse = z.infer<
   typeof acceptWorkspaceInviteResponseSchema
+>
+export type RevokeWorkspaceInviteResponse = z.infer<
+  typeof revokeWorkspaceInviteResponseSchema
 >

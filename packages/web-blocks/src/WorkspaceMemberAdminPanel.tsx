@@ -32,6 +32,8 @@ export type WorkspaceMemberAdminPanelProps = {
   onNewMemberFormChange: (value: WorkspaceMemberFormState) => void
   onInviteFormChange: (value: WorkspaceInviteFormState) => void
   onCreateInvite: () => void
+  onRevokeInvite: (inviteId: string) => void
+  onCopyInviteLink: () => void
   onMemberAdminAction: (input: {
     action: 'update_member_role' | 'remove_member' | 'add_member'
     userId: string
@@ -53,6 +55,8 @@ export function WorkspaceMemberAdminPanel({
   onNewMemberFormChange,
   onInviteFormChange,
   onCreateInvite,
+  onRevokeInvite,
+  onCopyInviteLink,
   onMemberAdminAction,
   onExportAudit,
 }: WorkspaceMemberAdminPanelProps) {
@@ -173,9 +177,18 @@ export function WorkspaceMemberAdminPanel({
             {inviteAction === 'running' ? 'Creating invite…' : 'Create invite link'}
           </button>
           {latestInviteUrl ? (
-            <p className="runtime-note">
-              Latest invite URL: <code>{latestInviteUrl}</code>
-            </p>
+            <div className="workspace-member-card__actions">
+              <p className="runtime-note">
+                Latest invite URL: <code>{latestInviteUrl}</code>
+              </p>
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={onCopyInviteLink}
+              >
+                Copy invite link
+              </button>
+            </div>
           ) : null}
           {invites.length > 0 ? (
             <div className="workspace-member-list">
@@ -187,6 +200,18 @@ export function WorkspaceMemberAdminPanel({
                       {formatWorkspaceRole(invite.role)} · {invite.status}
                     </p>
                   </div>
+                  {invite.status === 'pending' ? (
+                    <div className="workspace-member-card__actions">
+                      <button
+                        type="button"
+                        className="danger-button"
+                        disabled={inviteAction !== 'idle'}
+                        onClick={() => onRevokeInvite(invite.inviteId)}
+                      >
+                        Revoke
+                      </button>
+                    </div>
+                  ) : null}
                 </article>
               ))}
             </div>

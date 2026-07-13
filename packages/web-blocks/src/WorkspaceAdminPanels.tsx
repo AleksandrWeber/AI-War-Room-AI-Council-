@@ -29,6 +29,8 @@ export type WorkspaceAdminPanelsProps = {
   onNewMemberFormChange: (value: WorkspaceMemberFormState) => void
   onInviteFormChange: (value: WorkspaceInviteFormState) => void
   onCreateInvite: () => void
+  onRevokeInvite: (inviteId: string) => void
+  onCopyInviteLink: () => void
   onMemberAdminAction: (input: {
     action: 'update_member_role' | 'remove_member' | 'add_member'
     userId: string
@@ -57,6 +59,8 @@ export function WorkspaceAdminPanels({
   onNewMemberFormChange,
   onInviteFormChange,
   onCreateInvite,
+  onRevokeInvite,
+  onCopyInviteLink,
   onMemberAdminAction,
   onExportAudit,
   mode = 'all',
@@ -89,6 +93,8 @@ export function WorkspaceAdminPanels({
           onNewMemberFormChange={onNewMemberFormChange}
           onInviteFormChange={onInviteFormChange}
           onCreateInvite={onCreateInvite}
+          onRevokeInvite={onRevokeInvite}
+          onCopyInviteLink={onCopyInviteLink}
           onMemberAdminAction={onMemberAdminAction}
           onExportAudit={onExportAudit}
         />

@@ -91,6 +91,22 @@ export class WorkspacesController {
     })
   }
 
+  @Post(':workspaceId/invites/:inviteId/revoke')
+  @UseGuards(WorkspaceAccessGuard)
+  revokeWorkspaceInvite(
+    @Param('workspaceId') workspaceId: string,
+    @Param('inviteId') inviteId: string,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    this.assertWorkspaceParam(request, workspaceId)
+
+    return this.workspaceInviteService.revokeInvite({
+      authContext: request.authContext!,
+      workspaceId,
+      inviteId,
+    })
+  }
+
   @Get(':workspaceId/admin/members')
   @UseGuards(WorkspaceAccessGuard)
   getWorkspaceMemberAdminSummary(

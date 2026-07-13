@@ -67,4 +67,44 @@ describe('WorkspaceInviteService', () => {
       true,
     )
   })
+
+  it('revokes a pending invite so the token cannot be accepted', async () => {
+    const created = await service.createInvite({
+      authContext: {
+        userId: 'user_test',
+        workspaceId: 'workspace_1',
+        role: 'owner',
+      },
+      workspaceId: 'workspace_1',
+      body: {
+        email: 'revoke.me@example.com',
+        role: 'viewer',
+      },
+    })
+
+    const revoked = await service.revokeInvite({
+      authContext: {
+        userId: 'user_test',
+        workspaceId: 'workspace_1',
+        role: 'owner',
+      },
+      workspaceId: 'workspace_1',
+      inviteId: created.invite.inviteId,
+    })
+
+    expect(revoked.invite.status).toBe('revoked')
+
+    await expect(
+      service.acceptInvite({
+        authContext: {
+          userId: 'user_invitee',
+          workspaceId: 'workspace_1',
+          role: 'member',
+        },
+        body: { token: created.token },
+      }),
+    ).rejects.toMatchObject({
+      response: { message: 'Invite is revoked and cannot be accepted.' },
+    })
+  })
 })

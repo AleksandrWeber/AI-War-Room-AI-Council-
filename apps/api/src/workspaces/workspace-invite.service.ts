@@ -14,6 +14,7 @@ import {
   createWorkspaceInviteRequestSchema,
   createWorkspaceInviteResponseSchema,
   listWorkspaceInvitesResponseSchema,
+  revokeWorkspaceInviteResponseSchema,
   type AuthContext,
   type WorkspaceInviteRecord,
   type WorkspaceInviteRole,
@@ -107,6 +108,34 @@ export class WorkspaceInviteService {
     return listWorkspaceInvitesResponseSchema.parse({
       workspaceId: input.workspaceId,
       invites: invites.map((invite) => this.toPublicRecord(invite)),
+    })
+  }
+
+  async revokeInvite(input: {
+    authContext: AuthContext
+    workspaceId: string
+    inviteId: string
+  }) {
+    this.assertCanManageInvites(input.authContext, input.workspaceId)
+    const invite = await this.findById(input.inviteId)
+
+    if (!invite || invite.workspaceId !== input.workspaceId) {
+      throw new NotFoundException({ message: 'Invite was not found.' })
+    }
+
+    const status = this.resolveStatus(invite)
+    if (status !== 'pending') {
+      throw new BadRequestException({
+        message: `Invite is ${status} and cannot be revoked.`,
+      })
+    }
+
+    const revokedAt = new Date().toISOString()
+    await this.markRevoked({ inviteId: invite.inviteId, revokedAt })
+
+    return revokeWorkspaceInviteResponseSchema.parse({
+      invite: this.toPublicRecord({ ...invite, revokedAt }),
+      guidance: 'Invite revoked. The join link can no longer be accepted.',
     })
   }
 
@@ -334,6 +363,75 @@ export class WorkspaceInviteService {
       revokedAt: row.revoked_at?.toISOString(),
       createdAt: row.created_at.toISOString(),
     }
+  }
+
+  private async findById(inviteId: string): Promise<InviteRow | null> {
+    if (this.usesMemoryStore()) {
+      return this.memoryInvites.get(inviteId) ?? null
+    }
+
+    const result = await this.postgresService.query<{
+      invite_id: string
+      workspace_id: string
+      email: string
+      role: WorkspaceInviteRole
+      token_hash: string
+      invited_by_user_id: string
+      expires_at: Date
+      accepted_at: Date | null
+      accepted_by_user_id: string | null
+      revoked_at: Date | null
+      created_at: Date
+    }>(
+      `
+        SELECT *
+        FROM workspace_invites
+        WHERE invite_id = $1
+        LIMIT 1
+      `,
+      [inviteId],
+    )
+    const row = result.rows[0]
+    if (!row) {
+      return null
+    }
+
+    return {
+      inviteId: row.invite_id,
+      workspaceId: row.workspace_id,
+      email: row.email,
+      role: row.role,
+      tokenHash: row.token_hash,
+      invitedByUserId: row.invited_by_user_id,
+      expiresAt: row.expires_at.toISOString(),
+      acceptedAt: row.accepted_at?.toISOString(),
+      acceptedByUserId: row.accepted_by_user_id ?? undefined,
+      revokedAt: row.revoked_at?.toISOString(),
+      createdAt: row.created_at.toISOString(),
+    }
+  }
+
+  private async markRevoked(input: { inviteId: string; revokedAt: string }) {
+    if (this.usesMemoryStore()) {
+      const current = this.memoryInvites.get(input.inviteId)
+      if (!current) {
+        return
+      }
+      this.memoryInvites.set(input.inviteId, {
+        ...current,
+        revokedAt: input.revokedAt,
+      })
+      return
+    }
+
+    await this.postgresService.query(
+      `
+        UPDATE workspace_invites
+        SET revoked_at = $2
+        WHERE invite_id = $1
+      `,
+      [input.inviteId, input.revokedAt],
+    )
   }
 
   private async markAccepted(input: {

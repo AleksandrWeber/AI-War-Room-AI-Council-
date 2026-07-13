@@ -6,10 +6,21 @@ import {
   agentChunkSummaryListSchema,
 } from '@ai-war-room/schemas'
 import type { ApiEnv } from '../config/env.js'
+import type { LlmUsage } from '../llm/llm.types.js'
 import { LlmGatewayService } from '../llm/llm-gateway.service.js'
 import { chunkSummaryPromptV1 } from '../prompts/chunk-summary.prompts.js'
 
 const MAX_ITEMS = 5
+
+export type ChunkSummaryResult = {
+  summaries: AgentChunkSummary[]
+  llmUsage: {
+    providerId: string
+    modelName: string
+    promptVersion: string
+    usage: LlmUsage
+  } | null
+}
 
 /**
  * Spec Step 9: deterministic map-reduce compression before Moderator.
@@ -25,7 +36,7 @@ export class ChunkSummaryService {
   async summarizeAgentOutputs(input: {
     agentOutputs: AgentExecutionResult[]
     workspaceId?: string
-  }): Promise<AgentChunkSummary[]> {
+  }): Promise<ChunkSummaryResult> {
     const deterministic = this.buildDeterministic(input.agentOutputs)
     const payloadSize = JSON.stringify(input.agentOutputs).length
     const llmEnabled = this.configService.get('CHUNK_SUMMARY_LLM_ENABLED', {
@@ -36,7 +47,7 @@ export class ChunkSummaryService {
     })
 
     if (!llmEnabled || payloadSize < minChars) {
-      return deterministic
+      return { summaries: deterministic, llmUsage: null }
     }
 
     const result = await this.llmGatewayService.generateStructuredJson({
@@ -63,7 +74,19 @@ export class ChunkSummaryService {
       maxAttempts: 2,
     })
 
-    return result.value
+    if (result.validationStatus === 'fallback') {
+      return { summaries: result.value, llmUsage: null }
+    }
+
+    return {
+      summaries: result.value,
+      llmUsage: {
+        providerId: result.providerId,
+        modelName: result.model,
+        promptVersion: chunkSummaryPromptV1.version,
+        usage: result.usage,
+      },
+    }
   }
 
   private buildDeterministic(

@@ -86,11 +86,12 @@ describe('ChunkSummaryService', () => {
       ],
     })
 
-    expect(summaries).toHaveLength(2)
-    expect(summaries[0]?.agentRole).toBe('product_manager')
-    expect(summaries[0]?.topRisks).toEqual(['Scope creep'])
-    expect(summaries[0]?.conflicts[0]).toContain('product_manager')
-    expect(summaries[1]?.securityNotes[0]).toContain('secrets:')
+    expect(summaries.summaries).toHaveLength(2)
+    expect(summaries.summaries[0]?.agentRole).toBe('product_manager')
+    expect(summaries.summaries[0]?.topRisks).toEqual(['Scope creep'])
+    expect(summaries.summaries[0]?.conflicts[0]).toContain('product_manager')
+    expect(summaries.summaries[1]?.securityNotes[0]).toContain('secrets:')
+    expect(summaries.llmUsage).toBeNull()
     expect(llmGatewayService.generateStructuredJson).not.toHaveBeenCalled()
   })
 
@@ -99,12 +100,27 @@ describe('ChunkSummaryService', () => {
       CHUNK_SUMMARY_LLM_ENABLED: true,
       CHUNK_SUMMARY_LLM_MIN_CHARS: 10,
     })
+    llmGatewayService.generateStructuredJson.mockImplementationOnce(
+      async ({ fallback }: { fallback: unknown }) => ({
+        value: fallback,
+        validationStatus: 'valid',
+        providerId: 'mock',
+        model: 'mock-json-v1',
+        usage: {
+          inputTokens: 12,
+          outputTokens: 8,
+          totalTokens: 20,
+          estimatedCostUsd: 0.002,
+        },
+      }),
+    )
 
-    await service.summarizeAgentOutputs({
+    const result = await service.summarizeAgentOutputs({
       workspaceId: 'workspace_1',
       agentOutputs: [agentOutput({ agentRole: 'critic' })],
     })
 
     expect(llmGatewayService.generateStructuredJson).toHaveBeenCalledOnce()
+    expect(result.llmUsage?.usage.inputTokens).toBe(12)
   })
 })

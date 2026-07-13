@@ -201,6 +201,14 @@ export class UsageService {
   async recordPipelineUsage(input: {
     authContext?: AuthContext
     result: MockPipelineResult
+    chunkSummaryUsage?: {
+      providerId: string
+      modelName: string
+      promptVersion: string
+      inputTokens: number
+      outputTokens: number
+      estimatedCostUsd: number
+    } | null
   }): Promise<UsageEvent[]> {
     if (!input.authContext) {
       return []
@@ -223,6 +231,24 @@ export class UsageService {
         inputTokens: agentOutput.inputTokens,
         outputTokens: agentOutput.outputTokens,
         estimatedCostUsd: agentOutput.estimatedCostUsd,
+        createdAt,
+      })
+    }
+
+    if (input.chunkSummaryUsage) {
+      events.push({
+        usageEventId: createId('usage'),
+        workspaceId: input.result.workspaceId,
+        userId: input.authContext.userId,
+        runId: input.result.runId,
+        phase: 'chunk_summary',
+        sourceId: 'chunk_summary',
+        modelProvider: input.chunkSummaryUsage.providerId,
+        modelName: input.chunkSummaryUsage.modelName,
+        promptVersion: input.chunkSummaryUsage.promptVersion,
+        inputTokens: input.chunkSummaryUsage.inputTokens,
+        outputTokens: input.chunkSummaryUsage.outputTokens,
+        estimatedCostUsd: input.chunkSummaryUsage.estimatedCostUsd,
         createdAt,
       })
     }

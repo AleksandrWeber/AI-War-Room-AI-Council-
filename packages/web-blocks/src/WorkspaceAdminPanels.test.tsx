@@ -37,6 +37,8 @@ describe('WorkspaceAdminPanels', () => {
         onNewMemberFormChange={() => undefined}
         onInviteFormChange={() => undefined}
         onCreateInvite={() => undefined}
+        onRevokeInvite={() => undefined}
+        onCopyInviteLink={() => undefined}
         onMemberAdminAction={() => undefined}
         onExportAudit={() => undefined}
       />,

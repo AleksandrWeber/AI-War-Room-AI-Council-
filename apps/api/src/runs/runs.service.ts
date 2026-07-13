@@ -333,11 +333,12 @@ export class RunsService {
     const agentOutputs = baseline.agentOutputs.map((output) =>
       output.agentRole === agentRole ? regenerated : output,
     )
-    const chunkSummaries =
+    const chunkSummaryResult =
       await this.chunkSummaryService.summarizeAgentOutputs({
         agentOutputs,
         workspaceId: request.draftRun.workspaceId,
       })
+    const chunkSummaries = chunkSummaryResult.summaries
     const moderatorSynthesis = await this.moderatorService.synthesize({
       draftRun: request.draftRun,
       approvedTriage: request.approvedTriage,
@@ -375,6 +376,7 @@ export class RunsService {
     const usageEvents = await this.usageService.recordPipelineUsage({
       authContext: input.authContext,
       result: usageSlice,
+      chunkSummaryUsage: this.toChunkSummaryUsage(chunkSummaryResult.llmUsage),
     })
     const totalTokens = usageEvents.reduce(
       (total, event) => total + event.inputTokens + event.outputTokens,
@@ -476,10 +478,12 @@ export class RunsService {
       'Prompt-driven Moderator synthesis',
       'running',
     )
-    const chunkSummaries = await this.chunkSummaryService.summarizeAgentOutputs({
-      agentOutputs,
-      workspaceId: request.draftRun.workspaceId,
-    })
+    const chunkSummaryResult =
+      await this.chunkSummaryService.summarizeAgentOutputs({
+        agentOutputs,
+        workspaceId: request.draftRun.workspaceId,
+      })
+    const chunkSummaries = chunkSummaryResult.summaries
     const moderatorSynthesis = await this.measurePipelinePhase(
       request,
       'moderator',
@@ -552,6 +556,7 @@ export class RunsService {
       this.usageService.recordPipelineUsage({
         authContext,
         result: pipelineResult,
+        chunkSummaryUsage: this.toChunkSummaryUsage(chunkSummaryResult.llmUsage),
       }),
     )
     const totalTokens = usageEvents.reduce(
@@ -591,6 +596,25 @@ export class RunsService {
       status,
       timestamp: new Date().toISOString(),
     })
+  }
+
+  private toChunkSummaryUsage(
+    llmUsage: Awaited<
+      ReturnType<ChunkSummaryService['summarizeAgentOutputs']>
+    >['llmUsage'],
+  ) {
+    if (!llmUsage) {
+      return null
+    }
+
+    return {
+      providerId: llmUsage.providerId,
+      modelName: llmUsage.modelName,
+      promptVersion: llmUsage.promptVersion,
+      inputTokens: llmUsage.usage.inputTokens,
+      outputTokens: llmUsage.usage.outputTokens,
+      estimatedCostUsd: llmUsage.usage.estimatedCostUsd,
+    }
   }
 
   private async measurePipelinePhase<T>(

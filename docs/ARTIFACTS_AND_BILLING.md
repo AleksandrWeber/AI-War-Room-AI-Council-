@@ -57,7 +57,8 @@ PDF and Markdown exports both reflect the **immutable persisted** artifact conte
 
 Schemas: `packages/schemas/src/usage.ts`.
 
-- Each billable phase emits a `usageEvent` (`agent`, `moderator`, `executive_summary`, `prd`, `development_prompt`) with token counts and `estimatedCostUsd`.
+- Each billable phase emits a `usageEvent` (`agent`, `chunk_summary`, `moderator`, `executive_summary`, `prd`, `development_prompt`) with token counts and `estimatedCostUsd`.
+- Optional LLM chunk summary (`CHUNK_SUMMARY_LLM_ENABLED`) only emits `chunk_summary` when the LLM path succeeds; deterministic / fail-soft paths do not invent usage.
 - Workspace limits (`workspaceUsageLimitSchema`) key off `paidTier`: `free` | `pro` | `business` (daily token + cost caps).
 - Limits are enforced server-side; UI surfaces remaining budget via usage/billing panels.
 

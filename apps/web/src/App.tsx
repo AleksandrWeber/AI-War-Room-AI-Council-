@@ -1650,6 +1650,7 @@ function App() {
   const [streamedArtifacts, setStreamedArtifacts] = useState<ArtifactResult[]>([])
   const [lastStreamEventId, setLastStreamEventId] = useState<string | null>(null)
   const lastStreamEventIdRef = useRef<string | null>(null)
+  const processedInviteTokensRef = useRef(new Set<string>())
   const [lastStreamRunId, setLastStreamRunId] = useState<string | null>(null)
   const [runCapabilities, setRunCapabilities] =
     useState<RunCapabilitiesResponse | null>(null)
@@ -6699,6 +6700,64 @@ function App() {
   }, [authCapabilities, authSession])
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+    const inviteToken = params.get('inviteToken')?.trim()
+
+    if (!inviteToken || !workspaceAuthHeaders['x-user-id']) {
+      return
+    }
+
+    if (processedInviteTokensRef.current.has(inviteToken)) {
+      return
+    }
+    processedInviteTokensRef.current.add(inviteToken)
+
+    let cancelled = false
+
+    void (async () => {
+      setBillingError(null)
+      setBillingMessage(null)
+
+      try {
+        const accepted = await callUi(
+          'workspace-ui',
+          'acceptWorkspaceInvite',
+          apiBaseUrl,
+          workspaceAuthHeaders,
+          inviteToken,
+        )
+        if (cancelled) {
+          return
+        }
+
+        params.delete('inviteToken')
+        const nextQuery = params.toString()
+        const nextUrl = `${window.location.pathname}${nextQuery ? `?${nextQuery}` : ''}${window.location.hash}`
+        window.history.replaceState({}, '', nextUrl)
+        setBillingMessage(
+          `${accepted.guidance} Joined ${accepted.workspaceId} as ${accepted.role}.`,
+        )
+        await handleLoadBillingStatus()
+      } catch (error) {
+        if (cancelled) {
+          return
+        }
+
+        processedInviteTokensRef.current.delete(inviteToken)
+        setBillingError(
+          error instanceof Error
+            ? error.message
+            : 'Failed to accept workspace invite.',
+        )
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [authCapabilities, authSession, workspaceAuthHeaders['x-user-id']])
+
+  useEffect(() => {
     const returnHint = readBillingReturnHint()
 
     if (!returnHint) {
@@ -11598,6 +11657,23 @@ function App() {
       )
       setMemberAdminSummary(membersAdmin)
 
+      if (membersAdmin && (membersAdmin.role === 'owner' || membersAdmin.role === 'admin')) {
+        try {
+          const listed = await callUi(
+            'workspace-ui',
+            'listWorkspaceInvites',
+            apiBaseUrl,
+            defaultWorkspaceId,
+            workspaceAuthHeaders,
+          )
+          setWorkspaceInvites(listed.invites)
+        } catch {
+          setWorkspaceInvites([])
+        }
+      } else {
+        setWorkspaceInvites([])
+      }
+
       const settingsAdmin = await callUi('workspace-ui', 'fetchWorkspaceSettingsAdminSummary', 
         apiBaseUrl,
         defaultWorkspaceId,
@@ -11744,6 +11820,51 @@ function App() {
     } finally {
       setInviteAction('idle')
     }
+  }
+
+  async function handleRevokeWorkspaceInvite(inviteId: string) {
+    setInviteAction('running')
+    setBillingError(null)
+    setBillingMessage(null)
+
+    try {
+      const revoked = await callUi(
+        'workspace-ui',
+        'revokeWorkspaceInvite',
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+        inviteId,
+      )
+      setBillingMessage(revoked.guidance)
+      const listed = await callUi(
+        'workspace-ui',
+        'listWorkspaceInvites',
+        apiBaseUrl,
+        defaultWorkspaceId,
+        workspaceAuthHeaders,
+      )
+      setWorkspaceInvites(listed.invites)
+    } catch (error) {
+      setBillingError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to revoke workspace invite.',
+      )
+    } finally {
+      setInviteAction('idle')
+    }
+  }
+
+  function handleCopyInviteLink() {
+    if (!latestInviteUrl) {
+      return
+    }
+
+    void navigator.clipboard.writeText(latestInviteUrl).then(
+      () => setBillingMessage('Invite link copied to clipboard.'),
+      () => setBillingError('Could not copy invite link.'),
+    )
   }
 
   async function handleSettingsAdminAction(input: {
@@ -30177,6 +30298,8 @@ function App() {
           onNewMemberFormChange={setNewMemberForm}
           onInviteFormChange={setInviteForm}
           onCreateInvite={() => void handleCreateWorkspaceInvite()}
+          onRevokeInvite={(inviteId) => void handleRevokeWorkspaceInvite(inviteId)}
+          onCopyInviteLink={handleCopyInviteLink}
           onMemberAdminAction={(input) => void handleMemberAdminAction(input)}
           onExportAudit={(format) => void handleExportWorkspaceAudit(format)}
         />
@@ -31967,6 +32090,8 @@ function App() {
           onNewMemberFormChange={setNewMemberForm}
           onInviteFormChange={setInviteForm}
           onCreateInvite={() => void handleCreateWorkspaceInvite()}
+          onRevokeInvite={(inviteId) => void handleRevokeWorkspaceInvite(inviteId)}
+          onCopyInviteLink={handleCopyInviteLink}
           onMemberAdminAction={(input) => void handleMemberAdminAction(input)}
           onExportAudit={(format) => void handleExportWorkspaceAudit(format)}
         />

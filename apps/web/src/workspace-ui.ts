@@ -2,6 +2,7 @@ import {
   acceptWorkspaceInviteResponseSchema,
   createWorkspaceInviteResponseSchema,
   listWorkspaceInvitesResponseSchema,
+  revokeWorkspaceInviteResponseSchema,
   workspaceMemberAdminActionResponseSchema,
   workspaceMemberAdminSummaryResponseSchema,
   workspaceSettingsAdminActionResponseSchema,
@@ -236,3 +237,25 @@ export async function acceptWorkspaceInvite(
 
   return acceptWorkspaceInviteResponseSchema.parse(await response.json())
 }
+
+export async function revokeWorkspaceInvite(
+  apiBaseUrl: string,
+  workspaceId: string,
+  headers: Record<string, string>,
+  inviteId: string,
+) {
+  const response = await fetch(
+    `${apiBaseUrl}/workspaces/${encodeURIComponent(workspaceId)}/invites/${encodeURIComponent(inviteId)}/revoke`,
+    {
+      method: 'POST',
+      headers,
+    },
+  )
+
+  if (!response.ok) {
+    throw new Error(`API returned ${response.status}`)
+  }
+
+  return revokeWorkspaceInviteResponseSchema.parse(await response.json())
+}
+
