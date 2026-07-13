@@ -26,6 +26,7 @@ import type {
   ProviderKeyAdminSummaryResponse,
   ObservabilityRolloutResponse,
   ObservabilityAdminSummaryResponse,
+  PipelineStreamEvent,
   PromptEvaluationRolloutResponse,
   PromptRegressionAdminSummaryResponse,
   RunHistoryRolloutResponse,
@@ -1272,45 +1273,6 @@ type PipelineStep = {
   label: string
   status: 'draft' | 'pending' | 'running' | 'completed' | 'failed' | 'blocked'
 }
-
-type PipelineStreamEvent =
-  | {
-      eventId: string
-      type: 'status'
-      stepId: string
-      label: string
-      status: 'running' | 'completed'
-      timestamp: string
-    }
-  | {
-      eventId: string
-      type: 'artifact'
-      artifactType: ArtifactResult['metadata']['artifactType']
-      artifact: ArtifactResult
-      timestamp: string
-    }
-  | {
-      eventId: string
-      type: 'completed'
-      result: MockPipelineResult
-      timestamp: string
-    }
-  | {
-      eventId: string
-      type: 'error'
-      message: string
-      timestamp: string
-    }
-  | {
-      eventId: string
-      type: 'workflow_status'
-      runId: string
-      workflowId: string
-      temporalRunId?: string
-      taskQueue: string
-      status: TemporalWorkflowStatus
-      timestamp: string
-    }
 
 type AgentExecution = {
   agentRole: string

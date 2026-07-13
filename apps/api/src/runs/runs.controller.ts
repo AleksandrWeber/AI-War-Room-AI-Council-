@@ -19,6 +19,7 @@ import { TemporalRunService } from '../temporal/temporal-run.service.js'
 import { TemporalHealthService } from '../temporal/temporal-health.service.js'
 import { TemporalRolloutService } from '../temporal/temporal-rollout.service.js'
 import type { PipelineStreamEvent } from './pipeline-stream-event.js'
+import { isTerminalPipelineStreamEvent } from './pipeline-stream-event.js'
 import { RunsService } from './runs.service.js'
 
 @Controller('runs')
@@ -265,7 +266,7 @@ export class RunsController {
   }
 
   private isTerminalEvent(event: PipelineStreamEvent) {
-    return event.type === 'completed' || event.type === 'error'
+    return isTerminalPipelineStreamEvent(event)
   }
 
   private resolveStreamRunId(body: unknown) {
