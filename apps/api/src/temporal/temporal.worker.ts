@@ -5,7 +5,10 @@ import { NativeConnection, Worker } from '@temporalio/worker'
 import { AppModule } from '../app.module.js'
 import type { ApiEnv } from '../config/env.js'
 import { StreamEventBufferService } from '../persistence/stream-event-buffer.service.js'
-import { RunsService } from '../runs/runs.service.js'
+import {
+  APPROVED_RUN_EXECUTOR,
+  type ApprovedRunExecutor,
+} from '../runs/approved-run-executor.port.js'
 import { createRunWorkflowActivities } from './run-workflow.activities.js'
 import { getTemporalWorkerConfig } from './temporal-worker.config.js'
 import { TemporalWorkerHeartbeatService } from './temporal-worker-heartbeat.service.js'
@@ -13,7 +16,7 @@ import { TemporalWorkerHeartbeatService } from './temporal-worker-heartbeat.serv
 export async function startTemporalWorker() {
   const app = await NestFactory.createApplicationContext(AppModule)
   const configService = app.get(ConfigService<ApiEnv, true>)
-  const runsService = app.get(RunsService)
+  const runsService = app.get<ApprovedRunExecutor>(APPROVED_RUN_EXECUTOR)
   const streamEventBufferService = app.get(StreamEventBufferService)
   const temporalWorkerHeartbeatService = app.get(TemporalWorkerHeartbeatService)
   const workerConfig = getTemporalWorkerConfig(configService)

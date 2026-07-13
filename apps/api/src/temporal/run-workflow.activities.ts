@@ -1,4 +1,4 @@
-import type { RunsService } from '../runs/runs.service.js'
+import type { ApprovedRunExecutor } from '../runs/approved-run-executor.port.js'
 import type { StreamEventBufferService } from '../persistence/stream-event-buffer.service.js'
 import type {
   DurableRunWorkflowInput,
@@ -9,12 +9,10 @@ import {
   durableRunWorkflowResultSchema,
 } from './run-workflow.validation.js'
 
-type RunsServiceActivityPort = Pick<RunsService, 'executeMockPipelineStream'>
-
 type StreamEventBufferActivityPort = Pick<StreamEventBufferService, 'append'>
 
 export function createRunWorkflowActivities(deps: {
-  runsService: RunsServiceActivityPort
+  runsService: ApprovedRunExecutor
   streamEventBufferService: StreamEventBufferActivityPort
 }): RunWorkflowActivities {
   return {

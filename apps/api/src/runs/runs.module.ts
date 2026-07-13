@@ -25,6 +25,9 @@ import { RunHistoryController } from './run-history.controller.js'
 import { StreamRecoveryAdminService } from './stream-recovery-admin.service.js'
 import { StreamReplayController } from './stream-replay.controller.js'
 import { RunsService } from './runs.service.js'
+import {
+  APPROVED_RUN_EXECUTOR,
+} from './approved-run-executor.port.js'
 
 @Module({
   imports: [
@@ -41,6 +44,10 @@ import { RunsService } from './runs.service.js'
   controllers: [RunsController, RunHistoryController, StreamReplayController],
   providers: [
     RunsService,
+    {
+      provide: APPROVED_RUN_EXECUTOR,
+      useExisting: RunsService,
+    },
     RunHistoryAdminService,
     StreamRecoveryAdminService,
     TriageService,
@@ -55,6 +62,6 @@ import { RunsService } from './runs.service.js'
       useClass: TemporalSdkRunClient,
     },
   ],
-  exports: [TemporalHealthService],
+  exports: [TemporalHealthService, APPROVED_RUN_EXECUTOR],
 })
 export class RunsModule {}
