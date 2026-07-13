@@ -5925,7 +5925,6 @@ function App() {
   const [activeArtifactType, setActiveArtifactType] =
     useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
   const [rolloutControlsEnabled, setRolloutControlsEnabled] = useState(false)
-  const didBootstrapFetchRef = useRef(false)
 
   useEffect(() => {
     if (!useTemporalWorkflowRuntime) {
@@ -5970,36 +5969,42 @@ function App() {
   useEffect(() => {
     const controller = new AbortController()
 
-    if (!didBootstrapFetchRef.current) {
-      didBootstrapFetchRef.current = true
-
-      fetch(`${apiBaseUrl}/health`, {
-        signal: controller.signal,
-      })
-        .then((response) => {
+    fetch(`${apiBaseUrl}/health`, {
+      signal: controller.signal,
+    })
+      .then((response) => {
+        if (!controller.signal.aborted) {
           setApiHealth(response.ok ? 'online' : 'offline')
-        })
-        .catch(() => {
-          if (!controller.signal.aborted) {
-            setApiHealth('offline')
-          }
-        })
-
-      fetch(`${apiBaseUrl}/auth/capabilities`, {
-        signal: controller.signal,
+        }
       })
-        .then((response) => (response.ok ? response.json() : null))
-        .then((capabilities) => {
-          if (capabilities && !controller.signal.aborted) {
-            setAuthCapabilities(capabilities as AuthCapabilitiesResponse)
-          }
-        })
-        .catch(() => {
-          if (!controller.signal.aborted) {
-            setAuthCapabilities(null)
-          }
-        })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setApiHealth('offline')
+        }
+      })
+
+    fetch(`${apiBaseUrl}/auth/capabilities`, {
+      signal: controller.signal,
+    })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((capabilities) => {
+        if (capabilities && !controller.signal.aborted) {
+          setAuthCapabilities(capabilities as AuthCapabilitiesResponse)
+        }
+      })
+      .catch(() => {
+        if (!controller.signal.aborted) {
+          setAuthCapabilities(null)
+        }
+      })
+
+    return () => {
+      controller.abort()
     }
+  }, [])
+
+  useEffect(() => {
+    const controller = new AbortController()
 
     if (!rolloutControlsEnabled) {
       return () => {

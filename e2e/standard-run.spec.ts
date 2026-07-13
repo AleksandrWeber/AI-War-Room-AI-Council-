@@ -8,7 +8,9 @@ test('standard run happy path: draft, human review, mock pipeline, artifacts', a
 }) => {
   await page.goto('/')
 
-  await expect(page.locator('.api-status--online')).toBeVisible({ timeout: 60_000 })
+  await expect(page.getByText('API status: online')).toBeVisible({
+    timeout: 60_000,
+  })
 
   await page.getByLabel('Raw idea').fill(idea)
   await page.getByRole('button', { name: 'Create draft run' }).click()

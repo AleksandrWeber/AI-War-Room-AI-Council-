@@ -4,12 +4,14 @@ import { fileURLToPath } from 'node:url'
 import { dirname, join } from 'node:path'
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..')
+const apiPort = process.env.API_PORT ?? '3017'
+const webOrigin = process.env.WEB_ORIGIN ?? 'http://127.0.0.1:5177'
 
-function run(command, args) {
+function run(command, args, env = process.env) {
   const result = spawnSync(command, args, {
     cwd: root,
     stdio: 'inherit',
-    env: process.env,
+    env,
   })
 
   if (result.status !== 0) {
@@ -18,12 +20,20 @@ function run(command, args) {
 }
 
 run('npm', ['run', 'infra:up', '--', 'postgres', 'redis'])
-run('npm', ['run', 'db:migrate'])
+run('npm', ['run', 'db:migrate'], {
+  ...process.env,
+  API_PORT: apiPort,
+  WEB_ORIGIN: webOrigin,
+})
 
 const api = spawn('npm', ['run', 'dev', '--workspace', 'apps/api'], {
   cwd: root,
   stdio: 'inherit',
-  env: process.env,
+  env: {
+    ...process.env,
+    API_PORT: apiPort,
+    WEB_ORIGIN: webOrigin,
+  },
 })
 
 function shutdown(signal) {

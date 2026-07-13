@@ -154,11 +154,7 @@ export class RunsController {
   ) {
     const lastEventId = this.getSingleHeader(request.headers['last-event-id'])
 
-    reply.raw.writeHead(200, {
-      'Content-Type': 'text/event-stream; charset=utf-8',
-      'Cache-Control': 'no-cache, no-transform',
-      Connection: 'keep-alive',
-    })
+    reply.raw.writeHead(200, this.buildSseHeaders(request))
 
     try {
       await this.temporalRunService.observeWorkflowStream({
@@ -196,11 +192,7 @@ export class RunsController {
     const runId = this.resolveStreamRunId(body)
     const lastEventId = this.getSingleHeader(request.headers['last-event-id'])
 
-    reply.raw.writeHead(200, {
-      'Content-Type': 'text/event-stream; charset=utf-8',
-      'Cache-Control': 'no-cache, no-transform',
-      Connection: 'keep-alive',
-    })
+    reply.raw.writeHead(200, this.buildSseHeaders(request))
 
     const send = async (event: PipelineStreamEvent) => {
       const bufferedEvent = runId
@@ -253,6 +245,23 @@ export class RunsController {
     reply.raw.write(`event: ${event.type}\n`)
     reply.raw.write(`id: ${event.eventId}\n`)
     reply.raw.write(`data: ${JSON.stringify(event)}\n\n`)
+  }
+
+  private buildSseHeaders(request: AuthenticatedRequest) {
+    const origin = this.getSingleHeader(request.headers.origin)
+    const headers: Record<string, string> = {
+      'Content-Type': 'text/event-stream; charset=utf-8',
+      'Cache-Control': 'no-cache, no-transform',
+      Connection: 'keep-alive',
+    }
+
+    // reply.raw.writeHead replaces Fastify CORS headers; restore them for browsers.
+    if (origin) {
+      headers['Access-Control-Allow-Origin'] = origin
+      headers.Vary = 'Origin'
+    }
+
+    return headers
   }
 
   private isTerminalEvent(event: PipelineStreamEvent) {
