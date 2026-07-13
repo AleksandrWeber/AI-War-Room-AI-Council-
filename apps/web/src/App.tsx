@@ -28997,6 +28997,21 @@ function App() {
           <div className={`api-status api-status--${apiHealth}`}>
             API status: {apiHealth}
           </div>
+          {apiHealth === 'offline' ? (
+            <p className="local-setup-tip">
+              Local API is offline. Run{' '}
+              <code>npm run doctor</code>, then{' '}
+              <code>npm run infra:up</code>,{' '}
+              <code>npm run db:migrate</code>, and{' '}
+              <code>npm run dev:api</code>. Day-1 path: <code>docs/ONBOARDING.md</code>.
+            </p>
+          ) : null}
+          {apiHealth === 'online' && !draftRun ? (
+            <p className="local-setup-tip local-setup-tip--ready">
+              Ready for a mock run: draft an idea below → Human Review → execute
+              → artifacts. No provider keys required while LLM mode is mock.
+            </p>
+          ) : null}
           <div className="hero-actions">
             <button
               type="button"

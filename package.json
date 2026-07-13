@@ -13,6 +13,7 @@
     "dev": "npm run dev --workspace apps/web",
     "dev:web": "npm run dev --workspace apps/web",
     "dev:api": "npm run dev --workspace apps/api",
+    "doctor": "node ./scripts/doctor.mjs",
     "infra:up": "docker compose up -d --wait",
     "infra:down": "docker compose down",
     "docker:build": "docker compose build api web",

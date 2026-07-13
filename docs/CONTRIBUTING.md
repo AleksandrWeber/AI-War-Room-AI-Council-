@@ -1,6 +1,6 @@
 # Contributor guide
 
-Short path from a clean clone to a working local War Room. Deep product notes live in the root [README](../README.md).
+Short path from a clean clone to a working local War Room. Day-1 checklist: [ONBOARDING.md](./ONBOARDING.md). Deep product notes live in the root [README](../README.md).
 
 ## Prerequisites
 
@@ -13,6 +13,7 @@ Short path from a clean clone to a working local War Room. Deep product notes li
 ```bash
 npm install
 cp .env.example .env
+npm run doctor
 npm run infra:up
 npm run db:migrate
 ```
@@ -75,6 +76,7 @@ Custom ports must keep CORS aligned (`WEB_ORIGIN` ↔ `VITE_API_URL`). See READM
 
 | Command | When |
 | --- | --- |
+| `npm run doctor` | Day-1 env check (Node, `.env`, Postgres, Redis, API port). |
 | `npm run quality:gate` | Pre-push / PR baseline (build, lint, typecheck, API gate, audit, compose config). |
 | `npm run quality:infra` | Bring up Docker deps and apply migrations. |
 | `npm run test` | Workspace unit/integration tests. |
