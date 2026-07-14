@@ -303,7 +303,13 @@ export class PostgresRunRepository implements RunRepository {
     )
     const run = runResult.rows[0]
 
-    if (!run || run.status !== 'completed' || !run.completed_at) {
+    if (
+      !run ||
+      (run.status !== 'completed' &&
+        run.status !== 'awaiting_idea_approval' &&
+        run.status !== 'idea_approved') ||
+      !run.completed_at
+    ) {
       return null
     }
 
@@ -402,7 +408,7 @@ export class PostgresRunRepository implements RunRepository {
     return mockPipelineResultSchema.parse({
       runId: run.run_id,
       workspaceId: run.workspace_id,
-      status: 'completed',
+      status: run.status as 'awaiting_idea_approval' | 'idea_approved' | 'completed',
       steps: [
         {
           stepId: 'shield_scan',
@@ -429,11 +435,33 @@ export class PostgresRunRepository implements RunRepository {
           completedAt,
         },
         {
-          stepId: 'artifacts',
-          label: 'Prompt-driven artifact generation',
+          stepId: 'idea_brief',
+          label: 'Expanded idea brief',
           status: 'completed',
           completedAt,
         },
+        ...(run.status === 'completed'
+          ? [
+              {
+                stepId: 'idea_approval',
+                label: 'Idea approval',
+                status: 'completed' as const,
+                completedAt,
+              },
+              {
+                stepId: 'master_prompt',
+                label: 'Master prompt generation',
+                status: 'completed' as const,
+                completedAt,
+              },
+              {
+                stepId: 'todo_list',
+                label: 'Todo list generation',
+                status: 'completed' as const,
+                completedAt,
+              },
+            ]
+          : []),
       ],
       agentOutputs,
       moderatorSynthesis: moderatorSynthesisSchema.parse(moderatorRow.synthesis),

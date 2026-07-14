@@ -11,9 +11,9 @@ export const allModelRouterRoles: ModelRouterRole[] = [
   'software_architect',
   'market_researcher',
   'mobile_ux_expert',
-  'executive_summary',
-  'prd',
-  'development_prompt',
+  'idea_brief',
+  'master_prompt',
+  'todo_list',
   'shield_classifier',
 ]
 

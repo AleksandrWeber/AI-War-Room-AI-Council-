@@ -6,41 +6,6 @@ import {
 } from './common.js'
 import { shieldStatusSchema } from './shield.js'
 
-export const executiveSummarySchema = z.object({
-  productIdea: nonEmptyStringSchema.max(2_000),
-  targetUsers: z.array(nonEmptyStringSchema.max(500)).min(1).max(10),
-  coreValueProposition: nonEmptyStringSchema.max(2_000),
-  mainDifferentiator: nonEmptyStringSchema.max(2_000),
-  mvpRecommendation: nonEmptyStringSchema.max(2_000),
-  topRisks: z.array(nonEmptyStringSchema.max(1_000)).max(10),
-  recommendation: z.enum(['go', 'no_go', 'revise']),
-})
-
-export const prdSchema = z.object({
-  overview: nonEmptyStringSchema.max(8_000),
-  goals: z.array(nonEmptyStringSchema.max(2_000)).min(1).max(40),
-  nonGoals: z.array(nonEmptyStringSchema.max(2_000)).max(40),
-  userPersonas: z.array(nonEmptyStringSchema.max(2_000)).min(1).max(30),
-  userJourneys: z.array(nonEmptyStringSchema.max(2_000)).min(1).max(40),
-  functionalRequirements: z
-    .array(nonEmptyStringSchema.max(2_000))
-    .min(1)
-    .max(100),
-  nonFunctionalRequirements: z
-    .array(nonEmptyStringSchema.max(2_000))
-    .max(60),
-  mvpScope: z.array(nonEmptyStringSchema.max(2_000)).min(1).max(60),
-  futureScope: z.array(nonEmptyStringSchema.max(2_000)).max(60),
-  securityConsiderations: z
-    .array(nonEmptyStringSchema.max(2_000))
-    .max(60),
-  successMetrics: z.array(nonEmptyStringSchema.max(2_000)).max(40),
-  openQuestions: z.array(nonEmptyStringSchema.max(2_000)).max(40),
-  screensOrViews: z.array(nonEmptyStringSchema.max(2_000)).min(1).max(60),
-  userStories: z.array(nonEmptyStringSchema.max(2_000)).min(1).max(80),
-  acceptanceCriteria: z.array(nonEmptyStringSchema.max(2_000)).min(1).max(80),
-})
-
 export const developmentPromptTargetToolSchema = z.enum([
   'cursor',
   'claude_code',
@@ -51,36 +16,49 @@ export type DevelopmentPromptTargetTool = z.infer<
   typeof developmentPromptTargetToolSchema
 >
 
-export const developmentPromptBuildTodoSchema = z.object({
+export const ideaBriefToolSchema = z.object({
+  name: nonEmptyStringSchema.max(200),
+  why: nonEmptyStringSchema.max(2_000),
+  required: z.boolean().default(false),
+})
+
+export const ideaBriefAiChoiceSchema = z.object({
+  name: nonEmptyStringSchema.max(200),
+  role: nonEmptyStringSchema.max(500),
+  why: nonEmptyStringSchema.max(2_000),
+})
+
+/** Phase A: expanded idea for human discussion and approval. */
+export const ideaBriefSchema = z.object({
+  summaryForUser: nonEmptyStringSchema.max(4_000),
+  expandedIdea: nonEmptyStringSchema.max(16_000),
+  analysis: nonEmptyStringSchema.max(8_000),
+  acceptRecommendations: z.array(nonEmptyStringSchema.max(2_000)).min(1).max(40),
+  applyRecommendations: z.array(nonEmptyStringSchema.max(2_000)).min(1).max(40),
+  toolsToUse: z.array(ideaBriefToolSchema).min(1).max(40),
+  aiChoices: z.array(ideaBriefAiChoiceSchema).min(1).max(20),
+  openQuestions: z.array(nonEmptyStringSchema.max(2_000)).max(30).default([]),
+})
+
+/** Phase B: paste-ready general build prompt (.md style). */
+export const masterPromptSchema = z.object({
+  title: nonEmptyStringSchema.max(500),
+  targetTool: developmentPromptTargetToolSchema.default('cursor'),
+  markdownBody: nonEmptyStringSchema.max(40_000),
+})
+
+export const todoListItemSchema = z.object({
+  step: z.number().int().positive().max(200),
   title: nonEmptyStringSchema.max(500),
   details: nonEmptyStringSchema.max(4_000),
   acceptanceCheck: nonEmptyStringSchema.max(2_000),
   suggestedFiles: z.array(nonEmptyStringSchema.max(500)).max(20).default([]),
 })
 
-export const developmentPromptSchema = z.object({
-  targetTool: developmentPromptTargetToolSchema.default('cursor'),
-  productSummary: nonEmptyStringSchema.max(8_000),
-  technicalStack: z.array(nonEmptyStringSchema.max(500)).min(1).max(40),
-  architectureOverview: nonEmptyStringSchema.max(8_000),
-  requiredModules: z.array(nonEmptyStringSchema.max(2_000)).min(1).max(80),
-  dataModel: z.array(nonEmptyStringSchema.max(2_000)).max(80),
-  apiRequirements: z.array(nonEmptyStringSchema.max(2_000)).max(100),
-  uiRequirements: z.array(nonEmptyStringSchema.max(2_000)).max(100),
-  securityConstraints: z.array(nonEmptyStringSchema.max(2_000)).max(60),
-  testingRequirements: z.array(nonEmptyStringSchema.max(2_000)).max(60),
-  implementationOrder: z
-    .array(nonEmptyStringSchema.max(2_000))
-    .min(1)
-    .max(100),
-  outOfScope: z.array(nonEmptyStringSchema.max(2_000)).max(60),
-  toolSpecificGuidance: z
-    .array(nonEmptyStringSchema.max(2_000))
-    .max(30)
-    .default([]),
-  buildTodos: z.array(developmentPromptBuildTodoSchema).min(1).max(100),
-  screenMap: z.array(nonEmptyStringSchema.max(2_000)).min(1).max(60),
-  copyPasteBrief: nonEmptyStringSchema.max(12_000),
+/** Phase B: step-by-step execution checklist. */
+export const todoListSchema = z.object({
+  overview: nonEmptyStringSchema.max(4_000),
+  items: z.array(todoListItemSchema).min(1).max(100),
 })
 
 export const artifactMetadataSchema = z.object({
@@ -104,16 +82,16 @@ export const artifactMetadataSchema = z.object({
 
 export const artifactContentSchema = z.discriminatedUnion('artifactType', [
   z.object({
-    artifactType: z.literal('executive_summary'),
-    content: executiveSummarySchema,
+    artifactType: z.literal('idea_brief'),
+    content: ideaBriefSchema,
   }),
   z.object({
-    artifactType: z.literal('prd'),
-    content: prdSchema,
+    artifactType: z.literal('master_prompt'),
+    content: masterPromptSchema,
   }),
   z.object({
-    artifactType: z.literal('development_prompt'),
-    content: developmentPromptSchema,
+    artifactType: z.literal('todo_list'),
+    content: todoListSchema,
   }),
 ])
 
@@ -138,13 +116,22 @@ export const artifactHistoryResponseSchema = z.object({
   artifacts: z.array(artifactHistoryItemSchema),
 })
 
-export type ExecutiveSummary = z.infer<typeof executiveSummarySchema>
-export type Prd = z.infer<typeof prdSchema>
-export type DevelopmentPromptBuildTodo = z.infer<
-  typeof developmentPromptBuildTodoSchema
->
-export type DevelopmentPrompt = z.infer<typeof developmentPromptSchema>
+export type IdeaBriefTool = z.infer<typeof ideaBriefToolSchema>
+export type IdeaBriefAiChoice = z.infer<typeof ideaBriefAiChoiceSchema>
+export type IdeaBrief = z.infer<typeof ideaBriefSchema>
+export type MasterPrompt = z.infer<typeof masterPromptSchema>
+export type TodoListItem = z.infer<typeof todoListItemSchema>
+export type TodoList = z.infer<typeof todoListSchema>
 export type ArtifactMetadata = z.infer<typeof artifactMetadataSchema>
 export type Artifact = z.infer<typeof artifactSchema>
 export type ArtifactHistoryItem = z.infer<typeof artifactHistoryItemSchema>
 export type ArtifactHistoryResponse = z.infer<typeof artifactHistoryResponseSchema>
+
+/** @deprecated Use IdeaBrief / MasterPrompt / TodoList */
+export type ExecutiveSummary = IdeaBrief
+/** @deprecated Use IdeaBrief / MasterPrompt / TodoList */
+export type Prd = IdeaBrief
+/** @deprecated Use TodoListItem */
+export type DevelopmentPromptBuildTodo = TodoListItem
+/** @deprecated Use MasterPrompt */
+export type DevelopmentPrompt = MasterPrompt

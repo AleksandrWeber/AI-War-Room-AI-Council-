@@ -12,14 +12,14 @@ describe('run history admin helpers', () => {
         {
           artifactId: 'artifact_1',
           runId: 'run_1',
-          artifactType: 'executive_summary',
+          artifactType: 'idea_brief',
           artifactVersion: 'v1',
           createdAt: '2026-01-01T00:00:00.000Z',
         },
         {
           artifactId: 'artifact_2',
           runId: 'run_1',
-          artifactType: 'prd',
+          artifactType: 'master_prompt',
           artifactVersion: 'v1',
           createdAt: '2026-01-01T00:00:01.000Z',
         },
@@ -27,8 +27,8 @@ describe('run history admin helpers', () => {
     ).toMatchObject({
       totalArtifacts: 2,
       uniqueRunCount: 1,
-      executiveSummaryCount: 1,
-      prdCount: 1,
+      ideaBriefCount: 1,
+      masterPromptCount: 1,
     })
   })
 
@@ -39,7 +39,7 @@ describe('run history admin helpers', () => {
         {
           artifactId: 'artifact_1',
           runId: 'run_1',
-          artifactType: 'prd',
+          artifactType: 'master_prompt',
           artifactVersion: 'v1',
           createdAt: '2026-01-01T00:00:00.000Z',
         },

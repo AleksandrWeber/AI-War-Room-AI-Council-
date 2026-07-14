@@ -328,6 +328,120 @@ export class RunsController {
     }
   }
 
+  @Post('approve-idea/stream')
+  @UseGuards(WorkspaceAccessGuard)
+  async approveIdeaStream(
+    @Body() body: unknown,
+    @Req() request: AuthenticatedRequest,
+    @Res() reply: FastifyReply,
+  ) {
+    reply.raw.writeHead(200, this.buildSseHeaders(request))
+
+    const send = async (event: PipelineStreamEvent) => {
+      if (reply.raw.destroyed) {
+        return
+      }
+
+      this.writeStreamEvent(reply, event)
+    }
+
+    try {
+      await this.runsService.approveIdea(
+        body,
+        request.authContext!,
+        send,
+      )
+    } catch (error) {
+      send({
+        eventId: `event_${randomUUID()}`,
+        type: 'error',
+        message: this.formatPipelineError(error),
+        timestamp: new Date().toISOString(),
+      })
+    } finally {
+      reply.raw.end()
+    }
+  }
+
+  @Post('generate-prompt/stream')
+  @UseGuards(WorkspaceAccessGuard)
+  async generatePromptStream(
+    @Body() body: unknown,
+    @Req() request: AuthenticatedRequest,
+    @Res() reply: FastifyReply,
+  ) {
+    reply.raw.writeHead(200, this.buildSseHeaders(request))
+
+    const send = async (event: PipelineStreamEvent) => {
+      if (reply.raw.destroyed) {
+        return
+      }
+
+      this.writeStreamEvent(reply, event)
+    }
+
+    try {
+      await this.runsService.generateMasterPrompt(
+        body,
+        request.authContext!,
+        send,
+      )
+    } catch (error) {
+      send({
+        eventId: `event_${randomUUID()}`,
+        type: 'error',
+        message: this.formatPipelineError(error),
+        timestamp: new Date().toISOString(),
+      })
+    } finally {
+      reply.raw.end()
+    }
+  }
+
+  @Post('generate-todo/stream')
+  @UseGuards(WorkspaceAccessGuard)
+  async generateTodoStream(
+    @Body() body: unknown,
+    @Req() request: AuthenticatedRequest,
+    @Res() reply: FastifyReply,
+  ) {
+    reply.raw.writeHead(200, this.buildSseHeaders(request))
+
+    const send = async (event: PipelineStreamEvent) => {
+      if (reply.raw.destroyed) {
+        return
+      }
+
+      this.writeStreamEvent(reply, event)
+    }
+
+    try {
+      await this.runsService.generateTodoList(
+        body,
+        request.authContext!,
+        send,
+      )
+    } catch (error) {
+      send({
+        eventId: `event_${randomUUID()}`,
+        type: 'error',
+        message: this.formatPipelineError(error),
+        timestamp: new Date().toISOString(),
+      })
+    } finally {
+      reply.raw.end()
+    }
+  }
+
+  @Post('explain-idea')
+  @UseGuards(WorkspaceAccessGuard)
+  explainIdea(
+    @Body() body: unknown,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.runsService.explainIdea(body, request.authContext!)
+  }
+
   private formatPipelineError(error: unknown) {
     if (error instanceof ZodError) {
       return error.issues

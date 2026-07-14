@@ -333,7 +333,7 @@ export class LlmGatewayService {
     }
 
     if (taskName.startsWith('artifacts/')) {
-      return (taskName.split('/')[1] as ModelRouterRole | undefined) ?? 'prd'
+      return (taskName.split('/')[1] as ModelRouterRole | undefined) ?? 'idea_brief'
     }
 
     return 'critic'

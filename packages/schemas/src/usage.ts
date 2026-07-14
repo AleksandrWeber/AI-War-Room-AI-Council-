@@ -5,9 +5,9 @@ export const usagePhaseSchema = z.enum([
   'agent',
   'chunk_summary',
   'moderator',
-  'executive_summary',
-  'prd',
-  'development_prompt',
+  'idea_brief',
+  'master_prompt',
+  'todo_list',
 ])
 export type UsagePhase = z.infer<typeof usagePhaseSchema>
 

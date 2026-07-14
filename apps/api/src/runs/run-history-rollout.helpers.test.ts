@@ -8,7 +8,7 @@ describe('evaluateRunHistoryRollout', () => {
       usesInMemoryRepository: true,
       supportsMarkdownExport: true,
       supportsStreamReplay: false,
-      supportedArtifactTypes: ['executive_summary', 'prd', 'development_prompt'],
+      supportedArtifactTypes: ['idea_brief', 'master_prompt', 'todo_list'],
     })
 
     expect(rollout.status).toBe('ready')
@@ -20,7 +20,7 @@ describe('evaluateRunHistoryRollout', () => {
       usesInMemoryRepository: true,
       supportsMarkdownExport: true,
       supportsStreamReplay: true,
-      supportedArtifactTypes: ['executive_summary', 'prd', 'development_prompt'],
+      supportedArtifactTypes: ['idea_brief', 'master_prompt', 'todo_list'],
     })
 
     expect(rollout.status).toBe('not_ready')
@@ -32,7 +32,7 @@ describe('evaluateRunHistoryRollout', () => {
       usesInMemoryRepository: true,
       supportsMarkdownExport: true,
       supportsStreamReplay: false,
-      supportedArtifactTypes: ['executive_summary'],
+      supportedArtifactTypes: ['idea_brief'],
     })
 
     expect(

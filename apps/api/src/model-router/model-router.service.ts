@@ -17,9 +17,9 @@ import { createDefaultModelRegistry } from './model-router.defaults.js'
 
 const artifactRoles: ModelRouterRole[] = [
   'moderator',
-  'executive_summary',
-  'prd',
-  'development_prompt',
+  'idea_brief',
+  'master_prompt',
+  'todo_list',
 ]
 
 const safetyRoles: ModelRouterRole[] = ['security_expert', 'shield_classifier']

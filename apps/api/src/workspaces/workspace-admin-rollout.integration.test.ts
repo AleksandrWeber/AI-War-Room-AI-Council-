@@ -302,9 +302,9 @@ describe('run history rollout integration', () => {
       supportsRunHistoryAdminTools: true,
       supportsMarkdownExport: true,
       supportedArtifactTypes: [
-        'executive_summary',
-        'prd',
-        'development_prompt',
+        'idea_brief',
+        'master_prompt',
+        'todo_list',
       ],
     })
 

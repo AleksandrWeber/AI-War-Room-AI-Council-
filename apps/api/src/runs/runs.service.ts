@@ -17,19 +17,27 @@ import {
   type MockPipelineRequest,
   type MockPipelineResult,
   agentRoleSchema,
+  approveIdeaRequestSchema,
+  generateMasterPromptRequestSchema,
+  generateTodoListRequestSchema,
   artifactHistoryResponseSchema,
   createRunRequestSchema,
   draftRunSchema,
+  explainIdeaRequestSchema,
+  explainIdeaResponseSchema,
+  ideaBriefSchema,
   mockPipelineRequestSchema,
   mockPipelineResultSchema,
   regenerateAgentRequestSchema,
   runCapabilitiesResponseSchema,
   runStatusSchema,
 } from '@ai-war-room/schemas'
+import { z } from 'zod'
 import { AgentService } from '../agents/agent.service.js'
 import { ArtifactService } from '../artifacts/artifact.service.js'
 import { ChunkSummaryService } from '../chunk-summary/chunk-summary.service.js'
 import type { ApiEnv } from '../config/env.js'
+import { LlmGatewayService } from '../llm/llm-gateway.service.js'
 import { ModeratorService } from '../moderator/moderator.service.js'
 import { ObservabilityService } from '../observability/observability.service.js'
 import { IdempotencyService } from '../persistence/idempotency.service.js'
@@ -63,6 +71,7 @@ export class RunsService {
     private readonly chunkSummaryService: ChunkSummaryService,
     private readonly moderatorService: ModeratorService,
     private readonly artifactService: ArtifactService,
+    private readonly llmGatewayService: LlmGatewayService,
     private readonly usageService: UsageService,
     private readonly billingMeterUsageService: BillingMeterUsageService,
     private readonly billingNotificationService: BillingNotificationService,
@@ -86,7 +95,10 @@ export class RunsService {
         'human_review',
         'agent_pool',
         'moderator',
-        'artifacts',
+        'idea_brief',
+        'idea_approval',
+        'master_prompt',
+        'todo_list',
       ],
       runtime: {
         defaultPath: temporalEnabled ? 'temporal' : 'direct',
@@ -345,17 +357,18 @@ export class RunsService {
       agentOutputs,
       chunkSummaries,
     })
-    const artifacts = await this.artifactService.generateArtifacts({
+    const ideaBrief = await this.artifactService.generateIdeaBrief({
       draftRun: request.draftRun,
       moderatorSynthesis,
+      agentOutputs,
       completedAt: now,
-      developmentPromptTargetTool: request.developmentPromptTargetTool,
     })
+    const artifacts = [ideaBrief]
 
     const pipelineResult = mockPipelineResultSchema.parse({
       runId: request.draftRun.runId,
       workspaceId: request.draftRun.workspaceId,
-      status: 'completed',
+      status: 'awaiting_idea_approval',
       steps: baseline.steps.map((step) => ({
         ...step,
         status: 'completed',
@@ -515,50 +528,38 @@ export class RunsService {
       'completed',
     )
 
-    await this.emitStatus(
-      emit,
-      'artifacts',
-      'Prompt-driven artifact generation',
-      'running',
-    )
-    const artifacts = await this.measurePipelinePhase(request, 'artifacts', () =>
-      this.artifactService.generateArtifacts({
+    await this.emitStatus(emit, 'idea_brief', 'Expanded idea brief', 'running')
+    const ideaBrief = await this.measurePipelinePhase(request, 'idea_brief', () =>
+      this.artifactService.generateIdeaBrief({
         draftRun: request.draftRun,
         moderatorSynthesis,
+        agentOutputs,
         completedAt: now,
-        developmentPromptTargetTool: request.developmentPromptTargetTool,
       }),
     )
-    for (const artifact of artifacts) {
-      await emit?.({
-        eventId: createId('event'),
-        type: 'artifact',
-        artifactType: artifact.metadata.artifactType,
-        artifact,
-        timestamp: new Date().toISOString(),
-      })
-    }
-    await this.emitStatus(
-      emit,
-      'artifacts',
-      'Prompt-driven artifact generation',
-      'completed',
-    )
+    await emit?.({
+      eventId: createId('event'),
+      type: 'artifact',
+      artifactType: ideaBrief.metadata.artifactType,
+      artifact: ideaBrief,
+      timestamp: new Date().toISOString(),
+    })
+    await this.emitStatus(emit, 'idea_brief', 'Expanded idea brief', 'completed')
 
     const pipelineResult = mockPipelineResultSchema.parse({
       runId: request.draftRun.runId,
       workspaceId: request.draftRun.workspaceId,
-      status: 'completed',
+      status: 'awaiting_idea_approval',
       steps: [
         this.createCompletedStep('shield_scan', 'Shield scan', now),
         this.createCompletedStep('triage', 'Triage', now),
         this.createCompletedStep('agent_pool', 'Prompt-driven agent pool', now),
         this.createCompletedStep('moderator', 'Prompt-driven Moderator synthesis', now),
-        this.createCompletedStep('artifacts', 'Prompt-driven artifact generation', now),
+        this.createCompletedStep('idea_brief', 'Expanded idea brief', now),
       ],
       agentOutputs,
       moderatorSynthesis,
-      artifacts,
+      artifacts: [ideaBrief],
       completedAt: now,
     })
 
@@ -593,6 +594,434 @@ export class RunsService {
     })
 
     return pipelineResult
+  }
+
+  async approveIdea(
+    input: unknown,
+    authContext: AuthContext,
+    emit?: PipelineStreamEmitter,
+  ): Promise<MockPipelineResult> {
+    const parsed = approveIdeaRequestSchema.safeParse(input)
+
+    if (!parsed.success) {
+      throw new BadRequestException({
+        message: 'Invalid approve-idea request.',
+        issues: parsed.error.issues,
+      })
+    }
+
+    const request = parsed.data
+
+    if (
+      request.draftRun.workspaceId !== authContext.workspaceId ||
+      request.previousResult.workspaceId !== authContext.workspaceId
+    ) {
+      throw new BadRequestException({
+        message: 'Run workspace must match the authenticated workspace.',
+      })
+    }
+
+    if (request.previousResult.status !== 'awaiting_idea_approval') {
+      throw new BadRequestException({
+        message: 'Idea must be awaiting approval before it can be locked.',
+      })
+    }
+
+    const approvedIdeaBrief = ideaBriefSchema.parse(request.approvedIdeaBrief)
+    const now = new Date().toISOString()
+    const previousIdeaBrief = request.previousResult.artifacts.find(
+      (artifact) => artifact.artifact.artifactType === 'idea_brief',
+    )
+
+    await this.emitStatus(emit, 'idea_approval', 'Idea approval', 'running')
+
+    const ideaBriefArtifact = previousIdeaBrief
+      ? {
+          ...previousIdeaBrief,
+          artifact: {
+            artifactType: 'idea_brief' as const,
+            content: approvedIdeaBrief,
+          },
+          metadata: {
+            ...previousIdeaBrief.metadata,
+            createdAt: now,
+          },
+        }
+      : (
+          await this.artifactService.generateIdeaBrief({
+            draftRun: request.draftRun,
+            moderatorSynthesis: request.previousResult.moderatorSynthesis,
+            agentOutputs: request.previousResult.agentOutputs,
+            completedAt: now,
+          })
+        )
+
+    const pipelineResult = mockPipelineResultSchema.parse({
+      runId: request.draftRun.runId,
+      workspaceId: request.draftRun.workspaceId,
+      status: 'idea_approved',
+      steps: [
+        ...request.previousResult.steps,
+        this.createCompletedStep('idea_approval', 'Idea approval', now),
+      ],
+      agentOutputs: request.previousResult.agentOutputs,
+      moderatorSynthesis: request.previousResult.moderatorSynthesis,
+      artifacts: [ideaBriefArtifact],
+      completedAt: now,
+    })
+
+    await this.emitStatus(emit, 'idea_approval', 'Idea approval', 'completed')
+    await this.runRepository.replaceCompletedPipelineResult(pipelineResult)
+
+    await emit?.({
+      eventId: createId('event'),
+      type: 'completed',
+      result: pipelineResult,
+      timestamp: new Date().toISOString(),
+    })
+
+    return pipelineResult
+  }
+
+  /** @deprecated Use approveIdea + generateMasterPrompt + generateTodoList. */
+  async approveIdeaAndGeneratePlan(
+    input: unknown,
+    authContext: AuthContext,
+    emit?: PipelineStreamEmitter,
+  ): Promise<MockPipelineResult> {
+    const approved = await this.approveIdea(input, authContext, emit)
+    const withPrompt = await this.generateMasterPrompt(
+      {
+        ...(typeof input === 'object' && input !== null ? input : {}),
+        previousResult: approved,
+        approvedIdeaBrief:
+          approved.artifacts.find((a) => a.artifact.artifactType === 'idea_brief')
+            ?.artifact.content ??
+          (input as { approvedIdeaBrief?: unknown }).approvedIdeaBrief,
+      },
+      authContext,
+      emit,
+    )
+    return this.generateTodoList(
+      {
+        ...(typeof input === 'object' && input !== null ? input : {}),
+        previousResult: withPrompt,
+        approvedIdeaBrief:
+          withPrompt.artifacts.find((a) => a.artifact.artifactType === 'idea_brief')
+            ?.artifact.content ??
+          (input as { approvedIdeaBrief?: unknown }).approvedIdeaBrief,
+      },
+      authContext,
+      emit,
+    )
+  }
+
+  async generateMasterPrompt(
+    input: unknown,
+    authContext: AuthContext,
+    emit?: PipelineStreamEmitter,
+  ): Promise<MockPipelineResult> {
+    const parsed = generateMasterPromptRequestSchema.safeParse(input)
+
+    if (!parsed.success) {
+      throw new BadRequestException({
+        message: 'Invalid generate-master-prompt request.',
+        issues: parsed.error.issues,
+      })
+    }
+
+    const request = parsed.data
+
+    if (
+      request.draftRun.workspaceId !== authContext.workspaceId ||
+      request.previousResult.workspaceId !== authContext.workspaceId
+    ) {
+      throw new BadRequestException({
+        message: 'Run workspace must match the authenticated workspace.',
+      })
+    }
+
+    if (
+      request.previousResult.status !== 'idea_approved' &&
+      request.previousResult.status !== 'completed'
+    ) {
+      throw new BadRequestException({
+        message: 'Approve the idea before generating the master prompt.',
+      })
+    }
+
+    const approvedIdeaBrief = ideaBriefSchema.parse(request.approvedIdeaBrief)
+    const now = new Date().toISOString()
+    const ideaBriefArtifact = request.previousResult.artifacts.find(
+      (artifact) => artifact.artifact.artifactType === 'idea_brief',
+    )
+
+    await this.emitStatus(emit, 'master_prompt', 'Master prompt generation', 'running')
+
+    const masterPrompt = await this.artifactService.generateMasterPromptArtifact({
+      draftRun: request.draftRun,
+      approvedIdeaBrief,
+      completedAt: now,
+      developmentPromptTargetTool: request.developmentPromptTargetTool,
+    })
+
+    await emit?.({
+      eventId: createId('event'),
+      type: 'artifact',
+      artifactType: 'master_prompt',
+      artifact: masterPrompt,
+      timestamp: new Date().toISOString(),
+    })
+    await this.emitStatus(emit, 'master_prompt', 'Master prompt generation', 'completed')
+
+    const nextArtifacts = []
+    if (ideaBriefArtifact) {
+      nextArtifacts.push({
+        ...ideaBriefArtifact,
+        artifact: {
+          artifactType: 'idea_brief' as const,
+          content: approvedIdeaBrief,
+        },
+      })
+    }
+    nextArtifacts.push(masterPrompt)
+    for (const artifact of request.previousResult.artifacts) {
+      if (artifact.artifact.artifactType === 'todo_list') {
+        nextArtifacts.push(artifact)
+      }
+    }
+
+    const pipelineResult = mockPipelineResultSchema.parse({
+      runId: request.draftRun.runId,
+      workspaceId: request.draftRun.workspaceId,
+      status: 'idea_approved',
+      steps: [
+        ...request.previousResult.steps.filter(
+          (step) => step.stepId !== 'master_prompt',
+        ),
+        this.createCompletedStep('master_prompt', 'Master prompt generation', now),
+      ],
+      agentOutputs: request.previousResult.agentOutputs,
+      moderatorSynthesis: request.previousResult.moderatorSynthesis,
+      artifacts: nextArtifacts,
+      completedAt: now,
+    })
+
+    await this.runRepository.replaceCompletedPipelineResult(pipelineResult)
+    const usageEvents = await this.usageService.recordPipelineUsage({
+      authContext,
+      result: pipelineResult,
+    })
+    const totalTokens = usageEvents.reduce(
+      (total, event) => total + event.inputTokens + event.outputTokens,
+      0,
+    )
+    await this.billingMeterUsageService.reportRunTokenUsage({
+      workspaceId: request.draftRun.workspaceId,
+      runId: request.draftRun.runId,
+      totalTokens,
+    })
+    await this.billingNotificationService.syncWorkspaceNotifications(
+      request.draftRun.workspaceId,
+    )
+
+    await emit?.({
+      eventId: createId('event'),
+      type: 'completed',
+      result: pipelineResult,
+      timestamp: new Date().toISOString(),
+    })
+
+    return pipelineResult
+  }
+
+  async generateTodoList(
+    input: unknown,
+    authContext: AuthContext,
+    emit?: PipelineStreamEmitter,
+  ): Promise<MockPipelineResult> {
+    const parsed = generateTodoListRequestSchema.safeParse(input)
+
+    if (!parsed.success) {
+      throw new BadRequestException({
+        message: 'Invalid generate-todo-list request.',
+        issues: parsed.error.issues,
+      })
+    }
+
+    const request = parsed.data
+
+    if (
+      request.draftRun.workspaceId !== authContext.workspaceId ||
+      request.previousResult.workspaceId !== authContext.workspaceId
+    ) {
+      throw new BadRequestException({
+        message: 'Run workspace must match the authenticated workspace.',
+      })
+    }
+
+    if (
+      request.previousResult.status !== 'idea_approved' &&
+      request.previousResult.status !== 'completed'
+    ) {
+      throw new BadRequestException({
+        message: 'Approve the idea before generating the todo list.',
+      })
+    }
+
+    const masterPromptArtifact = request.previousResult.artifacts.find(
+      (artifact) => artifact.artifact.artifactType === 'master_prompt',
+    )
+
+    if (!masterPromptArtifact || masterPromptArtifact.artifact.artifactType !== 'master_prompt') {
+      throw new BadRequestException({
+        message: 'Create the master prompt before generating the todo list.',
+      })
+    }
+
+    const approvedIdeaBrief = ideaBriefSchema.parse(request.approvedIdeaBrief)
+    const now = new Date().toISOString()
+    const ideaBriefArtifact = request.previousResult.artifacts.find(
+      (artifact) => artifact.artifact.artifactType === 'idea_brief',
+    )
+
+    await this.emitStatus(emit, 'todo_list', 'Todo list generation', 'running')
+
+    const todoList = await this.artifactService.generateTodoListArtifact({
+      draftRun: request.draftRun,
+      approvedIdeaBrief,
+      masterPrompt: masterPromptArtifact.artifact.content,
+      completedAt: now,
+      developmentPromptTargetTool: request.developmentPromptTargetTool,
+    })
+
+    await emit?.({
+      eventId: createId('event'),
+      type: 'artifact',
+      artifactType: 'todo_list',
+      artifact: todoList,
+      timestamp: new Date().toISOString(),
+    })
+    await this.emitStatus(emit, 'todo_list', 'Todo list generation', 'completed')
+
+    const nextArtifacts = []
+    if (ideaBriefArtifact) {
+      nextArtifacts.push({
+        ...ideaBriefArtifact,
+        artifact: {
+          artifactType: 'idea_brief' as const,
+          content: approvedIdeaBrief,
+        },
+      })
+    }
+    nextArtifacts.push(masterPromptArtifact)
+    nextArtifacts.push(todoList)
+
+    const pipelineResult = mockPipelineResultSchema.parse({
+      runId: request.draftRun.runId,
+      workspaceId: request.draftRun.workspaceId,
+      status: 'completed',
+      steps: [
+        ...request.previousResult.steps.filter((step) => step.stepId !== 'todo_list'),
+        this.createCompletedStep('todo_list', 'Todo list generation', now),
+      ],
+      agentOutputs: request.previousResult.agentOutputs,
+      moderatorSynthesis: request.previousResult.moderatorSynthesis,
+      artifacts: nextArtifacts,
+      completedAt: now,
+    })
+
+    await this.runRepository.replaceCompletedPipelineResult(pipelineResult)
+    const usageEvents = await this.usageService.recordPipelineUsage({
+      authContext,
+      result: pipelineResult,
+    })
+    const totalTokens = usageEvents.reduce(
+      (total, event) => total + event.inputTokens + event.outputTokens,
+      0,
+    )
+    await this.billingMeterUsageService.reportRunTokenUsage({
+      workspaceId: request.draftRun.workspaceId,
+      runId: request.draftRun.runId,
+      totalTokens,
+    })
+    await this.billingNotificationService.syncWorkspaceNotifications(
+      request.draftRun.workspaceId,
+    )
+
+    await emit?.({
+      eventId: createId('event'),
+      type: 'completed',
+      result: pipelineResult,
+      timestamp: new Date().toISOString(),
+    })
+
+    return pipelineResult
+  }
+
+  async explainIdea(
+    input: unknown,
+    authContext: AuthContext,
+  ): Promise<{ explanation: string; modelProvider: string; modelName: string }> {
+    const parsed = explainIdeaRequestSchema.safeParse(input)
+
+    if (!parsed.success) {
+      throw new BadRequestException({
+        message: 'Invalid explain-idea request.',
+        issues: parsed.error.issues,
+      })
+    }
+
+    if (parsed.data.workspaceId !== authContext.workspaceId) {
+      throw new BadRequestException({
+        message: 'Workspace must match the authenticated workspace.',
+      })
+    }
+
+    const explanationSchema = z.object({
+      explanation: z.string().trim().min(1).max(12_000),
+    })
+
+    const result = await this.llmGatewayService.generateStructuredJson({
+      taskName: 'idea_explain/v1',
+      schema: explanationSchema,
+      workspaceId: authContext.workspaceId,
+      messages: [
+        {
+          role: 'system',
+          content: [
+            'You are the AI War Room Moderator explaining an idea brief to the founder.',
+            'Answer clearly; prefer Ukrainian if the question is in Ukrainian.',
+            'Return JSON { "explanation": "..." } only.',
+          ].join('\n'),
+        },
+        {
+          role: 'user',
+          content: `INPUT_JSON:${JSON.stringify({
+            question: parsed.data.question,
+            ideaBrief: parsed.data.ideaBrief,
+          })}`,
+        },
+      ],
+      fallback: {
+        explanation: [
+          `Питання: ${parsed.data.question}`,
+          '',
+          `Коротко про ідею: ${parsed.data.ideaBrief.summaryForUser}`,
+          '',
+          `Прийняти: ${parsed.data.ideaBrief.acceptRecommendations.join('; ')}`,
+          `Застосувати/змінити: ${parsed.data.ideaBrief.applyRecommendations.join('; ')}`,
+          '',
+          parsed.data.ideaBrief.analysis,
+        ].join('\n'),
+      },
+    })
+
+    return explainIdeaResponseSchema.parse({
+      explanation: result.value.explanation,
+      modelProvider: result.providerId,
+      modelName: result.model,
+    })
   }
 
   private async emitStatus(

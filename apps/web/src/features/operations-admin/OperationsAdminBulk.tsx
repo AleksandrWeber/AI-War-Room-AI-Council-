@@ -472,9 +472,9 @@ export default function OperationsAdminBulk(props: OperationsAdminBulkProps) {
             },
             {
               label: 'Artifact mix',
-              value: props.runHistoryAdminSummary.stats.executiveSummaryCount,
-              detail: <>{props.runHistoryAdminSummary.stats.prdCount} PRD ·{' '}
-                  {props.runHistoryAdminSummary.stats.developmentPromptCount} dev prompt</>,
+              value: props.runHistoryAdminSummary.stats.ideaBriefCount,
+              detail: <>{props.runHistoryAdminSummary.stats.masterPromptCount} master prompt ·{' '}
+                  {props.runHistoryAdminSummary.stats.todoListCount} todo list</>,
             }
             ]}
           >

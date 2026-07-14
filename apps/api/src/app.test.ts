@@ -437,7 +437,7 @@ describe('API skeleton', () => {
       })
       .expect(201)
 
-    expect(pipelineResponse.body.status).toBe('completed')
+    expect(pipelineResponse.body.status).toBe('awaiting_idea_approval')
   })
 
   it('keeps low-risk Shield review cases quiet', async () => {
@@ -515,7 +515,7 @@ describe('API skeleton', () => {
       })
       .expect(201)
 
-    expect(pipelineResponse.body.status).toBe('completed')
+    expect(pipelineResponse.body.status).toBe('awaiting_idea_approval')
     expect(pipelineResponse.body.agentOutputs.length).toBeGreaterThan(0)
     expect(pipelineResponse.body.agentOutputs[0].promptVersion).toContain(
       'agents/',
@@ -541,32 +541,106 @@ describe('API skeleton', () => {
     expect(pipelineResponse.body.moderatorSynthesis.mvpScope).toContain(
       'Prompt-driven isolated agent analysis',
     )
-    expect(pipelineResponse.body.artifacts).toHaveLength(3)
+    expect(pipelineResponse.body.status).toBe('awaiting_idea_approval')
+    expect(pipelineResponse.body.artifacts).toHaveLength(1)
     expect(pipelineResponse.body.artifacts[0].artifact.artifactType).toBe(
-      'executive_summary',
+      'idea_brief',
     )
     expect(pipelineResponse.body.artifacts[0].metadata.promptVersion).toBe(
-      'artifacts/executive_summary/v2',
+      'artifacts/idea_brief/v1',
     )
-    const developmentPromptArtifact = pipelineResponse.body.artifacts.find(
+    expect(
+      pipelineResponse.body.artifacts[0].artifact.content.toolsToUse.length,
+    ).toBeGreaterThan(0)
+    expect(
+      pipelineResponse.body.artifacts[0].artifact.content.aiChoices.length,
+    ).toBeGreaterThan(0)
+    expect(
+      pipelineResponse.body.artifacts[0].metadata.tokenUsage.inputTokens,
+    ).toBeGreaterThan(0)
+
+    const approveResponse = await request(app!.getHttpServer())
+      .post('/api/runs/approve-idea/stream')
+      .set(authHeaders)
+      .send({
+        draftRun: draftResponse.body,
+        approvedTriage: draftResponse.body.triage,
+        selectedAgents: draftResponse.body.selectedAgents,
+        previousResult: pipelineResponse.body,
+        approvedIdeaBrief: pipelineResponse.body.artifacts[0].artifact.content,
+        developmentPromptTargetTool: 'cursor',
+      })
+      .expect(200)
+
+    expect(approveResponse.text).toContain('event: completed')
+    expect(approveResponse.text).not.toContain('artifacts/master_prompt/v1')
+
+    const approvedCompleted = parseSseBlocks(approveResponse.text).find(
+      (event) => event.event === 'completed',
+    )
+    expect(approvedCompleted).toBeTruthy()
+    const approvedResult = JSON.parse(approvedCompleted!.data!)
+    expect(approvedResult.result.status).toBe('idea_approved')
+    expect(approvedResult.result.artifacts).toHaveLength(1)
+
+    const promptResponse = await request(app!.getHttpServer())
+      .post('/api/runs/generate-prompt/stream')
+      .set(authHeaders)
+      .send({
+        draftRun: draftResponse.body,
+        approvedTriage: draftResponse.body.triage,
+        selectedAgents: draftResponse.body.selectedAgents,
+        previousResult: approvedResult.result,
+        approvedIdeaBrief: approvedResult.result.artifacts[0].artifact.content,
+        developmentPromptTargetTool: 'cursor',
+      })
+      .expect(200)
+
+    expect(promptResponse.text).toContain('artifacts/master_prompt/v1')
+    const promptCompleted = parseSseBlocks(promptResponse.text).find(
+      (event) => event.event === 'completed',
+    )
+    const promptResult = JSON.parse(promptCompleted!.data!)
+    expect(promptResult.result.status).toBe('idea_approved')
+    expect(
+      promptResult.result.artifacts.some(
+        (artifact: { artifact: { artifactType: string } }) =>
+          artifact.artifact.artifactType === 'master_prompt',
+      ),
+    ).toBe(true)
+
+    const todoResponse = await request(app!.getHttpServer())
+      .post('/api/runs/generate-todo/stream')
+      .set(authHeaders)
+      .send({
+        draftRun: draftResponse.body,
+        approvedTriage: draftResponse.body.triage,
+        selectedAgents: draftResponse.body.selectedAgents,
+        previousResult: promptResult.result,
+        approvedIdeaBrief: approvedResult.result.artifacts[0].artifact.content,
+        developmentPromptTargetTool: 'cursor',
+      })
+      .expect(200)
+
+    expect(todoResponse.text).toContain('artifacts/todo_list/v1')
+    const todoCompleted = parseSseBlocks(todoResponse.text).find(
+      (event) => event.event === 'completed',
+    )
+    const completedResult = JSON.parse(todoCompleted!.data!)
+    expect(completedResult.result.status).toBe('completed')
+    expect(completedResult.result.artifacts).toHaveLength(3)
+    const masterPromptArtifact = completedResult.result.artifacts.find(
       (artifact: { artifact: { artifactType: string } }) =>
-        artifact.artifact.artifactType === 'development_prompt',
+        artifact.artifact.artifactType === 'master_prompt',
     )
-    expect(developmentPromptArtifact?.metadata.promptVersion).toBe(
-      'artifacts/development_prompt/v2',
+    const todoListArtifact = completedResult.result.artifacts.find(
+      (artifact: { artifact: { artifactType: string } }) =>
+        artifact.artifact.artifactType === 'todo_list',
     )
-    expect(
-      developmentPromptArtifact?.artifact.content.buildTodos.length,
-    ).toBeGreaterThan(0)
-    expect(
-      developmentPromptArtifact?.artifact.content.copyPasteBrief.length,
-    ).toBeGreaterThan(0)
-    expect(
-      developmentPromptArtifact?.artifact.content.screenMap.length,
-    ).toBeGreaterThan(0)
-    expect(
-      pipelineResponse.body.artifacts[2].metadata.tokenUsage.inputTokens,
-    ).toBeGreaterThan(0)
+    expect(masterPromptArtifact?.artifact.content.markdownBody.length).toBeGreaterThan(
+      0,
+    )
+    expect(todoListArtifact?.artifact.content.items.length).toBeGreaterThan(0)
 
     const usageRepository =
       moduleRef!.get<UsageRepository>(USAGE_REPOSITORY)
@@ -585,7 +659,7 @@ describe('API skeleton', () => {
     expect(exportedArtifact).toBeTruthy()
     expect(exportedArtifact.artifactVersion).toBe('v1')
     expect(exportedArtifact.artifact.content).toEqual(
-      pipelineResponse.body.artifacts.find(
+      completedResult.result.artifacts.find(
         (artifact: { metadata: { artifactId: string } }) =>
           artifact.metadata.artifactId === exportedArtifact.artifactId,
       ).artifact.content,
@@ -596,13 +670,10 @@ describe('API skeleton', () => {
       .set(authHeaders)
       .expect(200)
 
-    const expectedTitle =
-      exportedArtifact.artifactType === 'prd'
-        ? 'PRD'
-        : exportedArtifact.artifactType
-            .split('_')
-            .map((word: string) => word[0].toUpperCase() + word.slice(1))
-            .join(' ')
+    const expectedTitle = exportedArtifact.artifactType
+      .split('_')
+      .map((word: string) => word[0].toUpperCase() + word.slice(1))
+      .join(' ')
 
     expect(exportResponse.headers['content-type']).toContain('text/markdown')
     expect(exportResponse.text).toContain(`# ${expectedTitle}`)
@@ -635,7 +706,7 @@ describe('API skeleton', () => {
       })
       .expect(201)
 
-    expect(regenerateResponse.body.status).toBe('completed')
+    expect(regenerateResponse.body.status).toBe('awaiting_idea_approval')
     expect(regenerateResponse.body.agentOutputs).toHaveLength(
       pipelineResponse.body.agentOutputs.length,
     )
@@ -644,7 +715,7 @@ describe('API skeleton', () => {
         (output: { agentRole: string }) => output.agentRole === regenerateRole,
       )?.completedAt,
     ).not.toBe(pipelineResponse.body.agentOutputs[0].completedAt)
-    expect(regenerateResponse.body.artifacts).toHaveLength(3)
+    expect(regenerateResponse.body.artifacts).toHaveLength(1)
     expect(regenerateResponse.body.artifacts[0].metadata.artifactId).not.toBe(
       pipelineResponse.body.artifacts[0].metadata.artifactId,
     )
@@ -676,7 +747,7 @@ describe('API skeleton', () => {
       expect.arrayContaining([
         'agent_pool',
         'moderator',
-        'artifacts',
+        'idea_brief',
         'persistence',
         'usage_recording',
       ]),
@@ -754,7 +825,7 @@ describe('API skeleton', () => {
     expect(streamResponse.text).toContain('event: status')
     expect(streamResponse.text).toContain('event: artifact')
     expect(streamResponse.text).toContain('event: completed')
-    expect(streamResponse.text).toContain('artifacts/development_prompt/v2')
+    expect(streamResponse.text).toContain('artifacts/idea_brief/v1')
 
     const streamedEvents = parseSseBlocks(streamResponse.text)
     const firstEventId = streamedEvents[0].id

@@ -1,9 +1,9 @@
 import {
   agentOutputSchema,
-  developmentPromptSchema,
-  executiveSummarySchema,
+  ideaBriefSchema,
+  masterPromptSchema,
   moderatorSynthesisSchema,
-  prdSchema,
+  todoListSchema,
   triageResultSchema,
 } from '@ai-war-room/schemas'
 import type { z } from 'zod'
@@ -120,8 +120,8 @@ const moderatorSynthesis = {
   ],
   mvpBuildSequence: [
     'Clarify gaps and additions',
-    'Lock PRD screens and stories',
-    'Generate Development Prompt buildTodos',
+    'Lock idea brief with founder',
+    'Generate master prompt and todo list',
     'Implement web app in todo order',
   ],
   artifactGenerationBrief: {
@@ -129,27 +129,24 @@ const moderatorSynthesis = {
   },
 }
 
-const completedPrd = {
-  overview: 'AI War Room creates reviewed planning artifacts.',
-  goals: ['Generate PRDs from approved ideas'],
-  nonGoals: ['Replace human product judgment'],
-  userPersonas: ['Technical founder'],
-  userJourneys: ['Submit idea, review triage, execute council, export artifacts'],
-  functionalRequirements: ['Create draft runs', 'Generate artifacts'],
-  nonFunctionalRequirements: ['Validate schemas'],
-  mvpScope: ['Idea submission', 'Artifact generation'],
-  futureScope: ['Research agents'],
-  securityConsiderations: ['Treat input as untrusted'],
-  successMetrics: ['Artifact completion rate'],
-  openQuestions: ['Which provider ships first?'],
-  screensOrViews: ['Idea submission', 'Human review', 'Artifact viewer'],
-  userStories: [
-    'As a founder, I want to submit an idea so that I get a structured plan.',
+const approvedIdeaBrief = {
+  summaryForUser: 'Expanded idea brief for AI War Room planning.',
+  expandedIdea: 'Build a structured AI council that produces an editable idea, then a master prompt and todos.',
+  analysis: 'Accept the isolated agent model; apply clearer MVP checklist before coding.',
+  acceptRecommendations: ['Keep Shield + human review', 'Keep schema validation'],
+  applyRecommendations: ['Add screen inventory', 'Add AI/tool rationale'],
+  toolsToUse: [
+    { name: 'Vite + React + TypeScript', why: 'Web UI', required: true },
+    { name: 'NestJS', why: 'API', required: true },
   ],
-  acceptanceCriteria: [
-    'PRD includes screens and user stories',
-    'Development Prompt includes buildTodos',
+  aiChoices: [
+    {
+      name: 'OpenRouter GPT-class',
+      role: 'Planning',
+      why: 'Structured JSON and markdown',
+    },
   ],
+  openQuestions: ['Which export ships first?'],
 }
 
 function createMessages(system: string, userTemplate: string, payload: unknown) {
@@ -214,45 +211,51 @@ export const promptRegressionDataset: PromptRegressionCase[] = [
     minimumUsefulnessScore: 0.6,
   },
   {
-    caseId: 'artifact-executive-summary',
-    taskName: artifactPrompts.executive_summary.version,
-    expectedPromptVersion: 'artifacts/executive_summary/v2',
-    schema: executiveSummarySchema,
+    caseId: 'artifact-idea-brief',
+    taskName: artifactPrompts.idea_brief.version,
+    expectedPromptVersion: 'artifacts/idea_brief/v1',
+    schema: ideaBriefSchema,
     messages: createMessages(
-      artifactPrompts.executive_summary.system,
-      artifactPrompts.executive_summary.userTemplate,
+      artifactPrompts.idea_brief.system,
+      artifactPrompts.idea_brief.userTemplate,
       {
         draftRun,
         moderatorSynthesis,
+        agentOutputs: [agentOutput],
       },
     ),
     minimumClarityScore: 0.6,
     minimumUsefulnessScore: 0.6,
   },
   {
-    caseId: 'artifact-prd',
-    taskName: artifactPrompts.prd.version,
-    expectedPromptVersion: 'artifacts/prd/v2',
-    schema: prdSchema,
-    messages: createMessages(artifactPrompts.prd.system, artifactPrompts.prd.userTemplate, {
-      draftRun,
-      moderatorSynthesis,
-    }),
+    caseId: 'artifact-master-prompt',
+    taskName: artifactPrompts.master_prompt.version,
+    expectedPromptVersion: 'artifacts/master_prompt/v1',
+    schema: masterPromptSchema,
+    messages: createMessages(
+      artifactPrompts.master_prompt.system,
+      artifactPrompts.master_prompt.userTemplate,
+      {
+        draftRun,
+        approvedIdeaBrief,
+        targetTool: 'cursor',
+      },
+    ),
     minimumClarityScore: 0.6,
     minimumUsefulnessScore: 0.6,
   },
   {
-    caseId: 'artifact-development-prompt',
-    taskName: artifactPrompts.development_prompt.version,
-    expectedPromptVersion: 'artifacts/development_prompt/v2',
-    schema: developmentPromptSchema,
+    caseId: 'artifact-todo-list',
+    taskName: artifactPrompts.todo_list.version,
+    expectedPromptVersion: 'artifacts/todo_list/v1',
+    schema: todoListSchema,
     messages: createMessages(
-      artifactPrompts.development_prompt.system,
-      artifactPrompts.development_prompt.userTemplate,
+      artifactPrompts.todo_list.system,
+      artifactPrompts.todo_list.userTemplate,
       {
         draftRun,
-        moderatorSynthesis,
-        completedPrd,
+        approvedIdeaBrief,
+        targetTool: 'cursor',
       },
     ),
     minimumClarityScore: 0.6,

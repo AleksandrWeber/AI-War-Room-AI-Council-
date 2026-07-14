@@ -57,21 +57,31 @@ export class MockLlmProvider implements LlmProvider {
     }
 
     if (
+      request.taskName === 'artifacts/idea_brief/v1' ||
       request.taskName === 'artifacts/executive_summary/v1' ||
       request.taskName === 'artifacts/executive_summary/v2'
     ) {
-      return JSON.stringify(this.createExecutiveSummaryResponse(request))
-    }
-
-    if (request.taskName === 'artifacts/prd/v1' || request.taskName === 'artifacts/prd/v2') {
-      return JSON.stringify(this.createPrdResponse(request))
+      return JSON.stringify(this.createIdeaBriefResponse(request))
     }
 
     if (
+      request.taskName === 'artifacts/master_prompt/v1' ||
       request.taskName === 'artifacts/development_prompt/v1' ||
       request.taskName === 'artifacts/development_prompt/v2'
     ) {
-      return JSON.stringify(this.createDevelopmentPromptResponse(request))
+      return JSON.stringify(this.createMasterPromptResponse(request))
+    }
+
+    if (
+      request.taskName === 'artifacts/todo_list/v1' ||
+      request.taskName === 'artifacts/prd/v1' ||
+      request.taskName === 'artifacts/prd/v2'
+    ) {
+      return JSON.stringify(this.createTodoListResponse(request))
+    }
+
+    if (request.taskName === 'idea_explain/v1') {
+      return JSON.stringify(this.createIdeaExplainResponse(request))
     }
 
     if (request.taskName === 'shield/llm_classifier/v1') {
@@ -84,6 +94,7 @@ export class MockLlmProvider implements LlmProvider {
 
     return JSON.stringify({
       summary: `Mock response for ${request.taskName}`,
+      explanation: `Mock explanation for ${request.taskName}`,
     })
   }
 
@@ -274,209 +285,173 @@ export class MockLlmProvider implements LlmProvider {
     }
   }
 
-  private createExecutiveSummaryResponse(request: LlmProviderRequest) {
+  private createIdeaBriefResponse(request: LlmProviderRequest) {
     const payload = this.extractPayload(request)
     const draftRun = payload.draftRun ?? {}
     const moderatorSynthesis = payload.moderatorSynthesis ?? {}
+    const idea = String(draftRun.idea?.rawIdea ?? 'The submitted product idea')
 
     return {
-      productIdea: String(draftRun.idea?.rawIdea ?? 'The submitted product idea').slice(
-        0,
-        2_000,
-      ),
-      targetUsers: moderatorSynthesis.targetUsers ?? ['Founders'],
-      coreValueProposition:
-        moderatorSynthesis.proposedSolution ??
-        'Generate validated product planning artifacts from a raw idea in minutes.',
-      mainDifferentiator:
-        'A structured non-chat pipeline with isolated agents and human approval.',
-      mvpRecommendation:
-        'Continue with the prompt-driven local flow and validate artifact usefulness.',
-      topRisks: (moderatorSynthesis.risks ?? []).slice(0, 5),
-      recommendation: 'go',
+      summaryForUser:
+        moderatorSynthesis.executivePositioning ??
+        'Expanded idea brief ready for discussion before master prompt and todo generation.',
+      expandedIdea: [
+        idea.slice(0, 8_000),
+        '',
+        `Core problem: ${moderatorSynthesis.coreProblem ?? 'Needs clearer problem framing.'}`,
+        `Proposed solution: ${moderatorSynthesis.proposedSolution ?? 'Build a structured web app from the idea.'}`,
+      ].join('\n'),
+      analysis:
+        'Keep schema-validated council outputs. Discuss tools and AI choices with the founder before locking the build prompt.',
+      acceptRecommendations: moderatorSynthesis.mvpScope?.slice(0, 6) ?? [
+        'Keep the primary MVP modules',
+        'Keep human review before expensive generation',
+      ],
+      applyRecommendations: moderatorSynthesis.additionsToIdea?.slice(0, 6) ?? [
+        'Add screen inventory',
+        'Add success metrics and non-goals',
+      ],
+      toolsToUse: [
+        {
+          name: 'Vite + React + TypeScript',
+          why: 'Fast local UI development for the web app.',
+          required: true,
+        },
+        {
+          name: 'NestJS + Fastify',
+          why: 'Typed API surface for the planning backend.',
+          required: true,
+        },
+        {
+          name: 'Zod',
+          why: 'Shared validation between clients and APIs.',
+          required: true,
+        },
+        {
+          name: 'PostgreSQL + Redis',
+          why: 'Durable artifacts and stream replay.',
+          required: false,
+        },
+      ],
+      aiChoices: [
+        {
+          name: 'OpenRouter / GPT-class model',
+          role: 'Planning and long-form prompt generation',
+          why: 'Strong structured JSON and markdown generation.',
+        },
+        {
+          name: 'Cursor Agent / Composer',
+          role: 'Implementation against the master prompt and todos',
+          why: 'File-scoped coding with acceptance checks.',
+        },
+      ],
+      openQuestions: moderatorSynthesis.openQuestions ?? [],
     }
   }
 
-  private createPrdResponse(request: LlmProviderRequest) {
+  private createMasterPromptResponse(request: LlmProviderRequest) {
     const payload = this.extractPayload(request)
-    const moderatorSynthesis = payload.moderatorSynthesis ?? {}
+    const brief = payload.approvedIdeaBrief ?? {}
+    const targetTool = payload.targetTool ?? 'cursor'
+
+    return {
+      title: 'Master build prompt',
+      targetTool,
+      markdownBody: [
+        '# Product brief',
+        '',
+        brief.summaryForUser ?? 'Build the approved product.',
+        '',
+        '## Expanded idea',
+        '',
+        brief.expandedIdea ?? 'See approved idea brief.',
+        '',
+        '## Analysis',
+        '',
+        brief.analysis ?? 'Follow accept/apply recommendations.',
+        '',
+        '## Tools',
+        '',
+        ...(Array.isArray(brief.toolsToUse)
+          ? brief.toolsToUse.map(
+              (tool: { name?: string; why?: string }) =>
+                `- ${tool.name}: ${tool.why}`,
+            )
+          : ['- Vite/React/TypeScript', '- NestJS/Fastify', '- Zod']),
+        '',
+        '## Implementation principles',
+        '',
+        '- Build in small verified steps.',
+        '- Validate schemas on every API boundary.',
+        '- Prefer local-first MVP.',
+      ].join('\n'),
+    }
+  }
+
+  private createTodoListResponse(request: LlmProviderRequest) {
+    const payload = this.extractPayload(request)
+    const brief = payload.approvedIdeaBrief ?? {}
 
     return {
       overview:
-        moderatorSynthesis.proposedSolution ??
-        'Create a structured planning workflow that turns ideas into artifacts.',
-      goals: [
-        'Create a repeatable idea-to-artifacts workflow.',
-        'Keep execution structured and schema-validated.',
-        'Protect the pipeline with Shield checks.',
-      ],
-      nonGoals: moderatorSynthesis.nonGoals ?? [],
-      userPersonas: moderatorSynthesis.targetUsers ?? ['Founders'],
-      userJourneys: [
-        'User submits a raw idea and target audience.',
-        'System scans input and triages the draft.',
-        'User reviews metadata and selected agents.',
-        'System executes prompt-driven agents and produces artifacts.',
-      ],
-      functionalRequirements: [
-        'Submit idea draft.',
-        'Display Shield findings with highlighted spans.',
-        'Allow triage metadata edits.',
-        'Allow selected agent edits.',
-        'Generate Executive Summary, PRD, and Development Prompt.',
-      ],
-      nonFunctionalRequirements: [
-        'Validate all generated objects with shared schemas.',
-        'Record prompt version and model metadata for generated outputs.',
-      ],
-      mvpScope: moderatorSynthesis.mvpScope ?? ['Prompt-driven planning flow'],
-      futureScope: [
-        'Temporal orchestration',
-        'Real provider adapters',
-        'SSE artifact streaming',
-      ],
-      securityConsiderations: [
-        'Treat user input as untrusted.',
-        'Keep Shield findings separate from general product reasoning.',
-      ],
-      successMetrics: [
-        'Draft run completion rate.',
-        'Artifact copy/export rate.',
-        'User approval rate after Human Review.',
-      ],
-      openQuestions: moderatorSynthesis.openQuestions ?? [],
-      screensOrViews: [
-        'Idea submission screen',
-        'Human review screen',
-        'Pipeline progress view',
-        'Artifact viewer',
-        'Development Prompt copy panel',
-      ],
-      userStories: [
-        'As a founder, I want to submit a product idea so that I can receive a structured plan.',
-        'As a builder, I want a detailed development prompt so that I can implement a web app in Cursor.',
-        'As a reviewer, I want gaps and additions called out so that I can improve the idea before build.',
-      ],
-      acceptanceCriteria: [
-        'PRD includes screens, user stories, and acceptance criteria.',
-        'Development Prompt includes buildTodos and copyPasteBrief.',
-        'All generated artifacts validate against shared schemas.',
+        brief.summaryForUser ??
+        'Step-by-step build order derived from the approved idea brief.',
+      items: [
+        {
+          step: 1,
+          title: 'Scaffold the web app shell',
+          details: 'Create Vite + React + TypeScript shell with routing.',
+          acceptanceCheck: 'App boots and shows home route.',
+          suggestedFiles: ['apps/web/src/App.tsx'],
+        },
+        {
+          step: 2,
+          title: 'Define shared schemas',
+          details: 'Encode core entities as Zod schemas.',
+          acceptanceCheck: 'Fixtures parse against schemas.',
+          suggestedFiles: ['packages/schemas/src'],
+        },
+        {
+          step: 3,
+          title: 'Implement primary screens',
+          details: 'Build must-have UI flows from the idea brief.',
+          acceptanceCheck: 'Primary journey screens are reachable.',
+          suggestedFiles: ['apps/web/src'],
+        },
+        {
+          step: 4,
+          title: 'Wire MVP APIs',
+          details: 'Implement required endpoints with schema validation.',
+          acceptanceCheck: 'Happy-path endpoints return valid JSON.',
+          suggestedFiles: ['apps/api/src'],
+        },
+        {
+          step: 5,
+          title: 'Add verification gates',
+          details: 'Cover acceptance checks with tests.',
+          acceptanceCheck: 'Targeted tests pass.',
+          suggestedFiles: ['apps/api/src', 'apps/web/src'],
+        },
       ],
     }
   }
 
-  private createDevelopmentPromptResponse(request: LlmProviderRequest) {
+  private createIdeaExplainResponse(request: LlmProviderRequest) {
     const payload = this.extractPayload(request)
-    const completedPrd = payload.completedPrd ?? {}
-    const targetTool = payload.targetTool ?? 'cursor'
-    const toolSpecificGuidance = Array.isArray(payload.toolSpecificGuidance)
-      ? payload.toolSpecificGuidance
-      : []
+    const brief = payload.ideaBrief ?? {}
+    const question = payload.question ?? 'Explain the idea.'
 
     return {
-      targetTool,
-      productSummary:
-        completedPrd.overview ??
-        'Build the approved AI War Room product described by the PRD.',
-      technicalStack: ['Vite', 'React', 'TypeScript', 'NestJS', 'Fastify', 'Zod'],
-      architectureOverview:
-        'Use a monorepo with web, api, and shared schema packages. Route all model calls through the LLM gateway.',
-      requiredModules: [
-        'Idea submission UI',
-        'Human Review Screen',
-        'Runs API',
-        'Prompt-driven agent pipeline',
-        'Artifact viewer',
-      ],
-      dataModel: [
-        'DraftRun',
-        'AgentExecutionResult',
-        'ModeratorSynthesis',
-        'Artifact',
-      ],
-      apiRequirements: [
-        'POST /api/runs/draft',
-        'POST /api/runs/mock-pipeline',
-        'GET /api/runs/capabilities',
-      ],
-      uiRequirements: [
-        'Show agent step statuses.',
-        'Render generated artifacts after execution.',
-        'Keep Shield warnings compact and contextual.',
-      ],
-      securityConstraints: completedPrd.securityConsiderations ?? [
-        'Treat user input as untrusted.',
-      ],
-      testingRequirements: [
-        'Validate prompt-driven pipeline response schema.',
-        'Test Shield detection and agent routing.',
-        'Run build, lint, typecheck, and tests before committing.',
-      ],
-      implementationOrder: [
-        ...(completedPrd.functionalRequirements ?? []).slice(0, 5),
-        'Verify generated artifacts with schema tests and runtime checks.',
-      ],
-      outOfScope: completedPrd.nonGoals ?? [],
-      toolSpecificGuidance,
-      buildTodos: [
-        {
-          title: 'Scaffold the web app',
-          details:
-            'Create the Vite + React + TypeScript shell, routing, and base layout for MVP screens.',
-          acceptanceCheck: 'Local app boots and renders the home route.',
-          suggestedFiles: ['apps/web/src/main.tsx', 'apps/web/src/App.tsx'],
-        },
-        {
-          title: 'Define shared schemas',
-          details:
-            'Encode the PRD entities as Zod schemas and shared TypeScript types.',
-          acceptanceCheck: 'Fixture objects parse successfully against the new schemas.',
-          suggestedFiles: ['packages/schemas/src'],
-        },
-        {
-          title: 'Build primary screens',
-          details:
-            'Implement the screens from screenMap with empty/loading/error states.',
-          acceptanceCheck: 'Each listed screen is reachable in the UI.',
-          suggestedFiles: ['apps/web/src'],
-        },
-        {
-          title: 'Wire MVP APIs',
-          details:
-            'Implement the API requirements needed for the core user journeys.',
-          acceptanceCheck: 'Happy-path endpoints return schema-valid JSON.',
-          suggestedFiles: ['apps/api/src'],
-        },
-        {
-          title: 'Add Development Prompt export UX',
-          details:
-            'Surface copyPasteBrief and buildTodos so a builder can paste into Cursor.',
-          acceptanceCheck: 'User can copy the brief in one click from the artifact view.',
-          suggestedFiles: ['apps/web/src/App.tsx'],
-        },
-        {
-          title: 'Add verification gates',
-          details:
-            'Add tests and local checks covering the PRD acceptance criteria.',
-          acceptanceCheck: 'Targeted tests pass for the MVP journey.',
-          suggestedFiles: ['apps/api/src', 'apps/web/src'],
-        },
-      ],
-      screenMap: completedPrd.screensOrViews ?? [
-        'Idea submission',
-        'Human review',
-        'Pipeline progress',
-        'Artifact viewer',
-      ],
-      copyPasteBrief: [
-        `Build this product: ${completedPrd.overview ?? 'Approved MVP web application.'}`,
-        `Personas: ${(completedPrd.userPersonas ?? ['Founders']).join(', ')}`,
-        `MVP scope: ${(completedPrd.mvpScope ?? []).join('; ')}`,
-        `Screens: ${(completedPrd.screensOrViews ?? []).join('; ')}`,
-        'Stack: Vite, React, TypeScript, NestJS, Fastify, Zod.',
-        'Implement buildTodos one by one. After each todo, run the acceptanceCheck before continuing.',
-        'Keep scope limited to the PRD; put marketplace/chat features in outOfScope.',
-      ].join('\n\n'),
+      explanation: [
+        `Питання: ${question}`,
+        '',
+        `Коротко: ${brief.summaryForUser ?? 'Idea brief'}`,
+        '',
+        `Аналіз: ${brief.analysis ?? 'N/A'}`,
+        '',
+        `Прийняти: ${(brief.acceptRecommendations ?? []).slice(0, 5).join('; ')}`,
+        `Застосувати: ${(brief.applyRecommendations ?? []).slice(0, 5).join('; ')}`,
+      ].join('\n'),
     }
   }
 

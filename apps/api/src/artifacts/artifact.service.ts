@@ -1,17 +1,18 @@
 import { Injectable } from '@nestjs/common'
 import { randomUUID } from 'node:crypto'
 import {
+  type AgentExecutionResult,
   type Artifact,
-  type DevelopmentPrompt,
   type DevelopmentPromptTargetTool,
   type DraftRun,
-  type ExecutiveSummary,
+  type IdeaBrief,
+  type MasterPrompt,
   type ModeratorSynthesis,
-  type Prd,
+  type TodoList,
   artifactSchema,
-  developmentPromptSchema,
-  executiveSummarySchema,
-  prdSchema,
+  ideaBriefSchema,
+  masterPromptSchema,
+  todoListSchema,
 } from '@ai-war-room/schemas'
 import { LlmGatewayService } from '../llm/llm-gateway.service.js'
 import { truncateText } from '../llm/llm.utils.js'
@@ -29,136 +30,159 @@ function createId(prefix: string) {
 export class ArtifactService {
   constructor(private readonly llmGatewayService: LlmGatewayService) {}
 
-  async generateArtifacts(input: {
+  /** Phase A: expanded idea for human discussion. */
+  async generateIdeaBrief(input: {
     draftRun: DraftRun
     moderatorSynthesis: ModeratorSynthesis
+    agentOutputs: AgentExecutionResult[]
+    completedAt: string
+  }): Promise<Artifact & { artifact: { artifactType: 'idea_brief'; content: IdeaBrief } }> {
+    const prompt = artifactPrompts.idea_brief
+    const fallback = this.createFallbackIdeaBrief(input)
+    const result = await this.llmGatewayService.generateStructuredJson({
+      taskName: prompt.version,
+      schema: ideaBriefSchema,
+      workspaceId: input.draftRun.workspaceId,
+      messages: this.createMessages(prompt.system, prompt.userTemplate, {
+        draftRun: input.draftRun,
+        moderatorSynthesis: input.moderatorSynthesis,
+        agentOutputs: input.agentOutputs.map((agent) => ({
+          agentRole: agent.agentRole,
+          output: agent.output,
+        })),
+      }),
+      fallback,
+    })
+
+    return artifactSchema.parse({
+      metadata: this.createMetadata({
+        input,
+        artifactType: 'idea_brief',
+        promptVersion: prompt.version,
+        providerId: result.providerId,
+        model: result.model,
+        validationStatus: result.validationStatus,
+        inputTokens: result.usage.inputTokens,
+        outputTokens: result.usage.outputTokens,
+        estimatedCostUsd: result.usage.estimatedCostUsd,
+        content: result.value,
+      }),
+      artifact: {
+        artifactType: 'idea_brief',
+        content: result.value,
+      },
+    }) as Artifact & { artifact: { artifactType: 'idea_brief'; content: IdeaBrief } }
+  }
+
+  /** Phase B1: master .md prompt after idea approval. */
+  async generateMasterPromptArtifact(input: {
+    draftRun: DraftRun
+    approvedIdeaBrief: IdeaBrief
+    completedAt: string
+    developmentPromptTargetTool?: DevelopmentPromptTargetTool
+  }) {
+    return this.generateMasterPrompt({
+      draftRun: input.draftRun,
+      approvedIdeaBrief: input.approvedIdeaBrief,
+      completedAt: input.completedAt,
+      targetTool: input.developmentPromptTargetTool ?? 'cursor',
+    })
+  }
+
+  /** Phase B2: todo list derived from approved idea + master prompt. */
+  async generateTodoListArtifact(input: {
+    draftRun: DraftRun
+    approvedIdeaBrief: IdeaBrief
+    masterPrompt: MasterPrompt
+    completedAt: string
+    developmentPromptTargetTool?: DevelopmentPromptTargetTool
+  }) {
+    return this.generateTodoList({
+      draftRun: input.draftRun,
+      approvedIdeaBrief: input.approvedIdeaBrief,
+      masterPrompt: input.masterPrompt,
+      completedAt: input.completedAt,
+      targetTool: input.developmentPromptTargetTool ?? 'cursor',
+    })
+  }
+
+  /** @deprecated Prefer generateMasterPromptArtifact + generateTodoListArtifact. */
+  async generatePromptAndTodo(input: {
+    draftRun: DraftRun
+    moderatorSynthesis: ModeratorSynthesis
+    approvedIdeaBrief: IdeaBrief
+    previousIdeaBriefArtifact?: Artifact
     completedAt: string
     developmentPromptTargetTool?: DevelopmentPromptTargetTool
   }): Promise<Artifact[]> {
-    const executiveSummary = await this.generateExecutiveSummary(input)
-    const prd = await this.generatePrd(input)
-    const developmentPrompt = await this.generateDevelopmentPrompt({
+    const targetTool = input.developmentPromptTargetTool ?? 'cursor'
+    const masterPrompt = await this.generateMasterPrompt({
       ...input,
-      completedPrd: prd.artifact.content,
-      targetTool: input.developmentPromptTargetTool ?? 'cursor',
+      targetTool,
     })
+    const todoList = await this.generateTodoList({
+      ...input,
+      targetTool,
+      masterPrompt: masterPrompt.artifact.content,
+    })
+    const ideaBriefArtifact =
+      input.previousIdeaBriefArtifact ??
+      artifactSchema.parse({
+        metadata: this.createMetadata({
+          input,
+          artifactType: 'idea_brief',
+          promptVersion: 'artifacts/idea_brief/v1',
+          providerId: 'mock',
+          model: 'approved-idea',
+          validationStatus: 'valid',
+          inputTokens: 0,
+          outputTokens: 0,
+          estimatedCostUsd: 0,
+          content: input.approvedIdeaBrief,
+        }),
+        artifact: {
+          artifactType: 'idea_brief',
+          content: input.approvedIdeaBrief,
+        },
+      })
 
-    return [executiveSummary, prd, developmentPrompt]
+    return [ideaBriefArtifact, masterPrompt, todoList]
   }
 
-  private async generateExecutiveSummary(input: {
+  private async generateMasterPrompt(input: {
     draftRun: DraftRun
-    moderatorSynthesis: ModeratorSynthesis
+    approvedIdeaBrief: IdeaBrief
     completedAt: string
-  }): Promise<Artifact & { artifact: { artifactType: 'executive_summary' } }> {
-    const prompt = artifactPrompts.executive_summary
-    const fallback = this.createFallbackExecutiveSummary(input)
-    const result = await this.llmGatewayService.generateStructuredJson({
-      taskName: prompt.version,
-      schema: executiveSummarySchema,
-      workspaceId: input.draftRun.workspaceId,
-      messages: this.createMessages(prompt.system, prompt.userTemplate, input),
-      fallback,
-    })
-
-    return artifactSchema.parse({
-      metadata: this.createMetadata({
-        input,
-        artifactType: 'executive_summary',
-        promptVersion: prompt.version,
-        providerId: result.providerId,
-        model: result.model,
-        validationStatus: result.validationStatus,
-        inputTokens: result.usage.inputTokens,
-        outputTokens: result.usage.outputTokens,
-        estimatedCostUsd: result.usage.estimatedCostUsd,
-        content: result.value,
-      }),
-      artifact: {
-        artifactType: 'executive_summary',
-        content: result.value,
-      },
-    }) as Artifact & { artifact: { artifactType: 'executive_summary' } }
-  }
-
-  private async generatePrd(input: {
-    draftRun: DraftRun
-    moderatorSynthesis: ModeratorSynthesis
-    completedAt: string
-  }): Promise<Artifact & { artifact: { artifactType: 'prd'; content: Prd } }> {
-    const prompt = artifactPrompts.prd
-    const fallback = this.createFallbackPrd(input)
-    const result = await this.llmGatewayService.generateStructuredJson({
-      taskName: prompt.version,
-      schema: prdSchema,
-      workspaceId: input.draftRun.workspaceId,
-      messages: this.createMessages(prompt.system, prompt.userTemplate, input),
-      fallback,
-    })
-
-    return artifactSchema.parse({
-      metadata: this.createMetadata({
-        input,
-        artifactType: 'prd',
-        promptVersion: prompt.version,
-        providerId: result.providerId,
-        model: result.model,
-        validationStatus: result.validationStatus,
-        inputTokens: result.usage.inputTokens,
-        outputTokens: result.usage.outputTokens,
-        estimatedCostUsd: result.usage.estimatedCostUsd,
-        content: result.value,
-      }),
-      artifact: {
-        artifactType: 'prd',
-        content: result.value,
-      },
-    }) as Artifact & { artifact: { artifactType: 'prd'; content: Prd } }
-  }
-
-  private async generateDevelopmentPrompt(input: {
-    draftRun: DraftRun
-    moderatorSynthesis: ModeratorSynthesis
-    completedAt: string
-    completedPrd: Prd
     targetTool: DevelopmentPromptTargetTool
-  }): Promise<Artifact & { artifact: { artifactType: 'development_prompt' } }> {
-    const prompt = artifactPrompts.development_prompt
-    const toolSpecificGuidance = getDevelopmentPromptToolGuidance(input.targetTool)
-    const fallback = this.createFallbackDevelopmentPrompt({
-      ...input,
-      toolSpecificGuidance,
-    })
+  }): Promise<Artifact & { artifact: { artifactType: 'master_prompt'; content: MasterPrompt } }> {
+    const prompt = artifactPrompts.master_prompt
+    const toolGuidance = getDevelopmentPromptToolGuidance(input.targetTool)
+    const fallback = this.createFallbackMasterPrompt(input, toolGuidance)
     const result = await this.llmGatewayService.generateStructuredJson({
       taskName: prompt.version,
-      schema: developmentPromptSchema,
+      schema: masterPromptSchema,
       workspaceId: input.draftRun.workspaceId,
       messages: this.createMessages(
         `${prompt.system}\n${getDevelopmentPromptSystemAddon(input.targetTool)}`,
         prompt.userTemplate,
         {
           draftRun: input.draftRun,
-          moderatorSynthesis: input.moderatorSynthesis,
-          completedPrd: input.completedPrd,
+          approvedIdeaBrief: input.approvedIdeaBrief,
           targetTool: input.targetTool,
-          toolSpecificGuidance,
+          toolSpecificGuidance: toolGuidance,
         },
       ),
       fallback,
     })
-    const content = developmentPromptSchema.parse({
+    const content = masterPromptSchema.parse({
       ...result.value,
       targetTool: input.targetTool,
-      toolSpecificGuidance:
-        result.value.toolSpecificGuidance.length > 0
-          ? result.value.toolSpecificGuidance
-          : toolSpecificGuidance,
     })
 
     return artifactSchema.parse({
       metadata: this.createMetadata({
         input,
-        artifactType: 'development_prompt',
+        artifactType: 'master_prompt',
         promptVersion: prompt.version,
         providerId: result.providerId,
         model: result.model,
@@ -169,10 +193,54 @@ export class ArtifactService {
         content,
       }),
       artifact: {
-        artifactType: 'development_prompt',
+        artifactType: 'master_prompt',
         content,
       },
-    }) as Artifact & { artifact: { artifactType: 'development_prompt' } }
+    }) as Artifact & {
+      artifact: { artifactType: 'master_prompt'; content: MasterPrompt }
+    }
+  }
+
+  private async generateTodoList(input: {
+    draftRun: DraftRun
+    approvedIdeaBrief: IdeaBrief
+    masterPrompt: MasterPrompt
+    completedAt: string
+    targetTool: DevelopmentPromptTargetTool
+  }): Promise<Artifact & { artifact: { artifactType: 'todo_list'; content: TodoList } }> {
+    const prompt = artifactPrompts.todo_list
+    const fallback = this.createFallbackTodoList(input)
+    const result = await this.llmGatewayService.generateStructuredJson({
+      taskName: prompt.version,
+      schema: todoListSchema,
+      workspaceId: input.draftRun.workspaceId,
+      messages: this.createMessages(prompt.system, prompt.userTemplate, {
+        draftRun: input.draftRun,
+        approvedIdeaBrief: input.approvedIdeaBrief,
+        masterPromptTitle: input.masterPrompt.title,
+        targetTool: input.targetTool,
+      }),
+      fallback,
+    })
+
+    return artifactSchema.parse({
+      metadata: this.createMetadata({
+        input,
+        artifactType: 'todo_list',
+        promptVersion: prompt.version,
+        providerId: result.providerId,
+        model: result.model,
+        validationStatus: result.validationStatus,
+        inputTokens: result.usage.inputTokens,
+        outputTokens: result.usage.outputTokens,
+        estimatedCostUsd: result.usage.estimatedCostUsd,
+        content: result.value,
+      }),
+      artifact: {
+        artifactType: 'todo_list',
+        content: result.value,
+      },
+    }) as Artifact & { artifact: { artifactType: 'todo_list'; content: TodoList } }
   }
 
   private createMessages(system: string, userTemplate: string, input: unknown) {
@@ -233,193 +301,184 @@ export class ArtifactService {
       : 'clear'
   }
 
-  private createFallbackExecutiveSummary(input: {
+  private createFallbackIdeaBrief(input: {
     draftRun: DraftRun
     moderatorSynthesis: ModeratorSynthesis
-  }): ExecutiveSummary {
-    return {
-      productIdea: truncateText(input.draftRun.idea.rawIdea, 2_000),
-      targetUsers: input.moderatorSynthesis.targetUsers,
-      coreValueProposition: input.moderatorSynthesis.proposedSolution,
-      mainDifferentiator:
-        'A structured non-chat pipeline with isolated agents and human approval.',
-      mvpRecommendation:
-        'Continue with the prompt-driven local flow and validate artifact usefulness before adding orchestration complexity.',
-      topRisks: input.moderatorSynthesis.risks.slice(0, 5),
-      recommendation: 'go',
-    }
-  }
+    agentOutputs: AgentExecutionResult[]
+  }): IdeaBrief {
+    const ideaSnippet = truncateText(input.draftRun.idea.rawIdea, 2_000)
+    const additions = input.agentOutputs.flatMap((agent) => agent.output.additions).slice(0, 8)
+    const mustHaves = input.agentOutputs
+      .flatMap((agent) => agent.output.mustHaveFeatures)
+      .slice(0, 8)
 
-  private createFallbackPrd(input: {
-    draftRun: DraftRun
-    moderatorSynthesis: ModeratorSynthesis
-  }): Prd {
     return {
-      overview: input.moderatorSynthesis.proposedSolution,
-      goals: [
-        'Create a repeatable idea-to-artifacts workflow.',
-        'Keep execution structured and schema-validated.',
-        'Protect the pipeline with Shield checks.',
+      summaryForUser:
+        input.moderatorSynthesis.executivePositioning ||
+        'Expanded idea brief ready for discussion before prompt and todo generation.',
+      expandedIdea: [
+        ideaSnippet,
+        '',
+        `Core problem: ${input.moderatorSynthesis.coreProblem}`,
+        `Proposed solution: ${input.moderatorSynthesis.proposedSolution}`,
+        `MVP scope: ${input.moderatorSynthesis.mvpScope.join('; ')}`,
+      ].join('\n'),
+      analysis: [
+        'Keep the structured council workflow and schema-validated outputs.',
+        'Discuss tools and AI choices before locking the master prompt.',
+        ...input.moderatorSynthesis.additionsToIdea.slice(0, 5),
+      ].join('\n'),
+      acceptRecommendations:
+        mustHaves.length > 0
+          ? mustHaves
+          : ['Keep the primary user journey and MVP module list'],
+      applyRecommendations:
+        additions.length > 0
+          ? additions
+          : input.moderatorSynthesis.additionsToIdea.slice(0, 5),
+      toolsToUse: [
+        {
+          name: 'Vite + React + TypeScript',
+          why: 'Fast local UI development for the web app.',
+          required: true,
+        },
+        {
+          name: 'NestJS + Fastify',
+          why: 'Typed API surface aligned with this monorepo pattern.',
+          required: true,
+        },
+        {
+          name: 'Zod',
+          why: 'Shared schema validation between web and API.',
+          required: true,
+        },
+        {
+          name: 'PostgreSQL + Redis',
+          why: 'Durable artifacts and stream replay for local/production parity.',
+          required: false,
+        },
       ],
-      nonGoals: input.moderatorSynthesis.nonGoals,
-      userPersonas: input.moderatorSynthesis.targetUsers,
-      userJourneys: [
-        'User submits a raw idea and target audience.',
-        'System scans input and triages the draft.',
-        'User reviews metadata and selected agents.',
-        'System executes prompt-driven agents and produces artifacts.',
-      ],
-      functionalRequirements: [
-        'Submit idea draft.',
-        'Display Shield findings with highlighted spans.',
-        'Allow triage metadata edits.',
-        'Allow selected agent edits.',
-        'Generate Executive Summary, PRD, and Development Prompt.',
-      ],
-      nonFunctionalRequirements: [
-        'Validate all generated objects with shared schemas.',
-        'Record prompt version and model metadata for generated outputs.',
-      ],
-      mvpScope: input.moderatorSynthesis.mvpScope,
-      futureScope: [
-        'Temporal orchestration',
-        'Real provider adapters',
-        'SSE artifact streaming',
-      ],
-      securityConsiderations: [
-        'Treat user input as untrusted.',
-        'Keep Shield findings separate from general product reasoning.',
-      ],
-      successMetrics: [
-        'Draft run completion rate.',
-        'Artifact copy/export rate.',
-        'User approval rate after Human Review.',
+      aiChoices: [
+        {
+          name: 'OpenRouter / GPT-class chat model',
+          role: 'Primary planning and prompt generation',
+          why: 'Good structured JSON and long-form markdown generation for briefs.',
+        },
+        {
+          name: 'Cursor Agent / Composer',
+          role: 'Implementation tool for the master prompt and todos',
+          why: 'File-scoped coding with acceptance checks matches the todo list shape.',
+        },
       ],
       openQuestions: input.moderatorSynthesis.openQuestions,
-      screensOrViews: [
-        'Idea submission screen',
-        'Human review screen',
-        'Pipeline progress view',
-        'Artifact viewer with Development Prompt copy action',
-      ],
-      userStories: [
-        'As a founder, I want to submit a product idea so that I can get a structured plan.',
-        'As a builder, I want a detailed development prompt so that I can implement a web app in Cursor.',
-        'As a reviewer, I want agent gaps and additions so that I know what to improve in the idea.',
-      ],
-      acceptanceCriteria: [
-        'PRD includes screens, user stories, and acceptance criteria.',
-        'Development Prompt includes buildTodos and a copyPasteBrief.',
-        'Pipeline validates all artifacts against shared schemas.',
-      ],
     }
   }
 
-  private createFallbackDevelopmentPrompt(input: {
-    completedPrd: Prd
-    moderatorSynthesis: ModeratorSynthesis
-    targetTool: DevelopmentPromptTargetTool
-    toolSpecificGuidance: string[]
-  }): DevelopmentPrompt {
-    const buildTodos = [
-      {
-        title: 'Scaffold the web app shell',
-        details:
-          'Create the Vite + React + TypeScript app shell with routing and a primary layout for the product idea screens.',
-        acceptanceCheck: 'App boots locally and shows an empty home route.',
-        suggestedFiles: ['apps/web/src/App.tsx', 'apps/web/src/main.tsx'],
-      },
-      {
-        title: 'Model core entities',
-        details:
-          'Define TypeScript types/Zod schemas for the main entities described in the PRD data model.',
-        acceptanceCheck: 'Schemas parse fixture objects for the primary entities.',
-        suggestedFiles: ['packages/schemas/src'],
-      },
-      {
-        title: 'Implement primary screens',
-        details:
-          'Build the screens listed in screenMap with the functional requirements from the PRD.',
-        acceptanceCheck: 'Each screenOrViews item is reachable in the UI.',
-        suggestedFiles: ['apps/web/src'],
-      },
-      {
-        title: 'Wire API endpoints',
-        details:
-          'Implement the API requirements needed for the MVP journeys and validate responses with shared schemas.',
-        acceptanceCheck: 'Core endpoints return schema-valid JSON in local smoke checks.',
-        suggestedFiles: ['apps/api/src'],
-      },
-      {
-        title: 'Add acceptance tests',
-        details:
-          'Cover the happy-path user journey and schema validation gates listed in testingRequirements.',
-        acceptanceCheck: 'Targeted tests pass locally.',
-        suggestedFiles: ['apps/api/src', 'apps/web/src'],
-      },
-    ]
+  private createFallbackMasterPrompt(
+    input: {
+      approvedIdeaBrief: IdeaBrief
+      targetTool: DevelopmentPromptTargetTool
+    },
+    toolGuidance: string[],
+  ): MasterPrompt {
+    const tools = input.approvedIdeaBrief.toolsToUse
+      .map((tool) => `- ${tool.name}: ${tool.why}${tool.required ? ' (required)' : ''}`)
+      .join('\n')
+    const ais = input.approvedIdeaBrief.aiChoices
+      .map((ai) => `- ${ai.name} (${ai.role}): ${ai.why}`)
+      .join('\n')
 
     return {
+      title: 'Master build prompt',
       targetTool: input.targetTool,
-      productSummary: input.completedPrd.overview,
-      technicalStack: ['Vite', 'React', 'TypeScript', 'NestJS', 'Fastify', 'Zod'],
-      architectureOverview:
-        'Use a monorepo with web, api, and shared schema packages. Keep generation behind API services and route all model calls through the LLM gateway.',
-      requiredModules: [
-        'Idea submission UI',
-        'Human Review Screen',
-        'Runs API',
-        'Prompt-driven agent pipeline',
-        'Artifact viewer',
+      markdownBody: [
+        '# Product brief',
+        '',
+        input.approvedIdeaBrief.summaryForUser,
+        '',
+        '## Expanded idea',
+        '',
+        input.approvedIdeaBrief.expandedIdea,
+        '',
+        '## Analysis',
+        '',
+        input.approvedIdeaBrief.analysis,
+        '',
+        '## Accept',
+        '',
+        ...input.approvedIdeaBrief.acceptRecommendations.map((item) => `- ${item}`),
+        '',
+        '## Apply / change',
+        '',
+        ...input.approvedIdeaBrief.applyRecommendations.map((item) => `- ${item}`),
+        '',
+        '## Tools',
+        '',
+        tools,
+        '',
+        '## AI choices',
+        '',
+        ais,
+        '',
+        '## Implementation principles',
+        '',
+        '- Build a web application in small verified steps.',
+        '- Keep schemas shared and validate all API payloads.',
+        '- Prefer local-first MVP over premature orchestration.',
+        '',
+        '## Tool guidance',
+        '',
+        ...toolGuidance.map((item) => `- ${item}`),
+      ].join('\n'),
+    }
+  }
+
+  private createFallbackTodoList(_input: {
+    approvedIdeaBrief: IdeaBrief
+  }): TodoList {
+    return {
+      overview:
+        'Step-by-step build order derived from the approved idea brief. Complete acceptance checks before moving on.',
+      items: [
+        {
+          step: 1,
+          title: 'Scaffold the web app shell',
+          details:
+            'Create Vite + React + TypeScript app with routing and a primary layout covering the main screens from the idea.',
+          acceptanceCheck: 'App boots locally and shows an empty home route.',
+          suggestedFiles: ['apps/web/src/App.tsx', 'apps/web/src/main.tsx'],
+        },
+        {
+          step: 2,
+          title: 'Define shared schemas',
+          details:
+            'Encode core entities from the approved idea as Zod schemas shared by web and API.',
+          acceptanceCheck: 'Fixture objects parse against the new schemas.',
+          suggestedFiles: ['packages/schemas/src'],
+        },
+        {
+          step: 3,
+          title: 'Implement primary screens',
+          details:
+            'Build the must-have UI flows from acceptRecommendations / applyRecommendations.',
+          acceptanceCheck: 'Primary user journey screens are reachable.',
+          suggestedFiles: ['apps/web/src'],
+        },
+        {
+          step: 4,
+          title: 'Wire MVP APIs',
+          details: 'Implement API endpoints required by the MVP journey with schema validation.',
+          acceptanceCheck: 'Happy-path endpoints return schema-valid JSON.',
+          suggestedFiles: ['apps/api/src'],
+        },
+        {
+          step: 5,
+          title: 'Add verification gates',
+          details: 'Add tests covering the acceptance checks from earlier steps.',
+          acceptanceCheck: 'Targeted tests pass locally.',
+          suggestedFiles: ['apps/api/src', 'apps/web/src'],
+        },
       ],
-      dataModel: [
-        'DraftRun',
-        'AgentExecutionResult',
-        'ModeratorSynthesis',
-        'Artifact',
-      ],
-      apiRequirements: [
-        'POST /api/runs/draft',
-        'POST /api/runs/mock-pipeline',
-        'GET /api/runs/capabilities',
-      ],
-      uiRequirements: [
-        'Show agent step statuses.',
-        'Render generated artifacts after execution.',
-        'Keep Shield warnings compact and contextual.',
-        'Expose copy action for Development Prompt copyPasteBrief.',
-      ],
-      securityConstraints: input.completedPrd.securityConsiderations,
-      testingRequirements: [
-        'Validate prompt-driven pipeline response schema.',
-        'Test Shield detection and agent routing.',
-        'Run build, lint, typecheck, and tests before committing.',
-      ],
-      implementationOrder: [
-        ...input.completedPrd.functionalRequirements.slice(0, 5),
-        'Verify generated artifacts with schema tests and runtime checks.',
-      ],
-      outOfScope: input.completedPrd.nonGoals,
-      toolSpecificGuidance: input.toolSpecificGuidance,
-      buildTodos,
-      screenMap:
-        input.completedPrd.screensOrViews.length > 0
-          ? input.completedPrd.screensOrViews
-          : [
-              'Idea submission',
-              'Human review',
-              'Pipeline progress',
-              'Artifact viewer',
-            ],
-      copyPasteBrief: [
-        `Build the product described in this PRD overview: ${input.completedPrd.overview}`,
-        `Target users: ${input.completedPrd.userPersonas.join(', ')}`,
-        `MVP scope: ${input.completedPrd.mvpScope.join('; ')}`,
-        `Screens: ${input.completedPrd.screensOrViews.join('; ') || 'Define from MVP scope'}`,
-        'Implement using Vite, React, TypeScript, NestJS, Fastify, and Zod.',
-        'Work through buildTodos one by one with acceptance checks after each todo.',
-        `Additions from moderator: ${(input.moderatorSynthesis.additionsToIdea ?? []).join('; ')}`,
-      ].join('\n\n'),
     }
   }
 }

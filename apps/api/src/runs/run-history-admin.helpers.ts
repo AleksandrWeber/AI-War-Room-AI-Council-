@@ -25,13 +25,14 @@ export function buildRunHistoryAdminStats(
   return {
     totalArtifacts: artifacts.length,
     uniqueRunCount: uniqueRunIds.size,
-    executiveSummaryCount: artifacts.filter(
-      (artifact) => artifact.artifactType === 'executive_summary',
+    ideaBriefCount: artifacts.filter(
+      (artifact) => artifact.artifactType === 'idea_brief',
     ).length,
-    prdCount: artifacts.filter((artifact) => artifact.artifactType === 'prd')
-      .length,
-    developmentPromptCount: artifacts.filter(
-      (artifact) => artifact.artifactType === 'development_prompt',
+    masterPromptCount: artifacts.filter(
+      (artifact) => artifact.artifactType === 'master_prompt',
+    ).length,
+    todoListCount: artifacts.filter(
+      (artifact) => artifact.artifactType === 'todo_list',
     ).length,
   }
 }

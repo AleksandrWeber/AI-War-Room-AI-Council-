@@ -6,7 +6,11 @@ import {
   utcDateStringSchema,
 } from './common.js'
 import { agentExecutionResultSchema } from './agent.js'
-import { artifactSchema, developmentPromptTargetToolSchema } from './artifact.js'
+import {
+  artifactSchema,
+  developmentPromptTargetToolSchema,
+  ideaBriefSchema,
+} from './artifact.js'
 import { ideaSubmissionSchema } from './idea.js'
 import { moderatorSynthesisSchema } from './moderator.js'
 import { shieldScanResultSchema } from './shield.js'
@@ -58,12 +62,40 @@ export const mockPipelineRequestSchema = z.object({
 export const mockPipelineResultSchema = z.object({
   runId: nonEmptyStringSchema,
   workspaceId: nonEmptyStringSchema,
-  status: z.literal('completed'),
+  status: z.enum(['awaiting_idea_approval', 'idea_approved', 'completed']),
   steps: z.array(runStepStatusSchema),
   agentOutputs: z.array(agentExecutionResultSchema).min(1),
   moderatorSynthesis: moderatorSynthesisSchema,
-  artifacts: z.array(artifactSchema).length(3),
+  artifacts: z.array(artifactSchema).min(1).max(3),
   completedAt: utcDateStringSchema,
+})
+
+export const approveIdeaRequestSchema = z.object({
+  draftRun: draftRunSchema,
+  approvedTriage: triageResultSchema,
+  selectedAgents: z.array(agentRoleSchema).min(3).max(7),
+  previousResult: mockPipelineResultSchema,
+  approvedIdeaBrief: ideaBriefSchema,
+  developmentPromptTargetTool: developmentPromptTargetToolSchema.default('cursor'),
+})
+
+/** Generate master prompt after the idea is approved. */
+export const generateMasterPromptRequestSchema = approveIdeaRequestSchema
+
+/** Generate todo list after master prompt exists (todo is derived from the prompt). */
+export const generateTodoListRequestSchema = approveIdeaRequestSchema
+
+export const explainIdeaRequestSchema = z.object({
+  workspaceId: nonEmptyStringSchema,
+  runId: nonEmptyStringSchema,
+  ideaBrief: ideaBriefSchema,
+  question: nonEmptyStringSchema.max(4_000),
+})
+
+export const explainIdeaResponseSchema = z.object({
+  explanation: nonEmptyStringSchema.max(12_000),
+  modelProvider: nonEmptyStringSchema,
+  modelName: nonEmptyStringSchema,
 })
 
 export type CreateRunRequest = z.infer<typeof createRunRequestSchema>
@@ -72,6 +104,13 @@ export type DraftRun = z.infer<typeof draftRunSchema>
 export type RunStatusResponse = z.infer<typeof runStatusResponseSchema>
 export type MockPipelineRequest = z.infer<typeof mockPipelineRequestSchema>
 export type MockPipelineResult = z.infer<typeof mockPipelineResultSchema>
+export type ApproveIdeaRequest = z.infer<typeof approveIdeaRequestSchema>
+export type GenerateMasterPromptRequest = z.infer<
+  typeof generateMasterPromptRequestSchema
+>
+export type GenerateTodoListRequest = z.infer<typeof generateTodoListRequestSchema>
+export type ExplainIdeaRequest = z.infer<typeof explainIdeaRequestSchema>
+export type ExplainIdeaResponse = z.infer<typeof explainIdeaResponseSchema>
 
 export const approvedRunRuntimePathSchema = z.enum(['temporal', 'direct'])
 export type ApprovedRunRuntimePath = z.infer<typeof approvedRunRuntimePathSchema>

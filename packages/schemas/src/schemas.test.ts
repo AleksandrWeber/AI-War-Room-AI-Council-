@@ -109,15 +109,15 @@ describe('pipeline schemas', () => {
     expect(result.success).toBe(true)
   })
 
-  it('validates an executive summary artifact', () => {
+  it('validates an idea brief artifact', () => {
     const result = artifactSchema.safeParse({
       metadata: {
         artifactId: 'artifact_1',
         runId: 'run_1',
         workspaceId: 'workspace_1',
-        artifactType: 'executive_summary',
+        artifactType: 'idea_brief',
         artifactVersion: 'v1',
-        promptVersion: 'executive_summary/v1',
+        promptVersion: 'artifacts/idea_brief/v1',
         modelProvider: 'mock',
         modelName: 'mock-model',
         tokenUsage: {
@@ -130,15 +130,28 @@ describe('pipeline schemas', () => {
         createdAt: now,
       },
       artifact: {
-        artifactType: 'executive_summary',
+        artifactType: 'idea_brief',
         content: {
-          productIdea: 'AI planning engine.',
-          targetUsers: ['Founders'],
-          coreValueProposition: 'Turn rough ideas into build-ready specs.',
-          mainDifferentiator: 'Structured pipeline instead of chat.',
-          mvpRecommendation: 'Build the local core pipeline first.',
-          topRisks: ['Scope creep'],
-          recommendation: 'go',
+          summaryForUser: 'Expanded idea for discussion.',
+          expandedIdea: 'Build an AI planning engine.',
+          analysis: 'Keep the council pipeline; clarify tools before build.',
+          acceptRecommendations: ['Keep schema-validated agent outputs'],
+          applyRecommendations: ['Add screen inventory before coding'],
+          toolsToUse: [
+            {
+              name: 'Vite + React',
+              why: 'Fast local UI development',
+              required: true,
+            },
+          ],
+          aiChoices: [
+            {
+              name: 'Cursor',
+              role: 'Implementation',
+              why: 'File-scoped coding against the master prompt',
+            },
+          ],
+          openQuestions: ['Confirm auth provider'],
         },
       },
     })

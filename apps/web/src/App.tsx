@@ -1323,7 +1323,7 @@ type ArtifactResult = {
   metadata: {
     artifactId: string
     runId: string
-    artifactType: 'executive_summary' | 'prd' | 'development_prompt'
+    artifactType: 'idea_brief' | 'master_prompt' | 'todo_list'
     artifactVersion: string
     promptVersion: string
     modelProvider: string
@@ -1337,7 +1337,7 @@ type ArtifactResult = {
     createdAt: string
   }
   artifact: {
-    artifactType: 'executive_summary' | 'prd' | 'development_prompt'
+    artifactType: 'idea_brief' | 'master_prompt' | 'todo_list'
     content: Record<string, unknown>
   }
 }
@@ -1356,6 +1356,27 @@ type ArtifactHistoryItem = {
 type ArtifactHistoryResponse = {
   workspaceId: string
   artifacts: ArtifactHistoryItem[]
+}
+
+type IdeaBriefContent = {
+  summaryForUser: string
+  expandedIdea: string
+  analysis: string
+  acceptRecommendations: string[]
+  applyRecommendations: string[]
+  toolsToUse: Array<{ name: string; why: string; required?: boolean }>
+  aiChoices: Array<{ name: string; role: string; why: string }>
+  openQuestions?: string[]
+}
+
+type MockPipelineResult = {
+  status: 'awaiting_idea_approval' | 'idea_approved' | 'completed'
+  steps: PipelineStep[]
+  agentOutputs: AgentExecution[]
+  artifacts: ArtifactResult[]
+  runId?: string
+  workspaceId?: string
+  moderatorSynthesis?: Record<string, unknown>
 }
 
 type ProviderCredential = {
@@ -1395,13 +1416,6 @@ type ProviderCredentialForm = {
   apiKey: string
 }
 
-type MockPipelineResult = {
-  status: 'completed'
-  steps: PipelineStep[]
-  agentOutputs: AgentExecution[]
-  artifacts: ArtifactResult[]
-}
-
 type TemporalRunStatusResponse = {
   runId: string
   workspaceId: string
@@ -1431,8 +1445,9 @@ const pipelineSteps = [
   'Human review',
   'Agent pool',
   'Moderator',
-  'PRD',
-  'Dev prompt',
+  'Idea brief',
+  'Master prompt',
+  'Todo list',
 ]
 
 const agentCards = [
@@ -1511,11 +1526,160 @@ function formatAgent(agent: string) {
 }
 
 function formatArtifactTitle(artifactType: ArtifactResult['metadata']['artifactType']) {
-  if (artifactType === 'prd') {
-    return 'PRD'
+  if (artifactType === 'idea_brief') {
+    return 'Idea'
+  }
+
+  if (artifactType === 'master_prompt') {
+    return 'Master prompt'
+  }
+
+  if (artifactType === 'todo_list') {
+    return 'Todo list'
   }
 
   return formatAgent(artifactType)
+}
+
+function parseIdeaBriefContent(
+  content: Record<string, unknown> | undefined,
+): IdeaBriefContent | null {
+  if (!content) {
+    return null
+  }
+
+  const summaryForUser = content.summaryForUser
+  const expandedIdea = content.expandedIdea
+  const analysis = content.analysis
+  const acceptRecommendations = content.acceptRecommendations
+  const applyRecommendations = content.applyRecommendations
+  const toolsToUse = content.toolsToUse
+  const aiChoices = content.aiChoices
+
+  if (
+    typeof summaryForUser !== 'string' ||
+    typeof expandedIdea !== 'string' ||
+    typeof analysis !== 'string' ||
+    !Array.isArray(acceptRecommendations) ||
+    !Array.isArray(applyRecommendations) ||
+    !Array.isArray(toolsToUse) ||
+    !Array.isArray(aiChoices)
+  ) {
+    return null
+  }
+
+  return {
+    summaryForUser,
+    expandedIdea,
+    analysis,
+    acceptRecommendations: acceptRecommendations.map(String),
+    applyRecommendations: applyRecommendations.map(String),
+    toolsToUse: toolsToUse.map((tool) => {
+      const item = tool as { name?: unknown; why?: unknown; required?: unknown }
+      return {
+        name: String(item.name ?? ''),
+        why: String(item.why ?? ''),
+        required: Boolean(item.required),
+      }
+    }),
+    aiChoices: aiChoices.map((choice) => {
+      const item = choice as { name?: unknown; role?: unknown; why?: unknown }
+      return {
+        name: String(item.name ?? ''),
+        role: String(item.role ?? ''),
+        why: String(item.why ?? ''),
+      }
+    }),
+    openQuestions: Array.isArray(content.openQuestions)
+      ? content.openQuestions.map(String)
+      : [],
+  }
+}
+
+function linesFromList(items: string[] | undefined) {
+  return (items ?? []).join('\n')
+}
+
+function listFromLines(value: string) {
+  return value
+    .split('\n')
+    .map((line) => line.trim())
+    .filter(Boolean)
+}
+
+function downloadTextFile(filename: string, content: string) {
+  const blob = new Blob([content], { type: 'text/markdown;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const anchor = document.createElement('a')
+  anchor.href = url
+  anchor.download = filename
+  anchor.click()
+  URL.revokeObjectURL(url)
+}
+
+function formatTodoListMarkdown(content: Record<string, unknown>) {
+  const overview = String(content.overview ?? '')
+  const items = Array.isArray(content.items) ? content.items : []
+  const lines = ['# Todo list', '', overview, '']
+
+  for (const item of items) {
+    const entry = item as {
+      step?: number
+      title?: string
+      details?: string
+      acceptanceCheck?: string
+      suggestedFiles?: string[]
+    }
+    lines.push(`## ${entry.step ?? '?'}. ${entry.title ?? 'Step'}`)
+    lines.push('')
+    lines.push(String(entry.details ?? ''))
+    lines.push('')
+    lines.push(`Acceptance: ${entry.acceptanceCheck ?? ''}`)
+    if (Array.isArray(entry.suggestedFiles) && entry.suggestedFiles.length > 0) {
+      lines.push('')
+      lines.push('Files:')
+      for (const file of entry.suggestedFiles) {
+        lines.push(`- ${file}`)
+      }
+    }
+    lines.push('')
+  }
+
+  return lines.join('\n').trim() + '\n'
+}
+
+function formatApprovedIdeaMarkdown(idea: IdeaBriefContent) {
+  return [
+    '# Approved idea',
+    '',
+    idea.summaryForUser,
+    '',
+    '## Expanded idea',
+    '',
+    idea.expandedIdea,
+    '',
+    '## Analysis',
+    '',
+    idea.analysis,
+    '',
+    '## Accept',
+    ...idea.acceptRecommendations.map((item) => `- ${item}`),
+    '',
+    '## Apply / change',
+    ...idea.applyRecommendations.map((item) => `- ${item}`),
+    '',
+    '## Tools',
+    ...idea.toolsToUse.map(
+      (tool) =>
+        `- ${tool.name}${tool.required ? ' (required)' : ''}: ${tool.why}`,
+    ),
+    '',
+    '## AI choices',
+    ...idea.aiChoices.map(
+      (choice) => `- ${choice.name} — ${choice.role}: ${choice.why}`,
+    ),
+    '',
+  ].join('\n')
 }
 
 function getSeverityLabel(severity: string) {
@@ -6058,8 +6222,44 @@ function App() {
   >('idle')
   const [activeFindingId, setActiveFindingId] = useState<string | null>(null)
   const [activeArtifactType, setActiveArtifactType] =
-    useState<ArtifactResult['metadata']['artifactType']>('executive_summary')
+    useState<ArtifactResult['metadata']['artifactType']>('idea_brief')
+  const [ideaDraft, setIdeaDraft] = useState<IdeaBriefContent | null>(null)
+  const [ideaQuestion, setIdeaQuestion] = useState('')
+  const [ideaDiscussion, setIdeaDiscussion] = useState<
+    Array<{
+      id: string
+      role: 'you' | 'moderator'
+      text: string
+      at: string
+    }>
+  >([])
+  const [ideaExplainState, setIdeaExplainState] = useState<
+    'idle' | 'loading' | 'error'
+  >('idle')
+  const [ideaExplainError, setIdeaExplainError] = useState<string | null>(null)
+  const [ideaApprovalState, setIdeaApprovalState] = useState<
+    'idle' | 'running' | 'error'
+  >('idle')
+  const [ideaApprovalError, setIdeaApprovalError] = useState<string | null>(null)
+  const [approvedIdea, setApprovedIdea] = useState<IdeaBriefContent | null>(null)
+  const [artifactBuildState, setArtifactBuildState] = useState<
+    'idle' | 'prompt' | 'todo' | 'error'
+  >('idle')
+  const [artifactBuildError, setArtifactBuildError] = useState<string | null>(null)
   const [rolloutControlsEnabled, setRolloutControlsEnabled] = useState(false)
+  const [utilityPanel, setUtilityPanel] = useState<
+    null | 'workspace' | 'providers' | 'billing' | 'history' | 'about'
+  >(null)
+  const [strategicGoalsText, setStrategicGoalsText] = useState(
+    'Create build-ready planning artifacts',
+  )
+  const [technicalPreferencesText, setTechnicalPreferencesText] = useState(
+    'TypeScript\nVite\nNestJS',
+  )
+  const [constraintsText, setConstraintsText] = useState(
+    'MVP first\nNo chat loops',
+  )
+  const sessionOpen = Boolean(draftRun && reviewDraft)
 
   useEffect(() => {
     if (!useTemporalWorkflowRuntime) {
@@ -6856,6 +7056,35 @@ function App() {
   }, [pipelineResult])
 
   useEffect(() => {
+    if (!pipelineResult) {
+      return
+    }
+
+    const ideaArtifact = pipelineResult.artifacts.find(
+      (artifact) => artifact.artifact.artifactType === 'idea_brief',
+    )
+    const parsed = parseIdeaBriefContent(ideaArtifact?.artifact.content)
+
+    if (parsed) {
+      setIdeaDraft(parsed)
+    }
+
+    if (pipelineResult.status === 'awaiting_idea_approval') {
+      setActiveArtifactType('idea_brief')
+      setApprovedIdea(null)
+    }
+
+    if (
+      pipelineResult.status === 'idea_approved' ||
+      pipelineResult.status === 'completed'
+    ) {
+      if (parsed) {
+        setApprovedIdea(parsed)
+      }
+    }
+  }, [pipelineResult])
+
+  useEffect(() => {
     setActiveFindingId(draftRun?.shieldScan.findings[0]?.findingId ?? null)
   }, [draftRun])
 
@@ -7105,9 +7334,9 @@ function App() {
           idea: {
             rawIdea,
             targetAudience,
-            strategicGoals: ['Create build-ready planning artifacts'],
-            technicalPreferences: ['TypeScript', 'Vite', 'NestJS'],
-            constraints: ['MVP first', 'No chat loops'],
+            strategicGoals: listFromLines(strategicGoalsText),
+            technicalPreferences: listFromLines(technicalPreferencesText),
+            constraints: listFromLines(constraintsText),
             references: [],
           },
         }),
@@ -7154,11 +7383,18 @@ function App() {
       setStreamEvents([])
       setStreamedArtifacts([])
       setPipelineState('idle')
+      setApprovedIdea(null)
+      setArtifactBuildError(null)
+      setArtifactBuildState('idle')
+      setIdeaDiscussion([])
+      setIdeaQuestion('')
+      setIdeaExplainError(null)
       setSubmitState('success')
+      setUtilityPanel(null)
       queueMicrotask(() => {
-        document.getElementById('human-review')?.scrollIntoView({
+        document.getElementById('session-pane')?.scrollIntoView({
           behavior: 'smooth',
-          block: 'start',
+          block: 'nearest',
         })
       })
     } catch (error) {
@@ -7259,6 +7495,8 @@ function App() {
       const result = (await response.json()) as MockPipelineResult
       setPipelineResult(result)
       setPipelineState('completed')
+      setIdeaDiscussion([])
+      setIdeaApprovalError(null)
     } catch (error) {
       setPipelineError(
         error instanceof Error
@@ -7268,6 +7506,295 @@ function App() {
     } finally {
       setRegeneratingAgentRole(null)
     }
+  }
+
+  async function handleExplainIdea() {
+    if (!draftRun || !ideaDraft || !ideaQuestion.trim()) {
+      return
+    }
+
+    const question = ideaQuestion.trim()
+    const askedAt = new Date().toISOString()
+    setIdeaExplainState('loading')
+    setIdeaExplainError(null)
+    setIdeaDiscussion((current) => [
+      ...current,
+      {
+        id: `you_${askedAt}`,
+        role: 'you',
+        text: question,
+        at: askedAt,
+      },
+    ])
+    setIdeaQuestion('')
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/runs/explain-idea`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...workspaceAuthHeaders,
+        },
+        body: JSON.stringify({
+          workspaceId: draftRun.workspaceId,
+          runId: draftRun.runId,
+          ideaBrief: ideaDraft,
+          question,
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`)
+      }
+
+      const result = (await response.json()) as {
+        explanation: string
+      }
+      const repliedAt = new Date().toISOString()
+      setIdeaDiscussion((current) => [
+        ...current,
+        {
+          id: `moderator_${repliedAt}`,
+          role: 'moderator',
+          text: result.explanation,
+          at: repliedAt,
+        },
+      ])
+      setIdeaExplainState('idle')
+    } catch (error) {
+      setIdeaExplainState('error')
+      setIdeaExplainError(
+        error instanceof Error
+          ? error.message
+          : 'Failed to get moderator explanation.',
+      )
+    }
+  }
+
+  async function handleApproveIdea() {
+    if (!draftRun || !reviewDraft || !pipelineResult || !ideaDraft) {
+      return
+    }
+
+    if (pipelineResult.status !== 'awaiting_idea_approval') {
+      return
+    }
+
+    setIdeaApprovalState('running')
+    setIdeaApprovalError(null)
+    setPipelineState('running')
+    setPipelineError(null)
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/runs/approve-idea/stream`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...workspaceAuthHeaders,
+        },
+        body: JSON.stringify({
+          draftRun,
+          approvedTriage: reviewDraft.triage,
+          selectedAgents: reviewDraft.selectedAgents,
+          previousResult: pipelineResult,
+          approvedIdeaBrief: ideaDraft,
+          developmentPromptTargetTool:
+            reviewDraft.developmentPromptTargetTool ?? 'cursor',
+        }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`)
+      }
+
+      await readSseStream(response, handlePipelineStreamEvent)
+      setApprovedIdea(ideaDraft)
+      setIdeaApprovalState('idle')
+      setActiveArtifactType('idea_brief')
+    } catch (error) {
+      setIdeaApprovalState('error')
+      setPipelineState('error')
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Failed to approve idea.'
+      setIdeaApprovalError(message)
+      setPipelineError(message)
+    }
+  }
+
+  function buildArtifactGenerationPayload(previousResult: MockPipelineResult) {
+    if (!draftRun || !reviewDraft || !approvedIdea) {
+      return null
+    }
+
+    return {
+      draftRun,
+      approvedTriage: reviewDraft.triage,
+      selectedAgents: reviewDraft.selectedAgents,
+      previousResult,
+      approvedIdeaBrief: approvedIdea,
+      developmentPromptTargetTool:
+        reviewDraft.developmentPromptTargetTool ?? 'cursor',
+    }
+  }
+
+  async function handleGenerateMasterPrompt() {
+    if (!pipelineResult || !approvedIdea) {
+      return
+    }
+
+    if (
+      pipelineResult.status !== 'idea_approved' &&
+      pipelineResult.status !== 'completed'
+    ) {
+      return
+    }
+
+    const payload = buildArtifactGenerationPayload(pipelineResult)
+    if (!payload) {
+      return
+    }
+
+    setArtifactBuildState('prompt')
+    setArtifactBuildError(null)
+    setPipelineState('running')
+    setPipelineError(null)
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/runs/generate-prompt/stream`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...workspaceAuthHeaders,
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`)
+      }
+
+      let completedResult: MockPipelineResult | null = null
+      await readSseStream(response, (event) => {
+        handlePipelineStreamEvent(event)
+        if (event.type === 'completed') {
+          completedResult = event.result
+        }
+      })
+      setArtifactBuildState('idle')
+      setActiveArtifactType('master_prompt')
+      const markdown = completedResult?.artifacts.find(
+        (item) => item.artifact.artifactType === 'master_prompt',
+      )?.artifact.content.markdownBody
+      if (typeof markdown === 'string') {
+        downloadTextFile('warroom-master-prompt.md', markdown)
+      }
+    } catch (error) {
+      setArtifactBuildState('error')
+      setPipelineState('error')
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Failed to generate master prompt.'
+      setArtifactBuildError(message)
+      setPipelineError(message)
+    }
+  }
+
+  async function handleGenerateTodoList() {
+    if (!pipelineResult || !approvedIdea) {
+      return
+    }
+
+    const hasPrompt = pipelineResult.artifacts.some(
+      (artifact) => artifact.artifact.artifactType === 'master_prompt',
+    )
+    if (!hasPrompt) {
+      setArtifactBuildError('Create the master prompt first.')
+      setArtifactBuildState('error')
+      return
+    }
+
+    const payload = buildArtifactGenerationPayload(pipelineResult)
+    if (!payload) {
+      return
+    }
+
+    setArtifactBuildState('todo')
+    setArtifactBuildError(null)
+    setPipelineState('running')
+    setPipelineError(null)
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/runs/generate-todo/stream`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...workspaceAuthHeaders,
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`)
+      }
+
+      let completedResult: MockPipelineResult | null = null
+      await readSseStream(response, (event) => {
+        handlePipelineStreamEvent(event)
+        if (event.type === 'completed') {
+          completedResult = event.result
+        }
+      })
+      setArtifactBuildState('idle')
+      setActiveArtifactType('todo_list')
+      const todoArtifact = completedResult?.artifacts.find(
+        (item) => item.artifact.artifactType === 'todo_list',
+      )
+      if (todoArtifact) {
+        downloadTextFile(
+          'warroom-todo-list.md',
+          formatTodoListMarkdown(todoArtifact.artifact.content),
+        )
+      }
+    } catch (error) {
+      setArtifactBuildState('error')
+      setPipelineState('error')
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Failed to generate todo list.'
+      setArtifactBuildError(message)
+      setPipelineError(message)
+    }
+  }
+
+  function handleDownloadMasterPrompt() {
+    const artifact = pipelineResult?.artifacts.find(
+      (item) => item.artifact.artifactType === 'master_prompt',
+    )
+    const markdown =
+      typeof artifact?.artifact.content.markdownBody === 'string'
+        ? artifact.artifact.content.markdownBody
+        : null
+    if (!markdown) {
+      return
+    }
+    downloadTextFile('warroom-master-prompt.md', markdown)
+  }
+
+  function handleDownloadTodoList() {
+    const artifact = pipelineResult?.artifacts.find(
+      (item) => item.artifact.artifactType === 'todo_list',
+    )
+    if (!artifact) {
+      return
+    }
+    downloadTextFile(
+      'warroom-todo-list.md',
+      formatTodoListMarkdown(artifact.artifact.content),
+    )
   }
 
   async function handleExecuteApprovedRun() {
@@ -7386,6 +7913,11 @@ function App() {
       lastStreamEventIdRef.current = null
       setLastStreamEventId(null)
       setActiveTemporalWorkflow(null)
+      setIdeaDraft(null)
+      setIdeaDiscussion([])
+      setIdeaQuestion('')
+      setIdeaApprovalError(null)
+      setIdeaExplainError(null)
     }
 
     try {
@@ -29914,6 +30446,9 @@ function App() {
     if (event.type === 'completed') {
       setPipelineResult(event.result)
       setPipelineState('completed')
+      if (event.result.status === 'awaiting_idea_approval') {
+        setActiveArtifactType('idea_brief')
+      }
     }
 
     if (event.type === 'workflow_status') {
@@ -29997,67 +30532,1434 @@ function App() {
     })
 
   return (
-    <main className="app-shell">
-      <section className="hero-section">
-        <div className="hero-copy">
-          <p className="eyebrow">AI Council / AI War Room</p>
-          <h1>Turn a raw idea into build-ready product artifacts.</h1>
-          <p className="hero-text">
-            A structured planning engine that runs isolated AI specialists,
-            validates their output, and produces an executive summary, PRD, and
-            development prompt without becoming another chat app.
-          </p>
-          <div className="hero-actions">
-            <a href="#idea" className="primary-action">
-              Draft first idea
-            </a>
-            <a href="#pipeline" className="secondary-action">
-              View pipeline
-            </a>
-          </div>
-        </div>
+    <div className="app-frame">
+      <header className="app-header">
+        <a className="app-brand" href="#idea" aria-label="WarRoom home">
+          <span className="app-brand__mark" aria-hidden="true" />
+          <span className="app-brand__name">WarRoom</span>
+        </a>
 
-        <div className="war-room-card" aria-label="Run preview">
-          <div className="card-header">
-            <span>Standard run</span>
-            <strong>
-              {pipelineState === 'running'
-                ? `Running ${pipelineElapsedLabel}`
-                : 'Live models · often 5–15 min'}
-            </strong>
-          </div>
-          <form className="idea-form" id="idea" onSubmit={handleCreateDraftRun}>
-            <label htmlFor="rawIdea">Raw idea</label>
-            <textarea
-              id="rawIdea"
-              value={rawIdea}
-              onChange={(event) => setRawIdea(event.target.value)}
-              rows={7}
-            />
-            <label htmlFor="targetAudience">Target audience</label>
-            <input
-              id="targetAudience"
-              value={targetAudience}
-              onChange={(event) => setTargetAudience(event.target.value)}
-            />
-            <button type="submit" disabled={submitState === 'submitting'}>
-              {submitState === 'submitting' ? 'Creating draft...' : 'Create draft run'}
+        <nav className="app-menu" aria-label="Workspace utilities">
+          {(
+            [
+              ['workspace', 'Workspace'],
+              ['providers', 'API keys'],
+              ['billing', 'Plans & billing'],
+              ['history', 'Artifact history'],
+              ['about', 'About'],
+            ] as const
+          ).map(([id, label]) => (
+            <button
+              key={id}
+              type="button"
+              className={
+                utilityPanel === id
+                  ? 'app-menu__item app-menu__item--active'
+                  : 'app-menu__item'
+              }
+              aria-pressed={utilityPanel === id}
+              onClick={() =>
+                setUtilityPanel((current) => {
+                  const next = current === id ? null : id
+                  if (next === 'history') {
+                    setArtifactHistoryOpen(true)
+                  }
+                  return next
+                })
+              }
+            >
+              {label}
             </button>
-            {submitError ? <p className="form-error">{submitError}</p> : null}
-          </form>
-          <div className="shield-status">
-            <span className="status-dot"></span>
-            Shield:{' '}
-            {draftRun
-              ? `${draftRun.shieldScan.status} (${draftRun.shieldScan.findings.length} findings)`
-              : 'clear by default, visible only when risk is meaningful.'}
+          ))}
+        </nav>
+
+        <div className="app-header__meta" data-testid="active-workspace-id">
+          <span className={`api-chip api-chip--${apiHealth}`}>API {apiHealth}</span>
+          {myWorkspaces.length > 0 ? (
+            <label className="header-workspace">
+              <span className="visually-hidden">Active workspace</span>
+              <select
+                data-testid="workspace-picker"
+                value={activeWorkspaceId}
+                onChange={(event) => {
+                  const nextWorkspaceId = event.target.value
+                  void (async () => {
+                    const synced = await applyActiveWorkspace(nextWorkspaceId)
+                    if (!synced.ok) {
+                      return
+                    }
+                    setWorkspaceRecoveryTip(null)
+                    setLatestInviteUrl(null)
+                    setInviteUrlsById({})
+                    setWorkspaceInvites([])
+                  })()
+                }}
+              >
+                {myWorkspaces.map((workspace) => (
+                  <option
+                    key={workspace.workspaceId}
+                    value={workspace.workspaceId}
+                  >
+                    {workspace.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+          ) : (
+            <span className="header-workspace-label">
+              {activeWorkspaceId}
+            </span>
+          )}
+        </div>
+      </header>
+
+      <main
+        className={
+          sessionOpen ? 'app-shell app-shell--split' : 'app-shell'
+        }
+      >
+        <section
+          className="idea-pane"
+          aria-label="Idea intake"
+        >
+          <div className="idea-pane__intro">
+            <h1>Turn a raw idea into build-ready product artifacts.</h1>
+            <p className="hero-text">
+              Run isolated AI specialists, discuss the expanded idea, then
+              lock a master prompt and step-by-step todo list — without another
+              endless chat loop.
+            </p>
           </div>
-          <div className={`api-status api-status--${apiHealth}`}>
-            API status: {apiHealth}
+
+          {approvedIdea ? (
+            <div
+              className="idea-form idea-form--stack idea-form--approved"
+              data-testid="approved-idea-panel"
+            >
+              <div className="idea-label">
+                <span>Approved full idea</span>
+                <p className="runtime-note">
+                  The expanded idea moved here after your approval. Next, create
+                  the coding prompt, then the todo list from that prompt.
+                </p>
+              </div>
+              <label className="field-label">
+                Summary
+                <textarea rows={3} value={approvedIdea.summaryForUser} readOnly />
+              </label>
+              <label className="field-label">
+                Expanded idea
+                <textarea rows={10} value={approvedIdea.expandedIdea} readOnly />
+              </label>
+              <label className="field-label">
+                Analysis
+                <textarea rows={5} value={approvedIdea.analysis} readOnly />
+              </label>
+              <details className="approved-idea-details">
+                <summary>Accept / apply / tools / AI</summary>
+                <pre className="approved-idea-pre">
+                  {formatApprovedIdeaMarkdown(approvedIdea)}
+                </pre>
+              </details>
+            </div>
+          ) : (
+          <form className="idea-form idea-form--stack" id="idea" onSubmit={handleCreateDraftRun}>
+            <label className="idea-label" htmlFor="rawIdea">
+              Your idea
+              <textarea
+                id="rawIdea"
+                value={rawIdea}
+                onChange={(event) => setRawIdea(event.target.value)}
+                rows={sessionOpen ? 8 : 10}
+                placeholder="Describe the product you want to build…"
+                readOnly={Boolean(pipelineResult?.status === 'awaiting_idea_approval')}
+              />
+            </label>
+
+            <div className="idea-fields">
+              <label htmlFor="targetAudience">
+                Target audience
+                <input
+                  id="targetAudience"
+                  value={targetAudience}
+                  onChange={(event) => setTargetAudience(event.target.value)}
+                  readOnly={Boolean(pipelineResult?.status === 'awaiting_idea_approval')}
+                />
+              </label>
+              <label htmlFor="strategicGoals">
+                Strategic goals
+                <textarea
+                  id="strategicGoals"
+                  rows={3}
+                  value={strategicGoalsText}
+                  onChange={(event) => setStrategicGoalsText(event.target.value)}
+                  readOnly={Boolean(pipelineResult?.status === 'awaiting_idea_approval')}
+                />
+              </label>
+              <label htmlFor="technicalPreferences">
+                Technical preferences
+                <textarea
+                  id="technicalPreferences"
+                  rows={3}
+                  value={technicalPreferencesText}
+                  onChange={(event) =>
+                    setTechnicalPreferencesText(event.target.value)
+                  }
+                  readOnly={Boolean(pipelineResult?.status === 'awaiting_idea_approval')}
+                />
+              </label>
+              <label htmlFor="constraints">
+                Constraints
+                <textarea
+                  id="constraints"
+                  rows={3}
+                  value={constraintsText}
+                  onChange={(event) => setConstraintsText(event.target.value)}
+                  readOnly={Boolean(pipelineResult?.status === 'awaiting_idea_approval')}
+                />
+              </label>
+            </div>
+
+            <div className="idea-form__footer">
+              <button
+                type="submit"
+                className="start-button"
+                disabled={
+                  submitState === 'submitting' ||
+                  !rawIdea.trim() ||
+                  Boolean(pipelineResult?.status === 'awaiting_idea_approval')
+                }
+              >
+                {submitState === 'submitting' ? 'Starting…' : 'Start'}
+              </button>
+              <div className="idea-status-row">
+                <span className="shield-pill">
+                  Shield:{' '}
+                  {draftRun
+                    ? `${draftRun.shieldScan.status} (${draftRun.shieldScan.findings.length})`
+                    : 'quiet until risk appears'}
+                </span>
+                {pipelineResult?.status === 'awaiting_idea_approval' ? (
+                  <span className="shield-pill">
+                    Waiting for full idea approval on the right →
+                  </span>
+                ) : null}
+              </div>
+            </div>
+            {submitError ? <p className="form-error">{submitError}</p> : null}
+            {apiHealth === 'offline' ? (
+              <p className="local-setup-tip">
+                Local API is offline. Run <code>npm run doctor</code>, then{' '}
+                <code>npm run infra:up</code>, <code>npm run db:migrate</code>, and{' '}
+                <code>npm run dev:api</code>.
+              </p>
+            ) : null}
+          </form>
+          )}
+
+          {approvedIdea ? (
+            <div className="idea-build-actions" data-testid="idea-build-actions">
+              <button
+                type="button"
+                className="start-button"
+                data-testid="generate-prompt-button"
+                disabled={artifactBuildState !== 'idle' || pipelineState === 'running'}
+                onClick={() => void handleGenerateMasterPrompt()}
+              >
+                {artifactBuildState === 'prompt'
+                  ? 'Creating prompt…'
+                  : 'Створити промпт для написання коду'}
+              </button>
+              <button
+                type="button"
+                className="secondary-button"
+                data-testid="generate-todo-button"
+                disabled={
+                  artifactBuildState !== 'idle' ||
+                  pipelineState === 'running' ||
+                  !pipelineResult?.artifacts.some(
+                    (artifact) => artifact.artifact.artifactType === 'master_prompt',
+                  )
+                }
+                onClick={() => void handleGenerateTodoList()}
+              >
+                {artifactBuildState === 'todo'
+                  ? 'Creating todo…'
+                  : 'Створити todo list'}
+              </button>
+              {pipelineResult?.artifacts.some(
+                (artifact) => artifact.artifact.artifactType === 'master_prompt',
+              ) ? (
+                <button
+                  type="button"
+                  className="secondary-button"
+                  data-testid="download-prompt-button"
+                  onClick={handleDownloadMasterPrompt}
+                >
+                  Download prompt (.md)
+                </button>
+              ) : null}
+              {pipelineResult?.artifacts.some(
+                (artifact) => artifact.artifact.artifactType === 'todo_list',
+              ) ? (
+                <button
+                  type="button"
+                  className="secondary-button"
+                  data-testid="download-todo-button"
+                  onClick={handleDownloadTodoList}
+                >
+                  Download todo (.md)
+                </button>
+              ) : null}
+              {artifactBuildError ? (
+                <p className="form-error" role="alert">
+                  {artifactBuildError}
+                </p>
+              ) : null}
+            </div>
+          ) : null}
+        </section>
+
+        {sessionOpen ? (
+          <section
+            className="session-pane"
+            id="session-pane"
+            aria-label="Council session"
+          >
+            <div className="session-pane__scroll">
+      {draftRun && reviewDraft ? (
+        <CollapsiblePanel
+          className="review-panel"
+          id="human-review"
+          headingId="human-review-heading"
+          eyebrow="Human Review"
+          title="Approve the plan before execution."
+          description="Draft state is autosaved locally. Review Shield context, triage, selected agents, and estimated run cost before execution."
+          defaultOpen
+        >
+          <div className="review-grid">
+            <div className="review-card">
+              <h3 className="review-card-title">Input with Shield context</h3>
+              <div
+                className={`shield-warning-card shield-warning-card--${draftRun.shieldScan.status}`}
+                role={
+                  draftRun.shieldScan.status === 'blocked' ? 'alert' : 'status'
+                }
+              >
+                <strong>
+                  Shield {draftRun.shieldScan.status}:{' '}
+                  {getSeverityLabel(draftRun.shieldScan.maxSeverity)}
+                </strong>
+                <p>
+                  {visibleShieldFindings.length > 0
+                    ? `${visibleShieldFindings.length} visible finding(s) for current Shield display sensitivity (${settingsAdminSummary?.settings.shieldDisplaySensitivity ?? 'medium_and_up'}).`
+                    : draftRun.shieldScan.findings.length > 0
+                      ? 'Findings exist but are hidden by Shield display sensitivity.'
+                      : 'No meaningful findings. Shield stays quiet and the run can proceed.'}
+                </p>
+              </div>
+              <p className="review-idea">
+                {getHighlightedIdea(
+                  draftRun.idea.rawIdea,
+                  visibleShieldFindings,
+                  setActiveFindingId,
+                )}
+              </p>
+              {visibleShieldFindings.length > 0 ? (
+                <>
+                  <div
+                    className="finding-tabs"
+                    role="tablist"
+                    aria-label="Shield findings"
+                  >
+                    {visibleShieldFindings.map((finding) => {
+                      const selected =
+                        finding.findingId === activeFinding?.findingId
+                      return (
+                        <button
+                          className={
+                            selected
+                              ? 'finding-tab finding-tab--active'
+                              : 'finding-tab'
+                          }
+                          key={finding.findingId}
+                          type="button"
+                          role="tab"
+                          id={`finding-tab-${finding.findingId}`}
+                          aria-selected={selected}
+                          aria-controls={`finding-panel-${finding.findingId}`}
+                          tabIndex={selected ? 0 : -1}
+                          onClick={() => setActiveFindingId(finding.findingId)}
+                          onKeyDown={(event) => {
+                            const findings = visibleShieldFindings
+                            const index = findings.findIndex(
+                              (item) => item.findingId === finding.findingId,
+                            )
+                            if (event.key === 'ArrowRight') {
+                              event.preventDefault()
+                              const next =
+                                findings[(index + 1) % findings.length]
+                              setActiveFindingId(next.findingId)
+                              queueMicrotask(() =>
+                                document
+                                  .getElementById(
+                                    `finding-tab-${next.findingId}`,
+                                  )
+                                  ?.focus(),
+                              )
+                            }
+                            if (event.key === 'ArrowLeft') {
+                              event.preventDefault()
+                              const prev =
+                                findings[
+                                  (index - 1 + findings.length) % findings.length
+                                ]
+                              setActiveFindingId(prev.findingId)
+                              queueMicrotask(() =>
+                                document
+                                  .getElementById(
+                                    `finding-tab-${prev.findingId}`,
+                                  )
+                                  ?.focus(),
+                              )
+                            }
+                          }}
+                        >
+                          {finding.category}
+                        </button>
+                      )
+                    })}
+                  </div>
+                  {activeFinding ? (
+                    <div
+                      className="finding-detail"
+                      role="tabpanel"
+                      id={`finding-panel-${activeFinding.findingId}`}
+                      aria-labelledby={`finding-tab-${activeFinding.findingId}`}
+                      tabIndex={0}
+                    >
+                      <strong>
+                        {activeFinding.category} · {activeFinding.severity}
+                      </strong>
+                      <p>{activeFinding.explanation}</p>
+                      <small>
+                        Recommended action: {activeFinding.recommendedAction}
+                      </small>
+                      {activeFinding.severity === 'critical' ? (
+                        <p className="runtime-note">
+                          Critical findings stay on the override path and cannot
+                          be marked as false positives.
+                        </p>
+                      ) : reportedFalsePositiveFindingIds.includes(
+                          activeFinding.findingId,
+                        ) ? (
+                        <p className="clear-copy">
+                          False positive reported for this finding. It does not
+                          change scan status or unlock critical runs.
+                        </p>
+                      ) : (
+                        <div className="finding-detail">
+                          <label>
+                            Optional note
+                            <textarea
+                              rows={2}
+                              value={falsePositiveNote}
+                              onChange={(event) =>
+                                setFalsePositiveNote(event.target.value)
+                              }
+                              placeholder="Why this finding looks like a false positive."
+                            />
+                          </label>
+                          <button
+                            className="secondary-button"
+                            type="button"
+                            disabled={falsePositiveState === 'submitting'}
+                            onClick={handleMarkFindingAsFalsePositive}
+                          >
+                            {falsePositiveState === 'submitting'
+                              ? 'Reporting...'
+                              : 'Mark as false positive'}
+                          </button>
+                          {falsePositiveError ? (
+                            <p className="form-error">{falsePositiveError}</p>
+                          ) : null}
+                        </div>
+                      )}
+                    </div>
+                  ) : null}
+                </>
+              ) : (
+                <p className="clear-copy">No meaningful Shield findings.</p>
+              )}
+              {requiresCriticalShieldOverride ? (
+                <div className="finding-detail">
+                  <strong>Critical Shield override required</strong>
+                  <p>
+                    Owner or admin must record who/why before this run can
+                    execute. The override is audited.
+                  </p>
+                  {shieldOverride ? (
+                    <p className="clear-copy">
+                      Override recorded by {shieldOverride.actorUserId}:{' '}
+                      {shieldOverride.reason}
+                    </p>
+                  ) : (
+                    <>
+                      <label>
+                        Override reason
+                        <textarea
+                          rows={3}
+                          value={shieldOverrideReason}
+                          onChange={(event) =>
+                            setShieldOverrideReason(event.target.value)
+                          }
+                          placeholder="Explain why this critical finding is accepted for execution."
+                        />
+                      </label>
+                      <button
+                        className="secondary-button"
+                        type="button"
+                        disabled={
+                          shieldOverrideState === 'submitting' ||
+                          shieldOverrideReason.trim().length < 8
+                        }
+                        onClick={handleRecordShieldOverride}
+                      >
+                        {shieldOverrideState === 'submitting'
+                          ? 'Recording override...'
+                          : 'Record Shield override'}
+                      </button>
+                      {shieldOverrideError ? (
+                        <p className="form-error">{shieldOverrideError}</p>
+                      ) : null}
+                    </>
+                  )}
+                </div>
+              ) : null}
+            </div>
+
+            <div className="review-card">
+              <h3 className="review-card-title">Editable triage metadata</h3>
+              <div className="field-grid">
+                <label>
+                  Domain
+                  <select
+                    value={reviewDraft.triage.domain}
+                    onChange={(event) =>
+                      updateReviewTriage('domain', event.target.value)
+                    }
+                  >
+                    {domainOptions.map((domain) => (
+                      <option key={domain} value={domain}>
+                        {domain}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <label>
+                  Complexity
+                  <select
+                    value={reviewDraft.triage.complexity}
+                    onChange={(event) =>
+                      updateReviewTriage(
+                        'complexity',
+                        event.target.value as DraftRun['triage']['complexity'],
+                      )
+                    }
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </label>
+                <label>
+                  Market confidence
+                  <select
+                    value={reviewDraft.triage.marketConfidence}
+                    onChange={(event) =>
+                      updateReviewTriage(
+                        'marketConfidence',
+                        event.target
+                          .value as DraftRun['triage']['marketConfidence'],
+                      )
+                    }
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </label>
+                <label>
+                  Security sensitivity
+                  <select
+                    value={reviewDraft.triage.securitySensitivity}
+                    onChange={(event) =>
+                      updateReviewTriage(
+                        'securitySensitivity',
+                        event.target
+                          .value as DraftRun['triage']['securitySensitivity'],
+                      )
+                    }
+                  >
+                    <option value="low">Low</option>
+                    <option value="medium">Medium</option>
+                    <option value="high">High</option>
+                  </select>
+                </label>
+              </div>
+              <div className="triage-rationale">
+                <strong>Why this routing?</strong>
+                <p>{reviewDraft.triage.reasoningSummary}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="review-card">
+            <h3 className="review-card-title">Selected agents</h3>
+            <div className="agent-selection-summary" aria-live="polite">
+              <strong>{selectedAgentCount} selected</strong>
+              <span>{selectedSpecialistCount} specialists + Moderator</span>
+              <span>{reviewDraft.triage.recommendedRunMode} run mode</span>
+            </div>
+            <div className="agent-toggle-list">
+              {agentOptions.map((agent) => (
+                <label
+                  key={agent}
+                  className={
+                    reviewDraft.selectedAgents.includes(agent)
+                      ? 'agent-toggle agent-toggle--selected'
+                      : 'agent-toggle'
+                  }
+                >
+                  <input
+                    type="checkbox"
+                    checked={reviewDraft.selectedAgents.includes(agent)}
+                    onChange={() => toggleAgent(agent)}
+                  />
+                  {formatAgent(agent)}
+                </label>
+              ))}
+            </div>
+            <div className="agent-rationale-grid">
+              {reviewDraft.selectedAgents.map((agent) => (
+                <article className="agent-rationale-card" key={agent}>
+                  <strong>{formatAgent(agent)}</strong>
+                  <p>{agentCatalog[agent]?.rationale ?? 'Selected for this run.'}</p>
+                  {reviewDraft.triage.recommendedAgents.includes(agent) ? (
+                    <small>Recommended by triage</small>
+                  ) : (
+                    <small>Added during human review</small>
+                  )}
+                </article>
+              ))}
+            </div>
+            <div className="estimate-row">
+              <span>{reviewDraft.triage.estimatedDurationSeconds}s estimate</span>
+              <span>${reviewDraft.triage.estimatedMaxCostUsd.toFixed(2)} max cost</span>
+              <span>{reviewDraft.triage.complexity} complexity</span>
+              <span>{reviewDraft.triage.securitySensitivity} security</span>
+            </div>
+            <label>
+              Development Prompt target
+              <select
+                value={reviewDraft.developmentPromptTargetTool ?? 'cursor'}
+                onChange={(event) =>
+                  setReviewDraft((current) =>
+                    current
+                      ? {
+                          ...current,
+                          developmentPromptTargetTool: event.target
+                            .value as ReviewDraft['developmentPromptTargetTool'],
+                        }
+                      : current,
+                  )
+                }
+              >
+                {developmentPromptTargetToolOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <p className="runtime-note">
+              Cursor is the MVP default. Other tools keep the shared PRD and apply
+              tool-specific implementation guidance.
+            </p>
+            {reviewDraft.selectedAgents.length < 3 ? (
+              <p id="execute-gate-hint" className="form-error" role="status">
+                Select at least three agents (including Moderator) before
+                execution.
+              </p>
+            ) : requiresCriticalShieldOverride && !shieldOverride ? (
+              <p id="execute-gate-hint" className="form-error" role="status">
+                Record a Shield override with a reason before this critical run
+                can execute.
+              </p>
+            ) : null}
+            <button
+              className="execute-button"
+              type="button"
+              aria-describedby={
+                reviewDraft.selectedAgents.length < 3 ||
+                (Boolean(requiresCriticalShieldOverride) && !shieldOverride)
+                  ? 'execute-gate-hint'
+                  : undefined
+              }
+              disabled={
+                pipelineState === 'running' ||
+                reviewDraft.selectedAgents.length < 3 ||
+                (Boolean(requiresCriticalShieldOverride) && !shieldOverride)
+              }
+              onClick={handleExecuteApprovedRun}
+            >
+              {pipelineState === 'running'
+                ? useTemporalWorkflowRuntime
+                  ? 'Starting Temporal workflow...'
+                  : 'Executing prompt-driven pipeline...'
+                : useTemporalWorkflowRuntime
+                  ? 'Execute with Temporal workflow'
+                  : 'Execute prompt-driven pipeline'}
+            </button>
+            {showResumeTemporalObservation && activeTemporalWorkflow ? (
+              <button
+                className="secondary-button"
+                type="button"
+                disabled={pipelineState === 'running'}
+                onClick={() => handleResumeTemporalWorkflow(activeTemporalWorkflow)}
+              >
+                Resume observation
+              </button>
+            ) : null}
+            {useTemporalWorkflowRuntime ? (
+              <p className="runtime-note">
+                {approvedRunRuntimeLabel}. Make sure `TEMPORAL_ENABLED=true`
+                and the worker are running.
+              </p>
+            ) : (
+              <p className="runtime-note">{approvedRunRuntimeLabel}</p>
+            )}
+            {temporalRuntimeHealth && temporalRuntimeHealth.status !== 'healthy' ? (
+              <p className="form-error">{temporalRuntimeHealth.guidance}</p>
+            ) : null}
+            {temporalRuntimeHealth?.status === 'healthy' ? (
+              <p className="runtime-note">{temporalRuntimeHealth.guidance}</p>
+            ) : null}
+            {temporalRecoveryHint ? (
+              <p className="runtime-note">{temporalRecoveryHint}</p>
+            ) : null}
+            {pipelineError ? <p className="form-error">{pipelineError}</p> : null}
+            {pipelineState === 'running' ? (
+              <div
+                className="run-live"
+                role="status"
+                aria-live="polite"
+                aria-label="Pipeline is running"
+              >
+                <span className="run-live__spinner" aria-hidden="true" />
+                <span className="run-live__timer">{pipelineElapsedLabel}</span>
+                <span className="run-live__label">{liveStepLabel}</span>
+              </div>
+            ) : null}
+          </div>
+        </CollapsiblePanel>
+      ) : null}
+
+      {pipelineResult || streamEvents.length > 0 || pipelineState === 'running' ? (
+        <CollapsiblePanel
+          className="results-panel"
+          id="pipeline-result"
+          headingId="pipeline-result-heading"
+          eyebrow="Pipeline Result"
+          title={
+            pipelineState === 'running'
+              ? useTemporalWorkflowRuntime
+                ? 'Observing Temporal workflow...'
+                : 'Streaming run status...'
+              : 'Artifacts generated from isolated prompt-driven agents.'
+          }
+          description={
+            activeTemporalWorkflow
+              ? `Workflow ${activeTemporalWorkflow.workflowId} is ${activeTemporalWorkflow.status}.`
+              : undefined
+          }
+          defaultOpen
+          aria-busy={pipelineState === 'running'}
+        >
+          <div
+            className="step-list"
+            role="list"
+            aria-label="Pipeline step status"
+            aria-live="polite"
+          >
+            {displayedSteps.length === 0 && pipelineState === 'running' ? (
+              <div className="step-item step-item--pending" role="listitem">
+                <span>Agents will appear here as each step finishes.</span>
+                <strong>waiting</strong>
+              </div>
+            ) : null}
+            {displayedSteps.map((step) => (
+              <div
+                className={
+                  step.status === 'running'
+                    ? 'step-item step-item--running'
+                    : 'step-item'
+                }
+                role="listitem"
+                key={`${step.stepId}-${step.status}`}
+              >
+                <span>{step.label}</span>
+                <strong>{step.status}</strong>
+              </div>
+            ))}
+          </div>
+
+          {pipelineResult ? (
+            <>
+              {pipelineResult.status === 'awaiting_idea_approval' && ideaDraft ? (
+                <section
+                  className="idea-discussion-panel"
+                  aria-label="Idea discussion"
+                  data-testid="idea-review-panel"
+                >
+                  <div className="idea-discussion-panel__intro">
+                    <h3>Обговорення ідеї</h3>
+                    <p className="runtime-note">
+                      Праве вікно — місце для правки повної ідеї та діалогу з
+                      модератором. Ліве вікно лишає твою сиру ідею, доки не
+                      натиснеш «Затвердити».
+                    </p>
+                  </div>
+
+                  <div className="idea-discussion-layout">
+                    <div className="idea-discussion-draft">
+                      <h4>Повна ідея (чернетка)</h4>
+                      <label className="field-label">
+                        Summary
+                        <textarea
+                          rows={3}
+                          value={ideaDraft.summaryForUser}
+                          onChange={(event) =>
+                            setIdeaDraft({
+                              ...ideaDraft,
+                              summaryForUser: event.target.value,
+                            })
+                          }
+                        />
+                      </label>
+                      <label className="field-label">
+                        Expanded idea
+                        <textarea
+                          rows={8}
+                          value={ideaDraft.expandedIdea}
+                          onChange={(event) =>
+                            setIdeaDraft({
+                              ...ideaDraft,
+                              expandedIdea: event.target.value,
+                            })
+                          }
+                        />
+                      </label>
+                      <label className="field-label">
+                        Analysis
+                        <textarea
+                          rows={5}
+                          value={ideaDraft.analysis}
+                          onChange={(event) =>
+                            setIdeaDraft({
+                              ...ideaDraft,
+                              analysis: event.target.value,
+                            })
+                          }
+                        />
+                      </label>
+
+                      <details className="idea-discussion-extras">
+                        <summary>Accept / apply / tools / AI / questions</summary>
+                        <label className="field-label">
+                          Accept (one item per line)
+                          <textarea
+                            rows={3}
+                            value={linesFromList(ideaDraft.acceptRecommendations)}
+                            onChange={(event) =>
+                              setIdeaDraft({
+                                ...ideaDraft,
+                                acceptRecommendations: listFromLines(
+                                  event.target.value,
+                                ),
+                              })
+                            }
+                          />
+                        </label>
+                        <label className="field-label">
+                          Apply / change (one item per line)
+                          <textarea
+                            rows={3}
+                            value={linesFromList(ideaDraft.applyRecommendations)}
+                            onChange={(event) =>
+                              setIdeaDraft({
+                                ...ideaDraft,
+                                applyRecommendations: listFromLines(
+                                  event.target.value,
+                                ),
+                              })
+                            }
+                          />
+                        </label>
+                        <label className="field-label">
+                          Tools to use (JSON)
+                          <textarea
+                            rows={4}
+                            value={JSON.stringify(ideaDraft.toolsToUse, null, 2)}
+                            onChange={(event) => {
+                              try {
+                                const parsed = JSON.parse(event.target.value) as
+                                  IdeaBriefContent['toolsToUse']
+                                setIdeaDraft({
+                                  ...ideaDraft,
+                                  toolsToUse: parsed,
+                                })
+                              } catch {
+                                // Keep typing invalid JSON until the next valid parse.
+                              }
+                            }}
+                          />
+                        </label>
+                        <label className="field-label">
+                          AI choices (JSON)
+                          <textarea
+                            rows={4}
+                            value={JSON.stringify(ideaDraft.aiChoices, null, 2)}
+                            onChange={(event) => {
+                              try {
+                                const parsed = JSON.parse(event.target.value) as
+                                  IdeaBriefContent['aiChoices']
+                                setIdeaDraft({
+                                  ...ideaDraft,
+                                  aiChoices: parsed,
+                                })
+                              } catch {
+                                // Keep typing invalid JSON until the next valid parse.
+                              }
+                            }}
+                          />
+                        </label>
+                        <label className="field-label">
+                          Open questions (one item per line)
+                          <textarea
+                            rows={2}
+                            value={linesFromList(ideaDraft.openQuestions)}
+                            onChange={(event) =>
+                              setIdeaDraft({
+                                ...ideaDraft,
+                                openQuestions: listFromLines(event.target.value),
+                              })
+                            }
+                          />
+                        </label>
+                      </details>
+                    </div>
+
+                    <div
+                      className="idea-discussion-chat"
+                      data-testid="idea-discussion-chat"
+                    >
+                      <h4>Чат з модератором</h4>
+                      <div
+                        className="idea-chat-thread"
+                        role="log"
+                        aria-live="polite"
+                        aria-relevant="additions"
+                      >
+                        {ideaDiscussion.length === 0 ? (
+                          <p className="idea-chat-empty">
+                            Запитай, що незрозуміло: tools, AI choices, scope,
+                            ризики. Відповідь зʼявиться в цій стрічці.
+                          </p>
+                        ) : (
+                          ideaDiscussion.map((message) => (
+                            <article
+                              key={message.id}
+                              className={
+                                message.role === 'you'
+                                  ? 'idea-chat-bubble idea-chat-bubble--you'
+                                  : 'idea-chat-bubble idea-chat-bubble--moderator'
+                              }
+                              data-testid={
+                                message.role === 'moderator'
+                                  ? 'idea-explanation'
+                                  : undefined
+                              }
+                            >
+                              <header>
+                                <strong>
+                                  {message.role === 'you' ? 'Ти' : 'Модератор'}
+                                </strong>
+                                <time dateTime={message.at}>
+                                  {new Date(message.at).toLocaleTimeString()}
+                                </time>
+                              </header>
+                              <p>{message.text}</p>
+                            </article>
+                          ))
+                        )}
+                        {ideaExplainState === 'loading' ? (
+                          <p className="idea-chat-pending">Модератор думає…</p>
+                        ) : null}
+                      </div>
+
+                      <form
+                        className="idea-chat-composer"
+                        onSubmit={(event) => {
+                          event.preventDefault()
+                          void handleExplainIdea()
+                        }}
+                      >
+                        <label className="field-label" htmlFor="idea-question-input">
+                          Твоє питання
+                          <textarea
+                            id="idea-question-input"
+                            rows={3}
+                            data-testid="idea-question-input"
+                            value={ideaQuestion}
+                            onChange={(event) =>
+                              setIdeaQuestion(event.target.value)
+                            }
+                            placeholder="Що незрозуміло в tools, AI choices або scope?"
+                          />
+                        </label>
+                        <button
+                          type="submit"
+                          className="secondary-button"
+                          data-testid="explain-idea-button"
+                          disabled={
+                            ideaExplainState === 'loading' || !ideaQuestion.trim()
+                          }
+                        >
+                          {ideaExplainState === 'loading'
+                            ? 'Надсилаю…'
+                            : 'Спитати модератора'}
+                        </button>
+                        {ideaExplainError ? (
+                          <p className="form-error" role="alert">
+                            {ideaExplainError}
+                          </p>
+                        ) : null}
+                      </form>
+                    </div>
+                  </div>
+
+                  <div className="idea-approve-actions">
+                    <button
+                      type="button"
+                      className="execute-button"
+                      data-testid="approve-idea-button"
+                      disabled={
+                        ideaApprovalState === 'running' ||
+                        pipelineState === 'running' ||
+                        ideaDraft.acceptRecommendations.length === 0 ||
+                        ideaDraft.applyRecommendations.length === 0 ||
+                        ideaDraft.toolsToUse.length === 0 ||
+                        ideaDraft.aiChoices.length === 0
+                      }
+                      onClick={() => void handleApproveIdea()}
+                    >
+                      {ideaApprovalState === 'running'
+                        ? 'Approving…'
+                        : 'Затвердити ідею'}
+                    </button>
+                    {ideaApprovalError ? (
+                      <p className="form-error" role="alert">
+                        {ideaApprovalError}
+                      </p>
+                    ) : null}
+                  </div>
+                </section>
+              ) : null}
+
+              {pipelineResult.status === 'idea_approved' ||
+              pipelineResult.status === 'completed' ? (
+                <p className="runtime-note" data-testid="idea-approved-note">
+                  Ідею затверджено. Повна версія в лівому вікні — там створи
+                  промпт і todo list.
+                </p>
+              ) : null}
+
+              {useTemporalWorkflowRuntime &&
+              activeTemporalWorkflow &&
+              !isTemporalTerminalStatus(activeTemporalWorkflow.status) ? (
+                <p className="runtime-note">
+                  Agent regenerate is available after this Temporal workflow
+                  finishes. Mid-run Temporal partial replay stays out of scope.
+                </p>
+              ) : useTemporalWorkflowRuntime ? (
+                <p className="runtime-note">
+                  After a Temporal run completes, regenerate uses the direct
+                  cascade path (not Temporal partial replay).
+                </p>
+              ) : null}
+
+              <details
+                className="agent-outputs-details"
+                open={pipelineResult.status !== 'awaiting_idea_approval'}
+              >
+                <summary>Agent outputs ({pipelineResult.agentOutputs.length})</summary>
+              <div className="agent-result-grid">
+                {pipelineResult.agentOutputs.map((agentOutput) => (
+                  <article className="agent-card" key={agentOutput.agentRole}>
+                    <h3>{formatAgent(agentOutput.agentRole)}</h3>
+                    <p>{agentOutput.output.summary}</p>
+                    {renderAgentListSection(
+                      'Idea gaps',
+                      agentOutput.output.ideaGaps,
+                    )}
+                    {renderAgentListSection(
+                      'What to add',
+                      agentOutput.output.additions,
+                    )}
+                    {renderAgentListSection(
+                      'Must-have features',
+                      agentOutput.output.mustHaveFeatures,
+                    )}
+                    {renderAgentListSection(
+                      'Build notes',
+                      agentOutput.output.buildNotes,
+                    )}
+                    {renderAgentListSection(
+                      'Recommendations',
+                      agentOutput.output.recommendations,
+                    )}
+                    {renderAgentListSection(
+                      'Risks',
+                      agentOutput.output.risks,
+                    )}
+                    <div className="metadata-row">
+                      <span>{agentOutput.validationStatus}</span>
+                      <span>{agentOutput.modelProvider}</span>
+                      <span>
+                        {agentOutput.inputTokens + agentOutput.outputTokens} tokens
+                      </span>
+                    </div>
+                    {draftRun &&
+                    reviewDraft &&
+                    !(
+                      useTemporalWorkflowRuntime &&
+                      activeTemporalWorkflow &&
+                      !isTemporalTerminalStatus(activeTemporalWorkflow.status)
+                    ) ? (
+                      <button
+                        type="button"
+                        className="secondary-button"
+                        data-testid={`regenerate-agent-${agentOutput.agentRole}`}
+                        disabled={
+                          pipelineState === 'running' ||
+                          regeneratingAgentRole !== null
+                        }
+                        aria-busy={
+                          regeneratingAgentRole === agentOutput.agentRole
+                        }
+                        onClick={() =>
+                          void handleRegenerateAgent(agentOutput.agentRole)
+                        }
+                      >
+                        {regeneratingAgentRole === agentOutput.agentRole
+                          ? 'Regenerating…'
+                          : 'Regenerate agent'}
+                      </button>
+                    ) : null}
+                  </article>
+                ))}
+              </div>
+              </details>
+            </>
+          ) : null}
+
+          {visibleArtifacts.length > 0 ? (
+            <div className="artifact-viewer">
+              <div
+                className="artifact-tabs"
+                role="tablist"
+                aria-label="Generated artifacts"
+              >
+                {visibleArtifacts.map((artifact) => {
+                  const selected =
+                    artifact.metadata.artifactType === activeArtifactType
+                  const tabId = `artifact-tab-${artifact.metadata.artifactType}`
+                  return (
+                    <button
+                      className={
+                        selected
+                          ? 'artifact-tab artifact-tab--active'
+                          : 'artifact-tab'
+                      }
+                      key={artifact.metadata.artifactType}
+                      type="button"
+                      role="tab"
+                      id={tabId}
+                      aria-selected={selected}
+                      aria-controls="artifact-panel"
+                      tabIndex={selected ? 0 : -1}
+                      onClick={() =>
+                        setActiveArtifactType(artifact.metadata.artifactType)
+                      }
+                      onKeyDown={(event) => {
+                        const types = visibleArtifacts.map(
+                          (item) => item.metadata.artifactType,
+                        )
+                        const index = types.indexOf(
+                          artifact.metadata.artifactType,
+                        )
+                        if (event.key === 'ArrowRight') {
+                          event.preventDefault()
+                          const next = types[(index + 1) % types.length]
+                          setActiveArtifactType(next)
+                          queueMicrotask(() =>
+                            document
+                              .getElementById(`artifact-tab-${next}`)
+                              ?.focus(),
+                          )
+                        }
+                        if (event.key === 'ArrowLeft') {
+                          event.preventDefault()
+                          const prev =
+                            types[(index - 1 + types.length) % types.length]
+                          setActiveArtifactType(prev)
+                          queueMicrotask(() =>
+                            document
+                              .getElementById(`artifact-tab-${prev}`)
+                              ?.focus(),
+                          )
+                        }
+                      }}
+                    >
+                      {formatArtifactTitle(artifact.metadata.artifactType)}
+                    </button>
+                  )
+                })}
+              </div>
+
+              {selectedArtifact ? (
+                <article
+                  className="artifact-card"
+                  role="tabpanel"
+                  id="artifact-panel"
+                  aria-labelledby={`artifact-tab-${selectedArtifact.metadata.artifactType}`}
+                  tabIndex={0}
+                >
+                  <div className="artifact-card-header">
+                    <h3>
+                      {formatArtifactTitle(
+                        selectedArtifact.metadata.artifactType,
+                      )}
+                    </h3>
+                    <div className="metadata-row">
+                      <span>{selectedArtifact.metadata.validationStatus}</span>
+                      <span>{selectedArtifact.metadata.modelProvider}</span>
+                      <span>{selectedArtifact.metadata.shieldStatus} shield</span>
+                      <span>
+                        {selectedArtifact.metadata.tokenUsage.inputTokens +
+                          selectedArtifact.metadata.tokenUsage.outputTokens}{' '}
+                        tokens
+                      </span>
+                    </div>
+                  </div>
+                  <p className="prompt-version">
+                    Prompt version: {selectedArtifact.metadata.promptVersion}
+                  </p>
+                  <div className="history-export-actions">
+                    <button
+                      className="execute-button"
+                      type="button"
+                      onClick={() =>
+                        handleExportPdf(selectedArtifact.metadata.artifactId)
+                      }
+                    >
+                      Export PDF
+                    </button>
+                    <button
+                      className="secondary-button"
+                      type="button"
+                      onClick={() =>
+                        handleExportMarkdown(
+                          selectedArtifact.metadata.artifactId,
+                        )
+                      }
+                    >
+                      Export Markdown
+                    </button>
+                    {selectedArtifact.metadata.artifactType ===
+                      'master_prompt' &&
+                    typeof selectedArtifact.artifact.content.markdownBody ===
+                      'string' ? (
+                      <button
+                        className="secondary-button"
+                        type="button"
+                        data-testid="copy-master-prompt"
+                        onClick={() => {
+                          void navigator.clipboard.writeText(
+                            String(
+                              selectedArtifact.artifact.content.markdownBody,
+                            ),
+                          )
+                        }}
+                      >
+                        Copy master prompt
+                      </button>
+                    ) : null}
+                  </div>
+                  {Object.entries(selectedArtifact.artifact.content).map(
+                    ([key, value]) => (
+                      <div className="artifact-section" key={key}>
+                        <h4>{formatAgent(key)}</h4>
+                        {renderArtifactValue(value)}
+                      </div>
+                    ),
+                  )}
+                  <div
+                    className="feedback-panel"
+                    aria-label="Artifact usefulness feedback"
+                  >
+                    <p className="feedback-label">
+                      Was this{' '}
+                      {formatArtifactTitle(
+                        selectedArtifact.metadata.artifactType,
+                      ).toLowerCase()}{' '}
+                      useful?
+                    </p>
+                    <div className="feedback-actions" role="group">
+                      {(
+                        [
+                          ['useful', 'Useful'],
+                          ['partially_useful', 'Partial'],
+                          ['not_useful', 'Not useful'],
+                        ] as const
+                      ).map(([value, label]) => {
+                        const selected =
+                          feedbackByTarget[
+                            selectedArtifact.metadata.artifactId
+                          ] === value
+                        return (
+                          <button
+                            key={value}
+                            type="button"
+                            className={
+                              selected
+                                ? 'feedback-button feedback-button--selected'
+                                : 'feedback-button'
+                            }
+                            aria-pressed={selected}
+                            disabled={feedbackState === 'submitting'}
+                            onClick={() =>
+                              handleSubmitRunFeedback({
+                                targetType: 'artifact',
+                                runId: selectedArtifact.metadata.runId,
+                                artifactId:
+                                  selectedArtifact.metadata.artifactId,
+                                usefulness: value,
+                              })
+                            }
+                          >
+                            {label}
+                          </button>
+                        )
+                      })}
+                    </div>
+                    <label className="feedback-comment">
+                      Optional note
+                      <textarea
+                        rows={2}
+                        value={feedbackComment}
+                        onChange={(event) =>
+                          setFeedbackComment(event.target.value)
+                        }
+                        placeholder="What should improve next time?"
+                      />
+                    </label>
+                    {feedbackState === 'success' ? (
+                      <p className="clear-copy" role="status">
+                        Thanks — feedback saved for this workspace.
+                      </p>
+                    ) : null}
+                    {feedbackError ? (
+                      <p className="form-error">{feedbackError}</p>
+                    ) : null}
+                  </div>
+                </article>
+              ) : null}
+            </div>
+          ) : null}
+
+          {pipelineState === 'completed' && draftRun ? (
+            <div
+              className="feedback-panel feedback-panel--run"
+              aria-label="Overall run quality feedback"
+            >
+              <p className="feedback-label">Overall run quality?</p>
+              <div className="feedback-actions" role="group">
+                {(
+                  [
+                    ['useful', 'Useful'],
+                    ['partially_useful', 'Partial'],
+                    ['not_useful', 'Not useful'],
+                  ] as const
+                ).map(([value, label]) => {
+                  const selected =
+                    feedbackByTarget[`run:${draftRun.runId}`] === value
+                  return (
+                    <button
+                      key={value}
+                      type="button"
+                      className={
+                        selected
+                          ? 'feedback-button feedback-button--selected'
+                          : 'feedback-button'
+                      }
+                      aria-pressed={selected}
+                      disabled={feedbackState === 'submitting'}
+                      onClick={() =>
+                        handleSubmitRunFeedback({
+                          targetType: 'run',
+                          runId: draftRun.runId,
+                          usefulness: value,
+                        })
+                      }
+                    >
+                      {label}
+                    </button>
+                  )
+                })}
+              </div>
+            </div>
+          ) : null}
+        </CollapsiblePanel>
+      ) : null}
+
+            </div>
+          </section>
+        ) : null}
+      </main>
+
+      <div
+        className={
+          utilityPanel === 'workspace'
+            ? 'utility-layer utility-layer--open'
+            : 'utility-layer'
+        }
+        hidden={utilityPanel !== 'workspace'}
+        role="dialog"
+        aria-label="Workspace settings"
+      >
+        <div className="utility-layer__backdrop" onClick={() => setUtilityPanel(null)} />
+        <div className="utility-layer__panel war-room-card">
+          <div className="utility-layer__header">
+            <h2>Workspace</h2>
+            <button type="button" className="secondary-button" onClick={() => setUtilityPanel(null)}>
+              Close
+            </button>
           </div>
           <div
             className="active-workspace-status"
-            data-testid="active-workspace-id"
+            data-testid="active-workspace-id-panel"
           >
             Active workspace:{' '}
             {myWorkspaces.find(
@@ -30066,35 +31968,6 @@ function App() {
           </div>
           {myWorkspaces.length > 0 ? (
             <div className="workspace-picker-row">
-              <label className="workspace-picker">
-                Switch workspace
-                <select
-                  data-testid="workspace-picker"
-                  value={activeWorkspaceId}
-                  onChange={(event) => {
-                    const nextWorkspaceId = event.target.value
-                    void (async () => {
-                      const synced = await applyActiveWorkspace(nextWorkspaceId)
-                      if (!synced.ok) {
-                        return
-                      }
-                      setWorkspaceRecoveryTip(null)
-                      setLatestInviteUrl(null)
-                      setInviteUrlsById({})
-                      setWorkspaceInvites([])
-                    })()
-                  }}
-                >
-                  {myWorkspaces.map((workspace) => (
-                    <option
-                      key={workspace.workspaceId}
-                      value={workspace.workspaceId}
-                    >
-                      {workspace.name} ({workspace.role})
-                    </option>
-                  ))}
-                </select>
-              </label>
               {Boolean(
                 (() => {
                   const active = myWorkspaces.find(
@@ -30235,21 +32108,6 @@ function App() {
               {inviteStatusError}
             </p>
           ) : null}
-          {apiHealth === 'offline' ? (
-            <p className="local-setup-tip">
-              Local API is offline. Run{' '}
-              <code>npm run doctor</code>, then{' '}
-              <code>npm run infra:up</code>,{' '}
-              <code>npm run db:migrate</code>, and{' '}
-              <code>npm run dev:api</code>. Day-1 path: <code>docs/ONBOARDING.md</code>.
-            </p>
-          ) : null}
-          {apiHealth === 'online' && !draftRun ? (
-            <p className="local-setup-tip local-setup-tip--ready">
-              Ready for a mock run: draft an idea below → Human Review → execute
-              → artifacts. No provider keys required while LLM mode is mock.
-            </p>
-          ) : null}
           <div className="hero-actions">
             <button
               type="button"
@@ -30263,14 +32121,30 @@ function App() {
             </button>
           </div>
         </div>
-      </section>
+      </div>
 
+      <div
+        className={
+          utilityPanel === 'providers'
+            ? 'utility-layer utility-layer--open'
+            : 'utility-layer'
+        }
+        hidden={utilityPanel !== 'providers'}
+      >
+      <div className="utility-layer__backdrop" onClick={() => setUtilityPanel(null)} />
+      <div className="utility-layer__panel">
+      <div className="utility-layer__header">
+        <h2>API keys</h2>
+        <button type="button" className="secondary-button" onClick={() => setUtilityPanel(null)}>
+          Close
+        </button>
+      </div>
       <CollapsiblePanel
         className="provider-panel"
         eyebrow="Provider Keys"
         title="Connect workspace AI providers."
         description="Add Anthropic or OpenAI keys from the client UI. Keys are sent directly to the backend, encrypted before PostgreSQL storage, and never returned to the browser."
-        defaultOpen={false}
+        defaultOpen={true}
       >
         {providerCredentials?.needsProviderKey ? (
           <div className="provider-alert">
@@ -30453,7 +32327,25 @@ function App() {
           </div>
         ) : null}
       </CollapsiblePanel>
+      </div>
+      </div>
 
+      <div
+        className={
+          utilityPanel === 'billing'
+            ? 'utility-layer utility-layer--open'
+            : 'utility-layer'
+        }
+        hidden={utilityPanel !== 'billing'}
+      >
+      <div className="utility-layer__backdrop" onClick={() => setUtilityPanel(null)} />
+      <div className="utility-layer__panel">
+      <div className="utility-layer__header">
+        <h2>Plans &amp; billing</h2>
+        <button type="button" className="secondary-button" onClick={() => setUtilityPanel(null)}>
+          Close
+        </button>
+      </div>
       <CollapsiblePanel
         className="billing-panel"
         id="billing"
@@ -32970,838 +34862,25 @@ function App() {
         />
 
       </CollapsiblePanel>
+      </div>
+      </div>
 
-      {draftRun && reviewDraft ? (
-        <CollapsiblePanel
-          className="review-panel"
-          id="human-review"
-          headingId="human-review-heading"
-          eyebrow="Human Review"
-          title="Approve the plan before execution."
-          description="Draft state is autosaved locally. Review Shield context, triage, selected agents, and estimated run cost before execution."
-          defaultOpen
-        >
-          <div className="review-grid">
-            <div className="review-card">
-              <h3 className="review-card-title">Input with Shield context</h3>
-              <div
-                className={`shield-warning-card shield-warning-card--${draftRun.shieldScan.status}`}
-                role={
-                  draftRun.shieldScan.status === 'blocked' ? 'alert' : 'status'
-                }
-              >
-                <strong>
-                  Shield {draftRun.shieldScan.status}:{' '}
-                  {getSeverityLabel(draftRun.shieldScan.maxSeverity)}
-                </strong>
-                <p>
-                  {visibleShieldFindings.length > 0
-                    ? `${visibleShieldFindings.length} visible finding(s) for current Shield display sensitivity (${settingsAdminSummary?.settings.shieldDisplaySensitivity ?? 'medium_and_up'}).`
-                    : draftRun.shieldScan.findings.length > 0
-                      ? 'Findings exist but are hidden by Shield display sensitivity.'
-                      : 'No meaningful findings. Shield stays quiet and the run can proceed.'}
-                </p>
-              </div>
-              <p className="review-idea">
-                {getHighlightedIdea(
-                  draftRun.idea.rawIdea,
-                  visibleShieldFindings,
-                  setActiveFindingId,
-                )}
-              </p>
-              {visibleShieldFindings.length > 0 ? (
-                <>
-                  <div
-                    className="finding-tabs"
-                    role="tablist"
-                    aria-label="Shield findings"
-                  >
-                    {visibleShieldFindings.map((finding) => {
-                      const selected =
-                        finding.findingId === activeFinding?.findingId
-                      return (
-                        <button
-                          className={
-                            selected
-                              ? 'finding-tab finding-tab--active'
-                              : 'finding-tab'
-                          }
-                          key={finding.findingId}
-                          type="button"
-                          role="tab"
-                          id={`finding-tab-${finding.findingId}`}
-                          aria-selected={selected}
-                          aria-controls={`finding-panel-${finding.findingId}`}
-                          tabIndex={selected ? 0 : -1}
-                          onClick={() => setActiveFindingId(finding.findingId)}
-                          onKeyDown={(event) => {
-                            const findings = visibleShieldFindings
-                            const index = findings.findIndex(
-                              (item) => item.findingId === finding.findingId,
-                            )
-                            if (event.key === 'ArrowRight') {
-                              event.preventDefault()
-                              const next =
-                                findings[(index + 1) % findings.length]
-                              setActiveFindingId(next.findingId)
-                              queueMicrotask(() =>
-                                document
-                                  .getElementById(
-                                    `finding-tab-${next.findingId}`,
-                                  )
-                                  ?.focus(),
-                              )
-                            }
-                            if (event.key === 'ArrowLeft') {
-                              event.preventDefault()
-                              const prev =
-                                findings[
-                                  (index - 1 + findings.length) % findings.length
-                                ]
-                              setActiveFindingId(prev.findingId)
-                              queueMicrotask(() =>
-                                document
-                                  .getElementById(
-                                    `finding-tab-${prev.findingId}`,
-                                  )
-                                  ?.focus(),
-                              )
-                            }
-                          }}
-                        >
-                          {finding.category}
-                        </button>
-                      )
-                    })}
-                  </div>
-                  {activeFinding ? (
-                    <div
-                      className="finding-detail"
-                      role="tabpanel"
-                      id={`finding-panel-${activeFinding.findingId}`}
-                      aria-labelledby={`finding-tab-${activeFinding.findingId}`}
-                      tabIndex={0}
-                    >
-                      <strong>
-                        {activeFinding.category} · {activeFinding.severity}
-                      </strong>
-                      <p>{activeFinding.explanation}</p>
-                      <small>
-                        Recommended action: {activeFinding.recommendedAction}
-                      </small>
-                      {activeFinding.severity === 'critical' ? (
-                        <p className="runtime-note">
-                          Critical findings stay on the override path and cannot
-                          be marked as false positives.
-                        </p>
-                      ) : reportedFalsePositiveFindingIds.includes(
-                          activeFinding.findingId,
-                        ) ? (
-                        <p className="clear-copy">
-                          False positive reported for this finding. It does not
-                          change scan status or unlock critical runs.
-                        </p>
-                      ) : (
-                        <div className="finding-detail">
-                          <label>
-                            Optional note
-                            <textarea
-                              rows={2}
-                              value={falsePositiveNote}
-                              onChange={(event) =>
-                                setFalsePositiveNote(event.target.value)
-                              }
-                              placeholder="Why this finding looks like a false positive."
-                            />
-                          </label>
-                          <button
-                            className="secondary-button"
-                            type="button"
-                            disabled={falsePositiveState === 'submitting'}
-                            onClick={handleMarkFindingAsFalsePositive}
-                          >
-                            {falsePositiveState === 'submitting'
-                              ? 'Reporting...'
-                              : 'Mark as false positive'}
-                          </button>
-                          {falsePositiveError ? (
-                            <p className="form-error">{falsePositiveError}</p>
-                          ) : null}
-                        </div>
-                      )}
-                    </div>
-                  ) : null}
-                </>
-              ) : (
-                <p className="clear-copy">No meaningful Shield findings.</p>
-              )}
-              {requiresCriticalShieldOverride ? (
-                <div className="finding-detail">
-                  <strong>Critical Shield override required</strong>
-                  <p>
-                    Owner or admin must record who/why before this run can
-                    execute. The override is audited.
-                  </p>
-                  {shieldOverride ? (
-                    <p className="clear-copy">
-                      Override recorded by {shieldOverride.actorUserId}:{' '}
-                      {shieldOverride.reason}
-                    </p>
-                  ) : (
-                    <>
-                      <label>
-                        Override reason
-                        <textarea
-                          rows={3}
-                          value={shieldOverrideReason}
-                          onChange={(event) =>
-                            setShieldOverrideReason(event.target.value)
-                          }
-                          placeholder="Explain why this critical finding is accepted for execution."
-                        />
-                      </label>
-                      <button
-                        className="secondary-button"
-                        type="button"
-                        disabled={
-                          shieldOverrideState === 'submitting' ||
-                          shieldOverrideReason.trim().length < 8
-                        }
-                        onClick={handleRecordShieldOverride}
-                      >
-                        {shieldOverrideState === 'submitting'
-                          ? 'Recording override...'
-                          : 'Record Shield override'}
-                      </button>
-                      {shieldOverrideError ? (
-                        <p className="form-error">{shieldOverrideError}</p>
-                      ) : null}
-                    </>
-                  )}
-                </div>
-              ) : null}
-            </div>
-
-            <div className="review-card">
-              <h3 className="review-card-title">Editable triage metadata</h3>
-              <div className="field-grid">
-                <label>
-                  Domain
-                  <select
-                    value={reviewDraft.triage.domain}
-                    onChange={(event) =>
-                      updateReviewTriage('domain', event.target.value)
-                    }
-                  >
-                    {domainOptions.map((domain) => (
-                      <option key={domain} value={domain}>
-                        {domain}
-                      </option>
-                    ))}
-                  </select>
-                </label>
-                <label>
-                  Complexity
-                  <select
-                    value={reviewDraft.triage.complexity}
-                    onChange={(event) =>
-                      updateReviewTriage(
-                        'complexity',
-                        event.target.value as DraftRun['triage']['complexity'],
-                      )
-                    }
-                  >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                  </select>
-                </label>
-                <label>
-                  Market confidence
-                  <select
-                    value={reviewDraft.triage.marketConfidence}
-                    onChange={(event) =>
-                      updateReviewTriage(
-                        'marketConfidence',
-                        event.target
-                          .value as DraftRun['triage']['marketConfidence'],
-                      )
-                    }
-                  >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                  </select>
-                </label>
-                <label>
-                  Security sensitivity
-                  <select
-                    value={reviewDraft.triage.securitySensitivity}
-                    onChange={(event) =>
-                      updateReviewTriage(
-                        'securitySensitivity',
-                        event.target
-                          .value as DraftRun['triage']['securitySensitivity'],
-                      )
-                    }
-                  >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                  </select>
-                </label>
-              </div>
-              <div className="triage-rationale">
-                <strong>Why this routing?</strong>
-                <p>{reviewDraft.triage.reasoningSummary}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="review-card">
-            <h3 className="review-card-title">Selected agents</h3>
-            <div className="agent-selection-summary" aria-live="polite">
-              <strong>{selectedAgentCount} selected</strong>
-              <span>{selectedSpecialistCount} specialists + Moderator</span>
-              <span>{reviewDraft.triage.recommendedRunMode} run mode</span>
-            </div>
-            <div className="agent-toggle-list">
-              {agentOptions.map((agent) => (
-                <label
-                  key={agent}
-                  className={
-                    reviewDraft.selectedAgents.includes(agent)
-                      ? 'agent-toggle agent-toggle--selected'
-                      : 'agent-toggle'
-                  }
-                >
-                  <input
-                    type="checkbox"
-                    checked={reviewDraft.selectedAgents.includes(agent)}
-                    onChange={() => toggleAgent(agent)}
-                  />
-                  {formatAgent(agent)}
-                </label>
-              ))}
-            </div>
-            <div className="agent-rationale-grid">
-              {reviewDraft.selectedAgents.map((agent) => (
-                <article className="agent-rationale-card" key={agent}>
-                  <strong>{formatAgent(agent)}</strong>
-                  <p>{agentCatalog[agent]?.rationale ?? 'Selected for this run.'}</p>
-                  {reviewDraft.triage.recommendedAgents.includes(agent) ? (
-                    <small>Recommended by triage</small>
-                  ) : (
-                    <small>Added during human review</small>
-                  )}
-                </article>
-              ))}
-            </div>
-            <div className="estimate-row">
-              <span>{reviewDraft.triage.estimatedDurationSeconds}s estimate</span>
-              <span>${reviewDraft.triage.estimatedMaxCostUsd.toFixed(2)} max cost</span>
-              <span>{reviewDraft.triage.complexity} complexity</span>
-              <span>{reviewDraft.triage.securitySensitivity} security</span>
-            </div>
-            <label>
-              Development Prompt target
-              <select
-                value={reviewDraft.developmentPromptTargetTool ?? 'cursor'}
-                onChange={(event) =>
-                  setReviewDraft((current) =>
-                    current
-                      ? {
-                          ...current,
-                          developmentPromptTargetTool: event.target
-                            .value as ReviewDraft['developmentPromptTargetTool'],
-                        }
-                      : current,
-                  )
-                }
-              >
-                {developmentPromptTargetToolOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <p className="runtime-note">
-              Cursor is the MVP default. Other tools keep the shared PRD and apply
-              tool-specific implementation guidance.
-            </p>
-            {reviewDraft.selectedAgents.length < 3 ? (
-              <p id="execute-gate-hint" className="form-error" role="status">
-                Select at least three agents (including Moderator) before
-                execution.
-              </p>
-            ) : requiresCriticalShieldOverride && !shieldOverride ? (
-              <p id="execute-gate-hint" className="form-error" role="status">
-                Record a Shield override with a reason before this critical run
-                can execute.
-              </p>
-            ) : null}
-            <button
-              className="execute-button"
-              type="button"
-              aria-describedby={
-                reviewDraft.selectedAgents.length < 3 ||
-                (Boolean(requiresCriticalShieldOverride) && !shieldOverride)
-                  ? 'execute-gate-hint'
-                  : undefined
-              }
-              disabled={
-                pipelineState === 'running' ||
-                reviewDraft.selectedAgents.length < 3 ||
-                (Boolean(requiresCriticalShieldOverride) && !shieldOverride)
-              }
-              onClick={handleExecuteApprovedRun}
-            >
-              {pipelineState === 'running'
-                ? useTemporalWorkflowRuntime
-                  ? 'Starting Temporal workflow...'
-                  : 'Executing prompt-driven pipeline...'
-                : useTemporalWorkflowRuntime
-                  ? 'Execute with Temporal workflow'
-                  : 'Execute prompt-driven pipeline'}
-            </button>
-            {showResumeTemporalObservation && activeTemporalWorkflow ? (
-              <button
-                className="secondary-button"
-                type="button"
-                disabled={pipelineState === 'running'}
-                onClick={() => handleResumeTemporalWorkflow(activeTemporalWorkflow)}
-              >
-                Resume observation
-              </button>
-            ) : null}
-            {useTemporalWorkflowRuntime ? (
-              <p className="runtime-note">
-                {approvedRunRuntimeLabel}. Make sure `TEMPORAL_ENABLED=true`
-                and the worker are running.
-              </p>
-            ) : (
-              <p className="runtime-note">{approvedRunRuntimeLabel}</p>
-            )}
-            {temporalRuntimeHealth && temporalRuntimeHealth.status !== 'healthy' ? (
-              <p className="form-error">{temporalRuntimeHealth.guidance}</p>
-            ) : null}
-            {temporalRuntimeHealth?.status === 'healthy' ? (
-              <p className="runtime-note">{temporalRuntimeHealth.guidance}</p>
-            ) : null}
-            {temporalRecoveryHint ? (
-              <p className="runtime-note">{temporalRecoveryHint}</p>
-            ) : null}
-            {pipelineError ? <p className="form-error">{pipelineError}</p> : null}
-            {pipelineState === 'running' ? (
-              <div
-                className="run-live"
-                role="status"
-                aria-live="polite"
-                aria-label="Pipeline is running"
-              >
-                <span className="run-live__spinner" aria-hidden="true" />
-                <span className="run-live__timer">{pipelineElapsedLabel}</span>
-                <span className="run-live__label">{liveStepLabel}</span>
-              </div>
-            ) : null}
-          </div>
-        </CollapsiblePanel>
-      ) : null}
-
-      {pipelineResult || streamEvents.length > 0 || pipelineState === 'running' ? (
-        <CollapsiblePanel
-          className="results-panel"
-          id="pipeline-result"
-          headingId="pipeline-result-heading"
-          eyebrow="Pipeline Result"
-          title={
-            pipelineState === 'running'
-              ? useTemporalWorkflowRuntime
-                ? 'Observing Temporal workflow...'
-                : 'Streaming run status...'
-              : 'Artifacts generated from isolated prompt-driven agents.'
-          }
-          description={
-            activeTemporalWorkflow
-              ? `Workflow ${activeTemporalWorkflow.workflowId} is ${activeTemporalWorkflow.status}.`
-              : undefined
-          }
-          defaultOpen
-          aria-busy={pipelineState === 'running'}
-        >
-          <div
-            className="step-list"
-            role="list"
-            aria-label="Pipeline step status"
-            aria-live="polite"
-          >
-            {displayedSteps.length === 0 && pipelineState === 'running' ? (
-              <div className="step-item step-item--pending" role="listitem">
-                <span>Agents will appear here as each step finishes.</span>
-                <strong>waiting</strong>
-              </div>
-            ) : null}
-            {displayedSteps.map((step) => (
-              <div
-                className={
-                  step.status === 'running'
-                    ? 'step-item step-item--running'
-                    : 'step-item'
-                }
-                role="listitem"
-                key={`${step.stepId}-${step.status}`}
-              >
-                <span>{step.label}</span>
-                <strong>{step.status}</strong>
-              </div>
-            ))}
-          </div>
-
-          {pipelineResult ? (
-            <>
-              {useTemporalWorkflowRuntime &&
-              activeTemporalWorkflow &&
-              !isTemporalTerminalStatus(activeTemporalWorkflow.status) ? (
-                <p className="runtime-note">
-                  Agent regenerate is available after this Temporal workflow
-                  finishes. Mid-run Temporal partial replay stays out of scope.
-                </p>
-              ) : useTemporalWorkflowRuntime ? (
-                <p className="runtime-note">
-                  After a Temporal run completes, regenerate uses the direct
-                  cascade path (not Temporal partial replay).
-                </p>
-              ) : null}
-              <div className="agent-result-grid">
-                {pipelineResult.agentOutputs.map((agentOutput) => (
-                  <article className="agent-card" key={agentOutput.agentRole}>
-                    <h3>{formatAgent(agentOutput.agentRole)}</h3>
-                    <p>{agentOutput.output.summary}</p>
-                    {renderAgentListSection(
-                      'Idea gaps',
-                      agentOutput.output.ideaGaps,
-                    )}
-                    {renderAgentListSection(
-                      'What to add',
-                      agentOutput.output.additions,
-                    )}
-                    {renderAgentListSection(
-                      'Must-have features',
-                      agentOutput.output.mustHaveFeatures,
-                    )}
-                    {renderAgentListSection(
-                      'Build notes',
-                      agentOutput.output.buildNotes,
-                    )}
-                    {renderAgentListSection(
-                      'Recommendations',
-                      agentOutput.output.recommendations,
-                    )}
-                    {renderAgentListSection(
-                      'Risks',
-                      agentOutput.output.risks,
-                    )}
-                    <div className="metadata-row">
-                      <span>{agentOutput.validationStatus}</span>
-                      <span>{agentOutput.modelProvider}</span>
-                      <span>
-                        {agentOutput.inputTokens + agentOutput.outputTokens} tokens
-                      </span>
-                    </div>
-                    {draftRun &&
-                    reviewDraft &&
-                    !(
-                      useTemporalWorkflowRuntime &&
-                      activeTemporalWorkflow &&
-                      !isTemporalTerminalStatus(activeTemporalWorkflow.status)
-                    ) ? (
-                      <button
-                        type="button"
-                        className="secondary-button"
-                        data-testid={`regenerate-agent-${agentOutput.agentRole}`}
-                        disabled={
-                          pipelineState === 'running' ||
-                          regeneratingAgentRole !== null
-                        }
-                        aria-busy={
-                          regeneratingAgentRole === agentOutput.agentRole
-                        }
-                        onClick={() =>
-                          void handleRegenerateAgent(agentOutput.agentRole)
-                        }
-                      >
-                        {regeneratingAgentRole === agentOutput.agentRole
-                          ? 'Regenerating…'
-                          : 'Regenerate agent'}
-                      </button>
-                    ) : null}
-                  </article>
-                ))}
-              </div>
-            </>
-          ) : null}
-
-          {visibleArtifacts.length > 0 ? (
-            <div className="artifact-viewer">
-              <div
-                className="artifact-tabs"
-                role="tablist"
-                aria-label="Generated artifacts"
-              >
-                {visibleArtifacts.map((artifact) => {
-                  const selected =
-                    artifact.metadata.artifactType === activeArtifactType
-                  const tabId = `artifact-tab-${artifact.metadata.artifactType}`
-                  return (
-                    <button
-                      className={
-                        selected
-                          ? 'artifact-tab artifact-tab--active'
-                          : 'artifact-tab'
-                      }
-                      key={artifact.metadata.artifactType}
-                      type="button"
-                      role="tab"
-                      id={tabId}
-                      aria-selected={selected}
-                      aria-controls="artifact-panel"
-                      tabIndex={selected ? 0 : -1}
-                      onClick={() =>
-                        setActiveArtifactType(artifact.metadata.artifactType)
-                      }
-                      onKeyDown={(event) => {
-                        const types = visibleArtifacts.map(
-                          (item) => item.metadata.artifactType,
-                        )
-                        const index = types.indexOf(
-                          artifact.metadata.artifactType,
-                        )
-                        if (event.key === 'ArrowRight') {
-                          event.preventDefault()
-                          const next = types[(index + 1) % types.length]
-                          setActiveArtifactType(next)
-                          queueMicrotask(() =>
-                            document
-                              .getElementById(`artifact-tab-${next}`)
-                              ?.focus(),
-                          )
-                        }
-                        if (event.key === 'ArrowLeft') {
-                          event.preventDefault()
-                          const prev =
-                            types[(index - 1 + types.length) % types.length]
-                          setActiveArtifactType(prev)
-                          queueMicrotask(() =>
-                            document
-                              .getElementById(`artifact-tab-${prev}`)
-                              ?.focus(),
-                          )
-                        }
-                      }}
-                    >
-                      {formatArtifactTitle(artifact.metadata.artifactType)}
-                    </button>
-                  )
-                })}
-              </div>
-
-              {selectedArtifact ? (
-                <article
-                  className="artifact-card"
-                  role="tabpanel"
-                  id="artifact-panel"
-                  aria-labelledby={`artifact-tab-${selectedArtifact.metadata.artifactType}`}
-                  tabIndex={0}
-                >
-                  <div className="artifact-card-header">
-                    <h3>
-                      {formatArtifactTitle(
-                        selectedArtifact.metadata.artifactType,
-                      )}
-                    </h3>
-                    <div className="metadata-row">
-                      <span>{selectedArtifact.metadata.validationStatus}</span>
-                      <span>{selectedArtifact.metadata.modelProvider}</span>
-                      <span>{selectedArtifact.metadata.shieldStatus} shield</span>
-                      <span>
-                        {selectedArtifact.metadata.tokenUsage.inputTokens +
-                          selectedArtifact.metadata.tokenUsage.outputTokens}{' '}
-                        tokens
-                      </span>
-                    </div>
-                  </div>
-                  <p className="prompt-version">
-                    Prompt version: {selectedArtifact.metadata.promptVersion}
-                  </p>
-                  <div className="history-export-actions">
-                    <button
-                      className="execute-button"
-                      type="button"
-                      onClick={() =>
-                        handleExportPdf(selectedArtifact.metadata.artifactId)
-                      }
-                    >
-                      Export PDF
-                    </button>
-                    <button
-                      className="secondary-button"
-                      type="button"
-                      onClick={() =>
-                        handleExportMarkdown(
-                          selectedArtifact.metadata.artifactId,
-                        )
-                      }
-                    >
-                      Export Markdown
-                    </button>
-                    {selectedArtifact.metadata.artifactType ===
-                      'development_prompt' &&
-                    typeof selectedArtifact.artifact.content.copyPasteBrief ===
-                      'string' ? (
-                      <button
-                        className="secondary-button"
-                        type="button"
-                        data-testid="copy-development-prompt-brief"
-                        onClick={() => {
-                          void navigator.clipboard.writeText(
-                            String(
-                              selectedArtifact.artifact.content.copyPasteBrief,
-                            ),
-                          )
-                        }}
-                      >
-                        Copy Cursor brief
-                      </button>
-                    ) : null}
-                  </div>
-                  {Object.entries(selectedArtifact.artifact.content).map(
-                    ([key, value]) => (
-                      <div className="artifact-section" key={key}>
-                        <h4>{formatAgent(key)}</h4>
-                        {renderArtifactValue(value)}
-                      </div>
-                    ),
-                  )}
-                  <div
-                    className="feedback-panel"
-                    aria-label="Artifact usefulness feedback"
-                  >
-                    <p className="feedback-label">
-                      Was this{' '}
-                      {formatArtifactTitle(
-                        selectedArtifact.metadata.artifactType,
-                      ).toLowerCase()}{' '}
-                      useful?
-                    </p>
-                    <div className="feedback-actions" role="group">
-                      {(
-                        [
-                          ['useful', 'Useful'],
-                          ['partially_useful', 'Partial'],
-                          ['not_useful', 'Not useful'],
-                        ] as const
-                      ).map(([value, label]) => {
-                        const selected =
-                          feedbackByTarget[
-                            selectedArtifact.metadata.artifactId
-                          ] === value
-                        return (
-                          <button
-                            key={value}
-                            type="button"
-                            className={
-                              selected
-                                ? 'feedback-button feedback-button--selected'
-                                : 'feedback-button'
-                            }
-                            aria-pressed={selected}
-                            disabled={feedbackState === 'submitting'}
-                            onClick={() =>
-                              handleSubmitRunFeedback({
-                                targetType: 'artifact',
-                                runId: selectedArtifact.metadata.runId,
-                                artifactId:
-                                  selectedArtifact.metadata.artifactId,
-                                usefulness: value,
-                              })
-                            }
-                          >
-                            {label}
-                          </button>
-                        )
-                      })}
-                    </div>
-                    <label className="feedback-comment">
-                      Optional note
-                      <textarea
-                        rows={2}
-                        value={feedbackComment}
-                        onChange={(event) =>
-                          setFeedbackComment(event.target.value)
-                        }
-                        placeholder="What should improve next time?"
-                      />
-                    </label>
-                    {feedbackState === 'success' ? (
-                      <p className="clear-copy" role="status">
-                        Thanks — feedback saved for this workspace.
-                      </p>
-                    ) : null}
-                    {feedbackError ? (
-                      <p className="form-error">{feedbackError}</p>
-                    ) : null}
-                  </div>
-                </article>
-              ) : null}
-            </div>
-          ) : null}
-
-          {pipelineState === 'completed' && draftRun ? (
-            <div
-              className="feedback-panel feedback-panel--run"
-              aria-label="Overall run quality feedback"
-            >
-              <p className="feedback-label">Overall run quality?</p>
-              <div className="feedback-actions" role="group">
-                {(
-                  [
-                    ['useful', 'Useful'],
-                    ['partially_useful', 'Partial'],
-                    ['not_useful', 'Not useful'],
-                  ] as const
-                ).map(([value, label]) => {
-                  const selected =
-                    feedbackByTarget[`run:${draftRun.runId}`] === value
-                  return (
-                    <button
-                      key={value}
-                      type="button"
-                      className={
-                        selected
-                          ? 'feedback-button feedback-button--selected'
-                          : 'feedback-button'
-                      }
-                      aria-pressed={selected}
-                      disabled={feedbackState === 'submitting'}
-                      onClick={() =>
-                        handleSubmitRunFeedback({
-                          targetType: 'run',
-                          runId: draftRun.runId,
-                          usefulness: value,
-                        })
-                      }
-                    >
-                      {label}
-                    </button>
-                  )
-                })}
-              </div>
-            </div>
-          ) : null}
-        </CollapsiblePanel>
-      ) : null}
-
+      <div
+        className={
+          utilityPanel === 'history'
+            ? 'utility-layer utility-layer--open'
+            : 'utility-layer'
+        }
+        hidden={utilityPanel !== 'history'}
+      >
+      <div className="utility-layer__backdrop" onClick={() => setUtilityPanel(null)} />
+      <div className="utility-layer__panel">
+      <div className="utility-layer__header">
+        <h2>Artifact history</h2>
+        <button type="button" className="secondary-button" onClick={() => setUtilityPanel(null)}>
+          Close
+        </button>
+      </div>
       <CollapsiblePanel
         className="history-panel"
         eyebrow="Artifact History"
@@ -33867,7 +34946,25 @@ function App() {
           </div>
         ) : null}
       </CollapsiblePanel>
+      </div>
+      </div>
 
+      <div
+        className={
+          utilityPanel === 'about'
+            ? 'utility-layer utility-layer--open'
+            : 'utility-layer'
+        }
+        hidden={utilityPanel !== 'about'}
+      >
+      <div className="utility-layer__backdrop" onClick={() => setUtilityPanel(null)} />
+      <div className="utility-layer__panel">
+      <div className="utility-layer__header">
+        <h2>About WarRoom</h2>
+        <button type="button" className="secondary-button" onClick={() => setUtilityPanel(null)}>
+          Close
+        </button>
+      </div>
       <CollapsiblePanel
         id="pipeline"
         eyebrow="Pipeline"
@@ -33918,7 +35015,67 @@ function App() {
           </div>
         </div>
       </CollapsiblePanel>
-    </main>
+      </div>
+      </div>
+
+      <footer className="app-footer">
+        <div className="app-footer__inner">
+          <a className="app-brand app-footer__brand" href="#idea" aria-label="WarRoom home">
+            <span className="app-brand__mark" aria-hidden="true" />
+            <span className="app-brand__name">WarRoom</span>
+          </a>
+
+          <p className="app-footer__copy">
+            © {new Date().getFullYear()} WarRoom. All rights reserved.
+          </p>
+
+          <nav className="app-footer__social" aria-label="Social links">
+            <a
+              className="app-footer__social-link"
+              href="https://www.linkedin.com/in/oleksandr-shvachko-frontend-developer/"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="LinkedIn profile of Oleksandr Shvachko"
+            >
+              <svg
+                className="app-footer__icon"
+                viewBox="0 0 24 24"
+                width="22"
+                height="22"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  fill="currentColor"
+                  d="M20.45 20.45h-3.56v-5.57c0-1.33-.02-3.04-1.85-3.04-1.85 0-2.14 1.45-2.14 2.94v5.67H9.35V9h3.41v1.56h.05c.48-.9 1.64-1.85 3.37-1.85 3.6 0 4.27 2.37 4.27 5.46v6.28zM5.34 7.43a2.06 2.06 0 1 1 0-4.12 2.06 2.06 0 0 1 0 4.12zM7.12 20.45H3.56V9h3.56v11.45zM22.22 0H1.77C.79 0 0 .77 0 1.73v20.54C0 23.23.79 24 1.77 24h20.45c.98 0 1.78-.77 1.78-1.73V1.73C24 .77 23.2 0 22.22 0z"
+                />
+              </svg>
+            </a>
+            <a
+              className="app-footer__social-link"
+              href="https://github.com/AleksandrWeber"
+              target="_blank"
+              rel="noreferrer"
+              aria-label="GitHub profile AleksandrWeber"
+            >
+              <svg
+                className="app-footer__icon"
+                viewBox="0 0 24 24"
+                width="22"
+                height="22"
+                aria-hidden="true"
+                focusable="false"
+              >
+                <path
+                  fill="currentColor"
+                  d="M12 .3A12 12 0 0 0 8.2 23.7c.6.1.8-.3.8-.6v-2c-3.3.7-4-1.6-4-1.6-.5-1.3-1.3-1.7-1.3-1.7-1-.7.1-.7.1-.7 1.1.1 1.7 1.1 1.7 1.1 1 1.7 2.6 1.2 3.2.9.1-.7.4-1.2.7-1.5-2.7-.3-5.5-1.3-5.5-6 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.6.1-3.2 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.7-2.8 5.7-5.5 6 .4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 12 .3z"
+                />
+              </svg>
+            </a>
+          </nav>
+        </div>
+      </footer>
+    </div>
   )
 }
 

@@ -113,63 +113,46 @@ function createResult(): MockPipelineResult {
       artifactGenerationBrief: {},
     },
     artifacts: [
-      createArtifact('executive_summary', {
-        productIdea: 'AI War Room',
-        targetUsers: ['Founders'],
-        coreValueProposition: 'Better product decisions',
-        mainDifferentiator: 'Multi-agent council',
-        mvpRecommendation: 'Start with durable run workflow',
-        topRisks: ['Operational complexity'],
-        recommendation: 'go' as const,
-      }),
-      createArtifact('prd', {
-        overview: 'Durable workflow PRD',
-        goals: ['Recover approved runs'],
-        nonGoals: ['Replace all endpoints'],
-        userPersonas: ['Founder'],
-        userJourneys: ['Approve run then worker executes it'],
-        functionalRequirements: ['Start workflow from approved request'],
-        nonFunctionalRequirements: ['Idempotent activities'],
-        mvpScope: ['Worker skeleton'],
-        futureScope: ['Workflow status endpoint'],
-        securityConsiderations: ['Preserve Shield checks'],
-        successMetrics: ['Runs survive worker restart'],
-        openQuestions: [],
-        screensOrViews: ['Workflow status view'],
-        userStories: [
-          'As an operator, I want durable runs so that restarts do not lose progress.',
-        ],
-        acceptanceCriteria: [
-          'Approved runs can be recovered after worker restart',
-        ],
-      }),
-      createArtifact('development_prompt', {
-        targetTool: 'cursor',
-        productSummary: 'Add Temporal orchestration.',
-        technicalStack: ['NestJS', 'Temporal'],
-        architectureOverview: 'Worker executes existing pipeline as activity.',
-        requiredModules: ['Temporal worker'],
-        dataModel: ['Reuse run schemas'],
-        apiRequirements: ['No new endpoint in skeleton'],
-        uiRequirements: ['No UI change'],
-        securityConstraints: ['No API keys in workflow history'],
-        testingRequirements: ['Unit-test contracts'],
-        implementationOrder: ['Add skeleton first'],
-        outOfScope: ['Production deployment'],
-        toolSpecificGuidance: [
-          'Optimize steps for Cursor Agent / Composer with small file-scoped edits.',
-        ],
-        buildTodos: [
+      createArtifact('idea_brief', {
+        summaryForUser: 'Expanded Temporal idea for discussion.',
+        expandedIdea: 'Add a Temporal worker skeleton for durable approved runs.',
+        analysis: 'Keep REST/SSE; discuss durable recovery with the founder first.',
+        acceptRecommendations: ['Keep REST/SSE unchanged'],
+        applyRecommendations: ['Add durable recovery notes'],
+        toolsToUse: [
           {
+            name: 'Temporal',
+            why: 'Durable workflow execution for approved runs',
+            required: true,
+          },
+        ],
+        aiChoices: [
+          {
+            name: 'Cursor',
+            role: 'Implementation',
+            why: 'File-scoped coding for the worker skeleton',
+          },
+        ],
+        openQuestions: [],
+      }),
+      createArtifact('master_prompt', {
+        title: 'Master Temporal build prompt',
+        targetTool: 'cursor',
+        markdownBody:
+          '# Temporal worker\n\nAdd a Temporal worker skeleton that executes the existing mock pipeline as an activity without changing REST/SSE.',
+      }),
+      createArtifact('todo_list', {
+        overview: 'Build durable Temporal integration in small steps.',
+        items: [
+          {
+            step: 1,
             title: 'Add Temporal activity wrapper',
-            details: 'Wrap the existing pipeline execution behind a Temporal activity.',
+            details:
+              'Wrap the existing pipeline execution behind a Temporal activity.',
             acceptanceCheck: 'Unit tests cover validate and execute contracts.',
             suggestedFiles: ['apps/api/src/temporal'],
           },
         ],
-        screenMap: ['No UI change for skeleton'],
-        copyPasteBrief:
-          'Add a Temporal worker skeleton that executes the existing mock pipeline as an activity without changing REST/SSE.',
       }),
     ],
     completedAt: now,
@@ -177,7 +160,7 @@ function createResult(): MockPipelineResult {
 }
 
 function createArtifact(
-  artifactType: 'executive_summary' | 'prd' | 'development_prompt',
+  artifactType: 'idea_brief' | 'master_prompt' | 'todo_list',
   content: object,
 ) {
   return {
