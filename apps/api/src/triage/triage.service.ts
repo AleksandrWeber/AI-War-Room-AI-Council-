@@ -30,7 +30,10 @@ export class TriageService {
     request: CreateRunRequest,
     shieldScan: DraftRun['shieldScan'],
   ): Promise<DraftRun['triage']> {
-    const fallback = this.createFallbackTriage(request, shieldScan.maxSeverity)
+    const fallback = this.buildDeterministicTriage(
+      request,
+      shieldScan.maxSeverity,
+    )
     const result = await this.llmGatewayService.generateStructuredJson({
       taskName: triagePromptV1.version,
       schema: triageResultSchema,
@@ -58,7 +61,8 @@ export class TriageService {
     return result.value
   }
 
-  private createFallbackTriage(
+  /** Used when a hard security block must not send the idea to an LLM. */
+  buildDeterministicTriage(
     request: CreateRunRequest,
     maxShieldSeverity: DraftRun['shieldScan']['maxSeverity'],
   ): DraftRun['triage'] {
@@ -104,7 +108,15 @@ export class TriageService {
       recommendedAgents.push('mobile_ux_expert')
     }
 
-    const uniqueAgents = [...new Set(recommendedAgents)].slice(0, 7)
+    if (
+      /ui\/ux|ui ux|\bui\b|\bux\b|design system|wireframe|interface|frontend|landing|dashboard|visual design/.test(
+        text,
+      )
+    ) {
+      recommendedAgents.push('ui_ux_expert')
+    }
+
+    const uniqueAgents = [...new Set(recommendedAgents)].slice(0, 8)
 
     return {
       domain: mobileDomain ? 'mobile' : securitySensitive ? 'security' : 'software',
@@ -119,7 +131,9 @@ export class TriageService {
       estimatedDurationSeconds: uniqueAgents.length > 4 ? 150 : 60,
       estimatedMaxCostUsd: uniqueAgents.length > 4 ? 1.25 : 0.5,
       reasoningSummary:
-        'Fallback triage generated locally after gateway validation failure.',
+        maxShieldSeverity === 'critical'
+          ? 'Deterministic triage only — LLM skipped after critical input findings.'
+          : 'Fallback triage generated locally after gateway validation failure.',
     }
   }
 }

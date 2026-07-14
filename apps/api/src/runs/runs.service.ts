@@ -19,6 +19,7 @@ import {
   agentRoleSchema,
   approveIdeaRequestSchema,
   generateMasterPromptRequestSchema,
+  generateUiPromptRequestSchema,
   generateTodoListRequestSchema,
   artifactHistoryResponseSchema,
   createRunRequestSchema,
@@ -47,6 +48,7 @@ import {
 } from '../persistence/run.repository.js'
 import { ShieldOverrideService } from '../shield/shield-override.service.js'
 import { ShieldFullScanRetainService } from '../shield/shield-full-scan-retain.service.js'
+import { ShieldIpAbuseService } from '../shield/shield-ip-abuse.service.js'
 import { TriageService } from '../triage/triage.service.js'
 import { UsageService } from '../usage/usage.service.js'
 import { BillingMeterUsageService } from '../billing/billing-meter-usage.service.js'
@@ -78,6 +80,7 @@ export class RunsService {
     private readonly observabilityService: ObservabilityService,
     private readonly shieldOverrideService: ShieldOverrideService,
     private readonly shieldFullScanRetainService: ShieldFullScanRetainService,
+    private readonly shieldIpAbuseService: ShieldIpAbuseService,
   ) {}
 
   getCapabilities() {
@@ -98,6 +101,7 @@ export class RunsService {
         'idea_brief',
         'idea_approval',
         'master_prompt',
+        'ui_prompt',
         'todo_list',
       ],
       runtime: {
@@ -151,7 +155,10 @@ export class RunsService {
     return artifact
   }
 
-  async createDraftRun(input: unknown): Promise<DraftRun> {
+  async createDraftRun(
+    input: unknown,
+    options?: { clientIp?: string },
+  ): Promise<DraftRun> {
     const parsedRequest = createRunRequestSchema.safeParse(input)
 
     if (!parsedRequest.success) {
@@ -162,6 +169,10 @@ export class RunsService {
     }
 
     const request = parsedRequest.data
+    const clientIp = options?.clientIp?.trim() || 'unknown'
+
+    await this.shieldIpAbuseService.assertIpAllowed(clientIp)
+
     const existingRun =
       await this.runRepository.findDraftRunByIdempotencyKey(
         request.workspaceId,
@@ -209,7 +220,20 @@ export class RunsService {
       findingCount: shieldScan.findings.length,
     })
 
-    const triage = await this.triageService.triageIdea(request, shieldScan)
+    const isHardBlocked =
+      shieldScan.status === 'blocked' || shieldScan.maxSeverity === 'critical'
+
+    if (isHardBlocked) {
+      await this.shieldIpAbuseService.recordCriticalAttempt(clientIp)
+    }
+
+    // Critical findings must not reach any LLM — including triage.
+    const triage = isHardBlocked
+      ? this.triageService.buildDeterministicTriage(
+          request,
+          shieldScan.maxSeverity,
+        )
+      : await this.triageService.triageIdea(request, shieldScan)
     const now = new Date().toISOString()
 
     const draftRun = draftRunSchema.parse({
@@ -627,6 +651,13 @@ export class RunsService {
       })
     }
 
+    await this.shieldOverrideService.assertExecutionAllowed({
+      runId: request.draftRun.runId,
+      workspaceId: request.draftRun.workspaceId,
+      shieldStatus: request.draftRun.shieldScan.status,
+      maxSeverity: request.draftRun.shieldScan.maxSeverity,
+    })
+
     const approvedIdeaBrief = ideaBriefSchema.parse(request.approvedIdeaBrief)
     const now = new Date().toISOString()
     const previousIdeaBrief = request.previousResult.artifacts.find(
@@ -750,6 +781,13 @@ export class RunsService {
       })
     }
 
+    await this.shieldOverrideService.assertExecutionAllowed({
+      runId: request.draftRun.runId,
+      workspaceId: request.draftRun.workspaceId,
+      shieldStatus: request.draftRun.shieldScan.status,
+      maxSeverity: request.draftRun.shieldScan.maxSeverity,
+    })
+
     const approvedIdeaBrief = ideaBriefSchema.parse(request.approvedIdeaBrief)
     const now = new Date().toISOString()
     const ideaBriefArtifact = request.previousResult.artifacts.find(
@@ -786,7 +824,10 @@ export class RunsService {
     }
     nextArtifacts.push(masterPrompt)
     for (const artifact of request.previousResult.artifacts) {
-      if (artifact.artifact.artifactType === 'todo_list') {
+      if (
+        artifact.artifact.artifactType === 'todo_list' ||
+        artifact.artifact.artifactType === 'ui_prompt'
+      ) {
         nextArtifacts.push(artifact)
       }
     }
@@ -800,6 +841,133 @@ export class RunsService {
           (step) => step.stepId !== 'master_prompt',
         ),
         this.createCompletedStep('master_prompt', 'Master prompt generation', now),
+      ],
+      agentOutputs: request.previousResult.agentOutputs,
+      moderatorSynthesis: request.previousResult.moderatorSynthesis,
+      artifacts: nextArtifacts,
+      completedAt: now,
+    })
+
+    await this.runRepository.replaceCompletedPipelineResult(pipelineResult)
+    const usageEvents = await this.usageService.recordPipelineUsage({
+      authContext,
+      result: pipelineResult,
+    })
+    const totalTokens = usageEvents.reduce(
+      (total, event) => total + event.inputTokens + event.outputTokens,
+      0,
+    )
+    await this.billingMeterUsageService.reportRunTokenUsage({
+      workspaceId: request.draftRun.workspaceId,
+      runId: request.draftRun.runId,
+      totalTokens,
+    })
+    await this.billingNotificationService.syncWorkspaceNotifications(
+      request.draftRun.workspaceId,
+    )
+
+    await emit?.({
+      eventId: createId('event'),
+      type: 'completed',
+      result: pipelineResult,
+      timestamp: new Date().toISOString(),
+    })
+
+    return pipelineResult
+  }
+
+  async generateUiPrompt(
+    input: unknown,
+    authContext: AuthContext,
+    emit?: PipelineStreamEmitter,
+  ): Promise<MockPipelineResult> {
+    const parsed = generateUiPromptRequestSchema.safeParse(input)
+
+    if (!parsed.success) {
+      throw new BadRequestException({
+        message: 'Invalid generate-ui-prompt request.',
+        issues: parsed.error.issues,
+      })
+    }
+
+    const request = parsed.data
+
+    if (
+      request.draftRun.workspaceId !== authContext.workspaceId ||
+      request.previousResult.workspaceId !== authContext.workspaceId
+    ) {
+      throw new BadRequestException({
+        message: 'Run workspace must match the authenticated workspace.',
+      })
+    }
+
+    if (
+      request.previousResult.status !== 'idea_approved' &&
+      request.previousResult.status !== 'completed'
+    ) {
+      throw new BadRequestException({
+        message: 'Approve the idea before generating the UI prompt.',
+      })
+    }
+
+    await this.shieldOverrideService.assertExecutionAllowed({
+      runId: request.draftRun.runId,
+      workspaceId: request.draftRun.workspaceId,
+      shieldStatus: request.draftRun.shieldScan.status,
+      maxSeverity: request.draftRun.shieldScan.maxSeverity,
+    })
+
+    const approvedIdeaBrief = ideaBriefSchema.parse(request.approvedIdeaBrief)
+    const now = new Date().toISOString()
+    const ideaBriefArtifact = request.previousResult.artifacts.find(
+      (artifact) => artifact.artifact.artifactType === 'idea_brief',
+    )
+
+    await this.emitStatus(emit, 'ui_prompt', 'UI prompt generation', 'running')
+
+    const uiPrompt = await this.artifactService.generateUiPromptArtifact({
+      draftRun: request.draftRun,
+      approvedIdeaBrief,
+      completedAt: now,
+      developmentPromptTargetTool: request.developmentPromptTargetTool,
+    })
+
+    await emit?.({
+      eventId: createId('event'),
+      type: 'artifact',
+      artifactType: 'ui_prompt',
+      artifact: uiPrompt,
+      timestamp: new Date().toISOString(),
+    })
+    await this.emitStatus(emit, 'ui_prompt', 'UI prompt generation', 'completed')
+
+    const nextArtifacts = []
+    if (ideaBriefArtifact) {
+      nextArtifacts.push({
+        ...ideaBriefArtifact,
+        artifact: {
+          artifactType: 'idea_brief' as const,
+          content: approvedIdeaBrief,
+        },
+      })
+    }
+    for (const artifact of request.previousResult.artifacts) {
+      if (
+        artifact.artifact.artifactType === 'master_prompt' ||
+        artifact.artifact.artifactType === 'todo_list'
+      ) {
+        nextArtifacts.push(artifact)
+      }
+    }
+    nextArtifacts.push(uiPrompt)
+
+    const pipelineResult = mockPipelineResultSchema.parse({
+      runId: request.draftRun.runId,
+      workspaceId: request.draftRun.workspaceId,
+      status: 'idea_approved',
+      steps: [
+        ...request.previousResult.steps.filter((step) => step.stepId !== 'ui_prompt'),
+        this.createCompletedStep('ui_prompt', 'UI prompt generation', now),
       ],
       agentOutputs: request.previousResult.agentOutputs,
       moderatorSynthesis: request.previousResult.moderatorSynthesis,
@@ -879,6 +1047,13 @@ export class RunsService {
       })
     }
 
+    await this.shieldOverrideService.assertExecutionAllowed({
+      runId: request.draftRun.runId,
+      workspaceId: request.draftRun.workspaceId,
+      shieldStatus: request.draftRun.shieldScan.status,
+      maxSeverity: request.draftRun.shieldScan.maxSeverity,
+    })
+
     const approvedIdeaBrief = ideaBriefSchema.parse(request.approvedIdeaBrief)
     const now = new Date().toISOString()
     const ideaBriefArtifact = request.previousResult.artifacts.find(
@@ -915,6 +1090,11 @@ export class RunsService {
       })
     }
     nextArtifacts.push(masterPromptArtifact)
+    for (const artifact of request.previousResult.artifacts) {
+      if (artifact.artifact.artifactType === 'ui_prompt') {
+        nextArtifacts.push(artifact)
+      }
+    }
     nextArtifacts.push(todoList)
 
     const pipelineResult = mockPipelineResultSchema.parse({

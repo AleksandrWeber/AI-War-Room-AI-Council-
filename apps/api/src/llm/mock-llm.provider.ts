@@ -72,6 +72,10 @@ export class MockLlmProvider implements LlmProvider {
       return JSON.stringify(this.createMasterPromptResponse(request))
     }
 
+    if (request.taskName === 'artifacts/ui_prompt/v1') {
+      return JSON.stringify(this.createUiPromptResponse(request))
+    }
+
     if (
       request.taskName === 'artifacts/todo_list/v1' ||
       request.taskName === 'artifacts/prd/v1' ||
@@ -130,7 +134,12 @@ export class MockLlmProvider implements LlmProvider {
         ? ['market_researcher']
         : []),
       ...(mobileDomain ? ['mobile_ux_expert'] : []),
-    ].slice(0, 7)
+      ...(/ui\/ux|ui ux|\bui\b|\bux\b|design system|wireframe|interface|frontend|landing|dashboard|visual design/.test(
+        text,
+      )
+        ? ['ui_ux_expert']
+        : []),
+    ].slice(0, 8)
 
     return {
       domain: mobileDomain ? 'mobile' : securitySensitive ? 'security' : 'software',
@@ -384,6 +393,43 @@ export class MockLlmProvider implements LlmProvider {
         '- Build in small verified steps.',
         '- Validate schemas on every API boundary.',
         '- Prefer local-first MVP.',
+      ].join('\n'),
+    }
+  }
+
+  private createUiPromptResponse(request: LlmProviderRequest) {
+    const payload = this.extractPayload(request)
+    const brief = payload.approvedIdeaBrief ?? {}
+    const targetTool = payload.targetTool ?? 'cursor'
+
+    return {
+      title: 'UI/UX design prompt',
+      targetTool,
+      markdownBody: [
+        '# UI/UX brief',
+        '',
+        brief.summaryForUser ?? 'Design the approved product interface.',
+        '',
+        '## Product context',
+        '',
+        brief.expandedIdea ?? 'See approved idea brief.',
+        '',
+        '## Screens',
+        '',
+        '- Home / landing',
+        '- Primary working surface',
+        '- Results / detail view',
+        '',
+        '## Components',
+        '',
+        '- Header with brand',
+        '- Form and CTA group',
+        '- Empty / loading / error states',
+        '',
+        '## Visual system',
+        '',
+        '- Defined color tokens and typography scale',
+        '- Responsive layout with a single hero composition',
       ].join('\n'),
     }
   }

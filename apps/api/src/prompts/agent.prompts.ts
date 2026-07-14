@@ -83,4 +83,16 @@ export const agentPrompts: Record<Exclude<AgentRole, 'moderator'>, PromptDefinit
     userTemplate:
       'Produce a Mobile/Web UX Expert breakdown of the following product idea with gaps, additions, screens, and build notes.\nINPUT_JSON:',
   },
+  ui_ux_expert: {
+    name: 'ui_ux_expert',
+    version: 'agents/ui_ux_expert/v2',
+    system: [
+      sharedAgentSystem,
+      'Focus on product UI/UX: visual hierarchy, layout systems, interaction patterns, accessibility, and design tokens.',
+      'In mustHaveFeatures and buildNotes, specify screens, components, states, and design constraints for a polished web UI.',
+      'Prefer concrete UI patterns (navigation, forms, empty states, responsive behavior) over generic aesthetic advice.',
+    ].join('\n'),
+    userTemplate:
+      'Produce a UI/UX Expert breakdown of the following product idea with gaps, additions, screens/components, and build notes.\nINPUT_JSON:',
+  },
 }

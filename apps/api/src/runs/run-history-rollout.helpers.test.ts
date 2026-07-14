@@ -8,7 +8,7 @@ describe('evaluateRunHistoryRollout', () => {
       usesInMemoryRepository: true,
       supportsMarkdownExport: true,
       supportsStreamReplay: false,
-      supportedArtifactTypes: ['idea_brief', 'master_prompt', 'todo_list'],
+      supportedArtifactTypes: ['idea_brief', 'master_prompt', 'ui_prompt', 'todo_list'],
     })
 
     expect(rollout.status).toBe('ready')
@@ -20,7 +20,7 @@ describe('evaluateRunHistoryRollout', () => {
       usesInMemoryRepository: true,
       supportsMarkdownExport: true,
       supportsStreamReplay: true,
-      supportedArtifactTypes: ['idea_brief', 'master_prompt', 'todo_list'],
+      supportedArtifactTypes: ['idea_brief', 'master_prompt', 'ui_prompt', 'todo_list'],
     })
 
     expect(rollout.status).toBe('not_ready')

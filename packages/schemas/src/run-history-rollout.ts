@@ -22,7 +22,7 @@ export const runHistoryCapabilitiesResponseSchema = z.object({
   supportsRunHistoryAdminTools: z.literal(true),
   supportsMarkdownExport: z.literal(true),
   supportedArtifactTypes: z.array(
-    z.enum(['idea_brief', 'master_prompt', 'todo_list']),
+    z.enum(['idea_brief', 'master_prompt', 'ui_prompt', 'todo_list']),
   ),
   guidance: nonEmptyStringSchema,
 })
@@ -43,6 +43,7 @@ export type RunHistoryRolloutResponse = z.infer<
 export const criticalRunHistoryArtifactTypes = [
   'idea_brief',
   'master_prompt',
+  'ui_prompt',
   'todo_list',
 ] as const
 

@@ -9,10 +9,12 @@ import {
   type MasterPrompt,
   type ModeratorSynthesis,
   type TodoList,
+  type UiPrompt,
   artifactSchema,
   ideaBriefSchema,
   masterPromptSchema,
   todoListSchema,
+  uiPromptSchema,
 } from '@ai-war-room/schemas'
 import { LlmGatewayService } from '../llm/llm-gateway.service.js'
 import { truncateText } from '../llm/llm.utils.js'
@@ -82,6 +84,21 @@ export class ArtifactService {
     developmentPromptTargetTool?: DevelopmentPromptTargetTool
   }) {
     return this.generateMasterPrompt({
+      draftRun: input.draftRun,
+      approvedIdeaBrief: input.approvedIdeaBrief,
+      completedAt: input.completedAt,
+      targetTool: input.developmentPromptTargetTool ?? 'cursor',
+    })
+  }
+
+  /** Phase B1b: UI/UX .md prompt after idea approval. */
+  async generateUiPromptArtifact(input: {
+    draftRun: DraftRun
+    approvedIdeaBrief: IdeaBrief
+    completedAt: string
+    developmentPromptTargetTool?: DevelopmentPromptTargetTool
+  }) {
+    return this.generateUiPrompt({
       draftRun: input.draftRun,
       approvedIdeaBrief: input.approvedIdeaBrief,
       completedAt: input.completedAt,
@@ -198,6 +215,58 @@ export class ArtifactService {
       },
     }) as Artifact & {
       artifact: { artifactType: 'master_prompt'; content: MasterPrompt }
+    }
+  }
+
+  private async generateUiPrompt(input: {
+    draftRun: DraftRun
+    approvedIdeaBrief: IdeaBrief
+    completedAt: string
+    targetTool: DevelopmentPromptTargetTool
+  }): Promise<Artifact & { artifact: { artifactType: 'ui_prompt'; content: UiPrompt } }> {
+    const prompt = artifactPrompts.ui_prompt
+    const toolGuidance = getDevelopmentPromptToolGuidance(input.targetTool)
+    const fallback = this.createFallbackUiPrompt(input, toolGuidance)
+    const result = await this.llmGatewayService.generateStructuredJson({
+      taskName: prompt.version,
+      schema: uiPromptSchema,
+      workspaceId: input.draftRun.workspaceId,
+      messages: this.createMessages(
+        `${prompt.system}\n${getDevelopmentPromptSystemAddon(input.targetTool)}`,
+        prompt.userTemplate,
+        {
+          draftRun: input.draftRun,
+          approvedIdeaBrief: input.approvedIdeaBrief,
+          targetTool: input.targetTool,
+          toolSpecificGuidance: toolGuidance,
+        },
+      ),
+      fallback,
+    })
+    const content = uiPromptSchema.parse({
+      ...result.value,
+      targetTool: input.targetTool,
+    })
+
+    return artifactSchema.parse({
+      metadata: this.createMetadata({
+        input,
+        artifactType: 'ui_prompt',
+        promptVersion: prompt.version,
+        providerId: result.providerId,
+        model: result.model,
+        validationStatus: result.validationStatus,
+        inputTokens: result.usage.inputTokens,
+        outputTokens: result.usage.outputTokens,
+        estimatedCostUsd: result.usage.estimatedCostUsd,
+        content,
+      }),
+      artifact: {
+        artifactType: 'ui_prompt',
+        content,
+      },
+    }) as Artifact & {
+      artifact: { artifactType: 'ui_prompt'; content: UiPrompt }
     }
   }
 
@@ -425,6 +494,59 @@ export class ArtifactService {
         '- Build a web application in small verified steps.',
         '- Keep schemas shared and validate all API payloads.',
         '- Prefer local-first MVP over premature orchestration.',
+        '',
+        '## Tool guidance',
+        '',
+        ...toolGuidance.map((item) => `- ${item}`),
+      ].join('\n'),
+    }
+  }
+
+  private createFallbackUiPrompt(
+    input: {
+      approvedIdeaBrief: IdeaBrief
+      targetTool: DevelopmentPromptTargetTool
+    },
+    toolGuidance: string[],
+  ): UiPrompt {
+    return {
+      title: 'UI/UX design prompt',
+      targetTool: input.targetTool,
+      markdownBody: [
+        '# UI/UX brief',
+        '',
+        input.approvedIdeaBrief.summaryForUser,
+        '',
+        '## Product context',
+        '',
+        input.approvedIdeaBrief.expandedIdea,
+        '',
+        '## Visual direction',
+        '',
+        '- One clear composition per screen; avoid dashboard clutter unless the product is a dashboard.',
+        '- Use expressive typography and a defined token system (colors, spacing, radii).',
+        '- Prefer atmospheric backgrounds over flat single colors.',
+        '',
+        '## Screens & flows',
+        '',
+        ...input.approvedIdeaBrief.acceptRecommendations.map((item) => `- ${item}`),
+        '',
+        '## Must refine before build',
+        '',
+        ...input.approvedIdeaBrief.applyRecommendations.map((item) => `- ${item}`),
+        '',
+        '## Component inventory',
+        '',
+        '- Navigation / header',
+        '- Primary form and CTA group',
+        '- Empty, loading, and error states',
+        '- Footer with brand + social links when applicable',
+        '',
+        '## Interaction & accessibility',
+        '',
+        '- Keyboard-focusable controls and visible focus rings',
+        '- Motion for hierarchy (2–3 intentional motions), not decoration spam',
+        '- Mobile-first layouts that preserve the two-pane flows when needed',
         '',
         '## Tool guidance',
         '',

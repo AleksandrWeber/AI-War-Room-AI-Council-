@@ -31,6 +31,9 @@ export function buildRunHistoryAdminStats(
     masterPromptCount: artifacts.filter(
       (artifact) => artifact.artifactType === 'master_prompt',
     ).length,
+    uiPromptCount: artifacts.filter(
+      (artifact) => artifact.artifactType === 'ui_prompt',
+    ).length,
     todoListCount: artifacts.filter(
       (artifact) => artifact.artifactType === 'todo_list',
     ).length,

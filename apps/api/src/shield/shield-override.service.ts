@@ -109,7 +109,7 @@ export class ShieldOverrideService {
     if (!override || override.workspaceId !== input.workspaceId) {
       throw new ForbiddenException({
         message:
-          'Critical Shield findings require an explicit owner/admin override before execution.',
+          'This prompt is blocked due to a critical security risk. Edit the idea before using LLM features.',
       })
     }
   }

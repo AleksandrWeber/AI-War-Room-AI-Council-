@@ -11,7 +11,7 @@ import type { ApiEnv } from './config/env.js'
 export async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
     AppModule,
-    new FastifyAdapter(),
+    new FastifyAdapter({ trustProxy: true }),
     { rawBody: true },
   )
   const config = app.get(ConfigService<ApiEnv, true>)

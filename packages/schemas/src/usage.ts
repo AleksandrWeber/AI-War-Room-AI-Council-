@@ -7,6 +7,7 @@ export const usagePhaseSchema = z.enum([
   'moderator',
   'idea_brief',
   'master_prompt',
+  'ui_prompt',
   'todo_list',
 ])
 export type UsagePhase = z.infer<typeof usagePhaseSchema>

@@ -19,6 +19,7 @@ const artifactRoles: ModelRouterRole[] = [
   'moderator',
   'idea_brief',
   'master_prompt',
+  'ui_prompt',
   'todo_list',
 ]
 

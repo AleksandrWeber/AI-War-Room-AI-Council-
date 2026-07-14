@@ -35,9 +35,24 @@ export const artifactPrompts: Record<GeneratedArtifactType, PromptDefinition> = 
       'markdownBody must include: product vision, users, stack, architecture, modules, data model, screens, APIs, security, out of scope, and implementation principles.',
       'Write markdownBody in Markdown (headings, lists, code fences as needed) inside the JSON string field.',
       'Do NOT put the step-by-step todo list here; that is a separate artifact.',
+      'Do NOT put the detailed visual/UI system brief here; that is the separate ui_prompt artifact.',
     ].join('\n'),
     userTemplate:
       'Generate the Master Prompt content object from the approved idea brief.\nINPUT_JSON:',
+  },
+  ui_prompt: {
+    name: 'ui_prompt',
+    version: 'artifacts/ui_prompt/v1',
+    system: [
+      sharedArtifactSystem,
+      'The approved idea brief is the source of truth.',
+      'Produce one very detailed UI/UX design prompt as markdownBody — the kind of long .md brief a designer/frontend agent pastes into Cursor to design and implement the interface.',
+      'markdownBody must include: visual direction, typography, color/tokens, layout system, key screens, component inventory, interaction states, accessibility, responsive behavior, and out-of-scope visuals.',
+      'Write markdownBody in Markdown inside the JSON string field.',
+      'Do NOT duplicate full backend architecture or the step-by-step implementation todo list.',
+    ].join('\n'),
+    userTemplate:
+      'Generate the UI Prompt content object from the approved idea brief.\nINPUT_JSON:',
   },
   todo_list: {
     name: 'todo_list',

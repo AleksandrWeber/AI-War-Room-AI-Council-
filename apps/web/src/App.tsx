@@ -1323,7 +1323,7 @@ type ArtifactResult = {
   metadata: {
     artifactId: string
     runId: string
-    artifactType: 'idea_brief' | 'master_prompt' | 'todo_list'
+    artifactType: 'idea_brief' | 'master_prompt' | 'ui_prompt' | 'todo_list'
     artifactVersion: string
     promptVersion: string
     modelProvider: string
@@ -1337,7 +1337,7 @@ type ArtifactResult = {
     createdAt: string
   }
   artifact: {
-    artifactType: 'idea_brief' | 'master_prompt' | 'todo_list'
+    artifactType: 'idea_brief' | 'master_prompt' | 'ui_prompt' | 'todo_list'
     content: Record<string, unknown>
   }
 }
@@ -1440,13 +1440,13 @@ const defaultProviderCredentialForm: ProviderCredentialForm = {
 
 const pipelineSteps = [
   'Idea',
-  'Shield scan',
   'Triage',
   'Human review',
   'Agent pool',
   'Moderator',
   'Idea brief',
   'Master prompt',
+  'UI prompt',
   'Todo list',
 ]
 
@@ -1461,7 +1461,7 @@ const agentCards = [
   },
   {
     title: 'Security Expert',
-    text: 'Receives only sanitized Shield signals when risk is meaningful.',
+    text: 'Flags auth, privacy, abuse, and implementation security tradeoffs.',
   },
 ]
 
@@ -1473,6 +1473,7 @@ const agentOptions = [
   'software_architect',
   'market_researcher',
   'mobile_ux_expert',
+  'ui_ux_expert',
 ]
 
 const agentCatalog: Record<string, { label: string; rationale: string }> = {
@@ -1490,7 +1491,7 @@ const agentCatalog: Record<string, { label: string; rationale: string }> = {
   },
   security_expert: {
     label: 'Security Expert',
-    rationale: 'Selected when Shield or triage detects security-sensitive context.',
+    rationale: 'Selected when triage detects security-sensitive context.',
   },
   software_architect: {
     label: 'Software Architect',
@@ -1503,6 +1504,11 @@ const agentCatalog: Record<string, { label: string; rationale: string }> = {
   mobile_ux_expert: {
     label: 'Mobile UX Expert',
     rationale: 'Selected when the idea mentions mobile, iOS, Android, or compact review UX.',
+  },
+  ui_ux_expert: {
+    label: 'UI/UX Expert',
+    rationale:
+      'Selected when the idea needs visual systems, layouts, interaction design, or frontend polish.',
   },
 }
 
@@ -1532,6 +1538,10 @@ function formatArtifactTitle(artifactType: ArtifactResult['metadata']['artifactT
 
   if (artifactType === 'master_prompt') {
     return 'Master prompt'
+  }
+
+  if (artifactType === 'ui_prompt') {
+    return 'UI prompt'
   }
 
   if (artifactType === 'todo_list') {
@@ -1920,6 +1930,7 @@ function App() {
   )
   const [reportedFalsePositiveFindingIds, setReportedFalsePositiveFindingIds] =
     useState<string[]>([])
+  const [securityAlertOpen, setSecurityAlertOpen] = useState(false)
   const [reviewDraft, setReviewDraft] = useState<ReviewDraft | null>(() => {
     const saved = localStorage.getItem(reviewStorageKey)
     if (!saved) {
@@ -6243,7 +6254,7 @@ function App() {
   const [ideaApprovalError, setIdeaApprovalError] = useState<string | null>(null)
   const [approvedIdea, setApprovedIdea] = useState<IdeaBriefContent | null>(null)
   const [artifactBuildState, setArtifactBuildState] = useState<
-    'idle' | 'prompt' | 'todo' | 'error'
+    'idle' | 'prompt' | 'ui_prompt' | 'todo' | 'error'
   >('idle')
   const [artifactBuildError, setArtifactBuildError] = useState<string | null>(null)
   const [rolloutControlsEnabled, setRolloutControlsEnabled] = useState(false)
@@ -7346,7 +7357,9 @@ function App() {
         let detail = `API returned ${response.status}`
         try {
           const payload = (await response.json()) as {
-            message?: string | { message?: string }
+            message?: string | { message?: string; retryAfterSeconds?: number }
+            code?: string
+            retryAfterSeconds?: number
           }
           if (typeof payload.message === 'string' && payload.message.trim()) {
             detail = payload.message
@@ -7357,6 +7370,29 @@ function App() {
           ) {
             detail = payload.message.message
           }
+
+          const retryAfterSeconds =
+            typeof payload.retryAfterSeconds === 'number'
+              ? payload.retryAfterSeconds
+              : typeof payload.message === 'object' &&
+                  payload.message &&
+                  typeof payload.message.retryAfterSeconds === 'number'
+                ? payload.message.retryAfterSeconds
+                : null
+
+          if (
+            response.status === 429 ||
+            payload.code === 'ip_threat_rate_limited'
+          ) {
+            const hours =
+              retryAfterSeconds && retryAfterSeconds > 0
+                ? Math.max(1, Math.ceil(retryAfterSeconds / 3600))
+                : null
+            detail = hours
+              ? `Too many dangerous prompts from this network. You can edit the idea now, but Start is blocked for about ${hours} hour${hours === 1 ? '' : 's'}.`
+              : 'Too many dangerous prompts from this network. You can edit the idea now, but Start is temporarily blocked.'
+            setSecurityAlertOpen(false)
+          }
         } catch {
           // keep status fallback
         }
@@ -7364,6 +7400,14 @@ function App() {
       }
 
       const nextDraftRun = (await response.json()) as DraftRun
+      const hardBlocked =
+        nextDraftRun.shieldScan.status === 'blocked' ||
+        nextDraftRun.shieldScan.maxSeverity === 'critical'
+      const alertFindings = filterFindingsByDisplaySensitivity(
+        nextDraftRun.shieldScan.findings,
+        settingsAdminSummary?.settings.shieldDisplaySensitivity ??
+          'medium_and_up',
+      )
       setDraftRun(nextDraftRun)
       setShieldOverride(null)
       setShieldOverrideReason('')
@@ -7373,11 +7417,16 @@ function App() {
       setFalsePositiveState('idle')
       setFalsePositiveError(null)
       setReportedFalsePositiveFindingIds([])
-      setReviewDraft({
-        triage: nextDraftRun.triage,
-        selectedAgents: nextDraftRun.selectedAgents,
-        developmentPromptTargetTool: 'cursor',
-      })
+      setSecurityAlertOpen(hardBlocked || alertFindings.length > 0)
+      setReviewDraft(
+        hardBlocked
+          ? null
+          : {
+              triage: nextDraftRun.triage,
+              selectedAgents: nextDraftRun.selectedAgents,
+              developmentPromptTargetTool: 'cursor',
+            },
+      )
       setPipelineResult(null)
       localStorage.removeItem(pipelineResultStorageKey)
       setStreamEvents([])
@@ -7391,12 +7440,14 @@ function App() {
       setIdeaExplainError(null)
       setSubmitState('success')
       setUtilityPanel(null)
-      queueMicrotask(() => {
-        document.getElementById('session-pane')?.scrollIntoView({
-          behavior: 'smooth',
-          block: 'nearest',
+      if (!hardBlocked) {
+        queueMicrotask(() => {
+          document.getElementById('session-pane')?.scrollIntoView({
+            behavior: 'smooth',
+            block: 'nearest',
+          })
         })
-      })
+      }
     } catch (error) {
       setSubmitState('error')
       setSubmitError(
@@ -7702,6 +7753,69 @@ function App() {
     }
   }
 
+  async function handleGenerateUiPrompt() {
+    if (!pipelineResult || !approvedIdea) {
+      return
+    }
+
+    if (
+      pipelineResult.status !== 'idea_approved' &&
+      pipelineResult.status !== 'completed'
+    ) {
+      return
+    }
+
+    const payload = buildArtifactGenerationPayload(pipelineResult)
+    if (!payload) {
+      return
+    }
+
+    setArtifactBuildState('ui_prompt')
+    setArtifactBuildError(null)
+    setPipelineState('running')
+    setPipelineError(null)
+
+    try {
+      const response = await fetch(`${apiBaseUrl}/runs/generate-ui-prompt/stream`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          ...workspaceAuthHeaders,
+        },
+        body: JSON.stringify(payload),
+      })
+
+      if (!response.ok) {
+        throw new Error(`API returned ${response.status}`)
+      }
+
+      let completedResult: MockPipelineResult | null = null
+      await readSseStream(response, (event) => {
+        handlePipelineStreamEvent(event)
+        if (event.type === 'completed') {
+          completedResult = event.result
+        }
+      })
+      setArtifactBuildState('idle')
+      setActiveArtifactType('ui_prompt')
+      const markdown = completedResult?.artifacts.find(
+        (item) => item.artifact.artifactType === 'ui_prompt',
+      )?.artifact.content.markdownBody
+      if (typeof markdown === 'string') {
+        downloadTextFile('warroom-ui-prompt.md', markdown)
+      }
+    } catch (error) {
+      setArtifactBuildState('error')
+      setPipelineState('error')
+      const message =
+        error instanceof Error
+          ? error.message
+          : 'Failed to generate UI prompt.'
+      setArtifactBuildError(message)
+      setPipelineError(message)
+    }
+  }
+
   async function handleGenerateTodoList() {
     if (!pipelineResult || !approvedIdea) {
       return
@@ -7782,6 +7896,20 @@ function App() {
       return
     }
     downloadTextFile('warroom-master-prompt.md', markdown)
+  }
+
+  function handleDownloadUiPrompt() {
+    const artifact = pipelineResult?.artifacts.find(
+      (item) => item.artifact.artifactType === 'ui_prompt',
+    )
+    const markdown =
+      typeof artifact?.artifact.content.markdownBody === 'string'
+        ? artifact.artifact.content.markdownBody
+        : null
+    if (!markdown) {
+      return
+    }
+    downloadTextFile('warroom-ui-prompt.md', markdown)
   }
 
   function handleDownloadTodoList() {
@@ -30489,6 +30617,9 @@ function App() {
   const requiresCriticalShieldOverride =
     draftRun?.shieldScan.status === 'blocked' ||
     draftRun?.shieldScan.maxSeverity === 'critical'
+  const securityAlertFindings = requiresCriticalShieldOverride
+    ? (draftRun?.shieldScan.findings ?? [])
+    : visibleShieldFindings
   const selectedArtifact =
     (pipelineResult?.artifacts ?? streamedArtifacts).find(
       (artifact) => artifact.metadata.artifactType === activeArtifactType,
@@ -30499,14 +30630,15 @@ function App() {
     (event) => event.type === 'workflow_status',
   )
   const displayedSteps: PipelineStep[] =
-    pipelineResult?.steps ??
-    (workflowStatusEvents.length > 0
-      ? workflowStatusEvents.map((event) => ({
-          stepId: event.workflowId,
-          label: `Temporal workflow (${event.taskQueue})`,
-          status: mapTemporalStatusToStepStatus(event.status),
-        }))
-      : statusEvents)
+    (pipelineResult?.steps ??
+      (workflowStatusEvents.length > 0
+        ? workflowStatusEvents.map((event) => ({
+            stepId: event.workflowId,
+            label: `Temporal workflow (${event.taskQueue})`,
+            status: mapTemporalStatusToStepStatus(event.status),
+          }))
+        : statusEvents)
+    ).filter((step) => step.stepId !== 'shield_scan')
   const liveStepLabel =
     [...statusEvents]
       .reverse()
@@ -30733,14 +30865,8 @@ function App() {
                 {submitState === 'submitting' ? 'Starting…' : 'Start'}
               </button>
               <div className="idea-status-row">
-                <span className="shield-pill">
-                  Shield:{' '}
-                  {draftRun
-                    ? `${draftRun.shieldScan.status} (${draftRun.shieldScan.findings.length})`
-                    : 'quiet until risk appears'}
-                </span>
                 {pipelineResult?.status === 'awaiting_idea_approval' ? (
-                  <span className="shield-pill">
+                  <span className="idea-status-pill">
                     Waiting for full idea approval on the right →
                   </span>
                 ) : null}
@@ -30772,6 +30898,17 @@ function App() {
               </button>
               <button
                 type="button"
+                className="start-button"
+                data-testid="generate-ui-prompt-button"
+                disabled={artifactBuildState !== 'idle' || pipelineState === 'running'}
+                onClick={() => void handleGenerateUiPrompt()}
+              >
+                {artifactBuildState === 'ui_prompt'
+                  ? 'Creating UI prompt…'
+                  : 'Створити промпт для UI'}
+              </button>
+              <button
+                type="button"
                 className="secondary-button"
                 data-testid="generate-todo-button"
                 disabled={
@@ -30796,7 +30933,19 @@ function App() {
                   data-testid="download-prompt-button"
                   onClick={handleDownloadMasterPrompt}
                 >
-                  Download prompt (.md)
+                  Download code prompt (.md)
+                </button>
+              ) : null}
+              {pipelineResult?.artifacts.some(
+                (artifact) => artifact.artifact.artifactType === 'ui_prompt',
+              ) ? (
+                <button
+                  type="button"
+                  className="secondary-button"
+                  data-testid="download-ui-prompt-button"
+                  onClick={handleDownloadUiPrompt}
+                >
+                  Download UI prompt (.md)
                 </button>
               ) : null}
               {pipelineResult?.artifacts.some(
@@ -30834,208 +30983,13 @@ function App() {
           headingId="human-review-heading"
           eyebrow="Human Review"
           title="Approve the plan before execution."
-          description="Draft state is autosaved locally. Review Shield context, triage, selected agents, and estimated run cost before execution."
+          description="Draft state is autosaved locally. Review triage, selected agents, and estimated run cost before execution."
           defaultOpen
         >
           <div className="review-grid">
             <div className="review-card">
-              <h3 className="review-card-title">Input with Shield context</h3>
-              <div
-                className={`shield-warning-card shield-warning-card--${draftRun.shieldScan.status}`}
-                role={
-                  draftRun.shieldScan.status === 'blocked' ? 'alert' : 'status'
-                }
-              >
-                <strong>
-                  Shield {draftRun.shieldScan.status}:{' '}
-                  {getSeverityLabel(draftRun.shieldScan.maxSeverity)}
-                </strong>
-                <p>
-                  {visibleShieldFindings.length > 0
-                    ? `${visibleShieldFindings.length} visible finding(s) for current Shield display sensitivity (${settingsAdminSummary?.settings.shieldDisplaySensitivity ?? 'medium_and_up'}).`
-                    : draftRun.shieldScan.findings.length > 0
-                      ? 'Findings exist but are hidden by Shield display sensitivity.'
-                      : 'No meaningful findings. Shield stays quiet and the run can proceed.'}
-                </p>
-              </div>
-              <p className="review-idea">
-                {getHighlightedIdea(
-                  draftRun.idea.rawIdea,
-                  visibleShieldFindings,
-                  setActiveFindingId,
-                )}
-              </p>
-              {visibleShieldFindings.length > 0 ? (
-                <>
-                  <div
-                    className="finding-tabs"
-                    role="tablist"
-                    aria-label="Shield findings"
-                  >
-                    {visibleShieldFindings.map((finding) => {
-                      const selected =
-                        finding.findingId === activeFinding?.findingId
-                      return (
-                        <button
-                          className={
-                            selected
-                              ? 'finding-tab finding-tab--active'
-                              : 'finding-tab'
-                          }
-                          key={finding.findingId}
-                          type="button"
-                          role="tab"
-                          id={`finding-tab-${finding.findingId}`}
-                          aria-selected={selected}
-                          aria-controls={`finding-panel-${finding.findingId}`}
-                          tabIndex={selected ? 0 : -1}
-                          onClick={() => setActiveFindingId(finding.findingId)}
-                          onKeyDown={(event) => {
-                            const findings = visibleShieldFindings
-                            const index = findings.findIndex(
-                              (item) => item.findingId === finding.findingId,
-                            )
-                            if (event.key === 'ArrowRight') {
-                              event.preventDefault()
-                              const next =
-                                findings[(index + 1) % findings.length]
-                              setActiveFindingId(next.findingId)
-                              queueMicrotask(() =>
-                                document
-                                  .getElementById(
-                                    `finding-tab-${next.findingId}`,
-                                  )
-                                  ?.focus(),
-                              )
-                            }
-                            if (event.key === 'ArrowLeft') {
-                              event.preventDefault()
-                              const prev =
-                                findings[
-                                  (index - 1 + findings.length) % findings.length
-                                ]
-                              setActiveFindingId(prev.findingId)
-                              queueMicrotask(() =>
-                                document
-                                  .getElementById(
-                                    `finding-tab-${prev.findingId}`,
-                                  )
-                                  ?.focus(),
-                              )
-                            }
-                          }}
-                        >
-                          {finding.category}
-                        </button>
-                      )
-                    })}
-                  </div>
-                  {activeFinding ? (
-                    <div
-                      className="finding-detail"
-                      role="tabpanel"
-                      id={`finding-panel-${activeFinding.findingId}`}
-                      aria-labelledby={`finding-tab-${activeFinding.findingId}`}
-                      tabIndex={0}
-                    >
-                      <strong>
-                        {activeFinding.category} · {activeFinding.severity}
-                      </strong>
-                      <p>{activeFinding.explanation}</p>
-                      <small>
-                        Recommended action: {activeFinding.recommendedAction}
-                      </small>
-                      {activeFinding.severity === 'critical' ? (
-                        <p className="runtime-note">
-                          Critical findings stay on the override path and cannot
-                          be marked as false positives.
-                        </p>
-                      ) : reportedFalsePositiveFindingIds.includes(
-                          activeFinding.findingId,
-                        ) ? (
-                        <p className="clear-copy">
-                          False positive reported for this finding. It does not
-                          change scan status or unlock critical runs.
-                        </p>
-                      ) : (
-                        <div className="finding-detail">
-                          <label>
-                            Optional note
-                            <textarea
-                              rows={2}
-                              value={falsePositiveNote}
-                              onChange={(event) =>
-                                setFalsePositiveNote(event.target.value)
-                              }
-                              placeholder="Why this finding looks like a false positive."
-                            />
-                          </label>
-                          <button
-                            className="secondary-button"
-                            type="button"
-                            disabled={falsePositiveState === 'submitting'}
-                            onClick={handleMarkFindingAsFalsePositive}
-                          >
-                            {falsePositiveState === 'submitting'
-                              ? 'Reporting...'
-                              : 'Mark as false positive'}
-                          </button>
-                          {falsePositiveError ? (
-                            <p className="form-error">{falsePositiveError}</p>
-                          ) : null}
-                        </div>
-                      )}
-                    </div>
-                  ) : null}
-                </>
-              ) : (
-                <p className="clear-copy">No meaningful Shield findings.</p>
-              )}
-              {requiresCriticalShieldOverride ? (
-                <div className="finding-detail">
-                  <strong>Critical Shield override required</strong>
-                  <p>
-                    Owner or admin must record who/why before this run can
-                    execute. The override is audited.
-                  </p>
-                  {shieldOverride ? (
-                    <p className="clear-copy">
-                      Override recorded by {shieldOverride.actorUserId}:{' '}
-                      {shieldOverride.reason}
-                    </p>
-                  ) : (
-                    <>
-                      <label>
-                        Override reason
-                        <textarea
-                          rows={3}
-                          value={shieldOverrideReason}
-                          onChange={(event) =>
-                            setShieldOverrideReason(event.target.value)
-                          }
-                          placeholder="Explain why this critical finding is accepted for execution."
-                        />
-                      </label>
-                      <button
-                        className="secondary-button"
-                        type="button"
-                        disabled={
-                          shieldOverrideState === 'submitting' ||
-                          shieldOverrideReason.trim().length < 8
-                        }
-                        onClick={handleRecordShieldOverride}
-                      >
-                        {shieldOverrideState === 'submitting'
-                          ? 'Recording override...'
-                          : 'Record Shield override'}
-                      </button>
-                      {shieldOverrideError ? (
-                        <p className="form-error">{shieldOverrideError}</p>
-                      ) : null}
-                    </>
-                  )}
-                </div>
-              ) : null}
+              <h3 className="review-card-title">Your idea</h3>
+              <p className="review-idea">{draftRun.idea.rawIdea}</p>
             </div>
 
             <div className="review-card">
@@ -31193,8 +31147,8 @@ function App() {
               </p>
             ) : requiresCriticalShieldOverride && !shieldOverride ? (
               <p id="execute-gate-hint" className="form-error" role="status">
-                Record a Shield override with a reason before this critical run
-                can execute.
+                This prompt is blocked due to a critical security risk. Edit the
+                idea and start again.
               </p>
             ) : null}
             <button
@@ -31755,7 +31709,6 @@ function App() {
                     <div className="metadata-row">
                       <span>{selectedArtifact.metadata.validationStatus}</span>
                       <span>{selectedArtifact.metadata.modelProvider}</span>
-                      <span>{selectedArtifact.metadata.shieldStatus} shield</span>
                       <span>
                         {selectedArtifact.metadata.tokenUsage.inputTokens +
                           selectedArtifact.metadata.tokenUsage.outputTokens}{' '}
@@ -31787,14 +31740,21 @@ function App() {
                     >
                       Export Markdown
                     </button>
-                    {selectedArtifact.metadata.artifactType ===
-                      'master_prompt' &&
+                    {(selectedArtifact.metadata.artifactType ===
+                      'master_prompt' ||
+                      selectedArtifact.metadata.artifactType ===
+                        'ui_prompt') &&
                     typeof selectedArtifact.artifact.content.markdownBody ===
                       'string' ? (
                       <button
                         className="secondary-button"
                         type="button"
-                        data-testid="copy-master-prompt"
+                        data-testid={
+                          selectedArtifact.metadata.artifactType ===
+                          'ui_prompt'
+                            ? 'copy-ui-prompt'
+                            : 'copy-master-prompt'
+                        }
                         onClick={() => {
                           void navigator.clipboard.writeText(
                             String(
@@ -31803,7 +31763,9 @@ function App() {
                           )
                         }}
                       >
-                        Copy master prompt
+                        {selectedArtifact.metadata.artifactType === 'ui_prompt'
+                          ? 'Copy UI prompt'
+                          : 'Copy master prompt'}
                       </button>
                     ) : null}
                   </div>
@@ -34982,7 +34944,7 @@ function App() {
         className="grid-section-panel"
         eyebrow="Council model"
         title="Parallel experts, no endless debate."
-        description="Specialists run in isolation. Shield stays quiet until it matters."
+        description="Specialists run in isolation, then the moderator synthesizes one clear brief."
         defaultOpen={false}
       >
         <div className="grid-section collapsible-grid">
@@ -34998,25 +34960,101 @@ function App() {
               ))}
             </div>
           </div>
-
-          <div className="panel shield-panel nested-panel">
-            <p className="eyebrow">Shield layer</p>
-            <h2>Security stays quiet until it matters.</h2>
-            <p>
-              Shield scans user input, agent output, moderator synthesis, and
-              final artifacts. Findings are shown as compact warnings with exact
-              text highlights, while low-risk checks stay in the background.
-            </p>
-            <div className="finding-preview">
-              <span>Example finding</span>
-              <mark>ignore previous instructions</mark>
-              <p>Prompt injection pattern detected. Require confirmation.</p>
-            </div>
-          </div>
         </div>
       </CollapsiblePanel>
       </div>
       </div>
+
+      {securityAlertOpen &&
+      draftRun &&
+      (securityAlertFindings.length > 0 || requiresCriticalShieldOverride) ? (
+        <div className="security-alert-layer" role="presentation">
+          <button
+            type="button"
+            className="security-alert-layer__backdrop"
+            aria-label="Close security alert"
+            disabled={Boolean(requiresCriticalShieldOverride && !shieldOverride)}
+            onClick={() => {
+              if (requiresCriticalShieldOverride && !shieldOverride) {
+                return
+              }
+              setSecurityAlertOpen(false)
+            }}
+          />
+          <div
+            className="security-alert-dialog"
+            role="alertdialog"
+            aria-modal="true"
+            aria-labelledby="security-alert-title"
+            data-testid="security-alert-dialog"
+          >
+            <h2 id="security-alert-title">
+              {requiresCriticalShieldOverride && !shieldOverride
+                ? 'This prompt cannot be processed'
+                : 'Security risk detected'}
+            </h2>
+            <p>
+              {requiresCriticalShieldOverride && !shieldOverride
+                ? 'A clear security risk was found in the idea. LLM processing is blocked until you edit the prompt and start again.'
+                : 'Review the findings below before continuing with the council.'}
+            </p>
+            <p className="security-alert-dialog__idea">
+              {getHighlightedIdea(
+                draftRun.idea.rawIdea,
+                securityAlertFindings,
+                setActiveFindingId,
+              )}
+            </p>
+            <ul className="security-alert-findings">
+              {securityAlertFindings.map((finding) => (
+                <li key={finding.findingId}>
+                  <strong>
+                    {finding.category} · {getSeverityLabel(finding.severity)}
+                  </strong>
+                  <p>{finding.explanation}</p>
+                </li>
+              ))}
+            </ul>
+            <div className="security-alert-dialog__actions">
+              {requiresCriticalShieldOverride && !shieldOverride ? (
+                <button
+                  type="button"
+                  className="start-button"
+                  data-testid="security-alert-edit-idea"
+                  onClick={() => {
+                    setSecurityAlertOpen(false)
+                    setDraftRun(null)
+                    setReviewDraft(null)
+                    setPipelineResult(null)
+                    localStorage.removeItem(pipelineResultStorageKey)
+                    setSubmitState('idle')
+                    setSubmitError(null)
+                    // Keep rawIdea / form fields so the user can edit and resubmit.
+                    queueMicrotask(() => {
+                      document.getElementById('rawIdea')?.focus()
+                      document.getElementById('idea')?.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start',
+                      })
+                    })
+                  }}
+                >
+                  Edit idea
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className="start-button"
+                  data-testid="security-alert-continue"
+                  onClick={() => setSecurityAlertOpen(false)}
+                >
+                  Continue
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      ) : null}
 
       <footer className="app-footer">
         <div className="app-footer__inner">

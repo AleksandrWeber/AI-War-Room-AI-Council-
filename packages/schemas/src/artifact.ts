@@ -47,6 +47,13 @@ export const masterPromptSchema = z.object({
   markdownBody: nonEmptyStringSchema.max(40_000),
 })
 
+/** Phase B: paste-ready UI/UX design prompt (.md style). */
+export const uiPromptSchema = z.object({
+  title: nonEmptyStringSchema.max(500),
+  targetTool: developmentPromptTargetToolSchema.default('cursor'),
+  markdownBody: nonEmptyStringSchema.max(40_000),
+})
+
 export const todoListItemSchema = z.object({
   step: z.number().int().positive().max(200),
   title: nonEmptyStringSchema.max(500),
@@ -90,6 +97,10 @@ export const artifactContentSchema = z.discriminatedUnion('artifactType', [
     content: masterPromptSchema,
   }),
   z.object({
+    artifactType: z.literal('ui_prompt'),
+    content: uiPromptSchema,
+  }),
+  z.object({
     artifactType: z.literal('todo_list'),
     content: todoListSchema,
   }),
@@ -120,6 +131,7 @@ export type IdeaBriefTool = z.infer<typeof ideaBriefToolSchema>
 export type IdeaBriefAiChoice = z.infer<typeof ideaBriefAiChoiceSchema>
 export type IdeaBrief = z.infer<typeof ideaBriefSchema>
 export type MasterPrompt = z.infer<typeof masterPromptSchema>
+export type UiPrompt = z.infer<typeof uiPromptSchema>
 export type TodoListItem = z.infer<typeof todoListItemSchema>
 export type TodoList = z.infer<typeof todoListSchema>
 export type ArtifactMetadata = z.infer<typeof artifactMetadataSchema>

@@ -27,12 +27,14 @@ export const agentRoleSchema = z.enum([
   'software_architect',
   'market_researcher',
   'mobile_ux_expert',
+  'ui_ux_expert',
 ])
 export type AgentRole = z.infer<typeof agentRoleSchema>
 
 export const artifactTypeSchema = z.enum([
   'idea_brief',
   'master_prompt',
+  'ui_prompt',
   'todo_list',
 ])
 export type ArtifactType = z.infer<typeof artifactTypeSchema>

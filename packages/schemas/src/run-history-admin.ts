@@ -16,6 +16,7 @@ export const runHistoryAdminStatsSchema = z.object({
   uniqueRunCount: z.number().int().nonnegative(),
   ideaBriefCount: z.number().int().nonnegative(),
   masterPromptCount: z.number().int().nonnegative(),
+  uiPromptCount: z.number().int().nonnegative(),
   todoListCount: z.number().int().nonnegative(),
 })
 export type RunHistoryAdminStats = z.infer<typeof runHistoryAdminStatsSchema>

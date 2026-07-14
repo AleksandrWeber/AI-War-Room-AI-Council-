@@ -304,6 +304,7 @@ describe('run history rollout integration', () => {
       supportedArtifactTypes: [
         'idea_brief',
         'master_prompt',
+        'ui_prompt',
         'todo_list',
       ],
     })

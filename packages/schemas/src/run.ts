@@ -37,7 +37,7 @@ export const draftRunSchema = z.object({
   idea: ideaSubmissionSchema,
   shieldScan: shieldScanResultSchema,
   triage: triageResultSchema,
-  selectedAgents: z.array(agentRoleSchema).min(3).max(7),
+  selectedAgents: z.array(agentRoleSchema).min(3).max(8),
   estimatedDurationSeconds: z.number().int().positive().max(900),
   estimatedMaxCostUsd: z.number().nonnegative().max(100),
   createdAt: utcDateStringSchema,
@@ -55,7 +55,7 @@ export const runStatusResponseSchema = z.object({
 export const mockPipelineRequestSchema = z.object({
   draftRun: draftRunSchema,
   approvedTriage: triageResultSchema,
-  selectedAgents: z.array(agentRoleSchema).min(3).max(7),
+  selectedAgents: z.array(agentRoleSchema).min(3).max(8),
   developmentPromptTargetTool: developmentPromptTargetToolSchema.default('cursor'),
 })
 
@@ -66,14 +66,14 @@ export const mockPipelineResultSchema = z.object({
   steps: z.array(runStepStatusSchema),
   agentOutputs: z.array(agentExecutionResultSchema).min(1),
   moderatorSynthesis: moderatorSynthesisSchema,
-  artifacts: z.array(artifactSchema).min(1).max(3),
+  artifacts: z.array(artifactSchema).min(1).max(4),
   completedAt: utcDateStringSchema,
 })
 
 export const approveIdeaRequestSchema = z.object({
   draftRun: draftRunSchema,
   approvedTriage: triageResultSchema,
-  selectedAgents: z.array(agentRoleSchema).min(3).max(7),
+  selectedAgents: z.array(agentRoleSchema).min(3).max(8),
   previousResult: mockPipelineResultSchema,
   approvedIdeaBrief: ideaBriefSchema,
   developmentPromptTargetTool: developmentPromptTargetToolSchema.default('cursor'),
@@ -81,6 +81,9 @@ export const approveIdeaRequestSchema = z.object({
 
 /** Generate master prompt after the idea is approved. */
 export const generateMasterPromptRequestSchema = approveIdeaRequestSchema
+
+/** Generate UI prompt after the idea is approved. */
+export const generateUiPromptRequestSchema = approveIdeaRequestSchema
 
 /** Generate todo list after master prompt exists (todo is derived from the prompt). */
 export const generateTodoListRequestSchema = approveIdeaRequestSchema
@@ -108,6 +111,7 @@ export type ApproveIdeaRequest = z.infer<typeof approveIdeaRequestSchema>
 export type GenerateMasterPromptRequest = z.infer<
   typeof generateMasterPromptRequestSchema
 >
+export type GenerateUiPromptRequest = z.infer<typeof generateUiPromptRequestSchema>
 export type GenerateTodoListRequest = z.infer<typeof generateTodoListRequestSchema>
 export type ExplainIdeaRequest = z.infer<typeof explainIdeaRequestSchema>
 export type ExplainIdeaResponse = z.infer<typeof explainIdeaResponseSchema>

@@ -27,7 +27,7 @@ export const triageResultSchema = z.object({
   marketConfidence: confidenceSchema,
   securitySensitivity: complexitySchema,
   recommendedRunMode: runModeSchema,
-  recommendedAgents: z.array(agentRoleSchema).min(3).max(7),
+  recommendedAgents: z.array(agentRoleSchema).min(3).max(8),
   estimatedDurationSeconds: z.number().int().positive().max(900),
   estimatedMaxCostUsd: z.number().nonnegative().max(100),
   reasoningSummary: nonEmptyStringSchema.max(1_000),

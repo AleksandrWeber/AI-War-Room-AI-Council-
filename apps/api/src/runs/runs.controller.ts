@@ -23,6 +23,7 @@ import type { PipelineStreamEvent } from './pipeline-stream-event.js'
 import { isTerminalPipelineStreamEvent } from './pipeline-stream-event.js'
 import { RunsService } from './runs.service.js'
 import { RunFeedbackService } from './run-feedback.service.js'
+import { extractClientIp } from '../shield/client-ip.js'
 
 @Controller('runs')
 export class RunsController {
@@ -128,8 +129,13 @@ export class RunsController {
 
   @Post('draft')
   @UseGuards(WorkspaceAccessGuard)
-  createDraftRun(@Body() body: unknown) {
-    return this.runsService.createDraftRun(body)
+  createDraftRun(
+    @Body() body: unknown,
+    @Req() request: AuthenticatedRequest,
+  ) {
+    return this.runsService.createDraftRun(body, {
+      clientIp: extractClientIp(request),
+    })
   }
 
   @Post('mock-pipeline')
@@ -382,6 +388,41 @@ export class RunsController {
 
     try {
       await this.runsService.generateMasterPrompt(
+        body,
+        request.authContext!,
+        send,
+      )
+    } catch (error) {
+      send({
+        eventId: `event_${randomUUID()}`,
+        type: 'error',
+        message: this.formatPipelineError(error),
+        timestamp: new Date().toISOString(),
+      })
+    } finally {
+      reply.raw.end()
+    }
+  }
+
+  @Post('generate-ui-prompt/stream')
+  @UseGuards(WorkspaceAccessGuard)
+  async generateUiPromptStream(
+    @Body() body: unknown,
+    @Req() request: AuthenticatedRequest,
+    @Res() reply: FastifyReply,
+  ) {
+    reply.raw.writeHead(200, this.buildSseHeaders(request))
+
+    const send = async (event: PipelineStreamEvent) => {
+      if (reply.raw.destroyed) {
+        return
+      }
+
+      this.writeStreamEvent(reply, event)
+    }
+
+    try {
+      await this.runsService.generateUiPrompt(
         body,
         request.authContext!,
         send,
