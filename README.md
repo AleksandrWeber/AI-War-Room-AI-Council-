@@ -1,17 +1,56 @@
-# AI War Room / AI Council
+# AI War Room / AI Council (WarRoom)
 
-Structured AI planning engine that turns a raw idea into reviewed, build-ready artifacts.
+**WarRoom** is a structured AI planning engine — not a chat app. A founder pastes a rough product idea; WarRoom runs a council of specialist agents, then produces **build-ready artifacts** you can download and paste into Cursor (or similar): an expanded idea brief, a code-writing prompt, a UI/UX design prompt, and an implementation todo list.
 
-## Current MVP Flow
+## What it does
+
+1. **Takes a raw idea** (audience, goals, constraints optional).
+2. **Scans for security risk** with a built-in Shield layer before any council LLM work when the threat is critical.
+3. **Triages** the idea and selects specialist agents (Product Manager, Critic, Architect, UI/UX Expert, Security Expert, …).
+4. **Runs agents in parallel** through an LLM gateway + model router (one or more API providers — e.g. OpenRouter, Anthropic; agents are roles/prompts, not separate keys).
+5. **Moderator** synthesizes one coherent brief.
+6. **You approve** the full idea, then optionally generate:
+   - **Master prompt** — detailed `.md` for writing code  
+   - **UI prompt** — detailed `.md` for UI/UX design/implementation  
+   - **Todo list** — ordered build steps with acceptance checks  
+
+You discuss and refine the idea with the moderator in the session pane before locking it.
+
+## How it works
 
 ```text
 Idea submission
--> Shield input scan
--> Prompt-driven triage through LLM Gateway
--> Human Review Screen
--> Prompt-driven isolated agents through LLM Gateway
--> Prompt-driven Moderator synthesis through LLM Gateway
--> Prompt-driven Executive Summary, PRD, Development Prompt
+  → Shield (silent security scan; popup only if findings;
+            critical threats block LLM use; IP rate limits on abuse)
+  → Triage (agent mix + cost/duration estimate)
+  → Human review / Start council
+  → Parallel specialist agents (LLM Gateway + model router)
+  → Moderator synthesis
+  → Idea brief → discuss → Approve
+  → On demand: master prompt · UI prompt · todo list (.md downloads)
+```
+
+Stack overview:
+
+| Layer | Role |
+|-------|------|
+| `apps/web` | Vite + React UI (WarRoom shell, session, downloads) |
+| `apps/api` | NestJS + Fastify API, pipeline, Shield, usage/billing hooks |
+| `packages/schemas` | Shared Zod contracts |
+| PostgreSQL + Redis | Runs, artifacts, idempotency, short-lived abuse limits |
+| Temporal (optional) | Workflow runtime for longer council runs |
+| LLM providers | Anthropic, OpenAI, Gemini, OpenRouter, Cursor, mock |
+
+## Security
+
+- **Built-in Shield** — WarRoom embeds an AI security scan inspired by / aligned with [AI SECURITY GATEWAY (SHIELD)](https://github.com/AleksandrWeber/AI-SECURITY-GATEWAY-SHIELD-). It stays **quiet** in the product UI until risk appears, then shows findings in a separate alert. Clear critical threats **block** the prompt from reaching council LLMs; repeated critical submissions from the same IP are rate-limited (3 strikes → 2h ban, repeat → 24h).
+- **Code vulnerability review** — this repository was reviewed for security issues with [Scout](https://github.com/AleksandrWeber/scout) (AI-assisted AppSec scanner for JS/TS repos, PRs, and local workspaces).
+
+## Current MVP Flow (summary)
+
+```text
+Idea → Shield → Triage → Council agents → Moderator → Idea brief
+  → Approve → Master prompt / UI prompt / Todo (.md)
 ```
 
 ## Workspace Layout
